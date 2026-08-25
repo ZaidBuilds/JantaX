@@ -99,7 +99,6 @@ function mockRecords(code: string, module?: string): RecordsResponse {
   const records: RecordsResponse['records'] = {};
   const wantSchool = !module || module==='school';
   const wantInfra = !module || module==='infra';
-  const wantRera = !module || module==='rera' || module==='pds' || module==='hospital' || module==='grievance' || module==='contractor';
   if (wantSchool) records.school = [mkSchool(0), mkSchool(1)].slice(0, 2 + (h%1));
   if (wantInfra) records.infra = [mkInfra(0), mkInfra(1)];
   if (!module) {
