@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Env / secrets — NEVER commit real env files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local DB
+*.db
+*.sqlite
+*.sqlite3
+
+# Coverage / test output
+coverage/
+.playwright/
+test-results/
+
+# Legacy reference material (older duplicate projects, not part of JantaX app)
+reference/

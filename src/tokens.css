@@ -1,0 +1,17 @@
+/* JantaX Design Tokens — extracted from index.css :root */
+:root {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --border-color: #eef2f7;
+  --border-soft: #f1f5f9;
+  --color-primary: #0f2d59;
+  --color-primary-700: #1a4d8f;
+  --color-accent: #f97316;
+  --killer-line: linear-gradient(90deg, #0f2d59 0%, #2563eb 50%, #f97316 100%);
+  --glass-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  --premium-shadow: 0 10px 25px -5px rgba(15,23,42,0.08);
+  --focus-ring: 0 0 0 3px rgba(37,99,235,0.16);
+  --radius-control: 8px;
+  --radius-surface: 12px;
+}

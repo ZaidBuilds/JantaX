@@ -1,0 +1,526 @@
+// JantaX — Postgres backend schema (Prisma)
+// Covers: location (PIN) hierarchy, the six ingestion sources
+// (UDISE+ schools, RERA, govt projects, hospitals, welfare/PDS, CPGRAMS grievances),
+// contractor ledger, citizen evidence + moderation, and admin/moderator auth.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Region {
+  NORTH
+  SOUTH
+  EAST
+  WEST
+  CENTRAL
+}
+
+enum UserRole {
+  CITIZEN
+  MODERATOR
+  ADMIN
+}
+
+enum ProjectStatus {
+  PLANNED
+  ONGOING
+  DELAYED
+  COMPLETED
+  CANCELLED
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FLAGGED
+}
+
+enum EvidenceType {
+  PHOTO
+  VIDEO
+  DOCUMENT
+  AUDIO
+}
+
+/// Location spine — every record hangs off a PIN code.
+model Pincode {
+  code       String   @id
+  state      String
+  district   String
+  region     Region
+  lat        Float?
+  lng        Float?
+  population Int?
+  areaType   String?
+
+  schools         School[]
+  infraProjects   InfraProject[]
+  reraProjects    ReraProject[]
+  hospitals       Hospital[]
+  pdsShops        PdsShop[]
+  grievances      Grievance[]
+  citizenReports  CitizenReport[]
+  follows         Follow[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([state, district])
+}
+
+/// UDISE+ school scorecard + parent ground-truth check-ins.
+model School {
+  id               String  @id @default(cuid())
+  pincodeCode      String
+  pincode          Pincode @relation(fields: [pincodeCode], references: [code])
+  udiseCode        String  @unique
+  nameEnglish      String
+  nameHindi        String
+  level            String // Primary / Upper Primary / Secondary
+  managementType   String // Govt / Govt-Aided / Private
+  studentsEnrolled Int
+  teachersWorking  Int
+  teachersSanctioned Int
+  groundTruthScore Int
+  officialScore    Int?
+  hasToilet        Boolean?
+  hasElectricity   Boolean?
+  hasDrinkingWater Boolean?
+  lastCheckIn      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([pincodeCode])
+}
+
+/// Government / infrastructure projects (PMGSY, NHAI, state PWD, etc).
+model InfraProject {
+  id                 String        @id @default(cuid())
+  pincodeCode        String
+  pincode            Pincode       @relation(fields: [pincodeCode], references: [code])
+  titleEnglish       String
+  titleHindi         String
+  department         String
+  budget             Decimal       @db.Decimal(14, 2)
+  startDate          DateTime
+  expectedCompletion DateTime
+  status             ProjectStatus
+  claimCompletionPct Int // official claim
+  groundTruthScore   Int? // citizen-verified
+  responsibleOfficer String
+  implementingAgency String
+  evidenceCount      Int           @default(0)
+  sourceUrl          String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([pincodeCode])
+  @@index([status])
+}
+
+/// RERA project registry (state RERA portals).
+model ReraProject {
+  id                String        @id @default(cuid())
+  pincodeCode       String
+  pincode           Pincode       @relation(fields: [pincodeCode], references: [code])
+  name              String
+  reraNumber        String        @unique
+  promoter          String
+  configuration     String
+  plannedPossession DateTime
+  actualPossession  DateTime?
+  status            ProjectStatus
+  delayMonths       Int           @default(0)
+  complaints        Int           @default(0)
+  refundsPending    Int           @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([pincodeCode])
+}
+
+/// Healthcare / PHC / CHC facility registry (HMIS, NHM).
+model Hospital {
+  id              String  @id @default(cuid())
+  pincodeCode     String
+  pincode         Pincode @relation(fields: [pincodeCode], references: [code])
+  name            String
+  type            String // PHC / CHC / District Hospital
+  isOpen          Boolean @default(true)
+  doctorPresent   Boolean @default(false)
+  bedsTotal       Int     @default(0)
+  bedsOccupied    Int     @default(0)
+  medicinesAvailable Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([pincodeCode])
+}
+
+/// PDS / ration shop audit (NFSA, state ePOS).
+model PdsShop {
+  id                String  @id @default(cuid())
+  pincodeCode       String
+  pincode           Pincode @relation(fields: [pincodeCode], references: [code])
+  shopName          String
+  dealerName        String
+  isOpen            Boolean @default(true)
+  quotaDistributedPct Int   @default(0)
+  qualityOk         Boolean @default(true)
+  beneficiaries     Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([pincodeCode])
+}
+
+/// CPGRAMS grievance backlog (DARPG monthly reports).
+model Grievance {
+  id          String   @id @default(cuid())
+  pincodeCode String
+  pincode     Pincode  @relation(fields: [pincodeCode], references: [code])
+  ministry    String
+  state       String
+  category    String
+  status      String // Closed / Pending / Escalated
+  filedDate   DateTime
+  resolvedDate DateTime?
+  delayDays   Int      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([pincodeCode])
+  @@index([ministry])
+}
+
+/// Contractor / builder ledger (GeM, CPPP tender awards).
+model Contractor {
+  id              String @id @default(cuid())
+  name            String
+  registeredState String
+  verified        Boolean @default(false)
+  totalContracts  Int     @default(0)
+  completed       Int     @default(0)
+  ongoing         Int     @default(0)
+  delayed         Int     @default(0)
+  score           Int     @default(0)
+  contractorProjects ContractorProject[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([registeredState])
+}
+
+/// Privacy-safe citizen evidence (anonymous by default).
+model CitizenReport {
+  id          String           @id @default(cuid())
+  pincodeCode String
+  pincode     Pincode          @relation(fields: [pincodeCode], references: [code])
+  moduleId    String
+  title       String
+  description String
+  status      ModerationStatus @default(PENDING)
+  submittedBy String? // anonymized device/session token, never PII
+  reviewerId  String?
+  reviewer    User?            @relation(fields: [reviewerId], references: [id])
+  media       EvidenceMedia[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([pincodeCode])
+  @@index([status])
+}
+
+model EvidenceMedia {
+  id                 String           @id @default(cuid())
+  reportId           String
+  report             CitizenReport    @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  type               EvidenceType
+  url                String
+  caption            String?
+  verificationStatus ModerationStatus @default(PENDING)
+  createdAt          DateTime         @default(now())
+
+  @@index([reportId])
+}
+
+/// Admin / moderator authentication.
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  name         String?
+  role         UserRole   @default(CITIZEN)
+  reviews      CitizenReport[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+/// State CM Claims vs CAG (Andhbhakt State) — spec-m2
+model StateCmClaim {
+  id              String   @id @default(cuid())
+  stateCode       String   @db.VarChar(2)
+  category        String
+  claimTitleHindi String
+  claimTitleEn    String
+  claimSource     String
+  claimDetails    String   @db.Text
+  realityTitleHindi String
+  realityTitleEn    String
+  realityDetails    String   @db.Text
+  cagReportRef      String
+  realitySeverity   String
+  lastUpdated       DateTime @updatedAt
+  @@index([stateCode, category])
+}
+
+/// City Municipal Scorecard — spec-m10
+model MunicipalWard {
+  id                String   @id @default(cuid())
+  pincode           String   @db.VarChar(6)
+  wardNo            String
+  garbageClaimedSla String
+  waterClaimedSla   String
+  drainageClaimedSla String
+  citizenReviews    WardReview[]
+  @@index([pincode])
+}
+model WardReview {
+  id            String   @id @default(cuid())
+  wardId        String
+  serviceCategory String
+  actualRating  Int
+  feedbackText  String?
+  reportedAt    DateTime @default(now())
+  ward          MunicipalWard @relation(fields: [wardId], references: [id])
+  @@index([wardId])
+}
+model PincodeBudget {
+  id              String   @id @default(cuid())
+  pincode         String   @unique @db.VarChar(6)
+  financialYear   String
+  totalRevenueCr  Float
+  totalAllocatedCr Float
+  allocations     BudgetSectorAllocation[]
+}
+model BudgetSectorAllocation {
+  id              String   @id @default(cuid())
+  budgetId        String
+  sectorNameEn    String
+  sectorNameHi    String
+  allocatedCr     Float
+  utilizedCr      Float
+  stalledProjects Int      @default(0)
+  budget          PincodeBudget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  @@index([budgetId])
+}
+model RegionalAqiStation {
+  id              String   @id @default(cuid())
+  pincode         String   @db.VarChar(6)
+  stationName     String
+  aqiValue        Int
+  dominantPollutant String
+  lastUpdated     DateTime @updatedAt
+  pcbNotices      SpcbNotice[]
+  @@index([pincode])
+}
+model SpcbNotice {
+  id              String   @id @default(cuid())
+  stationId       String
+  industryName    String
+  noticeType      String
+  violationReason String   @db.Text
+  issueDate       String
+  station         RegionalAqiStation @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  @@index([stationId])
+}
+model TehsilOffice {
+  id                String   @id @default(cuid())
+  pincode           String   @db.VarChar(6)
+  tehsilName        String
+  district          String
+  promisedSlaDays   Int      @default(45)
+  mutationRecords   LandMutationRecord[]
+  @@index([pincode])
+}
+model LandMutationRecord {
+  id              String   @id @default(cuid())
+  tehsilId        String
+  surveyNumber    String
+  daysTaken       Int
+  status          String
+  appliedDate     String
+  tehsil          TehsilOffice @relation(fields: [tehsilId], references: [id], onDelete: Cascade)
+  @@index([tehsilId])
+}
+model DiscomFeeder {
+  id                  String   @id @default(cuid())
+  pincode             String   @db.VarChar(6)
+  feederName          String
+  substationName      String
+  promisedSupplyHours Int      @default(24)
+  outageLogs          FeederOutageLog[]
+  @@index([pincode])
+}
+model FeederOutageLog {
+  id              String   @id @default(cuid())
+  feederId        String
+  outageMinutes   Int
+  faultType       String
+  faultTypeHi     String
+  logDate         String
+  feeder          DiscomFeeder @relation(fields: [feederId], references: [id], onDelete: Cascade)
+  @@index([feederId])
+}
+model CandidateSpendRecord {
+  id                String   @id @default(cuid())
+  pincode           String   @db.VarChar(6)
+  candidateName     String
+  party             String
+  constituency      String
+  declaredSpend     Float
+  estimatedSpend    Float
+  sourceAffidavit   String
+  @@index([pincode])
+}
+model CpgramsMonthlyRecord {
+  id                String   @id @default(cuid())
+  recordType        String
+  rank              Int
+  name              String
+  nameHi            String
+  totalGrievances   Int
+  resolvedCount     Int
+  pendingCount      Int
+  avgDisposalDays   Int
+  backlogOver30Days Int
+  worstCategoryEn   String
+  worstCategoryHi   String
+  reportMonth       String
+  lastUpdated       DateTime @updatedAt
+  @@index([recordType, rank])
+}
+/// Contractor project ledger — spec-m3
+model ContractorProject {
+  id              String   @id @default(cuid())
+  contractorId    String
+  workOrderNo     String   @unique
+  workName        String
+  workNameHi      String
+  sanctionedLakhs Float
+  paymentReleased Float
+  status          String
+  delayMonths     Int      @default(0)
+  defectReports   Int      @default(0)
+  contractor      Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  @@index([contractorId])
+}
+
+/// Source governance — every dataset has a Source record (Phase 04)
+model Source {
+  sourceId              String   @id @default(cuid()) @map("source_id")
+  organization          String
+  department            String?
+  governmentLevel       String   @map("government_level")
+  sourceName            String   @map("source_name")
+  sourceUrl             String   @map("source_url")
+  apiUrl                String?  @map("api_url")
+  datasetUrl            String?  @map("dataset_url")
+  sourceType            String   @map("source_type")
+  license               String
+  termsUrl              String?  @map("terms_url")
+  attributionRequirement String  @map("attribution_requirement")
+  reusePermission       String   @map("reuse_permission")
+  dataSensitivity       String   @map("data_sensitivity")
+  updateFrequency       String   @map("update_frequency")
+  expectedRefreshInterval String @map("expected_refresh_interval")
+  lastChecked           DateTime @map("last_checked")
+  lastSuccessfulSync    DateTime? @map("last_successful_sync")
+  lastPublishedDate     String?  @map("last_published_date")
+  parserVersion         String   @map("parser_version")
+  status                String
+  owner                 String
+  notes                 String?  @db.Text
+  records               DataPoint[]
+  rawDocuments          RawDocument[]
+  @@index([sourceType, status])
+  @@index([organization, sourceName])
+}
+model RawDocument {
+  id          String   @id @default(cuid())
+  sourceId    String   @map("source_id")
+  source      Source   @relation(fields: [sourceId], references: [sourceId])
+  fetchedAt   DateTime @default(now()) @map("fetched_at")
+  url         String
+  contentType String   @map("content_type")
+  size        Int
+  hash        String
+  storagePath String?  @map("storage_path")
+  status      String   // fetched | failed
+  error       String?  @db.Text
+  parsed      ParsedDocument?
+  @@index([sourceId, fetchedAt])
+}
+model ParsedDocument {
+  id              String   @id @default(cuid())
+  rawDocumentId   String   @unique @map("raw_document_id")
+  rawDocument     RawDocument @relation(fields: [rawDocumentId], references: [id])
+  parsedAt        DateTime @default(now()) @map("parsed_at")
+  rowCount        Int      @map("row_count")
+  parsedJson      Json?    @map("parsed_json")
+  validation      ValidationResult?
+  @@index([parsedAt])
+}
+model ValidationResult {
+  id               String   @id @default(cuid())
+  parsedDocumentId String   @unique @map("parsed_document_id")
+  parsedDocument   ParsedDocument @relation(fields: [parsedDocumentId], references: [id])
+  isValid          Boolean  @map("is_valid")
+  errors           Json?
+  warnings         Json?
+  checkedAt        DateTime @default(now()) @map("checked_at")
+}
+model DataPoint {
+  id                String   @id @default(cuid())
+  sourceId          String   @map("source_id")
+  source            Source   @relation(fields: [sourceId], references: [sourceId])
+  entityType        String   @map("entity_type")
+  entityId          String   @map("entity_id")
+  field             String
+  value             String
+  observedAt        String?  @map("observed_at")
+  sourcePublishedAt String?  @map("source_published_at")
+  recalcAt          String   @map("recalc_at")
+  scoringVersion    String?  @map("scoring_version")
+  sampleSize        Int?     @map("sample_size")
+  reportingDays     Int?     @map("reporting_days")
+  agreementRate     Float?   @map("agreement_rate")
+  capturedAt        DateTime @default(now()) @map("captured_at")
+  @@index([sourceId, entityId])
+}
+
+/// Users (or anonymous devices) tracking a PIN for alerts.
+model Follow {
+  id           String   @id @default(cuid())
+  userId       String? // nullable for anonymous device tracking
+  pincodeCode  String
+  pincode      Pincode  @relation(fields: [pincodeCode], references: [code])
+  createdAt    DateTime @default(now())
+
+  @@unique([userId, pincodeCode])
+  @@index([pincodeCode])
+}

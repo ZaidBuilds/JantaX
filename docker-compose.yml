@@ -1,0 +1,43 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: jantax
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U postgres"]
+      interval: 5s
+      retries: 5
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/jantax?schema=public
+      JWT_SECRET: ${JWT_SECRET:-jantax-dev-secret-2026}
+      PORT: 4000
+      NODE_ENV: development
+    ports:
+      - "4000:4000"
+    command: npm run server:dev
+
+  web:
+    build: .
+    depends_on:
+      - api
+    environment:
+      VITE_API_URL: http://localhost:4000
+    ports:
+      - "4173:4173"
+    command: npm run preview -- --host 0.0.0.0 --port 4173
+
+volumes:
+  pgdata:
