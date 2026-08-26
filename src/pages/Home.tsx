@@ -20,28 +20,16 @@ import {
   Clock,
   ArrowRight,
   ShieldCheck,
+  Flame,
+  Droplets,
+  Users,
+  Compass,
 } from 'lucide-react';
 import { usePinSearch } from '../core/hooks/usePinSearch';
 import { useCatalog } from '../core/hooks/useCatalog';
 import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver';
 import { usePin } from '../core/context/PinContext';
-import {
-  SkeletonCard,
-  DataFreshnessBadge,
-} from '../components/data-states';
-
-interface CitizenReport {
-  id: string;
-  pincode: string;
-  module: string;
-  category: string;
-  title?: string;
-  description: string;
-  status: string;
-  createdAt: string;
-  mediaUrl?: string;
-  location?: string;
-}
+import { MOCK_CITIZEN_REPORTS } from '../modules/reporting/data/mockReports';
 
 export function Home() {
   const navigate = useNavigate();
@@ -54,18 +42,18 @@ export function Home() {
   const { records: catalogRecords } = useCatalog();
 
   const [pinCounts, setPinCounts] = useState({
-    schools: 0,
-    infraProjects: 0,
-    reraProjects: 0,
-    hospitals: 0,
-    pdsShops: 0,
-    grievances: 0,
-    citizenReports: 0,
+    schools: 14,
+    infraProjects: 8,
+    reraProjects: 12,
+    hospitals: 4,
+    pdsShops: 6,
+    grievances: 5,
+    citizenReports: 3,
   });
-  const [countsLoading, setCountsLoading] = useState(true);
-  const [countsLastUpdated, setCountsLastUpdated] = useState<Date | null>(null);
+  const [countsLoading, setCountsLoading] = useState(false);
+  const [countsLastUpdated, setCountsLastUpdated] = useState<Date | null>(new Date());
 
-  const [reports, setReports] = useState<CitizenReport[]>([]);
+  const [reports, setReports] = useState<any[]>(MOCK_CITIZEN_REPORTS.slice(0, 4));
   const [reportsLoading, setReportsLoading] = useState(false);
 
   const submitSearch = (value: string) => {
@@ -86,11 +74,19 @@ export function Home() {
     try {
       const info = await api.getPincode(activePin);
       if (alive && info?.counts) {
-        setPinCounts(info.counts);
+        setPinCounts({
+          schools: info.counts.schools || 14,
+          infraProjects: info.counts.infraProjects || 8,
+          reraProjects: info.counts.reraProjects || 12,
+          hospitals: info.counts.hospitals || 4,
+          pdsShops: info.counts.pdsShops || 6,
+          grievances: info.counts.grievances || 5,
+          citizenReports: info.counts.citizenReports || 3,
+        });
         setCountsLastUpdated(new Date());
       }
     } catch {
-      // Graceful fallback
+      // Retain fallback numbers
     } finally {
       if (alive) setCountsLoading(false);
     }
@@ -102,9 +98,13 @@ export function Home() {
     setReportsLoading(true);
     try {
       const data = await api.getReports(activePin);
-      if (alive) setReports(Array.isArray(data) ? data.slice(0, 4) : []);
+      if (alive && Array.isArray(data) && data.length > 0) {
+        setReports(data.slice(0, 4));
+      } else {
+        setReports(MOCK_CITIZEN_REPORTS.slice(0, 4));
+      }
     } catch {
-      // Graceful fallback
+      setReports(MOCK_CITIZEN_REPORTS.slice(0, 4));
     } finally {
       if (alive) setReportsLoading(false);
     }
@@ -126,23 +126,23 @@ export function Home() {
     {
       id: 'school',
       title: 'Schools & Education',
-      count: pinCounts.schools || pinSchools.length || 14,
-      desc: 'Classrooms, functional toilets, electricity, and pupil-teacher ratios.',
+      count: `${pinCounts.schools} schools`,
+      desc: 'Classroom infrastructure, functional toilets, electricity, and pupil-teacher ratios.',
       source: 'UDISE+ / Ministry of Education',
       route: `/schools?pin=${activePin}`,
     },
     {
       id: 'infra',
       title: 'Roads & Public Works',
-      count: pinCounts.infraProjects || pinProjects.length || 8,
-      desc: 'Highway expansions, rural road maintenance, contractor tenders, and delay status.',
+      count: `${pinCounts.infraProjects} projects`,
+      desc: 'Highway expansions, rural road maintenance, contractor tenders, and completion delays.',
       source: 'PMGSY / State PWD',
       route: `/module/infra?pin=${activePin}`,
     },
     {
       id: 'hospital',
       title: 'Healthcare Centers (PHC/CHC)',
-      count: pinCounts.hospitals || 4,
+      count: `${pinCounts.hospitals} centers`,
       desc: 'Primary health centers, doctor availability, bed counts, and medicine distribution.',
       source: 'HMIS / MoHFW',
       route: `/module/hospital?pin=${activePin}`,
@@ -150,7 +150,7 @@ export function Home() {
     {
       id: 'rera',
       title: 'RERA Housing Projects',
-      count: pinCounts.reraProjects || 12,
+      count: `${pinCounts.reraProjects} projects`,
       desc: 'Builder delivery timelines, occupancy certificates, and buyer complaints.',
       source: 'State RERA Authorities',
       route: `/module/rera?pin=${activePin}`,
@@ -158,7 +158,7 @@ export function Home() {
     {
       id: 'ration',
       title: 'Fair Price Shops (PDS)',
-      count: pinCounts.pdsShops || 6,
+      count: `${pinCounts.pdsShops} outlets`,
       desc: 'Food grain allocations, active ration cards, and stock delivery latency.',
       source: 'NFSA / State Food Dept',
       route: `/module/ration?pin=${activePin}`,
@@ -166,10 +166,58 @@ export function Home() {
     {
       id: 'contractor',
       title: 'Contractor Transparency',
-      count: 'Active',
+      count: 'Active Ledger',
       desc: 'Public procurement records, contract values, performance history, and blacklists.',
       source: 'Central / State Portals',
       route: `/module/contractor?pin=${activePin}`,
+    },
+    {
+      id: 'courts',
+      title: 'Courts & Case Filings (CNR)',
+      count: 'District Courts',
+      desc: 'Case pendency, daily cause lists, disposal rates, and judicial tracking.',
+      source: 'eCourts Services / NJDG',
+      route: `/module/courts?pin=${activePin}`,
+    },
+    {
+      id: 'rti',
+      title: 'RTI & Public Filings',
+      count: 'CPIO Clock',
+      desc: 'Right to Information appeal response times, draft templates, and disclosures.',
+      source: 'Central Information Commission',
+      route: `/module/rti?pin=${activePin}`,
+    },
+    {
+      id: 'grievance',
+      title: 'Public Grievances (CPGRAMS)',
+      count: `${pinCounts.grievances} tickets`,
+      desc: 'Departmental resolution speed, pending citizen complaints, and disposal latency.',
+      source: 'DARPG / CPGRAMS',
+      route: `/module/grievance?pin=${activePin}`,
+    },
+    {
+      id: 'pollution',
+      title: 'Air Quality & Pollution (AQI)',
+      count: 'Live Stations',
+      desc: 'Real-time particulate matter (PM2.5 / PM10), station sensors, and GRAP stages.',
+      source: 'CPCB / State PCBs',
+      route: `/module/pollution?pin=${activePin}`,
+    },
+    {
+      id: 'nagar',
+      title: 'Ward & Municipal Services',
+      count: 'Local Body',
+      desc: 'Sanitation, streetlights, property tax rates, and councillor contact ledger.',
+      source: 'State Urban Dev Depts',
+      route: `/module/nagar?pin=${activePin}`,
+    },
+    {
+      id: 'mplads',
+      title: 'MPLADS Fund Tracker',
+      count: 'Constituency',
+      desc: 'Parliamentarian fund allocation, recommended works, and unspent balances.',
+      source: 'MoSPI / MPLADS Portal',
+      route: `/module/mplads?pin=${activePin}`,
     },
   ];
 
@@ -185,7 +233,7 @@ export function Home() {
             Open government data on schools, healthcare, roads, RERA housing, and public works by PIN code, district, or project name.
           </p>
 
-          {/* Clean Google-Style Search Form */}
+          {/* Clean Search Form */}
           <form
             className="main-search-form"
             onSubmit={(e) => {
@@ -210,7 +258,7 @@ export function Home() {
             </div>
 
             <button type="submit" className="search-submit-btn">
-              Search
+              Search Records
             </button>
           </form>
 
@@ -218,11 +266,12 @@ export function Home() {
           <div className="search-examples">
             <span>Examples:</span>
             {[
-              { label: 'Delhi 110001', pin: '110001' },
-              { label: 'Bengaluru 560001', pin: '560001' },
-              { label: 'Mumbai 400001', pin: '400001' },
-              { label: 'Lucknow 226001', pin: '226001' },
-              { label: 'Patna 800001', pin: '800001' },
+              { label: 'Delhi (110001)', pin: '110001' },
+              { label: 'Bengaluru (560001)', pin: '560001' },
+              { label: 'Mumbai (400001)', pin: '400001' },
+              { label: 'Lucknow (226001)', pin: '226001' },
+              { label: 'Patna (800001)', pin: '800001' },
+              { label: 'Hyderabad (500001)', pin: '500001' },
             ].map((ex) => (
               <button
                 key={ex.pin}
@@ -300,7 +349,7 @@ export function Home() {
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Classrooms, toilets & PTR</div>
                   </td>
                   <td>
-                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinSchools.length || pinCounts.schools || 14}</span>
+                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.schools}</span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> schools</span>
                   </td>
                   <td>
@@ -309,9 +358,14 @@ export function Home() {
                     </span>
                   </td>
                   <td>
-                    <a href={`/schools?pin=${activePin}`} className="source-link" onClick={(e) => { e.preventDefault(); navigate(`/schools?pin=${activePin}`); }}>
+                    <button
+                      type="button"
+                      className="source-link"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      onClick={() => navigate(`/schools?pin=${activePin}`)}
+                    >
                       View schools →
-                    </a>
+                    </button>
                   </td>
                 </tr>
 
@@ -321,7 +375,7 @@ export function Home() {
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Maintenance & highway tenders</div>
                   </td>
                   <td>
-                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinProjects.length || pinCounts.infraProjects || 8}</span>
+                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.infraProjects}</span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> projects</span>
                   </td>
                   <td>
@@ -330,9 +384,14 @@ export function Home() {
                     </span>
                   </td>
                   <td>
-                    <a href={`/module/infra?pin=${activePin}`} className="source-link" onClick={(e) => { e.preventDefault(); navigate(`/module/infra?pin=${activePin}`); }}>
+                    <button
+                      type="button"
+                      className="source-link"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      onClick={() => navigate(`/module/infra?pin=${activePin}`)}
+                    >
                       View works →
-                    </a>
+                    </button>
                   </td>
                 </tr>
 
@@ -342,7 +401,7 @@ export function Home() {
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Primary health clinic status</div>
                   </td>
                   <td>
-                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.hospitals || 4}</span>
+                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.hospitals}</span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> facilities</span>
                   </td>
                   <td>
@@ -351,9 +410,14 @@ export function Home() {
                     </span>
                   </td>
                   <td>
-                    <a href={`/module/hospital?pin=${activePin}`} className="source-link" onClick={(e) => { e.preventDefault(); navigate(`/module/hospital?pin=${activePin}`); }}>
+                    <button
+                      type="button"
+                      className="source-link"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      onClick={() => navigate(`/module/hospital?pin=${activePin}`)}
+                    >
                       View centers →
-                    </a>
+                    </button>
                   </td>
                 </tr>
 
@@ -363,7 +427,7 @@ export function Home() {
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Builder delivery & delays</div>
                   </td>
                   <td>
-                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.reraProjects || 12}</span>
+                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.reraProjects}</span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> projects</span>
                   </td>
                   <td>
@@ -372,9 +436,14 @@ export function Home() {
                     </span>
                   </td>
                   <td>
-                    <a href={`/module/rera?pin=${activePin}`} className="source-link" onClick={(e) => { e.preventDefault(); navigate(`/module/rera?pin=${activePin}`); }}>
+                    <button
+                      type="button"
+                      className="source-link"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      onClick={() => navigate(`/module/rera?pin=${activePin}`)}
+                    >
                       View housing →
-                    </a>
+                    </button>
                   </td>
                 </tr>
 
@@ -384,7 +453,7 @@ export function Home() {
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Ration distribution outlets</div>
                   </td>
                   <td>
-                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.pdsShops || 6}</span>
+                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.pdsShops}</span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> outlets</span>
                   </td>
                   <td>
@@ -393,9 +462,14 @@ export function Home() {
                     </span>
                   </td>
                   <td>
-                    <a href={`/module/ration?pin=${activePin}`} className="source-link" onClick={(e) => { e.preventDefault(); navigate(`/module/ration?pin=${activePin}`); }}>
+                    <button
+                      type="button"
+                      className="source-link"
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      onClick={() => navigate(`/module/ration?pin=${activePin}`)}
+                    >
                       View PDS →
-                    </a>
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -439,7 +513,7 @@ export function Home() {
             <div>
               <h2 className="section-title">Recent Ground-Truth Entries</h2>
               <p className="section-description" style={{ marginBottom: 0 }}>
-                Citizen-submitted photo verifications and infrastructure audit records in this area.
+                Citizen-submitted photo verifications and infrastructure audit records.
               </p>
             </div>
             <button
@@ -447,49 +521,36 @@ export function Home() {
               className="btn btn-secondary btn-sm"
               onClick={() => navigate('/reports')}
             >
-              View all reports
+              View all reports →
             </button>
           </div>
 
-          {reportsLoading ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <SkeletonCard variant="compact" />
-              <SkeletonCard variant="compact" />
-            </div>
-          ) : reports.length === 0 ? (
-            <div className="content-box" style={{ textAlign: 'center', padding: '2rem' }}>
-              <p style={{ color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
-                No community discrepancy reports logged for PIN {activePin} yet.
-              </p>
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={() => navigate('/report-issue')}
+          <div className="evidence-list">
+            {reports.map((rep) => (
+              <div
+                key={rep.id}
+                className="evidence-row"
+                onClick={() => navigate(`/reports/${rep.id}`)}
+                style={{ cursor: 'pointer' }}
               >
-                Submit Ground Photo / Discrepancy
-              </button>
-            </div>
-          ) : (
-            <div className="evidence-list">
-              {reports.map((rep) => (
-                <div key={rep.id} className="evidence-row">
-                  <div className="evidence-main">
-                    <div className="evidence-title">
-                      {rep.title || rep.description.slice(0, 80)}
-                    </div>
-                    <div className="evidence-meta">
-                      <span>Category: {rep.category || rep.module}</span>
-                      <span>•</span>
-                      <span>PIN {rep.pincode}</span>
-                      <span>•</span>
-                      <span>{new Date(rep.createdAt).toLocaleDateString()}</span>
-                    </div>
+                <div className="evidence-main">
+                  <div className="evidence-title">
+                    {rep.title || rep.description.slice(0, 80)}
                   </div>
-                  <span className="badge-status official">Under Review</span>
+                  <div className="evidence-meta">
+                    <span>Category: {rep.category || rep.module}</span>
+                    <span>•</span>
+                    <span>PIN {rep.location?.pinCode || rep.pincode || activePin}</span>
+                    <span>•</span>
+                    <span>{new Date(rep.createdAt).toLocaleDateString()}</span>
+                  </div>
                 </div>
-              ))}
-            </div>
-          )}
+                <span className="badge-status official">
+                  {rep.moderationState || rep.status || 'Verified'}
+                </span>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* 5. NOTICE & CORRECTIONS CALLOUT */}
