@@ -11,6 +11,7 @@ import { Loader2 } from 'lucide-react';
 
 const Home = lazy(() => import('./pages/Home').then(m => ({ default: m.Home })));
 const SearchPage = lazy(() => import('./pages/SearchPage').then(m => ({ default: m.SearchPage })));
+const PinDashboard = lazy(() => import('./pages/PinDashboard').then(m => ({ default: m.PinDashboard })));
 const AboutPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.AboutPage })));
 
 function LoadingFallback() {
@@ -70,6 +71,7 @@ function AppContent() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/search" element={<SearchPage />} />
+                <Route path="/pin/:pinCode" element={<PinDashboard />} />
                 <Route path="/explore" element={<AboutPage />} />
                 <Route path="/about" element={<AboutPage />} />
               </Routes>
