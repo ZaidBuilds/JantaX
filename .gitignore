@@ -37,3 +37,10 @@ test-results/
 
 # Legacy reference material (older duplicate projects, not part of JantaX app)
 reference/
+
+# Agent/config cruft (not part of JantaX - belongs to other projects)
+.agents/
+
+# Prisma backups / temp files
+*.backup
+*.backup2

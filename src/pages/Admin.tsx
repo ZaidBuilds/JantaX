@@ -1,17 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../core/services/api';
+import { checkCurrentUserPermission } from '../modules/security/services/rbacService';
 
 export function AdminPage() {
   const [queue, setQueue] = useState<any[]>([]);
   const [pin, setPin] = useState('110001');
   const [followCount, setFollowCount] = useState(0);
   const [syncSources, setSyncSources] = useState<any[]>([]);
+  const isAdmin = checkCurrentUserPermission('ADMIN_ACCESS');
+
   useEffect(()=>{
     fetch('/api/moderation').then(r=>r.json()).then(j=>setQueue(j.queue||[])).catch(()=>{});
     fetch('/api/reports/pending-count').then(r=>r.json()).then(j=>setFollowCount(j.count||0)).catch(()=>{});
     const t=localStorage.getItem('jantax_token');
     fetch('/api/admin/sync/status', { headers: t?{Authorization:`Bearer ${t}`}:{} }).then(r=>r.json()).then(j=>{ if(j.sources) setSyncSources(j.sources); }).catch(()=>{});
   },[]);
+
+  if (!isAdmin) {
+    return (
+      <div style={{ maxWidth: 600, margin: '4rem auto', padding: '2rem', textAlign: 'center', background: '#ffffff', borderRadius: 16, border: '1px solid #e2e8f0' }}>
+        <h2 style={{ fontSize: '1.4rem', color: '#b91c1c', fontWeight: 800 }}>Access Denied — Role Authorization Required</h2>
+        <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+          This page requires an authorized <strong>ADMIN</strong> Bearer token (<code>jantax_token</code>). You are currently browsing with <code>CITIZEN</code> role permissions.
+        </p>
+      </div>
+    );
+  }
   const createPin = async ()=>{
     const token = localStorage.getItem('jantax_token');
     if(!token) return alert('Login as ADMIN first (POST /api/auth/login)');

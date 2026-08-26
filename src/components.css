@@ -1,3 +1,254 @@
-/* JantaX Components — glass-card, dash-header, etc extracted */
-.glass-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-surface); box-shadow: var(--glass-shadow); }
-.dash-header-card { border-left: 4px solid var(--color-accent); }
+/* JantaX Modern Component Primitives */
+
+/* Glass Cards & Surfaces */
+.glass-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-surface);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+}
+
+.glass-card:hover {
+  border-color: rgba(37, 99, 235, 0.2);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.surface-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-surface);
+  box-shadow: var(--shadow-xs);
+}
+
+.dash-header-card {
+  border-left: 4px solid var(--color-accent);
+}
+
+/* Primary Button — Modern Gradient Elevation */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  padding: 0.5rem 1.15rem;
+  border-radius: var(--radius-control);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all var(--transition-normal);
+  text-decoration: none;
+  user-select: none;
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(11, 25, 44, 0.2);
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-900);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(11, 25, 44, 0.28);
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-accent {
+  background: var(--gradient-accent);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.25);
+}
+
+.btn-accent:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35);
+}
+
+.btn-accent:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-xs);
+}
+
+.btn-secondary:hover {
+  background: var(--color-primary-50);
+  border-color: var(--color-primary-500);
+  color: var(--color-primary-600);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+}
+
+.btn-ghost:hover {
+  background: var(--border-soft);
+  color: var(--text-primary);
+}
+
+/* Tab Filter / Time Tabs */
+.time-tab {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  padding: 0.45rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.time-tab:hover {
+  background: var(--border-soft);
+  color: var(--text-primary);
+}
+
+.time-tab.active {
+  background: var(--bg-card);
+  color: var(--color-primary);
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-xs);
+  font-weight: 700;
+}
+
+/* Stat & Metric Cards */
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-surface);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-xs);
+  transition: all var(--transition-normal);
+}
+
+.stat-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: rgba(37, 99, 235, 0.2);
+}
+
+.metric-value {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.metric-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+/* Modern Status Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.badge-success {
+  background: var(--color-emerald-50);
+  color: #065f46;
+  border: 1px solid var(--color-emerald-border);
+}
+
+.badge-warning {
+  background: var(--color-amber-50);
+  color: #92400e;
+  border: 1px solid var(--color-amber-border);
+}
+
+.badge-danger {
+  background: var(--color-rose-50);
+  color: #991b1b;
+  border: 1px solid var(--color-rose-border);
+}
+
+.badge-info {
+  background: var(--color-primary-50);
+  color: #1e40af;
+  border: 1px solid var(--color-primary-100);
+}
+
+.badge-neutral {
+  background: var(--border-soft);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+/* Modern Form Controls */
+.form-input {
+  width: 100%;
+  padding: 0.65rem 0.95rem;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-control);
+  font-size: 0.875rem;
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background: #ffffff;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.form-input:focus {
+  border-color: var(--color-primary-500);
+  box-shadow: var(--focus-ring);
+}
+
+/* Layout Utilities */
+.container {
+  max-width: 1240px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 1.5rem;
+}
+
+.page-section {
+  padding: 2.5rem 0;
+}
+
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.flex-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-gap-1 { display: flex; gap: 0.5rem; }
+.flex-gap-2 { display: flex; gap: 1rem; }
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+.grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; }

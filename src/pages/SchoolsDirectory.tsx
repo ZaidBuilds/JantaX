@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../core/services/api';
 import type { SchoolRecord } from '../modules/school/types';
+import { GraduationCap, Search, MapPin, Download, AlertTriangle, Star, Filter, DownloadCloud } from 'lucide-react';
 
 /**
  * JantaX Schools Directory Page
@@ -36,11 +37,11 @@ export function SchoolsDirectory() {
   }, [pinFromUrl]);
   
   const statsCards = [
-    { label: 'Total Schools', value: '1,48,732', sub: 'Across India', icon: '🏫', border: '#cbd5e1' },
-    { label: 'Schools with Data', value: '1,12,409', sub: '76% of total', icon: '🔍', border: '#3b82f6' },
-    { label: 'Need Attention', value: '42,871', sub: '29% of total', icon: '⚠️', border: '#f97316' },
-    { label: 'Critical Condition', value: '13,245', sub: '9% of total', icon: '🚨', border: '#ef4444' },
-    { label: 'Top Rated Schools', value: '8,732', sub: '6% of total', icon: '⭐', border: '#8b5cf6' }
+    { label: 'Total Schools', value: '1,48,732', sub: 'Across India', icon: GraduationCap, color: '#64748b' },
+    { label: 'Schools with Data', value: '1,12,409', sub: '76% of total', icon: Search, color: '#3b82f6' },
+    { label: 'Need Attention', value: '42,871', sub: '29% of total', icon: AlertTriangle, color: '#f97316' },
+    { label: 'Critical Condition', value: '13,245', sub: '9% of total', icon: AlertTriangle, color: '#ef4444' },
+    { label: 'Top Rated Schools', value: '8,732', sub: '6% of total', icon: Star, color: '#8b5cf6' }
   ];
 
   const PAGE_SIZE_SD = 6;
@@ -154,32 +155,41 @@ export function SchoolsDirectory() {
             <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>Find and explore government schools across India with real data and ground truth insights.</span>
           </div>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button className="time-tab" style={{ border: '1px solid #e2e8f0' }}>📥 Download List</button>
+            <button className="time-tab" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}><DownloadCloud size={14} /> Download List</button>
             <button className="search-action-btn" style={{ borderRadius: '8px', fontSize: '0.85rem' }} onClick={() => navigate('/module/school')}>+ Report an Issue</button>
           </div>
         </div>
 
         {/* 5 Stats overview row */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.75rem' }}>
-          {statsCards.map((c, idx) => (
-            <div key={idx} className="glass-card" style={{ padding: '1rem', borderTop: `3px solid ${c.border}`, textAlign: 'center' }}>
-              <span style={{ fontSize: '1.4rem' }}>{c.icon}</span>
-              <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-primary)', margin: '0.15rem 0' }}>{c.value}</div>
-              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)' }}>{c.label}</div>
-              <div style={{ fontSize: '0.62rem', opacity: 0.5 }}>{c.sub}</div>
-            </div>
-          ))}
+          {statsCards.map((c, idx) => {
+            const Icon = c.icon;
+            return (
+              <div key={idx} className="glass-card" style={{ padding: '1rem', borderTop: `3px solid ${c.color}`, textAlign: 'center' }}>
+                <div style={{ width: 40, height: 40, borderRadius: 12, background: `${c.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 0.5rem' }}>
+                  <Icon size={20} style={{ color: c.color }} />
+                </div>
+                <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-primary)', margin: '0.15rem 0' }}>{c.value}</div>
+                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)' }}>{c.label}</div>
+                <div style={{ fontSize: '0.62rem', opacity: 0.5 }}>{c.sub}</div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Search Results list selectors */}
         <div className="glass-card" style={{ padding: '0.75rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
-          <input
-            type="text"
-            placeholder="Search within results..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ width: '280px', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '0.35rem 0.75rem', outline: 'none', fontSize: '0.8rem' }}
-          />
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <Search size={14} style={{ position: 'absolute', left: '0.6rem', opacity: 0.5 }} />
+            <input
+              type="text"
+              placeholder="Search within results..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="form-input"
+              style={{ width: '280px', paddingLeft: '2rem' }}
+            />
+          </div>
 
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>Sort by:</span>
@@ -208,7 +218,7 @@ export function SchoolsDirectory() {
             return (
               <div key={school.id} className="glass-card" style={{ padding: '1.25rem', display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
                 {/* Thumbnail */}
-                <div style={{ width: '120px', height: '90px', borderRadius: '8px', overflow: 'hidden', background: '#cbd5e1', flexShrink: 0 }}>
+                <div style={{ width: '120px', height: '90px', borderRadius: 'var(--radius-control)', overflow: 'hidden', background: '#cbd5e1', flexShrink: 0 }}>
                   <img src={idx === 0 ? "https://images.unsplash.com/photo-1577896851231-70ee18881754?auto=format&fit=crop&w=200&q=80" : "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=200&q=80"} alt={school.titleEnglish} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
 
@@ -216,12 +226,12 @@ export function SchoolsDirectory() {
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <h4 style={{ fontSize: '1.05rem', margin: 0 }}>{school.titleHindi}</h4>
-                    <span style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: '4px', background: badgeBg, color: badgeColor, fontWeight: 700 }}>
+                    <span className="badge" style={{ background: badgeBg, color: badgeColor, fontSize: '0.65rem' }}>
                       {school.schoolLevel}
                     </span>
                   </div>
-                  <div style={{ fontSize: '0.72rem', opacity: 0.6, margin: '0.2rem 0' }}>
-                    📍 {school.location.district} · UDISE: {school.udiseCode} · Students: {school.officialStudentCount} · Teachers: {school.officialTeacherCount}
+                  <div style={{ fontSize: '0.72rem', opacity: 0.6, margin: '0.2rem 0', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <MapPin size={12} /> {school.location.district} · UDISE: {school.udiseCode} · Students: {school.officialStudentCount} · Teachers: {school.officialTeacherCount}
                   </div>
                 </div>
 
@@ -234,16 +244,18 @@ export function SchoolsDirectory() {
                 {/* Sub ratings column breakdown */}
                 <div style={{ display: 'flex', gap: '1rem', fontSize: '0.72rem', width: '200px' }}>
                   <div style={{ display: 'grid', gap: '0.2rem' }}>
-                    <div>🏫 Infra: <strong>62/100</strong></div>
-                    <div>👨‍🏫 Teachers: <strong>72/100</strong></div>
-                    <div>🍱 Attendance: <strong>65/100</strong></div>
+                    <div><GraduationCap size={11} style={{ verticalAlign: '-1px', marginRight: 2 }} /> Infra: <strong>62/100</strong></div>
+                    <div><GraduationCap size={11} style={{ verticalAlign: '-1px', marginRight: 2 }} /> Teachers: <strong>72/100</strong></div>
+                    <div><GraduationCap size={11} style={{ verticalAlign: '-1px', marginRight: 2 }} /> Attendance: <strong>65/100</strong></div>
                   </div>
                 </div>
 
                 {/* View Details button */}
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
                   <button className="time-tab active" onClick={() => navigate(`/module/school?id=${school.id}`)}>View Details →</button>
-                  <div style={{ fontSize: '0.62rem', opacity: 0.5, marginTop: '0.5rem' }}>✓ Data Available</div>
+                  <div style={{ fontSize: '0.62rem', opacity: 0.5, marginTop: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.2rem' }}>
+                    <span style={{ color: '#10b981' }}>✓</span> Data Available
+                  </div>
                 </div>
               </div>
             );

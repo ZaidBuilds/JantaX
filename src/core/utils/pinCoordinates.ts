@@ -12,6 +12,7 @@ export const PIN_COORDINATES: PinCoordinate[] = [
   { prefix: '110', lat: 28.6139, lng: 77.2090, state: 'Delhi', district: 'New Delhi' },
   { prefix: '400', lat: 19.0760, lng: 72.8777, state: 'Maharashtra', district: 'Mumbai' },
   { prefix: '411', lat: 18.5204, lng: 73.8567, state: 'Maharashtra', district: 'Pune' },
+  { prefix: '440', lat: 21.1458, lng: 79.0882, state: 'Maharashtra', district: 'Nagpur' },
   { prefix: '246', lat: 30.4100, lng: 79.3300, state: 'Uttarakhand', district: 'Chamoli' },
   { prefix: '248', lat: 30.3165, lng: 78.0322, state: 'Uttarakhand', district: 'Dehradun' },
   { prefix: '226', lat: 26.8467, lng: 80.9462, state: 'Uttar Pradesh', district: 'Lucknow' },

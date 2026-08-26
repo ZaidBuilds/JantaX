@@ -1,311 +1,733 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Bookmark, Share2, MapPin, Clock, SlidersHorizontal, SearchX } from 'lucide-react';
-import { EmptyState } from '../components/UI/EmptyState';
+import {
+  Search,
+  MapPin,
+  GraduationCap,
+  Construction,
+  HardHat,
+  Home as HomeIcon,
+  Hospital,
+  Wheat,
+  Users,
+  AlertCircle,
+  Clock,
+  X,
+  SlidersHorizontal,
+  ChevronRight,
+  Loader2,
+  Bookmark,
+  Share2,
+  History,
+  TrendingUp,
+  CheckCircle,
+  AlertTriangle,
+} from 'lucide-react';
+import {
+  useSearch,
+  useAutocomplete,
+  getRecentSearches,
+  addRecentSearch,
+  clearRecentSearches,
+  removeRecentSearch,
+  POPULAR_SEARCHES,
+} from '../core/hooks/useSearch';
+import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver';
 import { SourceBadge } from '../components/UI/SourceBadge';
+import {
+  SkeletonCard,
+  ErrorState,
+  NoResultsState,
+  EmptyState,
+  DataFreshnessBadge,
+} from '../components/data-states';
+import type { SearchResult, SearchEntityType } from '../core/services/api';
 
-interface ReraProject { name: string; status: string; color: string; location: string; reraNo: string; config: string; posDate: string; delay: string; expected: string; img: string; }
-interface PublicProject { name: string; status: string; color: string; location: string; dept: string; budget: string; start: string; completion: string; delay: string; img: string; }
-interface Contractor { name: string; verified: boolean; score: number; total: number; completed: number; ongoing: number; delayed: number; registered: string; }
-interface Issue { title: string; place: string; count: string; time: string; badge: string; img: string; }
+const ENTITY_ICONS: Record<string, React.ElementType> = {
+  school: GraduationCap,
+  infra: Construction,
+  rera: HomeIcon,
+  hospital: Hospital,
+  contractor: HardHat,
+  pds: Wheat,
+  issue: AlertTriangle,
+  grievance: Users,
+};
 
-const PAGE_SIZE = 5;
+const ENTITY_COLORS: Record<string, string> = {
+  school: '#3b82f6',
+  infra: '#f59e0b',
+  rera: '#06b6d4',
+  hospital: '#ec4899',
+  contractor: '#ef4444',
+  pds: '#d97706',
+  issue: '#8b5cf6',
+  grievance: '#10b981',
+};
+
+const ENTITY_LABELS: Record<string, string> = {
+  school: 'School',
+  infra: 'Public Works',
+  rera: 'RERA Project',
+  hospital: 'Healthcare',
+  contractor: 'Contractor',
+  pds: 'Welfare Shop',
+  issue: 'Issue',
+  grievance: 'Grievance',
+};
+
+const MATCH_TYPE_LABELS: Record<string, { label: string; color: string }> = {
+  exact: { label: 'Exact Match', color: '#10b981' },
+  related: { label: 'Related', color: '#f59e0b' },
+  location: { label: 'Location Match', color: '#3b82f6' },
+};
+
+interface SearchResultCardProps {
+  result: SearchResult;
+  onNavigate: (result: SearchResult) => void;
+}
+
+function SearchResultCard({ result, onNavigate }: SearchResultCardProps) {
+  const Icon = ENTITY_ICONS[result.type] || MapPin;
+  const color = ENTITY_COLORS[result.type] || '#6b7280';
+  const matchType = result.matchType || (result.score > 0.5 ? 'exact' : 'related');
+  const matchInfo = MATCH_TYPE_LABELS[matchType];
+
+  const freshnessDate = result.source.freshness ? new Date(result.source.freshness) : null;
+  const status = result.metadata.status as string | undefined;
+  const statusColor = status
+    ? status.toLowerCase().includes('delay') || status.toLowerCase().includes('pending')
+      ? '#f97316'
+      : status.toLowerCase().includes('complete') || status.toLowerCase().includes('resolved')
+      ? '#10b981'
+      : '#6b7280'
+    : '#6b7280';
+
+  return (
+    <div
+      className="glass-card"
+      style={{
+        padding: '1rem',
+        display: 'flex',
+        gap: '1rem',
+        cursor: 'pointer',
+        transition: 'box-shadow 0.2s',
+      }}
+      onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)')}
+      onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}
+      onClick={() => onNavigate(result)}
+    >
+      <div
+        style={{
+          width: 48,
+          height: 48,
+          borderRadius: 12,
+          background: `${color}14`,
+          border: `1px solid ${color}18`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color,
+          flexShrink: 0,
+        }}
+      >
+        <Icon size={22} strokeWidth={1.9} />
+      </div>
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
+          <h4 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
+            {result.title}
+          </h4>
+          <span
+            style={{
+              fontSize: '0.65rem',
+              fontWeight: 700,
+              padding: '2px 6px',
+              borderRadius: 4,
+              background: `${color}15`,
+              color,
+              textTransform: 'uppercase',
+            }}
+          >
+            {ENTITY_LABELS[result.type] || result.type}
+          </span>
+          <span
+            style={{
+              fontSize: '0.65rem',
+              fontWeight: 600,
+              padding: '2px 6px',
+              borderRadius: 4,
+              background: `${matchInfo.color}15`,
+              color: matchInfo.color,
+            }}
+          >
+            {matchInfo.label}
+          </span>
+        </div>
+
+        <p style={{ fontSize: '0.78rem', opacity: 0.7, margin: '0 0 0.35rem 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {result.description}
+        </p>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', fontSize: '0.72rem' }}>
+          {result.location && (
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', opacity: 0.7 }}>
+              <MapPin size={11} /> {result.location.district}, {result.location.state} ({result.location.pincode})
+            </span>
+          )}
+          {status && (
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: statusColor }}>
+              {statusColor === '#10b981' ? <CheckCircle size={11} /> : statusColor === '#f97316' ? <AlertTriangle size={11} /> : null}
+              {status}
+            </span>
+          )}
+          {freshnessDate && (
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', opacity: 0.5 }}>
+              <Clock size={11} /> Updated {freshnessDate.toLocaleDateString()}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem', flexShrink: 0 }}>
+        <SourceBadge
+          sourceType={result.source.reliability === 'high' ? 'A' : result.source.reliability === 'medium' ? 'B' : 'C'}
+          sourceName={result.source.name}
+        />
+        <ChevronRight size={16} style={{ opacity: 0.4 }} />
+      </div>
+    </div>
+  );
+}
+
+function SkeletonResultCard() {
+  return (
+    <div className="glass-card" style={{ padding: '1rem', display: 'flex', gap: '1rem' }}>
+      <div className="skeleton" style={{ width: 48, height: 48, borderRadius: 12, flexShrink: 0 }} />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        <div className="skeleton" style={{ height: 16, width: '60%', borderRadius: 4 }} />
+        <div className="skeleton" style={{ height: 12, width: '80%', borderRadius: 4 }} />
+        <div className="skeleton" style={{ height: 12, width: '40%', borderRadius: 4 }} />
+      </div>
+    </div>
+  );
+}
 
 export function SearchPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || 'abc developers');
-  const [activeTab, setActiveTab] = useState<'all' | 'rera' | 'public' | 'contractor' | 'issues'>('all');
-  const [category, setCategory] = useState('All Categories');
-  const [location, setLocation] = useState('');
-  const [pinFilter, setPinFilter] = useState('');
-  const [enabled, setEnabled] = useState({ rera: true, public: true, contractor: true, issues: true });
-  const [page, setPage] = useState(1);
+  const initialQuery = searchParams.get('q') || '';
+
+  const [inputValue, setInputValue] = useState(initialQuery);
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+
+  const {
+    query,
+    setQuery,
+    results,
+    isLoading,
+    isError,
+    error,
+    pagination,
+    filters,
+    updateFilter,
+    page,
+    setPage,
+    total,
+    refetch,
+    search,
+  } = useSearch({ debounceMs: 300, pageSize: 10 });
+
+  const { suggestions, isLoading: autocompleteLoading, setQuery: setAutocompleteQuery, clear: clearAutocomplete } = useAutocomplete({ debounceMs: 200, minLength: 2 });
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const autocompleteRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setSearchQuery(searchParams.get('q') || 'abc developers');
+    setRecentSearches(getRecentSearches());
+  }, []);
+
+  useEffect(() => {
+    if (initialQuery) {
+      search(initialQuery);
+      setInputValue(initialQuery);
+    }
+  }, [initialQuery]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (autocompleteRef.current && !autocompleteRef.current.contains(e.target as Node) && inputRef.current && !inputRef.current.contains(e.target as Node)) {
+        setShowAutocomplete(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSearch = useCallback((q: string) => {
+    if (!q.trim()) return;
+    addRecentSearch(q);
+    setRecentSearches(getRecentSearches());
+    setShowAutocomplete(false);
+    search(q);
+    navigate(`/search?q=${encodeURIComponent(q)}`, { replace: true });
+  }, [search, navigate]);
+
+  const handleInputChange = useCallback((value: string) => {
+    setInputValue(value);
+    setAutocompleteQuery(value);
+    if (value.length >= 2) {
+      setShowAutocomplete(true);
+    } else {
+      setShowAutocomplete(false);
+    }
+  }, [setAutocompleteQuery]);
+
+  const handleSuggestionClick = useCallback((suggestion: { text: string; type?: string; pincode?: string }) => {
+    setInputValue(suggestion.text);
+    clearAutocomplete();
+    setShowAutocomplete(false);
+    if (suggestion.pincode) {
+      navigate(`/pin/${suggestion.pincode}`);
+    } else {
+      handleSearch(suggestion.text);
+    }
+  }, [clearAutocomplete, handleSearch, navigate]);
+
+  const handleRecentClick = useCallback((q: string) => {
+    setInputValue(q);
+    handleSearch(q);
+  }, [handleSearch]);
+
+  const handleResultNavigate = useCallback((result: SearchResult) => {
+    const typeToRoute: Record<string, string> = {
+      school: 'school',
+      infra: 'infra',
+      rera: 'rera',
+      hospital: 'hospital',
+      contractor: 'contractor',
+      pds: 'ration',
+      issue: 'reports',
+      grievance: 'reports',
+    };
+    const route = typeToRoute[result.type] || 'search';
+    if (result.location?.pincode) {
+      navigate(`/${route}?pin=${result.location.pincode}&q=${encodeURIComponent(result.title)}`);
+    } else {
+      navigate(`/${route}?q=${encodeURIComponent(result.title)}`);
+    }
+  }, [navigate]);
+
+  const activeTypes = Object.entries(filters)
+    .filter(([, v]) => v)
+    .map(([k]) => k);
+
+  const clearFilters = () => {
+    updateFilter('type', undefined);
+    updateFilter('pincode', undefined);
+    updateFilter('state', undefined);
+    updateFilter('district', undefined);
+    updateFilter('status', undefined);
     setPage(1);
-  }, [searchParams]);
-
-  const reraProjects: ReraProject[] = [
-    { name: 'ABC Developers – Green Meadows', status: 'Registered', color: '#10b981', location: 'Gurugram, Haryana', reraNo: 'GGM/415/2022/56', config: '2, 3 BHK Apartments', posDate: 'Dec 2025', delay: 'Delay: 6 Months', expected: 'Expected: Jun 2026', img: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=150&q=80' },
-    { name: 'ABC Developers – Sky Heights', status: 'Ongoing', color: '#f97316', location: 'Noida, Uttar Pradesh', reraNo: 'UPRERAPRJ123456', config: '2, 3, 4 BHK Apartments', posDate: 'Mar 2026', delay: 'On Track', expected: 'Expected: Mar 2026', img: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=150&q=80' },
-    { name: 'ABC Developers – Park View Residences', status: 'Delayed', color: '#ef4444', location: 'Ghaziabad, Uttar Pradesh', reraNo: 'UPRERAPRJ654321', config: '2 BHK Apartments', posDate: 'Dec 2024', delay: 'Delay: 10 Months', expected: 'Expected: Oct 2025', img: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=150&q=80' }
-  ];
-
-  const publicProjects: PublicProject[] = [
-    { name: 'Construction of Road from Sector 50 to Sector 68', status: 'Ongoing', color: '#f97316', location: 'Gurugram, Haryana', dept: 'PWD, Haryana', budget: '₹ 12.45 Cr', start: '15 Aug 2023', completion: '15 Dec 2024', delay: 'Delayed 35% Completed', img: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=150&q=80' },
-    { name: 'Storm Water Drain Improvement Project', status: 'Ongoing', color: '#f97316', location: 'Noida, Uttar Pradesh', dept: 'Noida Authority', budget: '₹ 8.78 Cr', start: '10 Jan 2024', completion: '10 Jul 2024', delay: 'On Track 65% Completed', img: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=150&q=80' }
-  ];
-
-  const contractors: Contractor[] = [
-    { name: 'ABC Developers Pvt. Ltd.', verified: true, score: 72, total: 78, completed: 42, ongoing: 28, delayed: 8, registered: 'Haryana' },
-    { name: 'ABC Developers & Infrastructure', verified: true, score: 68, total: 54, completed: 26, ongoing: 20, delayed: 8, registered: 'Uttar Pradesh' }
-  ];
-
-  const issues: Issue[] = [
-    { title: 'Delay in possession – ABC Developers', place: 'Gurugram, Haryana', count: '23 reports', time: '2 days ago', badge: 'Rera', img: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=100&q=80' },
-    { title: 'Poor quality road construction', place: 'Gurugram, Haryana', count: '18 reports', time: '5 days ago', badge: 'Public Works', img: 'https://images.unsplash.com/photo-1515162305285-0293e4767cc2?auto=format&fit=crop&w=100&q=80' }
-  ];
-
-  const normalizedQuery = searchQuery.trim().toLowerCase();
-  const matches = (values: string[]) => !normalizedQuery || values.some(v => v.toLowerCase().includes(normalizedQuery));
-  const matchesFilters = (values: string[]) =>
-    (category === 'All Categories' || category === 'RERA Projects' && values.some(v => v.includes('RERA')) || category === 'Public Projects' && values.some(v => v.includes('Public')) || category === 'Contractors' && values.some(v => v.includes('Contractor')) || category === 'Reports & Issues' && values.some(v => v.includes('Issue'))) &&
-    (!location.trim() || values.some(v => v.toLowerCase().includes(location.trim().toLowerCase()))) &&
-    (!pinFilter.trim() || values.some(v => v.includes(pinFilter.trim())));
-
-  const visibleRera = reraProjects.filter(p => matches([p.name, p.location, p.reraNo]) && matchesFilters([p.name, p.location, p.reraNo, 'RERA']));
-  const visiblePublic = publicProjects.filter(p => matches([p.name, p.location, p.dept]) && matchesFilters([p.name, p.location, p.dept, 'Public']));
-  const visibleContractors = contractors.filter(c => matches([c.name, c.registered]) && matchesFilters([c.name, c.registered, 'Contractor']));
-  const visibleIssues = issues.filter(i => matches([i.title, i.place, i.badge]) && matchesFilters([i.title, i.place, i.badge, 'Issue']));
-
-  const counts = {
-    all: (enabled.rera ? visibleRera.length : 0) + (enabled.public ? visiblePublic.length : 0) + (enabled.contractor ? visibleContractors.length : 0) + (enabled.issues ? visibleIssues.length : 0),
-    rera: visibleRera.length,
-    public: visiblePublic.length,
-    contractor: visibleContractors.length,
-    issues: visibleIssues.length,
   };
 
-  const visibleReraPage = visibleRera.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const visiblePublicPage = visiblePublic.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const visibleContractorsPage = visibleContractors.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const visibleIssuesPage = visibleIssues.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  const totalPages = useMemo(() => {
-    // Correct pagination: per active tab, not max across tabs — killer fix
-    const activeLists: Record<string, number> = {
-      all: counts.all,
-      rera: counts.rera,
-      public: counts.public,
-      contractor: counts.contractor,
-      issues: counts.issues,
-    };
-    const relevant = activeTab === 'all' ? Math.max(counts.rera, counts.public, counts.contractor, counts.issues) : (activeLists[activeTab] || 0);
-    // For "all" we show paginated per-section, so total pages is max of sections
-    // For specific tab, pages based on that tab's count
-    const countForTab = activeTab === 'all' ? Math.max(counts.rera, counts.public, counts.contractor, counts.issues) : (activeTab === 'rera' ? counts.rera : activeTab === 'public' ? counts.public : activeTab === 'contractor' ? counts.contractor : counts.issues);
-    return Math.max(1, Math.ceil(countForTab / PAGE_SIZE));
-  }, [visibleRera, visiblePublic, visibleContractors, visibleIssues, activeTab, counts.all, counts.rera, counts.public, counts.contractor, counts.issues]);
-
-  const clearFilters = () => { setCategory('All Categories'); setLocation(''); setPinFilter(''); setEnabled({ rera: true, public: true, contractor: true, issues: true }); setPage(1); };
+  const handleTypeToggle = (type: string) => {
+    if (filters.type === type) {
+      updateFilter('type', undefined);
+    } else {
+      updateFilter('type', type);
+    }
+    setPage(1);
+  };
 
   const sidebar = (
     <aside className="glass-card" style={{ padding: '1.25rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-        <h3 style={{ fontSize: '0.95rem', margin: 0 }}>Refine Your Search</h3>
-        <button className="btn btn-secondary" type="button" onClick={clearFilters}>Clear All</button>
+        <h3 style={{ fontSize: '0.95rem', margin: 0, fontWeight: 700 }}>Refine Your Search</h3>
+        {(filters.type || filters.pincode || filters.state || filters.status) && (
+          <button className="btn btn-secondary" type="button" onClick={clearFilters} style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem' }}>
+            Clear
+          </button>
+        )}
       </div>
 
       <div style={{ marginBottom: '1.25rem' }}>
-        <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.5rem' }}>Search in</label>
-        <select className="form-input" style={{ fontSize: '0.8rem' }} value={category} onChange={(e) => { setCategory(e.target.value); setPage(1); }}>
-          <option>All Categories</option>
-          <option>RERA Projects</option>
-          <option>Public Projects</option>
-          <option>Contractors</option>
-          <option>Reports & Issues</option>
-        </select>
-      </div>
-
-      <div style={{ marginBottom: '1.25rem', display: 'grid', gap: '0.75rem' }}>
-        <div>
-          <label style={{ fontSize: '0.75rem', opacity: 0.6, display: 'block', marginBottom: '0.25rem' }}>State</label>
-          <select className="form-input" style={{ fontSize: '0.8rem' }}><option>All States</option></select>
-        </div>
-        <div>
-          <label style={{ fontSize: '0.75rem', opacity: 0.6, display: 'block', marginBottom: '0.25rem' }}>District</label>
-          <select className="form-input" style={{ fontSize: '0.8rem' }}><option>All Districts</option></select>
-        </div>
-        <div>
-          <label style={{ fontSize: '0.75rem', opacity: 0.6, display: 'block', marginBottom: '0.25rem' }}>PIN Code</label>
-          <input type="text" placeholder="Enter PIN code" className="form-input" style={{ fontSize: '0.8rem' }} value={pinFilter} onChange={(e) => { setPinFilter(e.target.value.replace(/\D/g, '').slice(0, 6)); setPage(1); }} />
+        <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.5rem' }}>Category</label>
+        <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.8rem' }}>
+          {Object.entries(ENTITY_LABELS).slice(0, 6).map(([type, label]) => (
+            <label key={type} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={filters.type === type}
+                onChange={() => handleTypeToggle(type)}
+                style={{ accentColor: ENTITY_COLORS[type] }}
+              />
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                {React.createElement(ENTITY_ICONS[type] || MapPin, { size: 14, style: { color: ENTITY_COLORS[type] } })}
+                {label}
+              </span>
+            </label>
+          ))}
         </div>
       </div>
 
       <div style={{ marginBottom: '1.25rem', borderTop: '1px solid #e2e8f0', paddingTop: '1rem' }}>
-        <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.5rem' }}>Category</label>
-        <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.8rem' }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><input type="checkbox" checked={enabled.rera} onChange={(e) => setEnabled(s => ({ ...s, rera: e.target.checked })) } /> RERA Projects</label>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><input type="checkbox" checked={enabled.public} onChange={(e) => setEnabled(s => ({ ...s, public: e.target.checked })) } /> Public Projects</label>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><input type="checkbox" checked={enabled.contractor} onChange={(e) => setEnabled(s => ({ ...s, contractor: e.target.checked })) } /> Contractors</label>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><input type="checkbox" checked={enabled.issues} onChange={(e) => setEnabled(s => ({ ...s, issues: e.target.checked })) } /> Reports & Issues</label>
-        </div>
+        <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.5rem' }}>PIN Code</label>
+        <input
+          type="text"
+          placeholder="e.g. 110001"
+          className="form-input"
+          style={{ fontSize: '0.8rem' }}
+          value={filters.pincode || ''}
+          onChange={e => updateFilter('pincode', e.target.value.replace(/\D/g, '').slice(0, 6) || undefined)}
+        />
       </div>
 
-      <button className="search-action-btn" style={{ width: '100%', borderRadius: '8px', fontSize: '0.85rem' }} onClick={() => setPage(1)}>Apply Filters</button>
+      <div style={{ marginBottom: '1.25rem' }}>
+        <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.5rem' }}>State</label>
+        <input
+          type="text"
+          placeholder="e.g. Delhi"
+          className="form-input"
+          style={{ fontSize: '0.8rem' }}
+          value={filters.state || ''}
+          onChange={e => updateFilter('state', e.target.value || undefined)}
+        />
+      </div>
+
+      <div style={{ marginBottom: '1.25rem' }}>
+        <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.5rem' }}>Status</label>
+        <select
+          className="form-input"
+          style={{ fontSize: '0.8rem' }}
+          value={filters.status || ''}
+          onChange={e => updateFilter('status', e.target.value || undefined)}
+        >
+          <option value="">All Statuses</option>
+          <option value="active">Active</option>
+          <option value="completed">Completed</option>
+          <option value="delayed">Delayed</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
     </aside>
   );
 
   return (
-    <div className="container search-layout" style={{ padding: '2rem 1rem', display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
+    <div className="container" style={{ padding: '1.5rem 1rem', maxWidth: 1200 }}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: '0.25rem', fontWeight: 800 }}>
+          Universal Search
+        </h1>
+        <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>Search across locations, schools, projects, contractors, builders, healthcare, schemes and issues</p>
+      </div>
 
-      {/* Desktop sidebar */}
-      <div className="hidden md:block" style={{ width: '260px', flexShrink: 0 }}>{sidebar}</div>
+      <div style={{ position: 'relative', marginBottom: '1.5rem' }} ref={autocompleteRef}>
+        <form
+          onSubmit={e => { e.preventDefault(); handleSearch(inputValue); }}
+          style={{ display: 'flex', gap: '0.75rem' }}
+        >
+          <div style={{ flex: 1, position: 'relative' }}>
+            <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }}>
+              <Search size={18} />
+            </div>
+            <input
+              ref={inputRef}
+              type="text"
+              value={inputValue}
+              onChange={e => handleInputChange(e.target.value)}
+              onFocus={() => inputValue.length >= 2 && setShowAutocomplete(true)}
+              placeholder="Search PIN, school, builder, contractor, project, location…"
+              style={{
+                width: '100%',
+                padding: '0.85rem 1rem 0.85rem 2.75rem',
+                border: '1.5px solid var(--border-color)',
+                borderRadius: 12,
+                fontSize: '0.95rem',
+                outline: 'none',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+              }}
+              onFocusCapture={e => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)'; }}
+              onBlurCapture={e => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'; }}
+            />
+            {isLoading && (
+              <div style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)' }}>
+                <Loader2 size={18} style={{ animation: 'spin 1s linear infinite', opacity: 0.6 }} />
+              </div>
+            )}
+            {inputValue && !isLoading && (
+              <button
+                type="button"
+                onClick={() => { setInputValue(''); clearAutocomplete(); setShowAutocomplete(false); setQuery(''); inputRef.current?.focus(); }}
+                style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', opacity: 0.4, padding: 4 }}
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+          <button type="submit" className="search-action-btn" style={{ padding: '0.85rem 1.5rem', borderRadius: 12 }}>
+            Search
+          </button>
+          <button type="button" className="btn btn-secondary" onClick={() => setShowFilters(!showFilters)} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <SlidersHorizontal size={16} />
+          </button>
+        </form>
 
-      {/* Mobile filters drawer */}
-      {showFilters && (
-        <div className="fixed inset-0 z-50 flex" role="dialog" aria-modal="true">
-          <div className="fixed inset-0 bg-black/40" onClick={() => setShowFilters(false)} />
-          <div className="relative bg-white w-[280px] max-w-[85%] h-full overflow-y-auto p-4 shadow-xl">{sidebar}</div>
+        {showAutocomplete && (suggestions.length > 0 || autocompleteLoading) && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 'calc(100% + 4px)',
+              left: 0,
+              right: 0,
+              background: '#fff',
+              border: '1px solid var(--border-color)',
+              borderRadius: 12,
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+              zIndex: 50,
+              maxHeight: 360,
+              overflowY: 'auto',
+            }}
+          >
+            {autocompleteLoading && (
+              <div style={{ padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
+                <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Searching…
+              </div>
+            )}
+            {suggestions.map((s, i) => {
+              const Icon = ENTITY_ICONS[s.type] || Search;
+              const color = ENTITY_COLORS[s.type] || '#6b7280';
+              return (
+                <div
+                  key={i}
+                  style={{
+                    padding: '0.75rem 1rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    cursor: 'pointer',
+                    borderBottom: i < suggestions.length - 1 ? '1px solid #f1f5f9' : 'none',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#f8fafc')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                  onClick={() => handleSuggestionClick(s)}
+                >
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: `${color}12`, display: 'flex', alignItems: 'center', justifyContent: 'center', color, flexShrink: 0 }}>
+                    <Icon size={16} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{s.text}</div>
+                    {s.subtitle && <div style={{ fontSize: '0.72rem', opacity: 0.6 }}>{s.subtitle}</div>}
+                  </div>
+                  <span style={{ fontSize: '0.68rem', opacity: 0.5, flexShrink: 0 }}>{ENTITY_LABELS[s.type] || s.type}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {(recentSearches.length > 0 || POPULAR_SEARCHES.length > 0) && !query && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+          {recentSearches.length > 0 && (
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <h3 style={{ fontSize: '0.85rem', fontWeight: 700, opacity: 0.6, margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <History size={14} /> Recent
+                </h3>
+                <button onClick={() => { clearRecentSearches(); setRecentSearches([]); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.72rem', opacity: 0.5 }}>
+                  Clear
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                {recentSearches.map(s => (
+                  <span
+                    key={s}
+                    onClick={() => handleRecentClick(s)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      padding: '0.4rem 0.75rem',
+                      background: 'var(--color-primary-50)',
+                      border: '1px solid var(--color-primary-200)',
+                      borderRadius: 999,
+                      fontSize: '0.8rem',
+                      cursor: 'pointer',
+                      color: 'var(--color-primary-700)',
+                    }}
+                  >
+                    <X size={12} onClick={e => { e.stopPropagation(); removeRecentSearch(s); setRecentSearches(getRecentSearches()); }} />
+                    {s}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <h3 style={{ fontSize: '0.85rem', fontWeight: 700, opacity: 0.6, margin: '0 0 0.75rem 0', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <TrendingUp size={14} /> Popular
+            </h3>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+              {POPULAR_SEARCHES.map(s => (
+                <span
+                  key={s}
+                  onClick={() => { setInputValue(s); handleSearch(s); }}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.25rem',
+                    padding: '0.4rem 0.75rem',
+                    background: '#f1f5f9',
+                    borderRadius: 999,
+                    fontSize: '0.8rem',
+                    cursor: 'pointer',
+                    color: 'var(--text-secondary)',
+                    transition: 'all 0.15s',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#e2e8f0'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = '#f1f5f9'; }}
+                >
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div className="md:hidden" style={{ marginBottom: '1rem' }}>
-          <button className="btn btn-secondary" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }} onClick={() => setShowFilters(true)}>
-            <SlidersHorizontal size={15} /> Filters
-          </button>
+      <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
+        <div className="hidden md:block" style={{ width: 260, flexShrink: 0, position: 'sticky', top: '1rem' }}>
+          {sidebar}
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-          <div>
-            <h2 style={{ fontSize: '1.4rem', color: 'var(--color-primary)' }}>Search results for "{searchQuery}"</h2>
-            <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>{counts.all} results across all categories</span>
-          </div>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button className="time-tab" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}><Bookmark size={14} /> Save</button>
-            <button className="search-action-btn" style={{ borderRadius: '8px', fontSize: '0.8rem', padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}><Share2 size={14} /> Share</button>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem', overflowX: 'auto' }}>
-          <button onClick={() => { setActiveTab('all'); setPage(1); }} className={`time-tab ${activeTab === 'all' ? 'active' : ''}`}>All ({counts.all})</button>
-          <button onClick={() => { setActiveTab('rera'); setPage(1); }} className={`time-tab ${activeTab === 'rera' ? 'active' : ''}`}>RERA ({counts.rera})</button>
-          <button onClick={() => { setActiveTab('public'); setPage(1); }} className={`time-tab ${activeTab === 'public' ? 'active' : ''}`}>Public ({counts.public})</button>
-          <button onClick={() => { setActiveTab('contractor'); setPage(1); }} className={`time-tab ${activeTab === 'contractor' ? 'active' : ''}`}>Contractors ({counts.contractor})</button>
-          <button onClick={() => { setActiveTab('issues'); setPage(1); }} className={`time-tab ${activeTab === 'issues' ? 'active' : ''}`}>Reports ({counts.issues})</button>
-        </div>
-
-        <div style={{ display: 'grid', gap: '2rem' }}>
-          {counts.all === 0 && (
-            <EmptyState title="No results for this PIN / query" desc="Try a PIN code, project, school, contractor, or location. Clear filters or try 110001." action={<button onClick={()=>{setSearchQuery(''); setCategory('All Categories'); setLocation(''); setPinFilter(''); setEnabled({rera:true,public:true,contractor:true,issues:true}); setPage(1);}} className="btn btn-secondary" style={{ fontSize:'0.78rem' }}>Clear filters</button>} />
-          )}
-
-          {(activeTab === 'rera') && enabled.rera && visibleReraPage.length === 0 && (
-            <EmptyState title="No RERA projects found" desc="Try a different builder, project name, or clear filters." action={<button onClick={clearFilters} className="btn btn-secondary" style={{ fontSize: '0.78rem' }}>Clear filters</button>} />
-          )}
-          {(activeTab === 'public') && enabled.public && visiblePublicPage.length === 0 && (
-            <EmptyState title="No public projects found" desc="Try a different department, location, or clear filters." action={<button onClick={clearFilters} className="btn btn-secondary" style={{ fontSize: '0.78rem' }}>Clear filters</button>} />
-          )}
-          {(activeTab === 'contractor') && enabled.contractor && visibleContractorsPage.length === 0 && (
-            <EmptyState title="No contractors found" desc="Try a different name or registration state." action={<button onClick={clearFilters} className="btn btn-secondary" style={{ fontSize: '0.78rem' }}>Clear filters</button>} />
-          )}
-          {(activeTab === 'issues') && enabled.issues && visibleIssuesPage.length === 0 && (
-            <EmptyState title="No reports found" desc="Try a different keyword or location." action={<button onClick={clearFilters} className="btn btn-secondary" style={{ fontSize: '0.78rem' }}>Clear filters</button>} />
-          )}
-
-          {(activeTab === 'all' || activeTab === 'rera') && enabled.rera && visibleReraPage.length > 0 && (
-            <div>
-              <h3 style={{ fontSize: '1.1rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>RERA Projects <SourceBadge sourceType="A" sourceName="RERA" /></h3>
-              <div style={{ display: 'grid', gap: '1rem' }}>
-                {visibleReraPage.map((p, idx) => (
-                  <div key={idx} className="glass-card" style={{ padding: '1rem', display: 'flex', gap: '1.25rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <div style={{ width: '90px', height: '90px', borderRadius: '8px', overflow: 'hidden', background: '#cbd5e1', flexShrink: 0 }}>
-                      <img src={p.img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                        <h4 style={{ fontSize: '1.05rem', margin: 0 }}>{p.name}</h4>
-                        <span style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: '4px', background: `${p.color}15`, color: p.color, fontWeight: 700 }}>{p.status}</span>
-                      </div>
-                      <p style={{ fontSize: '0.75rem', opacity: 0.6, margin: '0.2rem 0' }}><MapPin size={12} style={{ verticalAlign: '-2px', marginRight: '0.2rem' }} />{p.location} · {p.reraNo} · {p.config}</p>
-                      <span style={{ fontSize: '0.8rem', color: '#ef4444', fontWeight: 700 }}><Clock size={12} style={{ verticalAlign: '-2px', marginRight: '0.2rem' }} />{p.delay} ({p.expected})</span>
-                    </div>
-                    <button className="time-tab" onClick={() => navigate('/module/rera')}>View Details</button>
-                  </div>
-                ))}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {query && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <div>
+                <h2 style={{ fontSize: '1.2rem', color: 'var(--color-primary)', margin: 0 }}>
+                  Results for "{query}"
+                </h2>
+                <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>
+                  {isLoading ? 'Searching…' : `${total} result${total !== 1 ? 's' : ''}`}
+                </span>
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem' }}>
+                  <Bookmark size={14} /> Save
+                </button>
               </div>
             </div>
           )}
 
-          {(activeTab === 'all' || activeTab === 'public') && enabled.public && visiblePublicPage.length > 0 && (
-            <div>
-              <h3 style={{ fontSize: '1.1rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>Public Projects <SourceBadge sourceType="A" sourceName="PMGSY/PWD" /></h3>
-              <div style={{ display: 'grid', gap: '1rem' }}>
-                {visiblePublicPage.map((p, idx) => (
-                  <div key={idx} className="glass-card" style={{ padding: '1rem', display: 'flex', gap: '1.25rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <div style={{ width: '90px', height: '90px', borderRadius: '8px', overflow: 'hidden', background: '#cbd5e1', flexShrink: 0 }}>
-                      <img src={p.img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                        <h4 style={{ fontSize: '1.05rem', margin: 0 }}>{p.name}</h4>
-                        <span style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: '4px', background: `${p.color}15`, color: p.color, fontWeight: 700 }}>{p.status}</span>
-                      </div>
-                      <p style={{ fontSize: '0.75rem', opacity: 0.6, margin: '0.2rem 0' }}><MapPin size={12} style={{ verticalAlign: '-2px', marginRight: '0.2rem' }} />{p.location} · Dept: {p.dept} · Budget: {p.budget}</p>
-                      <span style={{ fontSize: '0.8rem', color: '#f97316', fontWeight: 700 }}><Clock size={12} style={{ verticalAlign: '-2px', marginRight: '0.2rem' }} />{p.delay}</span>
-                    </div>
-                    <button className="time-tab" onClick={() => navigate('/module/infra')}>View Details</button>
-                  </div>
-                ))}
-              </div>
+          {activeTypes.length > 0 && (
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+              {activeTypes.map(type => (
+                <span
+                  key={type}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    padding: '0.3rem 0.6rem',
+                    background: `${ENTITY_COLORS[type]}15`,
+                    border: `1px solid ${ENTITY_COLORS[type]}30`,
+                    borderRadius: 999,
+                    fontSize: '0.72rem',
+                    fontWeight: 600,
+                    color: ENTITY_COLORS[type],
+                  }}
+                >
+                  {ENTITY_LABELS[type]}
+                  <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleTypeToggle(type)} />
+                </span>
+              ))}
             </div>
           )}
 
-          {(activeTab === 'all' || activeTab === 'contractor') && enabled.contractor && visibleContractorsPage.length > 0 && (
-            <div>
-              <h3 style={{ fontSize: '1.1rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>Contractors <SourceBadge sourceType="A" sourceName="MCA/Contractor Reg." /></h3>
-              <div style={{ display: 'grid', gap: '1rem' }}>
-                {visibleContractorsPage.map((c, idx) => (
-                  <div key={idx} className="glass-card" style={{ padding: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <h4 style={{ fontSize: '1.1rem', margin: 0 }}>{c.name}</h4>
-                        {c.verified && <span style={{ fontSize: '0.65rem', background: '#dcfce7', color: '#166534', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>✓ Verified</span>}
-                      </div>
-                      <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem', fontSize: '0.8rem', opacity: 0.8, flexWrap: 'wrap' }}>
-                        <span>Total: <strong>{c.total}</strong></span>
-                        <span>Completed: <strong style={{ color: '#10b981' }}>{c.completed}</strong></span>
-                        <span>Active: <strong>{c.ongoing}</strong></span>
-                        <span>Delayed: <strong style={{ color: '#ef4444' }}>{c.delayed}</strong></span>
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                      <div style={{ textAlign: 'center' }}>
-                        <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--color-primary)' }}>{c.score}</div>
-                        <div style={{ fontSize: '0.6rem', opacity: 0.5 }}>Score / 100</div>
-                      </div>
-                      <button className="time-tab" onClick={() => navigate('/module/contractor')}>View Profile</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {isError && (
+            <ErrorState
+              title="Search failed"
+              message={error?.message || 'An error occurred while searching. Please try again.'}
+              onRetry={refetch}
+            />
+          )}
+
+          {!isError && query && !isLoading && results.length === 0 && (
+            <NoResultsState
+              query={query}
+              onClear={() => { clearFilters(); setQuery(''); setInputValue(''); }}
+            />
+          )}
+
+          {!query && !isLoading && (
+            <EmptyState
+              title="Start searching"
+              description="Enter a search term to find schools, projects, contractors, builders, healthcare centers, schemes, or issues."
+            />
+          )}
+
+          {results.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {isLoading && results.length === 0 ? (
+                [...Array(5)].map((_, i) => <SkeletonResultCard key={i} />)
+              ) : (
+                results.map(result => (
+                  <SearchResultCard key={result.id} result={result} onNavigate={handleResultNavigate} />
+                ))
+              )}
             </div>
           )}
 
-          {(activeTab === 'all' || activeTab === 'issues') && enabled.issues && visibleIssuesPage.length > 0 && (
-            <div>
-              <h3 style={{ fontSize: '1.1rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.5rem', marginBottom: '1rem', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>Reports & Issues <SourceBadge sourceType="C" sourceName="JantaX Citizens" /></h3>
-              <div style={{ display: 'grid', gap: '1rem' }}>
-                {visibleIssuesPage.map((issue, idx) => (
-                  <div key={idx} className="glass-card" style={{ padding: '1rem', display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                    <div style={{ width: '72px', height: '72px', borderRadius: '8px', overflow: 'hidden', background: '#cbd5e1', flexShrink: 0 }}>
-                      <img src={issue.img} alt={issue.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <h4 style={{ fontSize: '0.95rem', margin: 0 }}>{issue.title}</h4>
-                      <p style={{ fontSize: '0.75rem', opacity: 0.6, margin: '0.25rem 0' }}><MapPin size={12} style={{ verticalAlign: '-2px', marginRight: '0.2rem' }} />{issue.place}</p>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{issue.count} · {issue.time}</span>
-                    </div>
-                    <span style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: '4px', background: '#fef3c7', color: '#92400e', fontWeight: 700 }}>{issue.badge}</span>
-                  </div>
-                ))}
-              </div>
+          {isLoading && results.length > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
+              <Loader2 size={24} style={{ animation: 'spin 1s linear infinite', opacity: 0.5 }} />
             </div>
           )}
 
-          {totalPages > 1 && (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
-              <button className="btn btn-secondary" disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))}>← Prev</button>
-              <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Page {page} of {totalPages}</span>
-              <button className="btn btn-secondary" disabled={page === totalPages} onClick={() => setPage(p => Math.min(totalPages, p + 1))}>Next →</button>
+          {pagination.totalPages > 1 && (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', marginTop: '2rem', flexWrap: 'wrap' }}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setPage(page - 1)}
+                disabled={page <= 1}
+                style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+              >
+                Previous
+              </button>
+              <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>
+                Page {page} of {pagination.totalPages}
+              </span>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setPage(page + 1)}
+                disabled={page >= pagination.totalPages}
+                style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
+              >
+                Next
+              </button>
             </div>
           )}
         </div>
       </div>
+
+      {showFilters && (
+        <div className="fixed inset-0 z-50 flex" role="dialog" aria-modal="true">
+          <div className="fixed inset-0 bg-black/40" onClick={() => setShowFilters(false)} />
+          <div className="relative bg-white w-[300px] max-w-[85%] h-full overflow-y-auto p-4 shadow-xl" style={{ marginLeft: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+              <button onClick={() => setShowFilters(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
+                <X size={20} />
+              </button>
+            </div>
+            {sidebar}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

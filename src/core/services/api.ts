@@ -75,34 +75,66 @@ function mockRecords(code: string, module?: string): RecordsResponse {
     hasDrinkingWater: true,
     lastCheckIn: new Date().toISOString(),
   });
-  const mkInfra = (i:number): ApiRecord => ({
-    id: `mock-infra-${code}-${i}`,
-    moduleId: 'infra',
-    location: { pinCode: code, state: 'Delhi', district: 'New Delhi' },
-    titleEnglish: i===0 ? 'Construction of Elevated Corridor Phase-2' : `PMGSY Road Project ${code}-${i}`,
-    titleHindi: i===0 ? 'एलिवेटेड कॉरिडोर निर्माण' : `सड़क परियोजना ${code}-${i}`,
-    status: ['Construction','Delayed','Completed'][i%3],
-    groundTruthScore: 70 + (h+i*5)%30,
-    reality: { evidenceCount: i },
-    claim: { value: 60 + i*10 },
-    updatedAt: new Date().toISOString(),
-    department: 'PWD',
-    ministry: 'Ministry of Road Transport',
-    budget: `${20+i*15} Cr`,
-    startDate: '2022-03-15',
-    expectedCompletion: '2024-12-31',
-    claimCompletionPct: 60 + i*10,
-    responsibleOfficer: 'EE, PWD',
-    evidenceCount: i,
-    sourceUrl: 'https://mospi.gov.in',
-  });
+  const mkInfra = (i:number): ApiRecord => {
+    let p: any;
+    try {
+      const { getStoredProjects } = require('../../modules/infra/services/projectService');
+      const allProjects = getStoredProjects();
+      p = allProjects[i % allProjects.length];
+    } catch {}
+
+    if (p) {
+      return {
+        id: p.id,
+        moduleId: 'infra',
+        location: { pinCode: p.pinCode, state: p.state, district: p.district },
+        titleEnglish: p.nameEnglish,
+        titleHindi: p.nameHindi,
+        status: p.status,
+        groundTruthScore: p.groundTruth.physicalScore,
+        reality: { evidenceCount: p.evidenceDocuments.length },
+        claim: { value: p.progressPhysical },
+        updatedAt: p.originalSource.lastUpdated || new Date().toISOString(),
+        department: p.implementingAgency,
+        ministry: p.ministry,
+        budget: `₹${(p.budgetAnticipatedLakhs/100).toFixed(1)} Cr`,
+        startDate: p.startDate,
+        expectedCompletion: p.anticipatedCompletionDate,
+        claimCompletionPct: p.progressPhysical,
+        responsibleOfficer: `${p.responsibleOfficer} (${p.responsibleOfficerDesignation})`,
+        evidenceCount: p.evidenceDocuments.length,
+        sourceUrl: p.originalSource.url,
+      };
+    }
+
+    return {
+      id: `mock-infra-${code}-${i}`,
+      moduleId: 'infra',
+      location: { pinCode: code, state: 'Delhi', district: 'New Delhi' },
+      titleEnglish: i===0 ? 'Construction of Elevated Corridor Phase-2' : `PMGSY Road Project ${code}-${i}`,
+      titleHindi: i===0 ? 'एलिवेटेड कॉरिडोर निर्माण' : `सड़क परियोजना ${code}-${i}`,
+      status: ['Construction','Delayed','Completed'][i%3],
+      groundTruthScore: 70 + (h+i*5)%30,
+      reality: { evidenceCount: i },
+      claim: { value: 60 + i*10 },
+      updatedAt: new Date().toISOString(),
+      department: 'PWD',
+      ministry: 'Ministry of Road Transport',
+      budget: `${20+i*15} Cr`,
+      startDate: '2022-03-15',
+      expectedCompletion: '2024-12-31',
+      claimCompletionPct: 60 + i*10,
+      responsibleOfficer: 'EE, PWD',
+      evidenceCount: i,
+      sourceUrl: 'https://mospi.gov.in',
+    };
+  };
   const records: RecordsResponse['records'] = {};
   const wantSchool = !module || module==='school';
   const wantInfra = !module || module==='infra';
   if (wantSchool) records.school = [mkSchool(0), mkSchool(1)].slice(0, 2 + (h%1));
   if (wantInfra) records.infra = [mkInfra(0), mkInfra(1)];
   if (!module) {
-    // also add stubs for other modules so counts feel live (mapped as infra for catalog)
     records.rera = [{ id:`mock-rera-${code}`, reraNumber:`RERA-${code}`, name:`Builder Project ${code}` } as any];
     records.hospital = [{ id:`mock-hosp-${code}`, name:`CHC ${code}` } as any];
     records.pds = [{ id:`mock-pds-${code}`, shopName:`FPS ${code}` } as any];
@@ -283,6 +315,33 @@ export const api = {
       return anyRes.reports || anyRes.data || [];
     }),
 
+  search: (params: {
+    q: string;
+    type?: string;
+    pincode?: string;
+    page?: number;
+    limit?: number;
+    state?: string;
+    district?: string;
+    status?: string;
+  }) => {
+    const sp = new URLSearchParams();
+    if (params.q) sp.set('q', params.q);
+    if (params.type) sp.set('type', params.type);
+    if (params.pincode) sp.set('pincode', params.pincode);
+    if (params.page) sp.set('page', String(params.page));
+    if (params.limit) sp.set('limit', String(params.limit));
+    if (params.state) sp.set('state', params.state);
+    if (params.district) sp.set('district', params.district);
+    if (params.status) sp.set('status', params.status);
+    return apiFetch<SearchResponse>(`/api/search?${sp.toString()}`);
+  },
+
+  searchAutocomplete: (q: string, pincode?: string) => {
+    const sp = new URLSearchParams({ q, ...(pincode ? { pincode } : {}) });
+    return apiFetch<AutocompleteResponse>(`/api/search/autocomplete?${sp.toString()}`);
+  },
+
   login: (email: string, password: string) => apiFetch<{ token: string }>('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
 
   register: (name: string, email: string, password: string, role: string) =>
@@ -292,3 +351,52 @@ export const api = {
 };
 
 export type { PincodeInfo as PincodeDataType };
+
+// --- Search Types ---
+export type SearchEntityType = 'school' | 'infra' | 'rera' | 'hospital' | 'pds' | 'contractor' | 'source' | 'issue' | 'grievance';
+
+export type MatchType = 'exact' | 'related' | 'location';
+
+export interface SearchResult {
+  id: string;
+  type: SearchEntityType;
+  title: string;
+  description: string;
+  matchType?: MatchType;
+  location?: {
+    pincode: string;
+    state: string;
+    district: string;
+  };
+  metadata: Record<string, unknown>;
+  score: number;
+  source: {
+    name: string;
+    freshness: string;
+    reliability: 'high' | 'medium' | 'low';
+  };
+}
+
+export interface SearchResponse {
+  results: SearchResult[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+  query: string;
+  filters: Record<string, unknown>;
+}
+
+export interface AutocompleteSuggestion {
+  text: string;
+  type: SearchEntityType;
+  subtitle?: string;
+  pincode?: string;
+}
+
+export interface AutocompleteResponse {
+  suggestions: AutocompleteSuggestion[];
+  query: string;
+}

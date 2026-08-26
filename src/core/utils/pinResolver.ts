@@ -50,17 +50,6 @@ const DIGIT_REGION_MAP: Record<string, 'North' | 'South' | 'East' | 'West' | 'Ce
   '9': 'Central',
 };
 
-const STATE_FALLBACK_MAP: Record<string, string> = {
-  '1': 'Delhi/Punjab/Haryana/HP',
-  '2': 'Uttar Pradesh / Uttarakhand',
-  '3': 'Rajasthan / Gujarat',
-  '4': 'Maharashtra / Madhya Pradesh',
-  '5': 'Karnataka / Andhra Pradesh',
-  '6': 'Tamil Nadu / Kerala',
-  '7': 'West Bengal / North-East',
-  '8': 'Bihar / Jharkhand / Odisha',
-};
-
 export function resolvePincode(pin: string): ResolvedLocation {
   const cleaned = pin.trim();
   const isValid = isValidIndianPincode(cleaned);

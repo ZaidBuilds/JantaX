@@ -64,9 +64,10 @@ model Pincode {
   reraProjects    ReraProject[]
   hospitals       Hospital[]
   pdsShops        PdsShop[]
-  grievances      Grievance[]
+  grievances      CpgramGrievance[]
   citizenReports  CitizenReport[]
   follows         Follow[]
+  issues          Issue[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -186,7 +187,7 @@ model PdsShop {
 }
 
 /// CPGRAMS grievance backlog (DARPG monthly reports).
-model Grievance {
+model CpgramGrievance {
   id          String   @id @default(cuid())
   pincodeCode String
   pincode     Pincode  @relation(fields: [pincodeCode], references: [code])
@@ -203,6 +204,183 @@ model Grievance {
 
   @@index([pincodeCode])
   @@index([ministry])
+}
+
+enum IssueStatus {
+  DETECTED
+  EVIDENCE_COLLECTED
+  AUTHORITY_IDENTIFIED
+  GRIEVANCE_DRAFTED
+  GRIEVANCE_SUBMITTED
+  AWAITING_RESPONSE
+  RESOLVED
+  REJECTED
+}
+
+enum IssueSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+/// Issue tracking system for accountability
+model Issue {
+  id            String   @id @default(cuid())
+  issueId       String   @unique
+  title         String
+  description   String
+  entityType    String
+  entityId      String
+  pincodeCode   String?
+  pincode       Pincode? @relation(fields: [pincodeCode], references: [code])
+  status        IssueStatus @default(DETECTED)
+  detectedAt    DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  issueDetail   IssueDetail?
+  grievances    Grievance[]
+  resolutions   Resolution[]
+  followUps     FollowUp[]
+
+  @@index([issueId])
+  @@index([entityType, entityId])
+  @@index([pincodeCode])
+  @@index([status])
+}
+
+model IssueDetail {
+  id            String   @id @default(cuid())
+  issue         Issue    @relation(fields: [issueId], references: [id])
+  issueId       String   @unique
+  severity      IssueSeverity?
+  impactArea    String?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([issueId])
+}
+
+model AuthorityResolver {
+  id              String   @id @default(cuid())
+  entityType      String
+  authority       String
+  officialChannel String
+  submissionUrl   String?
+  isActive        Boolean @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  grievances      Grievance[]
+
+  @@index([entityType])
+  @@index([authority])
+}
+
+enum GrievanceStatus {
+  DRAFT
+  SUBMITTED_TO_OFFICIAL
+  AWAITING_RESPONSE
+  RESPONSE_RECEIVED
+  APPEALED
+  RESOLVED
+  CLOSED
+}
+
+model Grievance {
+  id            String   @id @default(cuid())
+  grievanceId   String   @unique
+  issue         Issue    @relation(fields: [issueId], references: [id])
+  issueId       String
+  authorityResolver AuthorityResolver? @relation(fields: [authorityResolverId], references: [id])
+  authorityResolverId String?
+  officialChannel String
+  draft         String
+  status        GrievanceStatus @default(DRAFT)
+  submittedToOfficial Boolean @default(false)
+  officialReferenceNumber String?
+  submittedAt   DateTime?
+  officialResponse String?
+  responseDate  DateTime?
+  appealAvailable Boolean @default(false)
+  followUpAt    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  timeline      GrievanceTimeline[]
+  resolutions   Resolution[]
+  followUps     FollowUp[]
+
+  @@index([grievanceId])
+  @@index([issueId])
+  @@index([authorityResolverId])
+  @@index([status])
+  @@index([submittedToOfficial])
+}
+
+model GrievanceTimeline {
+  id            String   @id @default(cuid())
+  grievance     Grievance @relation(fields: [grievanceId], references: [id])
+  grievanceId   String
+  eventType     String
+  description   String
+  occurredAt    DateTime @default(now())
+  actor         String?
+  metadata      Json?
+
+  @@index([grievanceId])
+  @@index([occurredAt])
+}
+
+enum ResolutionStatus {
+  PROPOSED
+  VERIFIED_BY_CITIZEN
+  VERIFIED_BY_OFFICIAL
+  VERIFIED_BY_BOTH
+  REJECTED
+}
+
+model Resolution {
+  id            String   @id @default(cuid())
+  resolutionId  String   @unique
+  issue         Issue?   @relation(fields: [issueId], references: [id])
+  issueId       String?
+  grievance     Grievance? @relation(fields: [grievanceId], references: [id])
+  grievanceId   String?
+  description   String
+  status        ResolutionStatus @default(PROPOSED)
+  verifiedByCitizen Boolean @default(false)
+  verifiedByOfficial Boolean @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([resolutionId])
+  @@index([issueId])
+  @@index([grievanceId])
+  @@index([status])
+}
+
+enum FollowUpStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+}
+
+model FollowUp {
+  id            String   @id @default(cuid())
+  followUpId    String   @unique
+  grievance     Grievance? @relation(fields: [grievanceId], references: [id])
+  grievanceId   String?
+  issue         Issue?   @relation(fields: [issueId], references: [id])
+  issueId       String?
+  description   String
+  status        FollowUpStatus @default(PENDING)
+  initiatedAt   DateTime @default(now())
+  completedAt   DateTime?
+
+  @@index([followUpId])
+  @@index([grievanceId])
+  @@index([issueId])
+  @@index([status])
 }
 
 /// Contractor / builder ledger (GeM, CPPP tender awards).

@@ -74,7 +74,10 @@ export type ModuleId =
   | 'pollution'    // 12. प्रदूषण नक्शा
   | 'land'         // 13. ज़मीन रजिस्ट्री
   | 'election'     // 14. चुनाव खर्चा
-  | 'grievance';   // 15. शिकायत स्कोर
+  | 'grievance'    // 15. शिकायत स्कोर
+  | 'mplads'       // 16. सांसद/विधायक निधि
+  | 'booth'        // 17. मतदान केंद्र & BLO
+  | 'courts';      // 18. जिला न्यायालय & केस पेंडेंसी
 
 /**
  * Module metadata — used by the Home page grid and sidebar navigation.

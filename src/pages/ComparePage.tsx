@@ -3,6 +3,8 @@ import { HelpCircle, GraduationCap, HardHat, Construction, Home, MapPin, Plus, D
 import { api } from '../core/services/api';
 import { useSearchParams } from 'react-router-dom';
 import { resolvePincode } from '../core/utils/pinResolver';
+import { ComparisonTable } from '../components/compare/ComparisonTable';
+import type { ComparisonData } from '../components/compare/types';
 
 /**
  * JantaX Compare Matrix Page
@@ -278,35 +280,68 @@ export function ComparePage() {
             pinLoading ? (
               <div className="skeleton" style={{ height: 200, borderRadius: 12 }} />
             ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-              <thead>
-                <tr style={{ borderBottom: '2px solid #cbd5e1', textAlign: 'left' }}>
-                  <th style={{ paddingBottom: '0.75rem', width: '200px' }}>Metric</th>
-                  {pinInputs.filter(Boolean).map((p) => (
-                    <th key={p} style={{ paddingBottom: '0.75rem', minWidth: '150px' }}>{p}<div style={{ fontSize: '0.7rem', fontWeight: 500, opacity: 0.6 }}>{resolvePincode(p).district}, {resolvePincode(p).stateCode}</div></th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { label: 'State', get: (p: string) => resolvePincode(p).state },
-                  { label: 'Schools', get: (p: string) => pinCompareData[p]?.counts?.schools ?? '—' },
-                  { label: 'Public Projects', get: (p: string) => pinCompareData[p]?.counts?.infraProjects ?? '—' },
-                  { label: 'RERA Projects', get: (p: string) => pinCompareData[p]?.counts?.reraProjects ?? '—' },
-                  { label: 'Healthcare Centers', get: (p: string) => pinCompareData[p]?.counts?.hospitals ?? '—' },
-                  { label: 'Grievances (CPGRAMS)', get: (p: string) => pinCompareData[p]?.counts?.grievances ?? '—' },
-                  { label: 'Welfare Shops (PDS)', get: (p: string) => pinCompareData[p]?.counts?.pdsShops ?? '—' },
-                  { label: 'Citizen Reports', get: (p: string) => pinCompareData[p]?.counts?.citizenReports ?? '—' },
-                ].map((row, ri) => (
-                  <tr key={ri} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                    <td style={{ padding: '0.85rem 0', fontWeight: 700 }}>{row.label}</td>
-                    {pinInputs.filter(Boolean).map((p) => (
-                      <td key={p} style={{ padding: '0.85rem 0' }}>{row.get(p)}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+              (() => {
+                const validPins = pinInputs.filter(Boolean);
+                const areaData: ComparisonData = {
+                  entities: validPins.map(p => ({
+                    id: `pin-${p}`,
+                    type: 'location',
+                    name: `PIN ${p}`,
+                    subtitle: resolvePincode(p).district,
+                    location: { pincode: p, district: resolvePincode(p).district, state: resolvePincode(p).state },
+                  })),
+                  rows: [
+                    {
+                      id: 'location-info',
+                      category: 'State',
+                      metrics: validPins.map(p => ({ id: `state-${p}`, label: 'State', value: resolvePincode(p).state, status: 'available' as const })),
+                    },
+                    {
+                      id: 'schools',
+                      category: 'Schools',
+                      categoryHi: 'विद्यालय',
+                      metrics: validPins.map(p => ({ id: `schools-${p}`, label: 'Schools', value: pinCompareData[p]?.counts?.schools ?? '—', source: { name: 'Catalog API', type: 'A' as const }, status: pinCompareData[p] ? 'available' as const : 'unavailable' as const })),
+                    },
+                    {
+                      id: 'public-projects',
+                      category: 'Public Projects',
+                      categoryHi: 'सार्वजनिक परियोजनाएं',
+                      metrics: validPins.map(p => ({ id: `proj-${p}`, label: 'Public Projects', value: pinCompareData[p]?.counts?.infraProjects ?? '—', source: { name: 'CPWD/Gem.gov.in', type: 'B' as const }, status: pinCompareData[p] ? 'available' as const : 'unavailable' as const })),
+                    },
+                    {
+                      id: 'rera-projects',
+                      category: 'RERA Projects',
+                      categoryHi: 'रियर परियोजनाएं',
+                      metrics: validPins.map(p => ({ id: `rera-${p}`, label: 'RERA Projects', value: pinCompareData[p]?.counts?.reraProjects ?? '—', source: { name: 'RERA Portal', type: 'A' as const }, status: pinCompareData[p] ? 'available' as const : 'unavailable' as const })),
+                    },
+                    {
+                      id: 'healthcare',
+                      category: 'Healthcare Centers',
+                      categoryHi: 'स्वास्थ्य केंद्र',
+                      metrics: validPins.map(p => ({ id: `hc-${p}`, label: 'Healthcare Centers', value: pinCompareData[p]?.counts?.hospitals ?? '—', source: { name: 'MoHFW', type: 'A' as const }, status: pinCompareData[p] ? 'available' as const : 'unavailable' as const })),
+                    },
+                    {
+                      id: 'grievances',
+                      category: 'Grievances (CPGRAMS)',
+                      categoryHi: 'शिकायतें',
+                      metrics: validPins.map(p => ({ id: `gr-${p}`, label: 'Grievances', value: pinCompareData[p]?.counts?.grievances ?? '—', source: { name: 'CPGRAMS', type: 'B' as const }, status: pinCompareData[p] ? 'available' as const : 'unavailable' as const })),
+                    },
+                    {
+                      id: 'welfare-shops',
+                      category: 'Welfare Shops (PDS)',
+                      categoryHi: 'कल्याण दुकानें',
+                      metrics: validPins.map(p => ({ id: `pds-${p}`, label: 'PDS Shops', value: pinCompareData[p]?.counts?.pdsShops ?? '—', source: { name: 'NFSA/State Portals', type: 'B' as const }, status: pinCompareData[p] ? 'available' as const : 'unavailable' as const })),
+                    },
+                    {
+                      id: 'citizen-reports',
+                      category: 'Citizen Reports',
+                      categoryHi: 'नागरिक रिपोर्ट',
+                      metrics: validPins.map(p => ({ id: `cr-${p}`, label: 'Citizen Reports', value: pinCompareData[p]?.counts?.citizenReports ?? '—', source: { name: 'JantaX Reports', type: 'C' as const }, status: pinCompareData[p] ? 'available' as const : 'unavailable' as const })),
+                    },
+                  ],
+                };
+                return <ComparisonTable data={areaData} showSourceDisclosure />;
+              })()
             )
           ) : entityTab !== 'schools' ? (
             <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
