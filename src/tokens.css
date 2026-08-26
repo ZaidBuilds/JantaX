@@ -1,194 +1,67 @@
-/* JantaX Modern Civic OS Design Tokens */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+/* JantaX Clean Design Tokens — Public Information Utility */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  /* Color Palette — Modern Deep Navy, Electric Blue & Saffron */
-  --bg-primary: #f8fafc;
-  --bg-secondary: #ffffff;
-  --bg-card: #ffffff;
-  --bg-card-hover: #fafcfd;
-  --bg-glass: rgba(255, 255, 255, 0.85);
-  
-  --border-color: #e2e8f0;
-  --border-subtle: #edf2f7;
-  --border-soft: #f1f5f9;
-  --border-focus: #3b82f6;
+  /* Neutral Color Palette */
+  --bg-primary: #f9fafb;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f3f4f6;
+  --bg-muted: #e5e7eb;
 
-  /* Brand Colors */
-  --color-primary: #0b192c;
-  --color-primary-900: #060e1a;
-  --color-primary-800: #0b192c;
-  --color-primary-700: #132a48;
-  --color-primary-600: #1e3a8a;
-  --color-primary-500: #2563eb;
-  --color-primary-100: #dbeafe;
-  --color-primary-50: #eff6ff;
+  --border-color: #e5e7eb;
+  --border-subtle: #f3f4f6;
+  --border-dark: #d1d5db;
+  --border-focus: #0f2d59;
 
-  --color-accent: #f97316;
-  --color-accent-600: #ea580c;
-  --color-accent-400: #fb923c;
-  --color-accent-50: #fff7ed;
-  --color-accent-glow: rgba(249, 115, 22, 0.15);
+  /* Typography Colors */
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --text-inverse: #ffffff;
 
-  --color-emerald: #10b981;
-  --color-emerald-50: #ecfdf5;
-  --color-emerald-border: #a7f3d0;
+  /* Brand / Primary Civic Color */
+  --color-primary: #0f2d59;
+  --color-primary-hover: #0a1f3d;
+  --color-primary-subtle: #eff6ff;
+  --color-primary-border: #bfdbfe;
 
-  --color-amber: #f59e0b;
-  --color-amber-50: #fffbeb;
-  --color-amber-border: #fde68a;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
 
-  --color-rose: #ef4444;
-  --color-rose-50: #fef2f2;
-  --color-rose-border: #fecaca;
+  /* Semantic Status Colors (Used purely for meaning) */
+  --status-good-text: #166534;
+  --status-good-bg: #f0fdf4;
+  --status-good-border: #bbf7d0;
 
-  --color-cyan: #06b6d4;
-  --color-cyan-50: #ecfeff;
+  --status-warn-text: #92400e;
+  --status-warn-bg: #fffbeb;
+  --status-warn-border: #fde68a;
 
-  --color-purple: #8b5cf6;
-  --color-purple-50: #f5f3ff;
+  --status-alert-text: #991b1b;
+  --status-alert-bg: #fef2f2;
+  --status-alert-border: #fecaca;
 
-  /* Status Tokens */
-  --color-good: #10b981;
-  --color-good-bg: #ecfdf5;
-  --color-good-border: #a7f3d0;
+  --status-info-text: #1e40af;
+  --status-info-bg: #eff6ff;
+  --status-info-border: #dbeafe;
 
-  --color-info: #2563eb;
-  --color-info-bg: #eff6ff;
-  --color-info-border: #bfdbfe;
-
-  --color-warn: #f59e0b;
-  --color-warn-bg: #fffbeb;
-  --color-warn-border: #fde68a;
-
-  --color-alert: #ef4444;
-  --color-alert-bg: #fef2f2;
-  --color-alert-border: #fecaca;
-
-  /* Typography */
-  --font-heading: 'Outfit', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Typography Scale */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-  --text-accent: #f97316;
-
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #0b192c 0%, #1e3a8a 100%);
-  --gradient-accent: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-  --gradient-electric: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
-  --gradient-emerald: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  --killer-line: linear-gradient(90deg, #0b192c 0%, #2563eb 50%, #f97316 100%);
-  --gradient-hero: radial-gradient(1200px circle at 50% -20%, rgba(37, 99, 235, 0.08) 0%, rgba(249, 115, 22, 0.04) 40%, #f8fafc 100%);
-
-  /* Elevation & Shadows */
-  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
-  --shadow-sm: 0 2px 6px rgba(15, 23, 42, 0.05);
-  --shadow-md: 0 6px 18px -2px rgba(15, 23, 42, 0.07);
-  --shadow-lg: 0 14px 30px -4px rgba(15, 23, 42, 0.09);
-  --shadow-xl: 0 24px 48px -8px rgba(11, 25, 44, 0.12);
-  --glass-shadow: 0 8px 32px rgba(15, 23, 42, 0.06);
-  --focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.18);
-  --focus-ring-accent: 0 0 0 3px rgba(249, 115, 22, 0.2);
-
-  /* Radius */
-  --radius-xs: 6px;
-  --radius-control: 10px;
-  --radius-surface: 16px;
-  --radius-lg: 20px;
-  --radius-xl: 24px;
+  /* Sizing & Radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
   --radius-pill: 9999px;
 
-  /* Transitions */
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-smooth: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
+  /* Shadows — Minimal / Subtle */
+  --shadow-none: none;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #0f2d59;
 
-/* Base Card Class */
-.jantax-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-surface);
-  box-shadow: var(--shadow-sm);
-  transition: all var(--transition-normal);
-}
-
-.jantax-card:hover {
-  border-color: rgba(37, 99, 235, 0.25);
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-}
-
-/* Glass Surface */
-.jantax-glass {
-  background: var(--bg-glass);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-}
-
-/* Badge Utilities */
-.jantax-badge-good {
-  background: var(--color-good-bg);
-  color: #065f46;
-  border: 1px solid var(--color-good-border);
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.2rem 0.65rem;
-  border-radius: var(--radius-pill);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.jantax-badge-info {
-  background: var(--color-info-bg);
-  color: #1e40af;
-  border: 1px solid var(--color-info-border);
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.2rem 0.65rem;
-  border-radius: var(--radius-pill);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.jantax-badge-warn {
-  background: var(--color-warn-bg);
-  color: #92400e;
-  border: 1px solid var(--color-warn-border);
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.2rem 0.65rem;
-  border-radius: var(--radius-pill);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.jantax-badge-alert {
-  background: var(--color-alert-bg);
-  color: #991b1b;
-  border: 1px solid var(--color-alert-border);
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.2rem 0.65rem;
-  border-radius: var(--radius-pill);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-/* Responsive Table Wrapper */
-.jantax-table-wrapper {
-  width: 100%;
-  overflow-x: auto;
-  border-radius: var(--radius-surface);
-  border: 1px solid var(--border-color);
-  background: var(--bg-card);
-  box-shadow: var(--shadow-sm);
+  /* Layout */
+  --max-width-content: 960px;
+  --max-width-wide: 1140px;
 }

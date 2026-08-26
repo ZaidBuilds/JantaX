@@ -1,36 +1,68 @@
-import { useLanguage, SUPPORTED_LANGUAGES } from '../core/context/LanguageContext';
+import React, { useState, useRef, useEffect } from 'react';
+import { Globe, Check, ChevronDown } from 'lucide-react';
+import { useLanguage, SUPPORTED_LANGUAGES, LanguageCode } from '../core/context/LanguageContext';
 
-function LanguageToggle() {
-  const { language, setLanguage, t } = useLanguage();
+export function LanguageToggle() {
+  const { language, setLanguage } = useLanguage();
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const currentLang = SUPPORTED_LANGUAGES.find((l) => l.code === language) || SUPPORTED_LANGUAGES[0];
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }}>
-      <select
-        aria-label={t('language')}
-        value={language}
-        onChange={(e) => setLanguage(e.target.value as typeof language)}
-        style={{
-          appearance: 'none',
-          padding: '0.38rem 1.4rem 0.38rem 0.8rem',
-          fontSize: '0.75rem',
-          fontWeight: 700,
-          color: 'var(--text-primary)',
-          background: '#ffffff',
-          border: '1px solid #e2e8f0',
-          borderRadius: '9999px',
-          cursor: 'pointer',
-          outline: 'none',
-          minWidth: '92px',
-          boxShadow: '0 1px 3px rgba(15,23,42,0.04)',
-        }}
+    <div className="language-selector-wrapper" ref={dropdownRef}>
+      <button
+        type="button"
+        className="language-selector-btn"
+        onClick={() => setIsOpen((prev) => !prev)}
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        aria-label="Select Language"
       >
-        {SUPPORTED_LANGUAGES.map((lang) => (
-          <option key={lang.code} value={lang.code} style={{ background: '#ffffff', color: '#0f172a' }}>
-            {lang.label} · {lang.labelLocal}
-          </option>
-        ))}
-      </select>
-      <span style={{ position: 'absolute', right: '0.55rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', opacity: 0.5, fontSize: '0.7rem' }}>▾</span>
+        <Globe size={14} className="globe-icon" />
+        <span className="lang-name">{currentLang.label}</span>
+        <ChevronDown size={12} className={`chevron-arrow ${isOpen ? 'open' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <div className="language-dropdown-menu animate-fade-in" role="listbox">
+          <div className="dropdown-menu-title">Select Language</div>
+          <div className="language-options-list">
+            {SUPPORTED_LANGUAGES.map((lang) => {
+              const isSelected = lang.code === language;
+              return (
+                <button
+                  key={lang.code}
+                  type="button"
+                  className={`language-option-item ${isSelected ? 'selected' : ''}`}
+                  onClick={() => {
+                    setLanguage(lang.code as LanguageCode);
+                    setIsOpen(false);
+                  }}
+                  role="option"
+                  aria-selected={isSelected}
+                >
+                  <div className="lang-option-text">
+                    <span className="lang-primary-label">{lang.label}</span>
+                    <span className="lang-native-label">{lang.labelLocal}</span>
+                  </div>
+                  {isSelected && <Check size={14} className="lang-check-icon" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
