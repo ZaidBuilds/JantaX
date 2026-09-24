@@ -5,6 +5,7 @@ import type { CitizenReport } from '../types/citizenReport';
 import { ReportStatus } from '../components/ReportStatus';
 import { OfficialActionLayer } from '../components/OfficialActionLayer';
 import { OfficialRebuttalBanner } from '../components/OfficialRebuttalBanner';
+import { QuorumCorroborationCard } from '../components/QuorumCorroborationCard';
 import { ArrowLeft, FileText, Send, Share2, AlertCircle } from 'lucide-react';
 
 interface ReportDetailPageProps {
@@ -78,6 +79,7 @@ export function ReportDetailPage({ activeTab: initialTab }: ReportDetailPageProp
       {/* Tab 1: Citizen Report & Moderation */}
       {activeTab === 'report' && (
         <>
+          <QuorumCorroborationCard report={report} onQuorumUpdated={() => setReport(getReportById(report.id))} />
           <ReportStatus report={report} onUpdate={() => setReport(getReportById(report.id))} />
           <OfficialRebuttalBanner report={report} onRebuttalSubmitted={() => setReport(getReportById(report.id))} />
         </>

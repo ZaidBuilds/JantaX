@@ -13,13 +13,16 @@ import {
   ArrowRight,
   SlidersHorizontal,
   Award,
-  BarChart3
+  BarChart3,
+  Gavel
 } from 'lucide-react';
 import { searchContractors } from '../services/contractorService';
+import { ContractorDamagesLedger } from '../components/ContractorDamagesLedger';
 import type { ContractorProfile } from '../types/contractorIntelligence';
 
 export function ContractorsDirectoryPage() {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'directory' | 'damages'>('directory');
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('All');
   const [sortBy, setSortBy] = useState<'score_desc' | 'value_desc' | 'contracts_desc' | 'completion_desc'>('score_desc');
@@ -133,6 +136,51 @@ export function ContractorsDirectoryPage() {
         </div>
       </div>
 
+      {/* Subsystem Navigation Tabs */}
+      <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '2px solid #e2e8f0', marginBottom: '1.75rem' }}>
+        <button
+          onClick={() => setActiveTab('directory')}
+          style={{
+            padding: '0.75rem 1.25rem',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'directory' ? '3px solid #f97316' : '3px solid transparent',
+            color: activeTab === 'directory' ? '#f97316' : '#64748b',
+            fontWeight: activeTab === 'directory' ? 800 : 600,
+            fontSize: '0.92rem',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.4rem'
+          }}
+        >
+          <Building2 size={16} /> Contractor Directory & Rankings ({stats.totalCount})
+        </button>
+
+        <button
+          onClick={() => setActiveTab('damages')}
+          style={{
+            padding: '0.75rem 1.25rem',
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === 'damages' ? '3px solid #f97316' : '3px solid transparent',
+            color: activeTab === 'damages' ? '#f97316' : '#64748b',
+            fontWeight: activeTab === 'damages' ? 800 : 600,
+            fontSize: '0.92rem',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.4rem'
+          }}
+        >
+          <Gavel size={16} /> Liquidated Damages & Default Arrears Ledger
+        </button>
+      </div>
+
+      {activeTab === 'damages' ? (
+        <ContractorDamagesLedger />
+      ) : (
+        <>
       {/* Stats Cards */}
       <div style={{
         display: 'grid',
@@ -381,6 +429,8 @@ export function ContractorsDirectoryPage() {
           </div>
         ))}
       </div>
+      </>
+      )}
     </div>
   );
 }
