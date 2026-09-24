@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../../core/services/api';
 import type { SchoolRecord } from '../../modules/school/types';
 import { Search, MapPin, GraduationCap, Filter, Download, Plus, AlertTriangle, X } from 'lucide-react';
 import { SkeletonCard } from '../../components/data-states';
 
 export function SchoolsSearchPage() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [pin, setPin] = useState(searchParams.get('pin') || '');
@@ -142,7 +141,7 @@ export function SchoolsSearchPage() {
             </div>
             <div style={{ display: 'grid', gap: '0.75rem' }}>
               {filtered.slice(0, 20).map(school => (
-                <SchoolSearchResultCard key={school.id} school={school} onView={() => navigate(`/schools/${school.id}`)} />
+                <SchoolSearchResultCard key={school.id} school={school} />
               ))}
             </div>
           </>
@@ -152,12 +151,14 @@ export function SchoolsSearchPage() {
   );
 }
 
-function SchoolSearchResultCard({ school, onView }: { school: SchoolRecord; onView: () => void }) {
+function SchoolSearchResultCard({ school }: { school: SchoolRecord }) {
   const scoreColor = school.groundTruthScore >= 70 ? 'var(--good)' : school.groundTruthScore >= 40 ? 'var(--warn)' : 'var(--bad)';
   return (
-    <div
-      onClick={onView}
+    <Link
+      to={`/schools/${school.id}`}
       style={{
+        color: 'inherit',
+        textDecoration: 'none',
         background: 'var(--surface)',
         border: '1px solid var(--border)',
         borderRadius: 12,
@@ -172,7 +173,9 @@ function SchoolSearchResultCard({ school, onView }: { school: SchoolRecord; onVi
       onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = 'none'; }}
     >
       <div style={{ width: 56, height: 56, borderRadius: 10, background: 'var(--border-strong)', overflow: 'hidden', flexShrink: 0 }}>
-        <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=100&q=80" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ width: '100%', height: '100%', display: 'grid', placeItems: 'center', color: 'var(--brand-ink)', background: 'var(--brand-soft)' }} aria-hidden="true">
+          <GraduationCap size={24} />
+        </div>
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-primary)', marginBottom: '0.2rem' }}>
@@ -204,6 +207,6 @@ function SchoolSearchResultCard({ school, onView }: { school: SchoolRecord; onVi
           <div style={{ fontSize: '1.5rem', fontWeight: 900, color: scoreColor, lineHeight: 1 }}>{school.groundTruthScore}</div>
         )}
       </div>
-    </div>
+    </Link>
   );
 }

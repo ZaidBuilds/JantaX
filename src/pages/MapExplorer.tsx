@@ -102,7 +102,7 @@ export function MapExplorer() {
         pinCode: r.location.pinCode,
         lat: base.lat + dLat,
         lng: base.lng + dLng,
-        href: layer === 'school' ? `/module/school?id=${r.id}` : `/module/infra?pin=${r.location.pinCode}`,
+        href: layer === 'school' ? `/schools/${r.id}` : `/module/infra?pin=${r.location.pinCode}`,
         metricLabel: 'Ground truth',
         metricValue: `${r.groundTruthScore}/100`,
       });

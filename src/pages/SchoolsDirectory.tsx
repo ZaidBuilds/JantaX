@@ -222,7 +222,7 @@ export function SchoolsDirectory() {
                 <div className="school-card-main">
                   <div style={{ minWidth: 0 }}>
                     <h3 className="card-title">
-                      <Link to={`/module/school?id=${s.id}`} className="school-link">{s.titleEnglish}</Link>
+                      <Link to={`/schools/${s.id}`} className="school-link">{s.titleEnglish}</Link>
                     </h3>
                     <p className="tiny muted" lang="hi">{s.titleHindi}</p>
                     <p className="small" style={{ color: 'var(--ink-2)', marginTop: 'var(--s-2)' }}>
@@ -250,7 +250,7 @@ export function SchoolsDirectory() {
                     <input type="checkbox" checked={isSel} onChange={() => toggle(s.id)} disabled={!isSel && selected.length >= 3} />
                     Add to compare
                   </label>
-                  <Link to={`/module/school?id=${s.id}`} className="link">View school profile</Link>
+                  <Link to={`/schools/${s.id}`} className="link">View school profile</Link>
                 </div>
               </article>
             );

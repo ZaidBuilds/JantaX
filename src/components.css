@@ -1343,16 +1343,12 @@ a.search-result:hover .search-result-title { color: var(--brand-ink); }
 .cm-filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--s-5); }
 .cm-filters .select { min-width: 200px; }
 
-/* ---------- School detail (legacy 3-column layout) ---------- */
+/* ---------- School profile (side nav + content) ---------- */
 .sd-layout > div { min-width: 0; flex: 1; }
 @media (max-width: 1180px) {
   .sd-layout { flex-direction: column; align-items: stretch !important; }
   .sd-layout > .sd-aside { width: 100% !important; position: static !important; }
+  /* Section nav becomes a swipeable tab strip so the school itself stays above the fold. */
+  .sd-aside nav { grid-auto-flow: column; grid-auto-columns: max-content; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+  .sd-aside nav a { white-space: nowrap; }
 }
-@media (max-width: 760px) {
-  .sd-stats { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
-  .sd-stats > div { border-right: 0 !important; }
-  .sd-bottom, .sd-meta { grid-template-columns: minmax(0, 1fr) !important; }
-}
-.sd-hero > div:last-child { min-width: 0; flex: 1 1 240px; }
-@media (max-width: 760px) { .sd-hero { flex-wrap: wrap; } }

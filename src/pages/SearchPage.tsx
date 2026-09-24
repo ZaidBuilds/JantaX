@@ -77,7 +77,7 @@ function hrefFor(r: SearchResult): string {
   const pin = r.location?.pincode;
   switch (r.type) {
     case 'school':
-      return `/module/school?id=${r.id}`;
+      return `/schools/${r.id}`;
     case 'infra':
       return `/projects/${r.id}`;
     case 'contractor':

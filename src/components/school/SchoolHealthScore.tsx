@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { AlertTriangle, CheckCircle2, Eye, EyeOff, Info, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { AlertTriangle, CheckCircle2, Eye, EyeOff, Info, ChevronDown, ChevronUp } from 'lucide-react';
 import { SourceBadge } from '../UI/SourceBadge';
 
 export type ScoreStatus = 'stable' | 'watch' | 'needs_attention' | 'critical';
@@ -177,9 +178,9 @@ function CompositeScoreCard({
                 {version}
               </span>
               {methodologyUrl && (
-                <a href={methodologyUrl} target="_blank" rel="noreferrer" style={{ fontSize: '0.72rem', color: 'var(--brand-ink)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
-                  Methodology <ExternalLink size={10} />
-                </a>
+                <Link to={methodologyUrl} style={{ fontSize: '0.72rem', color: 'var(--brand-ink)', fontWeight: 600 }}>
+                  Methodology
+                </Link>
               )}
             </div>
           </div>

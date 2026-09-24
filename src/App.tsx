@@ -11,10 +11,11 @@ import { StatusBanner } from './shell/StatusBanner';
 import { ScrollToTop } from './shell/ScrollToTop';
 import { ToastProvider } from './ui/Toast';
 import { ModuleFrame } from './pages/ModuleFrame';
+import { canonicalModuleId, moduleHref } from './ui/modules';
 
 /** Lazy-load a named export. */
-function page<T extends Record<string, unknown>>(loader: () => Promise<T>, name: keyof T) {
-  return lazy(() => loader().then((m) => ({ default: m[name] as unknown as ComponentType })));
+function page<T extends Record<string, unknown>, K extends keyof T>(loader: () => Promise<T>, name: K) {
+  return lazy(() => loader().then((m) => ({ default: m[name] as unknown as ComponentType<T[K] extends ComponentType<infer P> ? P : object> })));
 }
 
 // Core
@@ -22,6 +23,7 @@ const Home = page(() => import('./pages/Home'), 'Home');
 const ExplorePage = page(() => import('./pages/ExplorePage'), 'ExplorePage');
 const SearchPage = page(() => import('./pages/SearchPage'), 'SearchPage');
 const PinDashboard = page(() => import('./pages/PinDashboard'), 'PinDashboard');
+const SchoolDeepLink = page(() => import('./pages/schools/SchoolDeepLink'), 'SchoolDeepLink');
 const ComparePage = page(() => import('./pages/ComparePage'), 'ComparePage');
 const MapExplorer = page(() => import('./pages/MapExplorer'), 'MapExplorer');
 const ModulePage = page(() => import('./pages/ModulePage'), 'ModulePage');
@@ -95,6 +97,12 @@ function InModule({ id, children }: { id: string; children: ReactNode }) {
   return <ModuleFrame moduleId={id}>{children}</ModuleFrame>;
 }
 
+/** /pin/110001/hospital, the per-PIN module URL in MODULE_EXPANSION_PROTOCOL, opens that module for the PIN. */
+function PinModuleRedirect() {
+  const { pinCode = '', moduleId = '' } = useParams();
+  return <Navigate to={moduleHref(canonicalModuleId(moduleId), pinCode)} replace />;
+}
+
 function LegacySchoolProfileRedirect() {
   const { schoolId } = useParams();
   return <Navigate to={`/schools/${schoolId}`} replace />;
@@ -106,7 +114,10 @@ function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/explore" element={<ExplorePage />} />
       <Route path="/search" element={<SearchPage />} />
+      <Route path="/pin" element={<PinDashboard choose />} />
+      <Route path="/pin/new" element={<PinDashboard choose />} />
       <Route path="/pin/:pinCode" element={<PinDashboard />} />
+      <Route path="/pin/:pinCode/:moduleId" element={<PinModuleRedirect />} />
       <Route path="/location" element={<PinDashboard />} />
       <Route path="/compare" element={<ComparePage />} />
       <Route path="/maps" element={<MapExplorer />} />
@@ -121,6 +132,7 @@ function AppRoutes() {
       <Route path="/schools/profile/:schoolId" element={<LegacySchoolProfileRedirect />} />
       <Route path="/schools/:id" element={<SchoolProfilePage />} />
       <Route path="/schools/:id/:tab" element={<SchoolProfilePage />} />
+      <Route path="/school/:code" element={<SchoolDeepLink />} />
 
       {/* Roads and public works */}
       <Route path="/projects" element={<InModule id="infra"><ProjectsDirectoryPage /></InModule>} />
@@ -205,7 +217,8 @@ function AppRoutes() {
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/admin" element={<AdminPage />} />
       <Route path="/monitoring" element={<InModule id="monitoring"><MonitoringDashboardPage /></InModule>} />
-      <Route path="/monitoring/:view" element={<InModule id="monitoring"><MonitoringDashboardPage /></InModule>} />
+      <Route path="/monitoring/quarantine" element={<InModule id="monitoring"><MonitoringDashboardPage /></InModule>} />
+      <Route path="/monitoring/snapshots" element={<InModule id="monitoring"><MonitoringDashboardPage /></InModule>} />
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

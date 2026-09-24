@@ -30,6 +30,7 @@ export function AdminPage() {
   if (!isAdmin) {
     return (
       <div className="page page-narrow">
+        <PageHeader crumbs={[{ label: 'Admin' }]} title="Data operations" />
         <div className="card">
           <EmptyState icon={Lock} title="Administrators only" text="This page needs an admin sign-in. If you run a JantaX instance, sign in with an administrator token to continue." />
         </div>

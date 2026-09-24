@@ -259,7 +259,7 @@ function SchoolsCompare() {
           />
           <div className="cluster">
             {loaded.map((s) => (
-              <Link key={s.id} to={`/module/school?id=${s.id}`} className="btn btn-secondary btn-sm">
+              <Link key={s.id} to={`/schools/${s.id}`} className="btn btn-secondary btn-sm">
                 <GraduationCap size={14} aria-hidden="true" />
                 <span className={`text-${toneForScore(s.groundTruthScore)}`}>{s.groundTruthScore}</span> Open {s.titleEnglish.split(',')[0]}
               </Link>

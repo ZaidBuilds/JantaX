@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { Link, useParams, useLocation } from 'react-router-dom';
 import { api } from '../../core/services/api';
 import type { SchoolRecord } from '../../modules/school/types';
 import { getConfidence, getCompositeScore, SCORING_VERSION } from '../../core/utils/scoring';
@@ -27,12 +27,12 @@ import {
   MessageSquare,
   BarChart3,
   ExternalLink,
-  ChevronRight,
   Check,
   X,
   HelpCircle,
 } from 'lucide-react';
 import { normalizeSchool } from '../../modules/school/normalize';
+import { Breadcrumbs, EmptyState } from '../../ui';
 
 const TAB_MAP: Record<string, string> = {
   overview: 'overview',
@@ -68,7 +68,6 @@ interface Props {
 
 export function SchoolProfile({ schoolId: propId }: Props) {
   const params = useParams();
-  const navigate = useNavigate();
   const location = useLocation();
   const urlId = params.id || new URLSearchParams(location.search).get('id');
   const schoolId = propId || urlId || '';
@@ -86,6 +85,16 @@ export function SchoolProfile({ schoolId: propId }: Props) {
   const [following, setFollowing] = useState(false);
   const [showShareToast, setShowShareToast] = useState(false);
   const [showCheckIn, setShowCheckIn] = useState(false);
+  const sectionNav = useRef<HTMLElement>(null);
+
+  // On narrow screens the section nav is a horizontal strip; keep the current section in view.
+  useEffect(() => {
+    const nav = sectionNav.current;
+    const current = nav?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (nav && current && nav.scrollWidth > nav.clientWidth) {
+      nav.scrollLeft = current.offsetLeft - nav.offsetLeft - (nav.clientWidth - current.offsetWidth) / 2;
+    }
+  }, [activeTab, loading]);
 
   useEffect(() => {
     if (!schoolId) { setLoading(false); return; }
@@ -94,7 +103,7 @@ export function SchoolProfile({ schoolId: propId }: Props) {
       setSchool(normalizeSchool(res.record || res));
       setLoading(false);
     }).catch(() => {
-      setError('Failed to load school data');
+      setError('not-found');
       setLoading(false);
     });
   }, [schoolId]);
@@ -113,7 +122,7 @@ export function SchoolProfile({ schoolId: propId }: Props) {
     if (!school) return [];
     const base = {
       scoringVersion: SCORING_VERSION,
-      methodologyUrl: '/methodology',
+      methodologyUrl: '/schools/methodology',
     };
     return [
       {
@@ -273,10 +282,6 @@ export function SchoolProfile({ schoolId: propId }: Props) {
     setTimeout(() => setShowShareToast(false), 2000);
   };
 
-  const navigateToTab = (tab: string) => {
-    navigate(`/schools/${schoolId}/${tab}`);
-  };
-
   if (loading) return (
     <div style={{ padding: '4rem', textAlign: 'center' }}>
       <div className="skeleton" style={{ height: 200, borderRadius: 12 }} />
@@ -284,9 +289,16 @@ export function SchoolProfile({ schoolId: propId }: Props) {
   );
 
   if (error || !school) return (
-    <div style={{ padding: '4rem', textAlign: 'center' }}>
-      <p style={{ color: 'var(--bad)', marginBottom: '1rem' }}>{error || 'School not found'}</p>
-      <button onClick={() => navigate('/schools')} className="btn btn-primary">Back to Schools</button>
+    <div className="page-narrow" style={{ margin: '0 auto' }}>
+      <Breadcrumbs items={[{ label: 'Schools', to: '/schools' }, { label: 'Not found' }]} />
+      <div className="card" style={{ marginTop: 'var(--s-4)' }}>
+        <EmptyState
+          icon={GraduationCap}
+          title="We could not find that school"
+          text={`No school with the reference "${schoolId}" is in our records. Search by name, PIN code or UDISE code instead.`}
+          action={<Link to="/schools/search" className="btn btn-primary">Search schools</Link>}
+        />
+      </div>
     </div>
   );
 
@@ -300,11 +312,7 @@ export function SchoolProfile({ schoolId: propId }: Props) {
 
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '1rem 1.25rem 0' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem' }}>
-          <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
-            <span style={{ cursor: 'pointer' }} onClick={() => navigate('/schools')}>Schools</span>
-            <ChevronRight size={12} />
-            <span>{school.titleEnglish || school.titleHindi}</span>
-          </div>
+          <Breadcrumbs items={[{ label: 'Schools', to: '/schools' }, { label: school.titleEnglish || school.titleHindi }]} />
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button onClick={() => setFollowing(v => !v)} style={{ padding: '0.45rem 0.9rem', borderRadius: 8, border: '1px solid var(--border)', background: following ? 'var(--good-soft)' : 'var(--surface)', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
               <Heart size={14} fill={following ? '#ef4444' : 'none'} style={{ color: following ? 'var(--bad)' : 'inherit' }} />
@@ -329,33 +337,38 @@ export function SchoolProfile({ schoolId: propId }: Props) {
       <div className="sd-layout" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 0 2rem', display: 'flex', gap: '1.25rem', alignItems: 'flex-start' }}>
         <aside className="sd-aside" style={{ width: 250, flexShrink: 0, position: 'sticky', top: 88, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '0.75rem', boxShadow: '0 1px 3px rgba(0,0,0,.04)' }}>
-            <button onClick={() => navigate('/schools')} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.75rem', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface)', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', marginBottom: '0.75rem' }}>
-              <ArrowLeft size={14} /> All Schools
-            </button>
-            <div style={{ display: 'grid', gap: '2px' }}>
-              {Object.entries(TAB_LABELS).map(([key, { label, icon: Icon }]) => (
-                <button
+            <Link to={`/schools?pin=${school.location.pinCode}`} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.75rem', borderRadius: 8, border: '1px solid var(--border)', color: 'var(--ink)', textDecoration: 'none', background: 'var(--surface)', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', marginBottom: '0.75rem' }}>
+              <ArrowLeft size={14} aria-hidden="true" /> Schools in this PIN
+            </Link>
+            <nav ref={sectionNav} aria-label="School sections" style={{ display: 'grid', gap: '2px' }}>
+              {Object.entries(TAB_LABELS).map(([key, { label, icon: Icon }]) => {
+                const current = TAB_MAP[key] === activeTab;
+                return (
+                <Link
                   key={key}
-                  onClick={() => navigateToTab(key)}
+                  to={key === 'overview' ? `/schools/${schoolId}` : `/schools/${schoolId}/${key}`}
+                  aria-current={current ? 'page' : undefined}
                   style={{
+                    textDecoration: 'none',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.55rem',
                     padding: '0.5rem 0.6rem',
                     borderRadius: 8,
                     cursor: 'pointer',
-                    background: activeTab === key ? 'var(--brand-soft)' : 'transparent',
-                    color: activeTab === key ? 'var(--brand-ink)' : 'var(--ink-2)',
-                    fontWeight: activeTab === key ? 700 : 500,
+                    background: current ? 'var(--brand-soft)' : 'transparent',
+                    color: current ? 'var(--brand-ink)' : 'var(--ink-2)',
+                    fontWeight: current ? 700 : 500,
                     fontSize: '0.82rem',
-                    border: activeTab === key ? '1px solid var(--brand-line)' : '1px solid transparent',
+                    border: current ? '1px solid var(--brand-line)' : '1px solid transparent',
                     textAlign: 'left',
                   }}
                 >
-                  <Icon size={15} /> {label}
-                </button>
-              ))}
-            </div>
+                  <Icon size={15} aria-hidden="true" /> {label}
+                </Link>
+                );
+              })}
+            </nav>
           </div>
         </aside>
 
@@ -373,11 +386,13 @@ function SchoolHeaderCard({ school, composite, conf }: { school: SchoolRecord; c
   return (
     <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '1rem', display: 'flex', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,.04)', flexWrap: 'wrap' }}>
       <div style={{ width: 140, height: 105, borderRadius: 10, overflow: 'hidden', background: 'var(--border-strong)', flexShrink: 0, position: 'relative' }}>
-        <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=400&q=80" alt="school" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        <div style={{ width: '100%', height: '100%', display: 'grid', placeItems: 'center', color: 'var(--brand-ink)', background: 'var(--brand-soft)' }} aria-hidden="true">
+          <GraduationCap size={40} />
+        </div>
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <h2 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>{school.titleHindi || school.titleEnglish}</h2>
+          <h1 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>{school.titleEnglish || school.titleHindi}</h1>
           {school.groundTruthScore >= 70 && <span style={{ fontSize: '0.62rem', background: 'var(--good-soft)', color: 'var(--good)', padding: '2px 7px', borderRadius: 999, fontWeight: 800, border: '1px solid var(--good-line)' }}>● Verified</span>}
         </div>
         <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', marginTop: '0.25rem', display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
@@ -403,7 +418,7 @@ function SchoolHealthScoreSection({ school, dimensions, composite, conf }: { sch
         compositeScore={composite}
         compositeStatus={compositeStatus}
         scoringVersion={SCORING_VERSION}
-        methodologyUrl="/methodology"
+        methodologyUrl="/schools/methodology"
       />
       <ProvenanceBar
         observedAt={school.lastCheckInDate?.slice(0, 10) || new Date().toISOString().slice(0, 10)}
@@ -704,7 +719,7 @@ function CompareTab({ school }: { school: SchoolRecord }) {
     <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center' }}>
       <BarChart3 size={32} style={{ opacity: 0.3, marginBottom: '0.5rem' }} />
       <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>
-        Compare this school with other schools on the <a href="/schools/compare" style={{ color: 'var(--brand-ink)' }}>Schools Compare page</a>.
+        <Link to={`/compare?type=schools&ids=${school.id}`} style={{ color: 'var(--brand-ink)' }}>Compare this school</Link> with others in the same PIN code.
       </p>
     </div>
   );

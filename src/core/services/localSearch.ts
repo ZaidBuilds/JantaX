@@ -64,7 +64,7 @@ function buildIndex(schools: ApiRecord[]): Doc[] {
     docs.push(doc('location', pin, `${p.district}, ${p.state}`, `Area dashboard for PIN ${pin}`, { pincode: pin, state: p.state, district: p.district }, { href: `/pin/${pin}` }, 'India Post PIN directory'));
   }
   for (const s of schools) {
-    docs.push(doc('school', s.id, s.titleEnglish, `${s.schoolLevel || 'School'} · ${s.managementType || 'Government'} · UDISE ${s.udiseCode || 'n/a'}`, { pincode: s.location.pinCode, state: s.location.state, district: s.location.district }, { href: `/module/school?id=${s.id}`, status: s.status, score: s.groundTruthScore, hindi: s.titleHindi }, 'UDISE+', s.titleHindi));
+    docs.push(doc('school', s.id, s.titleEnglish, `${s.schoolLevel || 'School'} · ${s.managementType || 'Government'} · UDISE ${s.udiseCode || 'n/a'}`, { pincode: s.location.pinCode, state: s.location.state, district: s.location.district }, { href: `/schools/${s.id}`, status: s.status, score: s.groundTruthScore, hindi: s.titleHindi }, 'UDISE+', s.titleHindi));
   }
   for (const p of safe(getStoredProjects)) {
     docs.push(doc('infra', p.id, p.nameEnglish, `${p.sector} · ${p.ministry}`, { pincode: p.pinCode, state: p.state, district: p.district }, { href: `/projects/${p.id}`, status: p.status, hindi: p.nameHindi }, 'MoSPI / PMGSY', p.nameHindi));

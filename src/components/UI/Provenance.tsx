@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { SCORING_VERSION, freshnessBadge } from '../../core/utils/scoring';
 
 export function ProvenanceBar({ observedAt, sourceAt, recalcAt, sourceUrl, sourceLabel, sampleSize, reportingDays, agreementRate }: {
@@ -15,9 +16,9 @@ export function ProvenanceBar({ observedAt, sourceAt, recalcAt, sourceUrl, sourc
       <span>·</span><span>Recalc: {recalc}</span>
       <span style={{ background: fresh.color==='Fresh'?'var(--good-soft)': fresh.color==='#f59e0b'?'var(--warn-soft)':'var(--surface-3)', color: fresh.color==='Fresh'?'var(--good)':fresh.color==='#f59e0b'?'var(--warn)':'var(--ink-2)', padding:'1px 6px', borderRadius:999, fontWeight:700, border:'1px solid currentColor', opacity:0.9 }}>{fresh.label}</span>
       {sourceUrl && <><span>·</span><a href={sourceUrl} target="_blank" rel="noreferrer" style={{ color:'var(--ink)', textDecoration:'underline' }}>{sourceLabel||'Source ↗'}</a></>}
-      {sampleSize!==undefined && <><span>·</span><span>{sampleSize} reports · {reportingDays} days · {(agreementRate??0.6*100).toFixed(0)}% agree</span></>}
+      {sampleSize!==undefined && <><span>·</span><span>{sampleSize} reports · {reportingDays} days · {Math.round((agreementRate ?? 0.6) * 100)}% agree</span></>}
       <span>·</span><span style={{ fontFamily:'monospace', background:'var(--surface-2)', border:'1px solid var(--border)', padding:'1px 4px', borderRadius:4 }}>{SCORING_VERSION}</span>
-      <a href="/data-sources" style={{ color:'var(--brand-ink)', fontWeight:700 }}>Methodology →</a>
+      <Link to="/transparency/methodology" style={{ color:'var(--brand-ink)', fontWeight:700 }}>Methodology</Link>
     </div>
   );
 }
@@ -25,7 +26,7 @@ export function ProvenanceBar({ observedAt, sourceAt, recalcAt, sourceUrl, sourc
 export function DisclaimerBar() {
   return (
     <div style={{ fontSize:'0.68rem', color:'var(--ink-3)', background:'var(--surface-2)', border:'1px solid var(--border)', borderRadius:8, padding:'0.5rem 0.7rem', marginTop:'0.5rem' }}>
-      <strong style={{ color:'var(--ink-2)' }}>Disclaimer:</strong> Counts are observations, not official rating. Sample size, agreement & freshness shown. See <a href="/data-sources" style={{ color:'var(--brand-ink)' }}>Methodology</a> · <em>Non-partisan: we list claims + audits side-by-side.</em>
+      <strong style={{ color:'var(--ink-2)' }}>Disclaimer:</strong> Counts are observations, not official rating. Sample size, agreement & freshness shown. See the <Link to="/transparency/methodology" style={{ color:'var(--brand-ink)' }}>methodology</Link> · <em>Non-partisan: we list claims + audits side-by-side.</em>
     </div>
   );
 }

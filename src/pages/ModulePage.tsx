@@ -30,8 +30,6 @@ const SCREENS: Record<string, ComponentType> = {
   booth: screen(() => import('../modules/booth/pages/BoothDirectoryPage'), 'BoothDirectoryPage'),
 };
 
-const SchoolModulePage = screen(() => import('./SchoolModulePage'), 'SchoolModulePage');
-
 function ScreenLoading() {
   return (
     <div className="stack" aria-busy="true">
@@ -48,18 +46,11 @@ export function ModulePage() {
   const id = canonicalModuleId(moduleId);
 
   if (id === 'school') {
+    // Schools have their own section; old /module/school links land on the directory or the profile.
     const schoolId = params.get('id') || params.get('schoolId');
-    if (!schoolId) {
-      const pin = params.get('pin');
-      return <Navigate to={pin ? `/schools?pin=${pin}` : '/schools'} replace />;
-    }
-    return (
-      <div className="page page-wide">
-        <Suspense fallback={<ScreenLoading />}>
-          <SchoolModulePage />
-        </Suspense>
-      </div>
-    );
+    if (schoolId) return <Navigate to={`/schools/${encodeURIComponent(schoolId)}`} replace />;
+    const pin = params.get('pin');
+    return <Navigate to={pin ? `/schools?pin=${pin}` : '/schools'} replace />;
   }
 
   const Screen = SCREENS[id];

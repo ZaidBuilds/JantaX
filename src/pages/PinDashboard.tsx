@@ -62,10 +62,11 @@ function tidy(text: string) {
 }
 
 function recordHref(r: ApiRecord) {
-  return r.moduleId === 'school' ? `/module/school?id=${r.id}` : `/module/infra?pin=${r.location.pinCode}`;
+  return r.moduleId === 'school' ? `/schools/${r.id}` : `/module/infra?pin=${r.location.pinCode}`;
 }
 
-export function PinDashboard() {
+/** `choose` renders the PIN picker (used by /pin and /pin/new) instead of a dashboard. */
+export function PinDashboard({ choose = false }: { choose?: boolean }) {
   const { pinCode } = useParams();
   const [params] = useSearchParams();
   const navigate = useNavigate();
@@ -108,14 +109,14 @@ export function PinDashboard() {
   const coord = getCoordinateForPin(pin);
   const following = isFollowing(pin);
 
-  if (!valid) {
+  if (choose || !valid) {
     return (
       <div className="page page-narrow">
         <Breadcrumbs items={[{ label: 'PIN code' }]} />
         <div className="card card-pad-lg">
           <h1 className="page-title" style={{ fontSize: 'var(--text-2xl)' }}>Open a PIN code</h1>
           <p className="page-lede" style={{ marginBottom: 'var(--s-5)' }}>
-            {pinCode ? <>“{pinCode}” is not a valid Indian PIN code. </> : null}
+            {pinCode && !choose ? <>“{pinCode}” is not a valid Indian PIN code. </> : null}
             Enter the six-digit PIN printed on your address.
           </p>
           <PinInput onSubmit={(p) => navigate(`/pin/${p}`)} submitLabel="Open dashboard" />
