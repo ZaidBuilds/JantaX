@@ -69,6 +69,7 @@ const MpladsDirectoryPage = lazy(() => import('./modules/mplads/pages/MpladsDire
 const MpladsProjectDetailPage = lazy(() => import('./modules/mplads/pages/MpladsProjectDetailPage').then((m) => ({ default: m.MpladsProjectDetailPage })));
 const RepresentativeProfilePage = lazy(() => import('./modules/mplads/pages/RepresentativeProfilePage').then((m) => ({ default: m.RepresentativeProfilePage })));
 const PeopleProfilePage = lazy(() => import('./pages/PeopleProfilePage').then((m) => ({ default: m.PeopleProfilePage })));
+const SchemesPage = lazy(() => import('./modules/schemes/pages/SchemesPage').then((m) => ({ default: m.SchemesPage })));
 const CanonicalEntityPage = lazy(() => import('./pages/CanonicalEntityPage').then((m) => ({ default: m.CanonicalEntityPage })));
 
 // Static & Transparency Pages
@@ -162,10 +163,12 @@ function AppContent() {
               {/* Locality Canonical Routes (V1 Spec Section 6) */}
               <Route path="/pin/:pinCode" element={<PinDashboard />} />
               <Route path="/pin/:pinCode/people" element={<PeopleProfilePage />} />
+              <Route path="/pin/:pinCode/representatives" element={<PeopleProfilePage />} />
               <Route path="/pin/:pinCode/schools" element={<SchoolsDirectory />} />
               <Route path="/pin/:pinCode/health" element={<PinDashboard />} />
               <Route path="/pin/:pinCode/works" element={<ProjectsDirectoryPage />} />
-              <Route path="/pin/:pinCode/schemes" element={<PinDashboard />} />
+              <Route path="/pin/:pinCode/schemes" element={<SchemesPage />} />
+              <Route path="/schemes" element={<SchemesPage />} />
 
               {/* Canonical Unified Entity Routes */}
               <Route path="/entity/:type/:id" element={<CanonicalEntityPage />} />

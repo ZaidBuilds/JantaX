@@ -25,6 +25,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   Info,
+  Users,
+  Milestone,
 } from 'lucide-react';
 import { usePin } from '../core/context/PinContext';
 import { useCatalog } from '../core/hooks/useCatalog';
@@ -33,13 +35,15 @@ import { resolvePincode } from '../core/utils/pinResolver';
 import { getAllWorks } from '../modules/mplads/services/mpladsService';
 import { getAllBooths } from '../modules/booth/services/boothService';
 import { getAllCourts } from '../modules/courts/services/courtsService';
+import { getAllSanctionedWorks } from '../modules/representatives/services/representativeService';
+import { getAllSchemeProjects } from '../modules/schemes/services/schemeService';
 import { MOCK_CITIZEN_REPORTS } from '../modules/reporting/data/mockReports';
 import { TransparencyDisclaimer } from '../modules/transparency/components/TransparencyDisclaimer';
 import { SkeletonCard } from '../components/data-states';
 
 export interface MapGeoEntity {
   id: string;
-  moduleId: 'school' | 'infra' | 'rera' | 'hospital' | 'mplads' | 'booth' | 'court' | 'issue';
+  moduleId: 'school' | 'infra' | 'rera' | 'hospital' | 'mplads' | 'booth' | 'court' | 'issue' | 'representative' | 'scheme';
   layerName: string;
   title: string;
   titleHi?: string;
@@ -53,6 +57,10 @@ export interface MapGeoEntity {
   keyMetricValue?: string;
   evidenceCount?: number;
   badgeColor: string;
+  contractorName?: string;
+  contractorId?: string;
+  costHikePercent?: number;
+  dlpStatus?: string;
 }
 
 const LAYER_COLORS: Record<string, string> = {
@@ -64,6 +72,8 @@ const LAYER_COLORS: Record<string, string> = {
   booth: '#16a34a', // Emerald Green
   court: '#4338ca', // Indigo
   issue: '#dc2626', // Red
+  representative: '#0284c7', // Sky Blue
+  scheme: '#e11d48', // Crimson Rose
 };
 
 const POPULAR_HUBS = [
@@ -101,6 +111,8 @@ export function MapExplorer() {
     booth: true,
     court: true,
     issues: true,
+    representatives: true,
+    schemes: true,
   });
 
   const [viewMode, setViewMode] = useState<ViewMode>('split');
@@ -255,6 +267,60 @@ export function MapExplorer() {
       });
     });
 
+    // 6. Multi-Tier Representative Works (Gram Pradhan to MP)
+    const repWorks = getAllSanctionedWorks(activePin);
+    repWorks.forEach((w, idx) => {
+      const offsetLat = (idx % 4 - 1.2) * 0.0038;
+      const offsetLng = ((idx + 2) % 4 - 1.2) * 0.0038;
+      list.push({
+        id: w.id,
+        moduleId: 'representative',
+        layerName: `${w.sector.toUpperCase()} WORK`,
+        title: w.workTitle,
+        titleHi: w.workTitleHi,
+        subtitle: `${w.locationName || w.district} · Contractor: ${w.contractorName}`,
+        status: w.status,
+        pinCode: w.pincode,
+        lat: w.latitude || baseCoords.lat + offsetLat,
+        lng: w.longitude || baseCoords.lng + offsetLng,
+        routeUrl: `/pin/${w.pincode}/representatives`,
+        keyMetricLabel: w.costHikePercentage > 0 ? `Sanctioned (Hike: +${w.costHikePercentage}%)` : 'Sanctioned Cost',
+        keyMetricValue: `₹${w.sanctionedCostLakhs} Lakhs`,
+        badgeColor: LAYER_COLORS.representative,
+        contractorName: w.contractorName,
+        contractorId: w.contractorId,
+        costHikePercent: w.costHikePercentage,
+        dlpStatus: w.dlpStatus,
+      });
+    });
+
+    // 7. Central & State Government Schemes Tracker
+    const schemeProjects = getAllSchemeProjects(activePin);
+    schemeProjects.forEach((s, idx) => {
+      const offsetLat = ((idx + 1) % 4 - 1.8) * 0.0042;
+      const offsetLng = ((idx + 3) % 4 - 1.8) * 0.0042;
+      list.push({
+        id: s.id,
+        moduleId: 'scheme',
+        layerName: `${s.category.toUpperCase()} PROJECT`,
+        title: s.projectName,
+        titleHi: s.projectNameHi,
+        subtitle: `${s.schemeName} · Contractor: ${s.contractorName}`,
+        status: s.status,
+        pinCode: s.pincode,
+        lat: s.latitude || baseCoords.lat + offsetLat,
+        lng: s.longitude || baseCoords.lng + offsetLng,
+        routeUrl: `/pin/${s.pincode}/schemes`,
+        keyMetricLabel: s.costHikePercentage > 0 ? `Sanctioned (Hike: +${s.costHikePercentage}%)` : 'Sanctioned Budget',
+        keyMetricValue: `₹${s.totalSanctionedBudgetCr} Cr`,
+        badgeColor: LAYER_COLORS.scheme,
+        contractorName: s.contractorName,
+        contractorId: s.contractorId,
+        costHikePercent: s.costHikePercentage,
+        dlpStatus: s.dlpStatus,
+      });
+    });
+
     return list;
   }, [catalogRecords, activePin, resolved]);
 
@@ -268,6 +334,8 @@ export function MapExplorer() {
       if (e.moduleId === 'booth' && !activeLayers.booth) return false;
       if (e.moduleId === 'court' && !activeLayers.court) return false;
       if (e.moduleId === 'issue' && !activeLayers.issues) return false;
+      if (e.moduleId === 'representative' && !activeLayers.representatives) return false;
+      if (e.moduleId === 'scheme' && !activeLayers.schemes) return false;
       return true;
     });
   }, [allEntities, activeLayers]);
@@ -536,6 +604,44 @@ export function MapExplorer() {
         >
           <Scale size={13} style={{ color: '#4338ca' }} /> District Courts ({allEntities.filter(e => e.moduleId === 'court').length})
         </button>
+
+        <button
+          onClick={() => toggleLayer('representatives')}
+          style={{
+            background: activeLayers.representatives ? '#f0f9ff' : '#ffffff',
+            border: `1px solid ${activeLayers.representatives ? '#0284c7' : '#cbd5e1'}`,
+            color: activeLayers.representatives ? '#0369a1' : '#64748b',
+            padding: '0.25rem 0.65rem',
+            borderRadius: 6,
+            fontSize: '0.74rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.3rem',
+          }}
+        >
+          <Users size={13} style={{ color: '#0284c7' }} /> Multi-Tier Works ({allEntities.filter(e => e.moduleId === 'representative').length})
+        </button>
+
+        <button
+          onClick={() => toggleLayer('schemes')}
+          style={{
+            background: activeLayers.schemes ? '#fff1f2' : '#ffffff',
+            border: `1px solid ${activeLayers.schemes ? '#e11d48' : '#cbd5e1'}`,
+            color: activeLayers.schemes ? '#be123c' : '#64748b',
+            padding: '0.25rem 0.65rem',
+            borderRadius: 6,
+            fontSize: '0.74rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.3rem',
+          }}
+        >
+          <Milestone size={13} style={{ color: '#e11d48' }} /> Mega Schemes ({allEntities.filter(e => e.moduleId === 'scheme').length})
+        </button>
       </div>
 
       {/* Main Workspace Area */}
@@ -574,7 +680,7 @@ export function MapExplorer() {
                   <MapPin size={32} style={{ opacity: 0.3, marginBottom: '0.5rem' }} />
                   <p style={{ fontSize: '0.85rem', margin: '0 0 0.5rem' }}>No entities match current layer filters.</p>
                   <button
-                    onClick={() => setActiveLayers({ schools: true, infra: true, rera: true, mplads: true, booth: true, court: true, issues: true })}
+                    onClick={() => setActiveLayers({ schools: true, infra: true, rera: true, mplads: true, booth: true, court: true, issues: true, representatives: true, schemes: true })}
                     style={{ padding: '0.4rem 0.8rem', background: '#0f2d59', color: '#fff', border: 'none', borderRadius: 6, fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}
                   >
                     Enable All Layers
@@ -611,12 +717,30 @@ export function MapExplorer() {
                         <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f2d59', lineHeight: 1.25, marginBottom: '0.2rem' }}>
                           {entity.title}
                         </div>
-                        <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: '0.35rem' }}>
+                        <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: '0.25rem' }}>
                           {entity.subtitle}
                         </div>
 
+                        {entity.contractorName && (
+                          <div style={{ fontSize: '0.68rem', color: '#0369a1', fontWeight: 600, marginBottom: '0.25rem' }}>
+                            Contractor: {entity.contractorName}
+                          </div>
+                        )}
+
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.7rem' }}>
-                          <span style={{ color: '#475569' }}>{entity.status}</span>
+                          <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <span style={{ color: '#475569' }}>{entity.status}</span>
+                            {entity.costHikePercent && entity.costHikePercent > 0 ? (
+                              <span style={{ fontSize: '0.62rem', fontWeight: 800, padding: '1px 5px', borderRadius: 4, background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' }}>
+                                +{entity.costHikePercent}% Hike
+                              </span>
+                            ) : null}
+                            {entity.dlpStatus && entity.dlpStatus !== 'Not Applicable' && entity.dlpStatus !== 'N/A' ? (
+                              <span style={{ fontSize: '0.62rem', fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0' }}>
+                                {entity.dlpStatus}
+                              </span>
+                            ) : null}
+                          </div>
                           <span style={{ color: '#2563eb', fontWeight: 700 }}>Inspect →</span>
                         </div>
                       </div>
@@ -714,9 +838,21 @@ export function MapExplorer() {
                           {entity.subtitle}
                         </div>
 
-                        {entity.keyMetricValue && (
-                          <div style={{ background: '#f8fafc', padding: '0.3rem 0.5rem', borderRadius: 6, fontSize: '0.72rem', border: '1px solid #e2e8f0', marginBottom: '0.5rem' }}>
-                            <strong>{entity.keyMetricLabel}:</strong> {entity.keyMetricValue}
+                        {entity.costHikePercent && entity.costHikePercent > 0 ? (
+                          <div style={{ margin: '0.2rem 0', display: 'inline-block', fontSize: '0.66rem', fontWeight: 800, padding: '2px 6px', borderRadius: 4, background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' }}>
+                            ⚠️ Cost Overrun: +{entity.costHikePercent}%
+                          </div>
+                        ) : null}
+
+                        {entity.contractorName && (
+                          <div style={{ fontSize: '0.72rem', color: '#0369a1', margin: '0.2rem 0 0.4rem', fontWeight: 600 }}>
+                            Contractor:{' '}
+                            <Link
+                              to={entity.contractorId ? `/contractors/${entity.contractorId}` : `/contractors`}
+                              style={{ color: '#0284c7', textDecoration: 'underline' }}
+                            >
+                              {entity.contractorName}
+                            </Link>
                           </div>
                         )}
 

@@ -22,10 +22,19 @@ import {
   XCircle,
   ExternalLink,
   Map as MapIcon,
+  Users,
+  Compass,
+  IndianRupee,
 } from 'lucide-react';
 import { LocalityPinpointMap } from '../components/map/LocalityPinpointMap';
+import { representativeService } from '../modules/representatives/services/representativeService';
+import { schemeService } from '../modules/schemes/services/schemeService';
+import { RepresentativeHierarchyCard } from '../modules/representatives/components/RepresentativeHierarchyCard';
+import { SchemeCard } from '../modules/schemes/components/SchemeCard';
+import { LocalityGovernanceHierarchy } from '../modules/representatives/types/representative';
+import { LocalitySchemesSummary } from '../modules/schemes/types/scheme';
 
-export type NicheTab = 'schools' | 'infra' | 'rera' | 'health' | 'ration' | 'map';
+export type NicheTab = 'schools' | 'representatives' | 'schemes' | 'infra' | 'rera' | 'health' | 'ration' | 'map';
 export type PerspectiveMode = 'claim' | 'reality';
 
 export function PinDashboard() {
@@ -48,6 +57,8 @@ export function PinDashboard() {
   const [rera, setRera] = useState<any[]>([]);
   const [hospitals, setHospitals] = useState<any[]>([]);
   const [pdsShops, setPdsShops] = useState<any[]>([]);
+  const [govHierarchy, setGovHierarchy] = useState<LocalityGovernanceHierarchy | null>(null);
+  const [schemesSummary, setSchemesSummary] = useState<LocalitySchemesSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -74,10 +85,12 @@ export function PinDashboard() {
       api.getReraProjects(currentPin),
       api.getHospitals(currentPin),
       api.getPdsShops(currentPin),
+      representativeService.getLocalityHierarchy(currentPin),
+      schemeService.getLocalitySchemesSummary(currentPin),
     ]).then((results) => {
       if (!isAlive) return;
 
-      const [pinRes, schoolsRes, infraRes, reraRes, hospRes, pdsRes] = results;
+      const [pinRes, schoolsRes, infraRes, reraRes, hospRes, pdsRes, govRes, schemeRes] = results;
 
       if (pinRes.status === 'fulfilled' && pinRes.value) {
         setPincodeInfo(pinRes.value);
@@ -96,6 +109,12 @@ export function PinDashboard() {
       }
       if (pdsRes.status === 'fulfilled' && Array.isArray(pdsRes.value)) {
         setPdsShops(pdsRes.value);
+      }
+      if (govRes.status === 'fulfilled' && govRes.value) {
+        setGovHierarchy(govRes.value);
+      }
+      if (schemeRes.status === 'fulfilled' && schemeRes.value) {
+        setSchemesSummary(schemeRes.value);
       }
       setLoading(false);
     });
@@ -342,6 +361,8 @@ export function PinDashboard() {
           }}
         >
           {[
+            { id: 'representatives', label: tr('Representatives & Funds', 'जनप्रतिनिधि व फंड'), icon: Users },
+            { id: 'schemes', label: tr('Govt Schemes & Corridors', 'सरकारी योजनाएं'), icon: Compass },
             { id: 'schools', label: tr('Schools & Education', 'स्कूल एवं शिक्षा'), icon: GraduationCap },
             { id: 'infra', label: tr('Roads & Public Works', 'सड़कें और निर्माण कार्य'), icon: Construction },
             { id: 'rera', label: tr('RERA Housing', 'रेरा हाउसिंग'), icon: Building2 },
@@ -381,6 +402,108 @@ export function PinDashboard() {
 
         {/* REAL FACILITY LISTS (REPLACING BARE NUMBERS) */}
         <div style={{ display: 'grid', gap: '2rem', marginBottom: '3rem' }}>
+          {/* Representatives & Funds Tab */}
+          {activeTab === 'representatives' && (
+            <div style={{ background: '#ffffff', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-xl)', padding: '1.75rem', boxShadow: 'var(--shadow-card)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.85rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 10, background: '#eff6ff', color: '#1d4ed8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Users size={20} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1.2rem', color: 'var(--navy-950)', margin: 0 }}>
+                      {tr('Public Representatives & Local Fund Tracker', 'जनप्रतिनिधि, फंड आवंटन एवं कार्य')}
+                    </h3>
+                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0 }}>
+                      Gram Pradhan · Block Pramukh · Zila Adhyaksha · Mayor · MLA · MP (PIN {currentPin})
+                    </p>
+                  </div>
+                </div>
+                <Link to={`/pin/${currentPin}/representatives`} className="btn btn-secondary" style={{ fontSize: '0.82rem' }}>
+                  <span>{tr('Full Multi-Tier Audit', 'संपूर्ण जनप्रतिनिधि ऑडिट')}</span>
+                  <ChevronRight size={14} />
+                </Link>
+              </div>
+
+              {govHierarchy && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: 12, border: '1px solid #e2e8f0' }}>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Total Public Funds</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f2d59' }}>₹{govHierarchy.totalLocalBudgetCr} Cr</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Reported Spent</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#16a34a' }}>₹{govHierarchy.totalSpentCr} Cr</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Unspent Balance</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#d97706' }}>₹{govHierarchy.totalUnspentCr} Cr</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Avg Cost Hike</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: govHierarchy.averageCostHike > 15 ? '#dc2626' : '#2563eb' }}>
+                      +{govHierarchy.averageCostHike}%
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {govHierarchy?.representatives.map((rep) => (
+                <RepresentativeHierarchyCard key={rep.id} representative={rep} />
+              ))}
+            </div>
+          )}
+
+          {/* Central & State Schemes Tab */}
+          {activeTab === 'schemes' && (
+            <div style={{ background: '#ffffff', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-xl)', padding: '1.75rem', boxShadow: 'var(--shadow-card)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.85rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 10, background: '#fef3c7', color: '#b45309', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Compass size={20} />
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: '1.2rem', color: 'var(--navy-950)', margin: 0 }}>
+                      {tr('Central & State Schemes Tracker', 'सरकारी योजनाएं एवं बुनियादी ढांचा')}
+                    </h3>
+                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', margin: 0 }}>
+                      PMGSY Roads · Jal Jeevan Water · PMAY Housing · Railways & AMRUT Corridors
+                    </p>
+                  </div>
+                </div>
+                <Link to={`/pin/${currentPin}/schemes`} className="btn btn-secondary" style={{ fontSize: '0.82rem' }}>
+                  <span>{tr('All Schemes & Corridors', 'सभी योजनाएं')}</span>
+                  <ChevronRight size={14} />
+                </Link>
+              </div>
+
+              {schemesSummary && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: 12, border: '1px solid #e2e8f0' }}>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Total Sanctioned</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f2d59' }}>₹{schemesSummary.totalSanctionedBudgetCr} Cr</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Funds Utilized</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#16a34a' }}>₹{schemesSummary.totalFundsUtilizedCr} Cr</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Overall Progress</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#2563eb' }}>{schemesSummary.overallProgressPercentage}%</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Under Construction</div>
+                    <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#d97706' }}>{schemesSummary.projectsUnderConstruction} Works</div>
+                  </div>
+                </div>
+              )}
+
+              {schemesSummary?.projects.map((project) => (
+                <SchemeCard key={project.id} project={project} />
+              ))}
+            </div>
+          )}
+
           {/* Locality GIS Map Card */}
           {activeTab === 'map' && (
             <div style={{ background: '#ffffff', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-xl)', padding: '1.75rem', boxShadow: 'var(--shadow-card)' }}>

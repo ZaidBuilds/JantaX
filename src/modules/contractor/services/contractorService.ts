@@ -1,31 +1,53 @@
 import type { ContractorProfile } from '../types/contractorIntelligence';
 import { MOCK_CONTRACTORS } from '../data/mockContractors';
+import { SHOWCASE_CONTRACTORS, synthesizeContractorProfile } from '../data/showcaseContractors';
 
 const STORAGE_KEY = 'jantax_contractor_profiles_v1';
 
 export function getStoredContractors(): ContractorProfile[] {
-  if (typeof window === 'undefined') return MOCK_CONTRACTORS;
+  const combinedMock = [...MOCK_CONTRACTORS, ...SHOWCASE_CONTRACTORS];
+  if (typeof window === 'undefined') return combinedMock;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_CONTRACTORS));
-      return MOCK_CONTRACTORS;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(combinedMock));
+      return combinedMock;
     }
     const parsed = JSON.parse(raw);
     if (Array.isArray(parsed) && parsed.length > 0) {
+      // Merge showcase contractors if not present in existing localStorage
+      const existingIds = new Set(parsed.map((c: ContractorProfile) => c.id));
+      let updated = false;
+      SHOWCASE_CONTRACTORS.forEach((sc) => {
+        if (!existingIds.has(sc.id)) {
+          parsed.push(sc);
+          updated = true;
+        }
+      });
+      if (updated) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      }
       return parsed;
     }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_CONTRACTORS));
-    return MOCK_CONTRACTORS;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(combinedMock));
+    return combinedMock;
   } catch (e) {
     console.error("Failed to read contractor profiles", e);
-    return MOCK_CONTRACTORS;
+    return combinedMock;
   }
 }
 
 export function getContractorById(id: string): ContractorProfile | undefined {
+  if (!id) return undefined;
   const list = getStoredContractors();
-  return list.find((c) => c.id === id);
+  const found = list.find((c) => c.id === id);
+  if (found) return found;
+
+  const inShowcase = SHOWCASE_CONTRACTORS.find((c) => c.id === id);
+  if (inShowcase) return inShowcase;
+
+  // Synthesize deterministic profile for arbitrary contractor IDs
+  return synthesizeContractorProfile(id);
 }
 
 export interface ContractorFilterParams {
