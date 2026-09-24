@@ -1,6 +1,7 @@
 import React from 'react';
 import { getScoringFormulas } from '../services/transparencyService';
 import { TransparencyDisclaimer } from '../components/TransparencyDisclaimer';
+import { InteractiveScoringCalculator } from '../components/InteractiveScoringCalculator';
 import { Award, Layers, Calculator, CheckCircle2, FileText } from 'lucide-react';
 
 export function ScoringPage() {
@@ -21,6 +22,9 @@ export function ScoringPage() {
           Every score on JantaX is 100% mathematical and open. No subjective opinion, bias, or editorial rating is ever applied.
         </p>
       </div>
+
+      {/* Interactive Mathematical Scoring Sandbox */}
+      <InteractiveScoringCalculator />
 
       {/* Scoring Formulas Cards List */}
       <div style={{ display: 'grid', gap: '1.5rem' }}>

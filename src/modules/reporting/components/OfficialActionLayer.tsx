@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { CitizenReport } from '../types/citizenReport';
 import type { OfficialTrackingRecord } from '../types/officialAction';
 import { generateGrievanceDraft, getOfficialTracking, verifyResolution } from '../services/reportingService';
+import { CitizenDossierModal } from '../../accountability/components/CitizenDossierModal';
 import { 
   Building2, 
   ExternalLink, 
@@ -14,7 +15,8 @@ import {
   CheckCircle2, 
   Layers,
   Send,
-  HelpCircle
+  HelpCircle,
+  Scale
 } from 'lucide-react';
 
 interface OfficialActionLayerProps {
@@ -25,6 +27,14 @@ export const OfficialActionLayer: React.FC<OfficialActionLayerProps> = ({ report
   const draft = generateGrievanceDraft(report);
   const [tracking, setTracking] = useState<OfficialTrackingRecord | undefined>(() => getOfficialTracking(report.id));
   const [copiedDraft, setCopiedDraft] = useState(false);
+  const [isDossierOpen, setIsDossierOpen] = useState(false);
+  const [dossierTab, setDossierTab] = useState<'rti' | 'lokayukta' | 'dossier'>('rti');
+
+  // SLA Watchdog calculation
+  const reportDate = new Date(report.createdAt);
+  const now = new Date();
+  const daysElapsed = Math.max(1, Math.floor((now.getTime() - (isNaN(reportDate.getTime()) ? now.getTime() - 32 * 86400000 : reportDate.getTime())) / (1000 * 60 * 60 * 24)));
+  const isSlaBreached = daysElapsed >= 30 || tracking?.status === 'Pending First Appeal' || tracking?.resolutionVerification?.verificationStatus === 'Paper Closure Flagged';
 
   // Ground Verification Form State
   const [isGroundFixed, setIsGroundFixed] = useState(true);
@@ -63,6 +73,82 @@ export const OfficialActionLayer: React.FC<OfficialActionLayerProps> = ({ report
         <ShieldCheck size={22} style={{ flexShrink: 0, color: '#2563eb' }} />
         <div>
           <strong>JantaX Official Action Layer:</strong> JantaX provides structured grievance drafting and tracking integration with official government portals (CPGRAMS / State IPGRS). JantaX never pretends to submit a complaint unless connected via an authorized direct API gateway.
+        </div>
+      </div>
+
+      {/* SLA STATUS & ESCALATION WATCHDOG BANNER */}
+      <div style={{
+        background: isSlaBreached ? '#fef2f2' : '#f0fdf4',
+        border: `1px solid ${isSlaBreached ? '#fca5a5' : '#86efac'}`,
+        borderRadius: 14,
+        padding: '1.25rem',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '1rem'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <Clock size={24} style={{ color: isSlaBreached ? '#dc2626' : '#16a34a', flexShrink: 0 }} />
+          <div>
+            <div style={{ fontWeight: 800, fontSize: '0.95rem', color: isSlaBreached ? '#991b1b' : '#166534' }}>
+              {isSlaBreached 
+                ? `⚠️ Statutory SLA Breached (${daysElapsed} Days Active — Mandated Window 30 Days)`
+                : `⏱️ Within Citizen Charter SLA Window (${daysElapsed}/30 Days Elapsed)`
+              }
+            </div>
+            <div style={{ fontSize: '0.82rem', color: isSlaBreached ? '#7f1d1d' : '#14532d', marginTop: '0.2rem' }}>
+              {isSlaBreached
+                ? 'Department has exceeded mandated disposal window. You have statutory standing to escalate via Section 6(1) RTI inquiry or Lokayukta complaint.'
+                : 'Under Citizen Charter rules, the nodal department is mandated to redress within 30 days.'
+              }
+            </div>
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => {
+              setDossierTab('rti');
+              setIsDossierOpen(true);
+            }}
+            style={{
+              padding: '0.55rem 1rem',
+              borderRadius: 8,
+              background: '#dc2626',
+              color: '#ffffff',
+              border: 'none',
+              fontWeight: 800,
+              fontSize: '0.82rem',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              boxShadow: '0 2px 8px rgba(220,38,38,0.3)'
+            }}
+          >
+            <FileText size={14} /> 1-Click RTI Escalation
+          </button>
+          <button
+            onClick={() => {
+              setDossierTab('lokayukta');
+              setIsDossierOpen(true);
+            }}
+            style={{
+              padding: '0.55rem 1rem',
+              borderRadius: 8,
+              background: '#1e293b',
+              color: '#ffffff',
+              border: 'none',
+              fontWeight: 800,
+              fontSize: '0.82rem',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem'
+            }}
+          >
+            <Scale size={14} /> Lokayukta Complaint
+          </button>
         </div>
       </div>
 
@@ -276,6 +362,29 @@ export const OfficialActionLayer: React.FC<OfficialActionLayerProps> = ({ report
           </div>
         )}
       </div>
+
+      {/* 1-CLICK CITIZEN DOSSIER & STATUTORY RTI MODAL */}
+      <CitizenDossierModal
+        isOpen={isDossierOpen}
+        onClose={() => setIsDossierOpen(false)}
+        defaultTab={dossierTab}
+        rtiOptions={{
+          publicAuthority: draft.relevantAuthorityName,
+          department: draft.department,
+          workTitle: report.title,
+          workOrderNo: tracking?.reference_number || `REF-${report.id.toUpperCase()}`,
+          localityPin: report.location.pinCode,
+          specificIssue: `${report.description} (Reported via JantaX at ${report.location.landmark || report.location.district})`
+        }}
+        lokayuktaOptions={{
+          complaintTitle: `Gross Administrative Delay & Public Negligence: ${report.title}`,
+          authorityOrOfficer: `${draft.nodalOfficerDesignation}, ${draft.relevantAuthorityName}`,
+          department: draft.department,
+          allegationSummary: `Statutory citizen grievance ${tracking?.reference_number || report.id} regarding "${report.title}" in PIN ${report.location.pinCode} remains unrectified exceeding statutory Citizen Charter timeframes.`,
+          localityPin: report.location.pinCode,
+          evidenceUrls: report.evidence.map(e => e.url)
+        }}
+      />
     </div>
   );
 };

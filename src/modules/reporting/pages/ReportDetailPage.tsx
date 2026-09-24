@@ -4,6 +4,7 @@ import { getReportById } from '../services/reportingService';
 import type { CitizenReport } from '../types/citizenReport';
 import { ReportStatus } from '../components/ReportStatus';
 import { OfficialActionLayer } from '../components/OfficialActionLayer';
+import { OfficialRebuttalBanner } from '../components/OfficialRebuttalBanner';
 import { ArrowLeft, FileText, Send, Share2, AlertCircle } from 'lucide-react';
 
 interface ReportDetailPageProps {
@@ -76,7 +77,10 @@ export function ReportDetailPage({ activeTab: initialTab }: ReportDetailPageProp
 
       {/* Tab 1: Citizen Report & Moderation */}
       {activeTab === 'report' && (
-        <ReportStatus report={report} onUpdate={() => setReport(getReportById(report.id))} />
+        <>
+          <ReportStatus report={report} onUpdate={() => setReport(getReportById(report.id))} />
+          <OfficialRebuttalBanner report={report} onRebuttalSubmitted={() => setReport(getReportById(report.id))} />
+        </>
       )}
 
       {/* Tab 2: Official Action & Tracking Layer */}

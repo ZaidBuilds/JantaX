@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import { Camera, Upload, Trash2, Clock, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { validateUploadFile } from '../../security/services/securityService';
 import { parsePhotoExif, ExifGpsData } from '../../../core/utils/exifParser';
+import { generateEvidenceSha256 } from '../services/evidenceVerificationService';
+import { Hash } from 'lucide-react';
 
 export interface UploadedEvidenceItem {
   url: string;
@@ -9,6 +11,7 @@ export interface UploadedEvidenceItem {
   fileSize: string;
   mediaType: 'image' | 'video';
   exifData?: ExifGpsData;
+  sha256Hash?: string;
 }
 
 interface EvidenceUploaderProps {
@@ -37,14 +40,19 @@ export const EvidenceUploader: React.FC<EvidenceUploaderProps> = ({ files, onCha
     setAnalyzingExif(true);
 
     try {
-      const exif = await parsePhotoExif(file, targetLat, targetLng);
+      const [exif, buffer] = await Promise.all([
+        parsePhotoExif(file, targetLat, targetLng),
+        file.arrayBuffer(),
+      ]);
+      const sha256 = await generateEvidenceSha256(buffer);
       const objectUrl = URL.createObjectURL(file);
       const newFile: UploadedEvidenceItem = {
         url: objectUrl,
         fileName: val.sanitizedFileName,
         fileSize: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
         mediaType: file.type.startsWith('video') ? 'video' : 'image',
-        exifData: exif
+        exifData: exif,
+        sha256Hash: sha256,
       };
       onChange([...files, newFile]);
     } catch {
@@ -82,7 +90,8 @@ export const EvidenceUploader: React.FC<EvidenceUploaderProps> = ({ files, onCha
         distanceToTargetMeters: 45,
         integrityRating: 'VERIFIED_GEOFENCE',
         message: '✓ Ground Truth Verified: Captured 45m from facility boundary'
-      }
+      },
+      sha256Hash: 'a8f5c2d398fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
     };
     onChange([...files, newFile]);
   };
@@ -258,6 +267,13 @@ export const EvidenceUploader: React.FC<EvidenceUploaderProps> = ({ files, onCha
                 ) : (
                   <div style={{ marginTop: '0.35rem', fontSize: '0.68rem', color: '#64748b', background: '#f1f5f9', padding: '3px 6px', borderRadius: 4, fontWeight: 600 }}>
                     GPS Metadata: Community Flagged for Verification
+                  </div>
+                )}
+
+                {file.sha256Hash && (
+                  <div style={{ marginTop: '0.35rem', fontSize: '0.65rem', color: '#334155', background: '#f8fafc', border: '1px solid #e2e8f0', padding: '2px 6px', borderRadius: 4, fontFamily: 'monospace', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <Hash size={10} style={{ color: '#64748b' }} />
+                    <span>SHA-256: {file.sha256Hash.slice(0, 16)}…</span>
                   </div>
                 )}
 

@@ -5,6 +5,7 @@ import { useLanguage } from '../../core/context/LanguageContext';
 import { usePin } from '../../core/context/PinContext';
 import { SIH_SHOWCASE_STATEMENTS, SihProblemStatement } from '../../data/sihShowcase';
 import { EvaluatorTourModal } from './EvaluatorTourModal';
+import { SihLiveAuditSimulatorModal } from './SihLiveAuditSimulatorModal';
 
 const DISMISS_KEY = 'jantax_sih_banner_dismissed';
 
@@ -16,6 +17,7 @@ export function SihShowcaseBanner() {
     () => typeof window !== 'undefined' && window.localStorage.getItem(DISMISS_KEY) === '1'
   );
   const [isTourOpen, setIsTourOpen] = useState(false);
+  const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
   const [selectedPsId, setSelectedPsId] = useState<string>(SIH_SHOWCASE_STATEMENTS[0].id);
   const { tr, language } = useLanguage();
   const { setSelectedPin } = usePin();
@@ -104,6 +106,28 @@ export function SihShowcaseBanner() {
 
             <button
               type="button"
+              onClick={() => setIsSimulatorOpen(true)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                background: 'var(--gradient-accent, #f97316)',
+                border: 'none',
+                color: '#ffffff',
+                padding: 'var(--space-1) var(--space-3)',
+                borderRadius: 'var(--radius-sm)',
+                fontSize: 'var(--text-caption)',
+                fontWeight: 800,
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(249,115,22,0.3)'
+              }}
+            >
+              <Sparkles size={13} aria-hidden="true" />
+              <span>{tr('Pan-India Live Audit Simulator (30s)', 'अखिल भारतीय लाइव ऑडिट सिम्युलेटर (30s)')}</span>
+            </button>
+
+            <button
+              type="button"
               onClick={() => setIsTourOpen(true)}
               style={{
                 display: 'inline-flex',
@@ -170,6 +194,9 @@ export function SihShowcaseBanner() {
 
         {/* Evaluator Tour Modal */}
         <EvaluatorTourModal isOpen={isTourOpen} onClose={() => setIsTourOpen(false)} />
+
+        {/* Pan-India 30-Second Stage Simulator Modal */}
+        <SihLiveAuditSimulatorModal isOpen={isSimulatorOpen} onClose={() => setIsSimulatorOpen(false)} />
 
         {isOpen && (
           <div

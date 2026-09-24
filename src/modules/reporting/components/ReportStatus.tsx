@@ -103,13 +103,23 @@ export const ReportStatus: React.FC<ReportStatusProps> = ({ report, onUpdate }) 
             <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.5rem' }}>
               Verified Ground Evidence ({report.evidence.length})
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.85rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.85rem' }}>
               {report.evidence.map((ev) => (
-                <div key={ev.id} style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid #cbd5e1', height: 130, position: 'relative' }}>
-                  <img src={ev.url} alt={ev.fileName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <span style={{ position: 'absolute', bottom: '0.35rem', left: '0.35rem', background: 'rgba(15,23,42,0.8)', color: '#ffffff', fontSize: '0.68rem', padding: '2px 6px', borderRadius: 4 }}>
-                    {ev.fileName}
+                <div key={ev.id} style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid #cbd5e1', height: 140, position: 'relative', background: '#0f172a' }}>
+                  <img src={ev.url} alt={ev.fileName} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.92 }} />
+                  <span style={{ position: 'absolute', top: '0.35rem', right: '0.35rem', background: ev.exifIntegrity === 'VERIFIED_GEOFENCE' ? '#059669' : 'rgba(15,23,42,0.85)', color: '#ffffff', fontSize: '0.65rem', fontWeight: 800, padding: '2px 6px', borderRadius: 4, display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
+                    <ShieldCheck size={10} /> {ev.exifIntegrity === 'VERIFIED_GEOFENCE' ? 'GPS VERIFIED' : 'GEOFENCE CHECKED'}
                   </span>
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'linear-gradient(to top, rgba(15,23,42,0.95), transparent)', padding: '0.5rem 0.4rem 0.3rem' }}>
+                    <div style={{ color: '#ffffff', fontSize: '0.7rem', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {ev.fileName}
+                    </div>
+                    {ev.sha256Hash && (
+                      <div style={{ color: '#93c5fd', fontSize: '0.62rem', fontFamily: 'monospace', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        🔒 {ev.sha256Hash.substring(0, 16)}...
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

@@ -1,5 +1,5 @@
 import type { CitizenReport, ReportCategory, ModerationState, EvidenceItem } from '../types/citizenReport';
-import type { OfficialTrackingRecord, GrievanceDraft } from '../types/officialAction';
+import type { OfficialTrackingRecord, GrievanceDraft, OfficialResponseLog } from '../types/officialAction';
 import { MOCK_CITIZEN_REPORTS, MOCK_OFFICIAL_TRACKING } from '../data/mockReports';
 
 import { sanitizeReportForPublicView, sanitizeInput } from '../../security/services/securityService';
@@ -281,6 +281,56 @@ export function verifyResolution(reportId: string, isResolved: boolean, feedback
     try {
       const raw = localStorage.getItem(TRACKING_KEY);
       const store = raw ? JSON.parse(raw) : MOCK_OFFICIAL_TRACKING;
+      store[reportId] = updatedTracking;
+      localStorage.setItem(TRACKING_KEY, JSON.stringify(store));
+    } catch {}
+  }
+
+  return updatedTracking;
+}
+
+export function submitOfficialRebuttal(
+  reportId: string,
+  rebuttal: Omit<OfficialResponseLog, 'id' | 'responseDate'> & { responseDate?: string }
+): OfficialTrackingRecord {
+  const currentTracking = getOfficialTracking(reportId);
+  const newResponse: OfficialResponseLog = {
+    id: `resp-${Date.now()}`,
+    responseDate: rebuttal.responseDate || new Date().toISOString().split('T')[0],
+    officerName: rebuttal.officerName,
+    officerDesignation: rebuttal.officerDesignation,
+    department: rebuttal.department,
+    responseText: rebuttal.responseText,
+    statusChangeTo: rebuttal.statusChangeTo || 'Under Process',
+    sourcePdfUrl: rebuttal.sourcePdfUrl
+  };
+
+  const baseTracking: OfficialTrackingRecord = currentTracking || {
+    reportId,
+    official_system: 'CPGRAMS (Central PG Portal)',
+    reference_number: `DARPG/E/2026/${Math.floor(100000 + Math.random() * 900000)}`,
+    submission_time: new Date().toISOString(),
+    status: 'Under Process',
+    responses: [],
+    appeals: [],
+    resolutionVerification: {
+      verificationStatus: 'Verification Pending',
+      groundCheckScore: 50,
+      citizenFeedbackNote: 'Official right-to-reply submitted. Citizen verification pending.'
+    },
+    isDirectApiSubmission: false
+  };
+
+  const updatedTracking: OfficialTrackingRecord = {
+    ...baseTracking,
+    status: rebuttal.statusChangeTo ? (rebuttal.statusChangeTo as any) : baseTracking.status,
+    responses: [newResponse, ...(baseTracking.responses || [])]
+  };
+
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = localStorage.getItem(TRACKING_KEY);
+      const store = raw ? JSON.parse(raw) : { ...MOCK_OFFICIAL_TRACKING };
       store[reportId] = updatedTracking;
       localStorage.setItem(TRACKING_KEY, JSON.stringify(store));
     } catch {}
