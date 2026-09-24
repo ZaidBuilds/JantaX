@@ -11,6 +11,7 @@ import {
   Send,
   User
 } from 'lucide-react';
+import { JuxtapositionSlider } from '../../../components/UI/JuxtapositionSlider';
 import { addCitizenReportToProject, upvoteCitizenReport } from '../services/projectService';
 
 interface ProjectGroundTruthTabProps {
@@ -112,6 +113,28 @@ export const ProjectGroundTruthTab: React.FC<ProjectGroundTruthTabProps> = ({
         <p style={{ fontSize: '0.9rem', color: '#334155', margin: 0, lineHeight: 1.55 }}>
           {project.groundTruth.physicalStatusNote}
         </p>
+      </div>
+
+      {/* Interactive Official Claim vs Citizen Reality Slider */}
+      <div style={{ background: '#ffffff', borderRadius: 16, border: '1px solid #e2e8f0', padding: '1.5rem' }}>
+        <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginTop: 0, marginBottom: '0.4rem' }}>
+          Interactive Ground Reality Comparison
+        </h4>
+        <p style={{ fontSize: '0.82rem', color: '#64748b', margin: '0 0 1rem' }}>
+          Drag the center handle to cross-examine official completion claims against geotagged citizen ground verification photos.
+        </p>
+
+        <JuxtapositionSlider
+          claimTitle={`Official Claim (${project.progressPhysical}% Completed)`}
+          claimImageUrl={project.groundTruth.geoTaggedPhotos[0]?.url || 'https://images.unsplash.com/photo-1541888946425-d0fbb18615f3?auto=format&fit=crop&w=1200&q=80'}
+          claimDate={project.originalCompletionDate || 'Target Date'}
+          claimDetails="Gazette Notification: Target progress reported on schedule."
+          realityTitle={`Citizen Ground Reality (${project.groundTruth.physicalScore}% Verified)`}
+          realityImageUrl={project.groundTruth.geoTaggedPhotos[1]?.url || project.groundTruth.geoTaggedPhotos[0]?.url || 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=1200&q=80'}
+          realityDate={project.groundTruth.lastVerifiedDate || 'Ground Audit'}
+          realityDetails="Citizen Field Audit: Incomplete surfacing and drainage."
+          aspectRatio="16/9"
+        />
       </div>
 
       {/* Geo-tagged Photos Gallery */}

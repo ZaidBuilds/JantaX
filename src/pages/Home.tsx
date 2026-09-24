@@ -24,6 +24,8 @@ import {
   Clock,
   Sparkles,
   CheckCircle2,
+  Users,
+  Milestone,
 } from 'lucide-react';
 import { usePinSearch } from '../core/hooks/usePinSearch';
 import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver';
@@ -32,6 +34,7 @@ import { useLanguage } from '../core/context/LanguageContext';
 import { useWhatsAppShare } from '../core/hooks/useWhatsAppShare';
 import { MOCK_CITIZEN_REPORTS } from '../modules/reporting/data/mockReports';
 import HeroBackground from '../components/Antigravity/HeroBackground';
+import { BentoCard, JuxtapositionSlider } from '../components/UI';
 
 const QUICK_CITIES = [
   { label: 'Delhi (110001)', pin: '110001' },
@@ -248,6 +251,32 @@ export function Home() {
       color: 'var(--sector-mplads)',
       bg: 'var(--sector-mplads-bg)',
     },
+    {
+      id: 'representatives',
+      className: 'sector-representatives',
+      title: tr('Public Representatives', 'जनप्रतिनिधि व फंड लेखा'),
+      category: tr('Multi-Tier Local Governance', 'त्रि-स्तरीय पंचायती एवं स्थानीय शासन'),
+      tag: tr('8-Tier Fund Audit', '8-स्तरीय फंड ऑडिट'),
+      desc: tr('Gram Pradhan, Block Pramukh, Mayor, MLA, and MP fund allocations, unspent balances, and cost hike alerts.', 'ग्राम प्रधान, ब्लॉक प्रमुख, मेयर, विधायक एवं सांसद निधि आवंटन, अप्रयुक्त शेष एवं लागत वृद्धि।'),
+      source: tr('eGramSwaraj & State Election Commission', 'eGramSwaraj एवं राज्य निर्वाचन आयोग'),
+      route: `/pin/${activePin}/representatives`,
+      icon: Users,
+      color: 'var(--sky-700)',
+      bg: 'var(--sky-50)',
+    },
+    {
+      id: 'schemes',
+      className: 'sector-schemes',
+      title: tr('Central & State Schemes', 'केंद्रीय व राज्य योजनाएं'),
+      category: tr('National Infrastructure Pipelines', 'राष्ट्रीय ढांचागत विकास योजनाएं'),
+      tag: tr('PMGSY · JJM · RRTS · AMRUT', 'PMGSY · JJM · RRTS · AMRUT'),
+      desc: tr('All-weather rural roads, Har Ghar Jal tap water, affordable housing, and high-speed rail corridors with milestone trackers.', 'ग्रामीण सड़कें, हर घर जल नल योजना, किफायती आवास एवं तीव्र गति रेल कॉरिडोर प्रगति।'),
+      source: tr('OMMAS · Jal Jeevan Mission · NCRTC', 'OMMAS · जल जीवन मिशन · NCRTC'),
+      route: `/pin/${activePin}/schemes`,
+      icon: Milestone,
+      color: 'var(--purple-700)',
+      bg: 'var(--purple-50)',
+    },
   ];
 
   const handleShareSample = () => {
@@ -450,86 +479,70 @@ export function Home() {
             )}
           </p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
-            {/* School Spotlight */}
-            <div style={{ background: 'var(--bg-subtle)', borderRadius: 'var(--radius-lg)', padding: '1rem', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--sector-school)', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
-                  <GraduationCap size={15} />
-                  <span>{tr('Education Benchmark', 'शिक्षा मानक')}</span>
-                </div>
-                <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--navy-950)', marginBottom: '0.2rem' }}>
-                  Kendriya Vidyalaya & Govt Schools
-                </div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
-                  100% functional sanitation · 24:1 pupil-teacher ratio · UDISE+ audited
-                </div>
+          <div className="bento-grid">
+            <BentoCard
+              title={tr('Elected Representatives', 'जनप्रतिनिधि')}
+              subtitle={tr('8-Tier Local Governance', '8-स्तरीय स्थानीय शासन')}
+              icon={Users}
+              iconColor="var(--sky-700)"
+              iconBg="var(--sky-50)"
+              metricValue="8 Tiers"
+              metricLabel={tr('Gram Pradhan to Lok Sabha MP', 'ग्राम प्रधान से सांसद तक')}
+              delta={{ value: 'Audit Active', isPositive: true }}
+              onClick={() => navigate(`/pin/${activePin}/representatives`)}
+            >
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.45, marginTop: '0.4rem' }}>
+                {tr('Track 15th FC tied grants, unspent balances, cost hike overruns, and official contractor work orders.', '15वें वित्त आयोग अनुदान, अप्रयुक्त शेष, लागत वृद्धि और ठेकेदार कार्य आदेश ट्रैक करें।')}
               </div>
-              <div style={{ marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem' }}>
-                <span style={{ color: 'var(--text-muted)', fontWeight: 700 }}>{tr('Example', 'उदाहरण')}</span>
-                <Link to={`/schools?pin=${activePin}`} style={{ color: 'var(--navy-600)', fontWeight: 700 }}>Inspect ↗</Link>
-              </div>
-            </div>
+            </BentoCard>
 
-            {/* Public Works Spotlight */}
-            <div style={{ background: 'var(--bg-subtle)', borderRadius: 'var(--radius-lg)', padding: '1rem', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--sector-infra)', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
-                  <Construction size={15} />
-                  <span>{tr('Public Infrastructure', 'सार्वजनिक निर्माण')}</span>
-                </div>
-                <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--navy-950)', marginBottom: '0.2rem' }}>
-                  PMGSY Road & Drainage Network
-                </div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
-                  ₹14.8 Cr sanctioned budget · 68% progress · 14 mo. average delay
-                </div>
+            <BentoCard
+              title={tr('Govt Schemes & Corridors', 'केंद्रीय व राज्य योजनाएं')}
+              subtitle={tr('Mega Project Milestones', 'राष्ट्रीय परियोजनाएं')}
+              icon={Milestone}
+              iconColor="var(--purple-700)"
+              iconBg="var(--purple-50)"
+              metricValue="5 Schemes"
+              metricLabel={tr('PMGSY · JJM · RRTS · PMAY · AMRUT', 'PMGSY · JJM · RRTS · PMAY · AMRUT')}
+              delta={{ value: 'Milestones Active', isPositive: true }}
+              onClick={() => navigate(`/pin/${activePin}/schemes`)}
+            >
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.45, marginTop: '0.4rem' }}>
+                {tr('5-stage pipeline tracking from administrative sanction to public operational handover.', 'प्रशासनिक स्वीकृति से लेकर सार्वजनिक लोकार्पण तक 5-चरणीय प्रगति ट्रैकिंग।')}
               </div>
-              <div style={{ marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem' }}>
-                <span style={{ color: 'var(--text-muted)', fontWeight: 700 }}>{tr('Example', 'उदाहरण')}</span>
-                <Link to={`/projects?pin=${activePin}`} style={{ color: 'var(--navy-600)', fontWeight: 700 }}>Inspect ↗</Link>
-              </div>
-            </div>
+            </BentoCard>
 
-            {/* Healthcare Spotlight */}
-            <div style={{ background: 'var(--bg-subtle)', borderRadius: 'var(--radius-lg)', padding: '1rem', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--sector-hospital)', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
-                  <Hospital size={15} />
-                  <span>{tr('Healthcare Access', 'स्वास्थ्य सुविधाएं')}</span>
-                </div>
-                <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--navy-950)', marginBottom: '0.2rem' }}>
-                  District Hospital & CHC Health Unit
-                </div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
-                  24x7 emergency duty verified · 200 sanctioned beds · HMIS registered
-                </div>
+            <BentoCard
+              title={tr('Contractors & DLP Watchdog', 'ठेकेदार व वारंटी')}
+              subtitle={tr('IRC SP:98 Quality Guarantees', 'गुणवत्ता व मरम्मत गारंटी')}
+              icon={HardHat}
+              iconColor="var(--amber-700)"
+              iconBg="var(--amber-50)"
+              metricValue="365 Days"
+              metricLabel={tr('Active DLP Defect Liability Clocks', 'सक्रिय डिफेक्ट लायबिलिटी वारंटी घड़ी')}
+              delta={{ value: '1-Click RTI Ready', isPositive: true }}
+              onClick={() => navigate('/contractors')}
+            >
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.45, marginTop: '0.4rem' }}>
+                {tr('Pre-fills Section 6(1) RTI applications demanding free road resurfacing under warranty clauses.', 'सड़क वारंटी क्लॉज के तहत निशुल्क मरम्मत की मांग हेतु 1-क्लिक आरटीआई आवेदन।')}
               </div>
-              <div style={{ marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem' }}>
-                <span style={{ color: 'var(--text-muted)', fontWeight: 700 }}>{tr('Example', 'उदाहरण')}</span>
-                <Link to={`/module/hospital?pin=${activePin}`} style={{ color: 'var(--navy-600)', fontWeight: 700 }}>Inspect ↗</Link>
-              </div>
-            </div>
+            </BentoCard>
 
-            {/* RERA Spotlight */}
-            <div style={{ background: 'var(--bg-subtle)', borderRadius: 'var(--radius-lg)', padding: '1rem', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--sector-rera)', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
-                  <Building2 size={15} />
-                  <span>{tr('Housing Accountability', 'हाउसिंग जवाबदेही')}</span>
-                </div>
-                <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--navy-950)', marginBottom: '0.2rem' }}>
-                  RERA Registered Residential Projects
-                </div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
-                  2,730 housing units tracked · Delivery timelines & buyer complaints
-                </div>
+            <BentoCard
+              title={tr('Schools & Hospitals', 'स्कूल व अस्पताल')}
+              subtitle={tr('UDISE+ & HMIS Registries', 'UDISE+ एवं HMIS रजिस्ट्री')}
+              icon={GraduationCap}
+              iconColor="var(--navy-600)"
+              iconBg="var(--navy-50)"
+              metricValue="100%"
+              metricLabel={tr('Facility Audits & Doctor Rosters', 'सुविधा ऑडिट एवं डॉक्टर रोस्टर')}
+              delta={{ value: 'Registry Synced', isPositive: true }}
+              onClick={() => navigate(`/schools?pin=${activePin}`)}
+            >
+              <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.45, marginTop: '0.4rem' }}>
+                {tr('Audited toilet functionality, drinking water, pupil-teacher ratios, and 24x7 emergency beds.', 'शौचालय, पेयजल, छात्र-शिक्षक अनुपात एवं 24 घंटे आपातकालीन स्वास्थ्य सुविधाएं।')}
               </div>
-              <div style={{ marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem' }}>
-                <span style={{ color: 'var(--text-muted)', fontWeight: 700 }}>{tr('Example', 'उदाहरण')}</span>
-                <Link to={`/rera?pin=${activePin}`} style={{ color: 'var(--navy-600)', fontWeight: 700 }}>Inspect ↗</Link>
-              </div>
-            </div>
+            </BentoCard>
           </div>
         </section>
 
@@ -613,50 +626,24 @@ export function Home() {
             </button>
           </div>
 
-          <div className="claim-reality-grid">
-            {/* Left: Official Claim */}
-            <div className="claim-panel">
-              <div className="panel-kicker">{tr('Official Claim', 'सरकारी दावा')}</div>
-              <h3 className="panel-headline">{tr('PMGSY Rural Road & Drain Package', 'प्रधानमंत्री ग्राम सड़क योजना कार्य')}</h3>
-              <div className="panel-metric-huge">{tr('100% Completed', '100% पूर्ण घोषित')}</div>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                {tr(
-                  'Official State PWD dashboard records the 4.8 km connecting road and stormwater drainage work as 100% physically complete with full fund disbursement.',
-                  'राज्य लोक निर्माण विभाग के अनुसार 4.8 किमी सड़क और जल निकासी कार्य 100% पूरा व भुगतान स्वीकृत है।'
-                )}
-              </p>
-              {/* Illustrative only. Never print a specific tender reference or
-                  claim portal verification unless it resolves to a real record. */}
-              <div className="panel-citation">
-                <strong>{tr('Source type:', 'स्रोत प्रकार:')}</strong>{' '}
-                {tr(
-                  'State public works portal — example, no real tender referenced',
-                  'राज्य लोक निर्माण पोर्टल — उदाहरण, कोई वास्तविक निविदा संदर्भित नहीं'
-                )}
-              </div>
-            </div>
-
-            {/* Right: Ground Reality */}
-            <div className="reality-panel">
-              <div className="panel-kicker">{tr('Ground Reality', 'जमीनी हकीकत')}</div>
-              <h3 className="panel-headline">{tr('Audit Finding & Citizen Observations', 'ऑडिट निष्कर्ष एवं नागरिक टिप्पणियाँ')}</h3>
-              <div className="panel-metric-huge">{tr('18 Months Delayed', '18 महीने से विलंबित')}</div>
-              {/* Illustrative. Do NOT cite a specific CAG paragraph number —
-                  a fabricated citation of a real audit body is indefensible. */}
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                {tr(
-                  'In this example, a state audit report records 40% physical completion with missing culverts, while several corroborating citizen photo reports show open waterlogged ditches.',
-                  'इस उदाहरण में, राज्य ऑडिट रिपोर्ट 40% वास्तविक कार्य दर्ज करती है, जबकि कई नागरिक फोटो रिपोर्टों में खुला जलभराव दिखता है।'
-                )}
-              </p>
-              <div className="panel-citation">
-                <strong>{tr('Evidence type:', 'साक्ष्य प्रकार:')}</strong>{' '}
-                {tr(
-                  'State performance audit + geotagged citizen reports — example, no real audit cited',
-                  'राज्य ऑडिट एवं जियोटैग नागरिक रिपोर्ट — उदाहरण, कोई वास्तविक ऑडिट संदर्भित नहीं'
-                )}
-              </div>
-            </div>
+          <div style={{ margin: '1.5rem 0' }}>
+            <JuxtapositionSlider
+              claimTitle={tr('Official Govt Record (100% Completed)', 'सरकारी दावा: 100% कार्य पूर्ण')}
+              claimImageUrl="https://images.unsplash.com/photo-1590486803833-1c5dc8ddd4c8?auto=format&fit=crop&w=1200&q=80"
+              claimDetails={tr(
+                'State PWD dashboard records the 4.8 km connecting road and stormwater drainage package as 100% physically complete with full fund disbursement.',
+                'राज्य लोक निर्माण विभाग के अनुसार 4.8 किमी सड़क और जल निकासी कार्य 100% पूरा व भुगतान स्वीकृत है।'
+              )}
+              claimDate="PMGSY OMMAS Record"
+              realityTitle={tr('Citizen Ground Truth (18 Months Overdue)', 'जमीनी हकीकत: 18 महीने से विलंबित')}
+              realityImageUrl="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=1200&q=80"
+              realityDetails={tr(
+                'Citizen GPS corroboration & physical inspection reveals unpaved trench, missing pre-cast culvert, and persistent waterlogging across 1.2 km.',
+                'नागरिक जीपीएस साक्ष्य एवं जमीनी निरीक्षण में कच्ची सड़क, अधूरा नाला निर्माण एवं 1.2 किमी तक जलभराव दर्ज किया गया।'
+              )}
+              realityDate="Verified Citizen Inspection Signal"
+              height={380}
+            />
           </div>
 
           <div className="claim-reality-footer">

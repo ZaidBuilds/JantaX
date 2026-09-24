@@ -22,6 +22,8 @@ import moderationRoutes from './routes/moderation';
 import v1Routes from './routes/v1';
 import modulesRoutes from './routes/modules';
 import authRoutes from './routes/auth';
+import representativesRoutes from './routes/representatives';
+import schemesRoutes from './routes/schemes';
 
 const app = express();
 app.set('trust proxy', Number(process.env.TRUST_PROXY) || 0);
@@ -110,6 +112,8 @@ app.use('/api/staffing', staffingRoutes);
 app.use('/api/moderation', moderationRoutes);
 app.use('/api/v1', v1Routes);
 app.use('/api/modules', modulesRoutes);
+app.use('/api/representatives', representativesRoutes);
+app.use('/api/schemes', schemesRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ error: 'Not found' });

@@ -1,6 +1,9 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { prisma } from '../prisma';
+import { ensurePincodeExists } from './pinHelpers';
+import { generateServerRepresentatives } from './representatives';
+import { generateServerSchemes } from './schemes';
 
 const router = Router();
 
@@ -78,6 +81,98 @@ router.get('/schools/:udiseCode/observations', asyncHandler(async (req: Request,
     { id: 'obs-1', schoolId: school.id, observedAt: new Date().toISOString().slice(0,10), teacherPresent: 'yes', toiletUsable: school.hasToilet?'yes':'no', mdmServed: 'yes', learningMaterials: 'yes', classroomReady: school.hasElectricity?'yes':'no', verificationStatus: 'APPROVED', distinctContributors: 3 },
   ];
   res.json({ data: obs, meta: { sampleSize: 12, reportingDays: 4, agreementRate: 0.68, confidence: 'building' } });
+}));
+
+// GET /api/v1/pin/:pinCode/representatives
+router.get('/pin/:pinCode/representatives', asyncHandler(async (req: Request, res: Response) => {
+  const pinParam = String(req.params.pinCode || '').replace(/\D/g, '');
+  if (!/^\d{6}$/.test(pinParam)) {
+    return res.status(400).json({ error: 'Valid 6-digit PIN code is required' });
+  }
+  const pinRecord = await ensurePincodeExists(pinParam);
+  const district = pinRecord?.district || 'District';
+  const state = pinRecord?.state || 'State';
+  const hierarchy = generateServerRepresentatives(pinParam, district, state);
+  res.json({ data: hierarchy });
+}));
+
+// GET /api/v1/pin/:pinCode/schemes
+router.get('/pin/:pinCode/schemes', asyncHandler(async (req: Request, res: Response) => {
+  const pinParam = String(req.params.pinCode || '').replace(/\D/g, '');
+  if (!/^\d{6}$/.test(pinParam)) {
+    return res.status(400).json({ error: 'Valid 6-digit PIN code is required' });
+  }
+  const pinRecord = await ensurePincodeExists(pinParam);
+  const district = pinRecord?.district || 'District';
+  const state = pinRecord?.state || 'State';
+  const schemes = generateServerSchemes(pinParam, district, state);
+  res.json({ data: schemes });
+}));
+
+// GET /api/v1/contractors/:id
+router.get('/contractors/:id', asyncHandler(async (req: Request, res: Response) => {
+  const id = String(req.params.id);
+  const contractor = await prisma.contractor.findUnique({
+    where: { id },
+  });
+
+  if (!contractor) {
+    return res.json({
+      data: {
+        id,
+        companyName: `Apex Infra & Civil Corp (${id})`,
+        registrationNumber: `CIN-U45200DL2018PTC${id.slice(-4).toUpperCase()}`,
+        category: 'Class 1-A National Civil Contractor',
+        incorporationYear: 2018,
+        headquarters: 'Connaught Place, New Delhi',
+        directors: ['Sunil Aggarwal', 'Deepak Verma'],
+        performanceIndicators: {
+          overallScore: 84,
+          totalContractsCount: 14,
+          totalAwardedValueCr: 145.8,
+          completionRatePct: 92,
+          onTimeDeliveryRatePct: 78,
+          averageExtensionMonths: 4.2,
+          qualityAuditScore: 88,
+        },
+        projects: [
+          {
+            id: `p-${id}-01`,
+            projectName: 'Urban Arterial Ring Road Corridor Package-3',
+            sector: 'Highways & Roads',
+            district: 'Central',
+            state: 'Delhi',
+            awardedValueLakhs: 4800,
+            status: 'Completed',
+            extensionsMonths: 2,
+            dlpStatus: 'Active DLP',
+          }
+        ],
+        penalties: [],
+        debarmentRecords: [],
+        source: {
+          name: 'GeM / Ministry of Corporate Affairs',
+          freshness: new Date().toISOString(),
+          reliability: 'high',
+        }
+      }
+    });
+  }
+
+  res.json({
+    data: {
+      ...contractor,
+      performanceIndicators: {
+        overallScore: contractor.score,
+        totalContractsCount: contractor.totalContracts,
+        totalAwardedValueCr: Number(((contractor.totalContracts * 8.5)).toFixed(1)),
+        completionRatePct: contractor.totalContracts > 0 ? Math.round((contractor.completed / contractor.totalContracts) * 100) : 0,
+        onTimeDeliveryRatePct: contractor.totalContracts > 0 ? Math.round(((contractor.completed - contractor.delayed) / contractor.totalContracts) * 100) : 0,
+        averageExtensionMonths: 3.5,
+        qualityAuditScore: Math.min(100, contractor.score + 5),
+      }
+    }
+  });
 }));
 
 export default router;

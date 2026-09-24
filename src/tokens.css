@@ -16,7 +16,7 @@
    existing components keep working while the visual language is unified.
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap');
 
 :root {
   /* ── Surfaces ──────────────────────────────────────────────────────────
@@ -149,14 +149,25 @@
   --sector-mplads-bg: var(--bg-subtle);
   --sector-mplads-border: var(--border-color);
 
+  /* ── Multi-Tier Local Works (Sky Blue) ───────────────────────────────── */
+  --sky-700: #0369a1;
+  --sky-600: #0284c7;
+  --sky-100: #e0f2fe;
+  --sky-50:  #f0f9ff;
+
+  /* ── Mega Schemes & Corridors (Purple / Indigo) ──────────────────────── */
+  --purple-700: #6d28d9;
+  --purple-600: #7c3aed;
+  --purple-100: #ede9fe;
+  --purple-50:  #f5f3ff;
+
   /* ── Typography ───────────────────────────────────────────────────────
-     Two typefaces only. `--font-display` intentionally resolves to the same
-     family as body text: headings earn hierarchy through size and weight,
-     not a second typeface. `--font-mono` uses the system stack so codes and
-     figures align without shipping a third webfont.                       */
+     Display typography powered by Outfit, UI body by Inter, Hindi by Noto
+     Sans Devanagari, and official identifiers by JetBrains Mono.           */
   --font-sans: 'Inter', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-display: var(--font-sans);
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-display: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-hindi: 'Noto Sans Devanagari', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   /* Type scale — 1.5 line-height for body, 1.2 for headings. */
   --text-caption: 0.75rem;   /* 12px — labels, never sentences */

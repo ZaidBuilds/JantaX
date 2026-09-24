@@ -177,6 +177,9 @@ export function PinDashboard() {
               <span style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: 600 }}>
                 {displayRegion} India · {displayArea}
               </span>
+              <span className="glass-pill" style={{ fontSize: '0.74rem' }}>
+                🛡️ {tr('IRC SP:98 DLP Active', 'आईआरसी गारंटी लागू')}
+              </span>
             </div>
 
             <h1 style={{ color: '#ffffff', fontSize: '2.2rem', fontWeight: 900, margin: '0 0 0.4rem' }}>
@@ -190,7 +193,7 @@ export function PinDashboard() {
             </p>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
             <button
               type="button"
               onClick={handleShare}
@@ -200,6 +203,14 @@ export function PinDashboard() {
               <Share2 size={16} />
               <span>{tr('Share Scorecard', 'रिपोर्ट कार्ड साझा करें')}</span>
             </button>
+            <Link
+              to={`/report-issue?pin=${currentPin}&quick=gps`}
+              className="btn"
+              style={{ background: 'rgba(255, 255, 255, 0.15)', color: '#ffffff', border: '1px solid rgba(255, 255, 255, 0.25)' }}
+            >
+              <MapPin size={16} />
+              <span>{tr('GPS Check-in', 'जीपीएस चेक-इन')}</span>
+            </Link>
             <Link
               to={`/report-issue?pin=${currentPin}`}
               className="btn"
@@ -691,9 +702,16 @@ export function PinDashboard() {
                       <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--navy-950)' }}>
                         {p.titleEnglish || p.title}
                       </div>
-                      <span style={{ fontSize: '0.7rem', fontWeight: 800, padding: '0.2rem 0.5rem', borderRadius: 'var(--radius-pill)', background: p.status === 'DELAYED' ? 'var(--saffron-50)' : 'var(--emerald-50)', color: p.status === 'DELAYED' ? 'var(--saffron-600)' : 'var(--emerald-700)' }}>
-                        {p.status || 'ONGOING'}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                        {p.claimCompletionPct && (p.groundTruthScore || 70) < p.claimCompletionPct - 10 ? (
+                          <span className="badge-overrun" style={{ fontSize: '0.68rem' }}>
+                            ⚠️ Gap {(p.claimCompletionPct || 85) - (p.groundTruthScore || 70)}%
+                          </span>
+                        ) : null}
+                        <span style={{ fontSize: '0.7rem', fontWeight: 800, padding: '0.2rem 0.5rem', borderRadius: 'var(--radius-pill)', background: p.status === 'DELAYED' ? 'var(--saffron-50)' : 'var(--emerald-50)', color: p.status === 'DELAYED' ? 'var(--saffron-600)' : 'var(--emerald-700)' }}>
+                          {p.status || 'ONGOING'}
+                        </span>
+                      </div>
                     </div>
 
                     <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>

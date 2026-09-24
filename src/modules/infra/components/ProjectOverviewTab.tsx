@@ -12,6 +12,8 @@ import {
   Calendar,
   Layers
 } from 'lucide-react';
+import { MilestoneTimeline } from '../../../components/UI/MilestoneTimeline';
+import { DlpWarrantyClock } from '../../../components/UI/DlpWarrantyClock';
 
 interface ProjectOverviewTabProps {
   project: InfraProject;
@@ -68,6 +70,65 @@ export const ProjectOverviewTab: React.FC<ProjectOverviewTabProps> = ({ project 
           <div style={{ fontSize: '0.74rem', color: '#64748b', marginTop: '0.2rem' }}>Verified Ground Audit</div>
         </div>
       </div>
+
+      {/* 5-Stage Project Milestone Pipeline */}
+      <MilestoneTimeline
+        currentProgressPct={project.progressPhysical}
+        steps={[
+          {
+            id: 'm1',
+            label: 'DPR & Sanction',
+            labelHi: 'प्रशासनिक एवं वित्तीय स्वीकृति',
+            date: project.startDate || '2023-01',
+            status: 'completed',
+            description: `Sanctioned by ${project.sanctioningBody}`,
+          },
+          {
+            id: 'm2',
+            label: 'Tender & Award',
+            labelHi: 'निविदा एवं संविदा आवंटन',
+            date: project.startDate || '2023-06',
+            status: 'completed',
+            description: `Awarded to ${project.leadContractor}`,
+          },
+          {
+            id: 'm3',
+            label: 'Civil Works & Sub-base',
+            labelHi: 'नागरिक निर्माण एवं उप-आधार',
+            date: project.originalCompletionDate,
+            status: project.progressPhysical >= 65 ? 'completed' : 'in_progress',
+            description: 'Bitumen/concrete layer and drainage grading',
+          },
+          {
+            id: 'm4',
+            label: 'Quality Core-Cut & Lab Audit',
+            labelHi: 'गुणवत्ता कोर-कट परीक्षण',
+            date: project.anticipatedCompletionDate,
+            status: project.progressPhysical >= 95 ? 'completed' : project.progressPhysical >= 65 ? 'in_progress' : 'pending',
+            description: 'IRC SP:98 compliance & compaction density audit',
+          },
+          {
+            id: 'm5',
+            label: 'Handover & Commissioning',
+            labelHi: 'हस्तांतरण एवं लोकार्पण',
+            date: project.anticipatedCompletionDate,
+            status: (project.status === 'Completed' || project.status === 'Verified') ? 'completed' : project.status === 'Delayed' ? 'delayed' : 'pending',
+            description: (project.status === 'Completed' || project.status === 'Verified') ? 'Commissioned for public transit' : 'Pending final snag-list rectification',
+          },
+        ]}
+      />
+
+      {/* Statutory DLP Warranty Clock for Completed / Verified Works */}
+      {(project.status === 'Completed' || project.status === 'Verified' || project.progressPhysical >= 95) && (
+        <DlpWarrantyClock
+          workTitle={project.nameEnglish}
+          contractorName={project.leadContractor}
+          contractorId={project.contractorDetails?.id}
+          completionDate={project.anticipatedCompletionDate || '2024-03-31'}
+          dlpEndDate="2027-03-31"
+          daysRemaining={340}
+        />
+      )}
 
       {/* Authorities & Lead Contractor Details Card */}
       <div style={{ background: '#ffffff', borderRadius: 16, border: '1px solid #e2e8f0', padding: '1.5rem' }}>

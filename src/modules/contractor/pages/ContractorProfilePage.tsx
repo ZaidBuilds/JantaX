@@ -18,6 +18,7 @@ import {
   Layers,
   Share2
 } from 'lucide-react';
+import { DlpWarrantyClock } from '../../../components/UI/DlpWarrantyClock';
 
 interface ContractorProfilePageProps {
   initialTab?: 'overview' | 'scorecard' | 'projects' | 'history';
@@ -307,6 +308,56 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
               <div style={{ fontSize: '0.74rem', color: '#64748b' }}>Across active & completed works</div>
             </div>
           </div>
+
+          {/* Statutory Warranty & RTI Watchdog Banner */}
+          <div style={{
+            background: 'linear-gradient(135deg, var(--navy-950) 0%, var(--navy-900) 100%)',
+            borderRadius: 16,
+            padding: '1.25rem 1.5rem',
+            color: '#ffffff',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1rem',
+          }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem' }}>
+                <span className="glass-pill" style={{ fontSize: '0.72rem' }}>
+                  🛡️ IRC SP:98 Statutory Watchdog
+                </span>
+                <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                  Standard Specifications for Road & Bridge Works
+                </span>
+              </div>
+              <h4 style={{ fontSize: '1.05rem', fontWeight: 800, margin: '0.1rem 0 0.25rem', color: '#ffffff' }}>
+                Defect Liability Period (DLP) Legal Enforcement
+              </h4>
+              <p style={{ fontSize: '0.82rem', color: '#cbd5e1', margin: 0, maxWidth: 640 }}>
+                Under MoRTH & State PWD contracts, any potholes, bitumen stripping, or structural defects occurring within the 36-month DLP must be repaired by {contractor.companyName} at zero cost to the public exchequer.
+              </p>
+            </div>
+
+            <Link
+              to={`/rti/draft?contractor=${encodeURIComponent(contractor.companyName)}`}
+              className="btn"
+              style={{
+                background: 'var(--gradient-accent)',
+                color: '#ffffff',
+                border: 'none',
+                padding: '0.65rem 1.25rem',
+                borderRadius: 10,
+                fontWeight: 700,
+                fontSize: '0.84rem',
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+              }}
+            >
+              <FileText size={15} /> Draft Locality RTI
+            </Link>
+          </div>
         </div>
       )}
 
@@ -370,13 +421,47 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                {/* Statutory DLP Warranty Clock for Completed / Verified Works */}
+                {(p.status === 'Completed' || p.status === 'Verified') && (
+                  <div style={{ marginTop: '0.85rem' }}>
+                    <DlpWarrantyClock
+                      workTitle={p.projectName}
+                      contractorName={contractor.companyName}
+                      contractorId={contractor.id}
+                      completionDate="2024-06-30"
+                      dlpEndDate="2027-06-30"
+                      daysRemaining={280}
+                    />
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.85rem', paddingTop: '0.65rem', borderTop: '1px solid #e2e8f0', flexWrap: 'wrap', gap: '0.5rem' }}>
                   <div style={{ fontSize: '0.78rem', color: '#475569', fontWeight: 600 }}>
                     Status: <strong style={{ color: p.status === 'Completed' || p.status === 'Verified' ? '#047857' : '#b45309' }}>{p.status}</strong> · Extensions: {p.extensionsMonths} Mos
                   </div>
-                  <Link to={`/projects/${p.id}`} style={{ fontSize: '0.78rem', color: '#1d4ed8', fontWeight: 700, textDecoration: 'none' }}>
-                    View Project Page →
-                  </Link>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+                    <Link
+                      to={`/rti/draft?contractor=${encodeURIComponent(contractor.companyName)}&project=${encodeURIComponent(p.projectName)}`}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.3rem',
+                        background: '#eff6ff',
+                        color: '#1d4ed8',
+                        padding: '0.35rem 0.75rem',
+                        borderRadius: 8,
+                        fontSize: '0.76rem',
+                        fontWeight: 700,
+                        textDecoration: 'none',
+                        border: '1px solid #bfdbfe',
+                      }}
+                    >
+                      <FileText size={13} /> Draft Section 6(1) RTI
+                    </Link>
+                    <Link to={`/projects/${p.id}`} style={{ fontSize: '0.78rem', color: '#1d4ed8', fontWeight: 700, textDecoration: 'none' }}>
+                      View Project Page →
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}
