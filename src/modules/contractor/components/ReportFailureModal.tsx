@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { WorkOrder, DefectType, SeverityLevel } from '../types';
 import { INDIAN_STATES, getCitiesByState } from '../data/statesAndCities';
+import { apiUrl } from '../../../core/services/api';
 
 interface ReportFailureModalProps {
   isOpen: boolean;
@@ -61,7 +62,7 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      const res = await fetch('/api/defects', {
+      const res = await fetch(apiUrl('/api/defects'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -101,26 +102,26 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs overflow-y-auto">
-      <div className="bg-white border-2 border-[#1A1A1A] max-w-xl w-full flex flex-col shadow-2xl overflow-hidden my-6">
+      <div className="bg-surface border rounded-[10px] border-line max-w-xl w-full flex flex-col shadow-lg overflow-hidden my-6">
         
         {/* Header */}
-        <div className="p-5 sm:p-6 border-b-2 border-[#1A1A1A] flex items-start justify-between bg-[#FAFAFA]">
+        <div className="p-5 sm:p-6 border-b border-line flex items-start justify-between bg-surface-2">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="bg-[#D43F33] text-white px-2 py-0.5 text-[10px] font-mono font-bold uppercase">
+              <span className="bg-[var(--bad-solid)] text-white px-2 py-0.5 text-xs font-bold">
                 Citizen Audit Tool
               </span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black uppercase text-[#1A1A1A] mt-1">
+            <h2 className="text-xl sm:text-2xl font-bold text-ink mt-1">
               Log Road Failure & Attribute Contractor
             </h2>
-            <p className="text-xs font-serif text-[#1A1A1A]/70 mt-1">
+            <p className="text-xs text-ink-3 mt-1">
               Unlike generic complaint apps, this report directly flags the contractor's public integrity scorecard and DLP liability ledger.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1 border border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-colors"
+            className="p-1 border rounded-[10px] border-line text-ink hover:bg-[var(--surface-inverse)] hover:text-white transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -129,24 +130,24 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
         {/* Content */}
         {submitted ? (
           <div className="p-8 text-center space-y-3">
-            <div className="w-12 h-12 bg-emerald-700 text-white flex items-center justify-center mx-auto border-2 border-[#1A1A1A]">
+            <div className="w-12 h-12 bg-[var(--good-solid)] text-white flex items-center justify-center mx-auto border rounded-[10px] border-line">
               <CheckCircle2 className="w-6 h-6" />
             </div>
-            <h3 className="text-lg font-black uppercase text-[#1A1A1A]">
+            <h3 className="text-lg font-bold text-ink">
               Road Failure Attributed Successfully!
             </h3>
-            <p className="text-xs font-serif text-[#1A1A1A]/80">
-              Assigned to <strong className="font-sans font-bold text-[#1A1A1A]">{currentWo.contractorName}</strong>. The Defect Liability Period breach counter has been incremented on the public scorecard.
+            <p className="text-xs text-ink-2">
+              Assigned to <strong className="font-sans font-bold text-ink">{currentWo.contractorName}</strong>. The Defect Liability Period breach counter has been incremented on the public scorecard.
             </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4">
             
             {/* Filter Work Order by State & City */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-[#FAFAFA] border border-black/15 p-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-surface-2 border rounded-[10px] border-line p-2.5">
               <div>
-                <label className="text-[10px] font-mono font-bold uppercase text-[#1A1A1A]/80 block mb-1 flex items-center gap-1">
-                  <Landmark className="w-3 h-3 text-[#1A1A1A]" />
+                <label className="text-xs font-bold text-ink-2 block mb-1 flex items-center gap-1">
+                  <Landmark className="w-3 h-3 text-ink" />
                   <span>Filter by State:</span>
                 </label>
                 <select
@@ -155,7 +156,7 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
                     setFilterState(e.target.value);
                     setFilterCity('all');
                   }}
-                  className="w-full bg-white border border-[#1A1A1A] px-2 py-1 text-xs font-mono font-bold text-[#1A1A1A] cursor-pointer"
+                  className="w-full bg-surface border rounded-[10px] border-line px-2 py-1 text-xs font-bold text-ink cursor-pointer"
                 >
                   <option value="all-india">All States & UTs (Pan-India)</option>
                   {INDIAN_STATES.filter(s => s.id !== 'all-india').map((st) => (
@@ -167,14 +168,14 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
               </div>
 
               <div>
-                <label className="text-[10px] font-mono font-bold uppercase text-[#1A1A1A]/80 block mb-1 flex items-center gap-1">
-                  <Building2 className="w-3 h-3 text-[#D43F33]" />
+                <label className="text-xs font-bold text-ink-2 block mb-1 flex items-center gap-1">
+                  <Building2 className="w-3 h-3 text-bad" />
                   <span>Filter by City:</span>
                 </label>
                 <select
                   value={filterCity}
                   onChange={(e) => setFilterCity(e.target.value)}
-                  className="w-full bg-white border border-[#1A1A1A] px-2 py-1 text-xs font-mono font-bold text-[#1A1A1A] cursor-pointer"
+                  className="w-full bg-surface border rounded-[10px] border-line px-2 py-1 text-xs font-bold text-ink cursor-pointer"
                 >
                   <option value="all">All Cities in State</option>
                   {availableCities.map((ct) => (
@@ -188,13 +189,13 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
 
             {/* Road / Work Order Picker */}
             <div>
-              <label className="text-[11px] font-mono font-bold uppercase text-[#1A1A1A] block mb-1">
+              <label className="text-xs font-bold text-ink block mb-1">
                 Select Road / Municipal Work Order ({filteredWorkOrders.length} Available):
               </label>
               <select
                 value={selectedWoId}
                 onChange={(e) => setSelectedWoId(e.target.value)}
-                className="w-full bg-[#FAFAFA] border-2 border-[#1A1A1A] px-3 py-2 text-xs font-bold uppercase text-[#1A1A1A] focus:outline-none cursor-pointer"
+                className="w-full bg-surface-2 border rounded-[10px] border-line px-3 py-2 text-xs font-bold text-ink focus:outline-none cursor-pointer"
               >
                 {filteredWorkOrders.map((wo) => (
                   <option key={wo.id} value={wo.id}>
@@ -204,9 +205,9 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
               </select>
 
               {currentWo && (
-                <div className="mt-2 p-2.5 bg-[#FAFAFA] border border-[#1A1A1A] text-[11px] font-mono text-[#1A1A1A]/80 flex justify-between">
-                  <span>Executing: <strong className="text-[#1A1A1A] uppercase font-bold">{currentWo.contractorName}</strong></span>
-                  <span>DLP Warranty: <strong className="text-[#D43F33] font-bold">{currentWo.dlpExpiryDate}</strong></span>
+                <div className="mt-2 p-2.5 bg-surface-2 border rounded-[10px] border-line text-xs text-ink-2 flex justify-between">
+                  <span>Executing: <strong className="text-ink font-bold">{currentWo.contractorName}</strong></span>
+                  <span>DLP Warranty: <strong className="text-bad font-bold">{currentWo.dlpExpiryDate}</strong></span>
                 </div>
               )}
             </div>
@@ -214,13 +215,13 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
             {/* Defect Type & Severity */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-[11px] font-mono font-bold uppercase text-[#1A1A1A] block mb-1">
+                <label className="text-xs font-bold text-ink block mb-1">
                   Defect Classification:
                 </label>
                 <select
                   value={defectType}
                   onChange={(e: any) => setDefectType(e.target.value)}
-                  className="w-full bg-[#FAFAFA] border-2 border-[#1A1A1A] px-3 py-2 text-xs font-bold uppercase text-[#1A1A1A] focus:outline-none cursor-pointer"
+                  className="w-full bg-surface-2 border rounded-[10px] border-line px-3 py-2 text-xs font-bold text-ink focus:outline-none cursor-pointer"
                 >
                   <option value="Pothole Cluster">Pothole Cluster / Craters</option>
                   <option value="Asphalt Stripping & Ravelling">Asphalt Stripping & Ravelling</option>
@@ -231,13 +232,13 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
               </div>
 
               <div>
-                <label className="text-[11px] font-mono font-bold uppercase text-[#1A1A1A] block mb-1">
+                <label className="text-xs font-bold text-ink block mb-1">
                   Hazard Severity:
                 </label>
                 <select
                   value={severity}
                   onChange={(e: any) => setSeverity(e.target.value)}
-                  className="w-full bg-[#FAFAFA] border-2 border-[#1A1A1A] px-3 py-2 text-xs font-bold uppercase text-[#1A1A1A] focus:outline-none cursor-pointer"
+                  className="w-full bg-surface-2 border rounded-[10px] border-line px-3 py-2 text-xs font-bold text-ink focus:outline-none cursor-pointer"
                 >
                   <option value="CRITICAL_HAZARD">Critical Hazard (Accident Prone)</option>
                   <option value="HIGH">High (Deep Craters)</option>
@@ -249,7 +250,7 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
 
             {/* Description */}
             <div>
-              <label className="text-[11px] font-mono font-bold uppercase text-[#1A1A1A] block mb-1">
+              <label className="text-xs font-bold text-ink block mb-1">
                 Description / Landmark Details:
               </label>
               <textarea
@@ -257,14 +258,14 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="e.g. Near Sony World junction turning, 4 deep potholes causing traffic snarls and water logging..."
                 rows={3}
-                className="w-full bg-[#FAFAFA] border-2 border-[#1A1A1A] p-3 text-xs text-[#1A1A1A] placeholder-[#1A1A1A]/40 focus:outline-none focus:bg-white resize-none font-serif"
+                className="w-full bg-surface-2 border rounded-[10px] border-line p-3 text-xs text-ink placeholder:text-ink-4 focus:outline-none focus:bg-surface resize-none"
               />
             </div>
 
             {/* Reporter Name & Photo Preset */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-[11px] font-mono font-bold uppercase text-[#1A1A1A] block mb-1">
+                <label className="text-xs font-bold text-ink block mb-1">
                   Your Name / RWA:
                 </label>
                 <input
@@ -272,12 +273,12 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
                   value={reporterName}
                   onChange={(e) => setReporterName(e.target.value)}
                   placeholder="e.g. Koramangala 4th Block RWA"
-                  className="w-full bg-[#FAFAFA] border-2 border-[#1A1A1A] px-3 py-2 text-xs text-[#1A1A1A] placeholder-[#1A1A1A]/40 focus:outline-none font-medium"
+                  className="w-full bg-surface-2 border rounded-[10px] border-line px-3 py-2 text-xs text-ink placeholder:text-ink-4 focus:outline-none font-medium"
                 />
               </div>
 
               <div>
-                <label className="text-[11px] font-mono font-bold uppercase text-[#1A1A1A] block mb-1">
+                <label className="text-xs font-bold text-ink block mb-1">
                   Evidence Photo URL:
                 </label>
                 <input
@@ -285,17 +286,17 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
                   value={photoUrl}
                   onChange={(e) => setPhotoUrl(e.target.value)}
                   placeholder="https://..."
-                  className="w-full bg-[#FAFAFA] border-2 border-[#1A1A1A] px-3 py-2 text-xs text-[#1A1A1A] placeholder-[#1A1A1A]/40 focus:outline-none text-[11px] font-mono"
+                  className="w-full bg-surface-2 border rounded-[10px] border-line px-3 py-2 text-xs text-ink placeholder:text-ink-4 focus:outline-none text-xs"
                 />
               </div>
             </div>
 
             {/* Submit Button */}
-            <div className="pt-3 border-t-2 border-[#1A1A1A] flex items-center justify-between">
+            <div className="pt-3 border-t border-line flex items-center justify-between">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 bg-white hover:bg-black/5 text-xs font-bold uppercase text-[#1A1A1A] border-2 border-[#1A1A1A] transition-colors"
+                className="px-4 py-2 bg-surface hover:bg-surface-3 text-xs font-bold text-ink border rounded-[10px] border-line transition-colors"
               >
                 Cancel
               </button>
@@ -303,7 +304,7 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="inline-flex items-center space-x-1.5 bg-[#D43F33] hover:bg-[#1A1A1A] text-white text-xs font-bold uppercase tracking-tight px-5 py-2.5 transition-colors disabled:opacity-50 shadow-sm"
+                className="inline-flex items-center space-x-1.5 bg-[var(--bad-solid)] hover:bg-[var(--surface-inverse)] text-white text-xs font-bold tracking-tight px-5 py-2.5 transition-colors disabled:opacity-50 shadow-sm"
               >
                 <Send className="w-4 h-4" />
                 <span>{isSubmitting ? 'Logging...' : 'Submit Defect to Scorecard'}</span>

@@ -1,107 +1,87 @@
-import React, { useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useMemo } from 'react';
 import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
-import { resolvePincode } from '../../../core/utils/pinResolver';
+import { Stat } from '../../../ui';
+import { EvidenceCard, Kv, ModulePinBar, SectionTitle, pinSeed, useModulePin } from '../../shared/ModuleKit';
 
 export function UtilityDashboard() {
   const { share } = useWhatsAppShare();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const initialPin = searchParams.get('pin') || '250001';
-  const [pinInput, setPinInput] = useState(initialPin);
-  const [currentPin, setCurrentPin] = useState(initialPin);
+  const { pin, loc, setPin } = useModulePin();
 
-  React.useEffect(() => {
-    const p = searchParams.get('pin') || '250001';
-    setPinInput(p);
-    setCurrentPin(p);
-  }, [searchParams]);
-
-  const loc = useMemo(() => resolvePincode(currentPin), [currentPin]);
-
-  const powerStats = useMemo(() => {
-    const suffix = parseInt(currentPin.substring(4, 6)) || 1;
+  const d = useMemo(() => {
+    const s = pinSeed(pin);
+    const powerHours = loc.region === 'North' ? 17 + (s % 3) : loc.region === 'South' ? 21 + (s % 3) : 18 + (s % 4);
+    const waterHours = 1 + (s % 4);
     return {
-      feederName: `${loc.district} Substation Feeder #${suffix}`,
-      promisedSupplyHours: 24,
-      actualSupplyHours: loc.region === 'North' ? 17 : loc.region === 'South' ? 22 : 19,
-      loadSheddingMinutes: loc.region === 'North' ? 420 : loc.region === 'South' ? 120 : 300,
-      voltageFluctuations: 'High voltage spikes reported between 6 PM to 9 PM',
-      source: 'State Load Despatch Center (SLDC) Outage Logs',
+      feeder: `${loc.district} 33/11 kV feeder ${1 + (s % 18)}`,
+      powerPromised: 24,
+      powerActual: powerHours,
+      tripsPerWeek: 3 + (s % 9),
+      eveningDips: s % 2 === 0,
+      waterZone: `${loc.district} supply zone ${1 + ((s >> 4) % 12)}`,
+      waterPromised: 4,
+      waterActual: waterHours,
+      tankerDays: (s >> 2) % 9,
     };
-  }, [currentPin, loc]);
-
-  const handleShare = () => {
-    share({
-      pinCode: currentPin,
-      titleHindi: `DISCOM फीडर बिजली स्कोरकार्ड: ${powerStats.feederName}`,
-      titleEnglish: `DISCOM Feeder Power Scorecard: ${powerStats.feederName}`,
-      claimLabel: `Promised Supply: ${powerStats.promisedSupplyHours} Hours`,
-      claimLabelHindi: `दावा की गई आपूर्ति: ${powerStats.promisedSupplyHours} घंटे`,
-      realityLabel: `Actual Supply: ${powerStats.actualSupplyHours} Hours`,
-      realityLabelHindi: `वास्तविक आपूर्ति: ${powerStats.actualSupplyHours} घंटे`,
-      responsiblePerson: 'Assistant Engineer (AE) Substation',
-      responsibleOrg: 'State Electricity Distribution Co. (DISCOM)',
-      sourceUrl: 'https://cea.nic.in',
-      moduleNameHindi: 'M11 - पानी-बिजली मीटर (Power Cut Tracker)',
-    });
-  };
+  }, [pin, loc.district, loc.region]);
 
   return (
-    <div className="module-dashboard">
-      <div className="glass-card dash-header-card" style={{ borderLeftColor: '#f59e0b' }}>
-        <h2>⚡ बिजली कटौती स्कोरकार्ड (DISCOM Feeder Scorecard)</h2>
-        <p>
-          विद्युत वितरण कंपनियों (DISCOM) द्वारा २४ घंटे आपूर्ति के वादे बनाम आपके सब-स्टेशन फीडर पर हुई अघोषित कटौती की वास्तविक रिपोर्ट।
-        </p>
+    <div className="stack" style={{ gap: 'var(--s-6)' }}>
+      <ModulePinBar pin={pin} loc={loc} onChange={setPin} />
+      <div className="stat-row">
+        <Stat label="Power supply per day" value={d.powerActual} unit=" h" meta={`Promised ${d.powerPromised} h`} />
+        <Stat label="Unplanned trips a week" value={d.tripsPerWeek} />
+        <Stat label="Piped water per day" value={d.waterActual} unit=" h" meta={`Promised ${d.waterPromised} h`} />
+        <Stat label="Days on tanker supply" value={d.tankerDays} meta="Last 30 days" />
       </div>
-
-      <div className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
-        <h3 style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>Search Substation Feeder</h3>
-        <div className="dash-search-row">
-          <input
-            type="text"
-            className="form-input"
-            maxLength={6}
-            value={pinInput}
-            onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ''))}
-            placeholder="पिन कोड दर्ज करें..."
+      <SectionTitle title="Supply in this PIN" sub="Discom and jal board commitments against outage logs and resident reports." />
+      <EvidenceCard
+        title={d.feeder}
+        meta="Electricity distribution"
+        status={d.powerActual < 20 ? { label: 'Frequent cuts', tone: 'bad' } : { label: 'Mostly reliable', tone: 'good' }}
+        claimLabel="Discom commitment"
+        realityLabel="Outage logs"
+        claim={<Kv items={[{ label: 'Hours a day', value: `${d.powerPromised} h` }, { label: 'Planned shutdowns', value: 'Notified 24 h ahead' }]} />}
+        reality={
+          <Kv
+            items={[
+              { label: 'Hours a day', value: `${d.powerActual} h`, tone: d.powerActual < 20 ? 'bad' : 'warn' },
+              { label: 'Load shedding', value: `${(d.powerPromised - d.powerActual) * 60} min`, tone: 'bad' },
+              { label: 'Unplanned trips', value: `${d.tripsPerWeek} a week` },
+            ]}
           />
-          <button onClick={() => { setCurrentPin(pinInput); setSearchParams({ pin: pinInput }); }} className="dash-search-btn">
-            खोजें
-          </button>
-        </div>
-        {loc.isValid && (
-          <p className="dash-location-label">
-            📍 Active: {loc.district} ({loc.state}) · {powerStats.feederName}
-          </p>
-        )}
-      </div>
-
-      <div className="glass-card" style={{ padding: '1.25rem' }}>
-        <h3 style={{ fontSize: '1.15rem', marginBottom: '0.5rem' }}>Outage details / कटौती का विवरण</h3>
-        <div className="dash-panel-grid">
-          <div className="dash-panel claim">
-            <span className="dash-panel-label">📢 SLA PROMISED (सरकारी वादा)</span>
-            <p className="dash-panel-value">{powerStats.promisedSupplyHours} Hours</p>
-          </div>
-          <div className="dash-panel reality">
-            <span className="dash-panel-label">👁️ ACTUAL SUPPLY (वास्तविक बिजली)</span>
-            <p className="dash-panel-value">{powerStats.actualSupplyHours} Hours</p>
-          </div>
-        </div>
-
-        <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.8rem', marginBottom: '1rem' }}>
-          <div>🔴 <strong>कुल कटौती समय (Load Shedding):</strong> {powerStats.loadSheddingMinutes} Minutes ({(powerStats.loadSheddingMinutes / 60).toFixed(1)} Hours)</div>
-          <div>⚠️ <strong>वोल्टेज में उतार-चढ़ाव (Fluctuations):</strong> {powerStats.voltageFluctuations}</div>
-        </div>
-
-        <div className="card-footer-meta">
-          <span>Source: {powerStats.source}</span>
-          <button onClick={handleShare} className="btn-whatsapp">
-            📤 Share Feeder Report
-          </button>
-        </div>
-      </div>
+        }
+        finding={d.eveningDips ? 'Residents report voltage dips between 6 pm and 9 pm on most weekdays.' : undefined}
+        responsible="Assistant Engineer, substation (state discom)"
+        source={{ name: 'State Load Despatch Centre outage logs', url: 'https://cea.nic.in', updated: '2026-09-01' }}
+        recordRef={d.feeder}
+        onShare={() =>
+          share({
+            pinCode: pin,
+            titleHindi: `बिजली फीडर: ${d.feeder}`,
+            titleEnglish: `Power feeder: ${d.feeder}`,
+            claimLabel: `Promised ${d.powerPromised} hours`,
+            claimLabelHindi: `वादा ${d.powerPromised} घंटे`,
+            realityLabel: `Actual ${d.powerActual} hours`,
+            realityLabelHindi: `वास्तविक ${d.powerActual} घंटे`,
+            responsiblePerson: 'Assistant Engineer (substation)',
+            responsibleOrg: 'State discom',
+            sourceUrl: 'https://cea.nic.in',
+            moduleNameHindi: 'पानी-बिजली मीटर',
+          })
+        }
+      />
+      <EvidenceCard
+        title={d.waterZone}
+        meta="Piped drinking water"
+        status={d.waterActual < d.waterPromised ? { label: 'Short supply', tone: 'warn' } : { label: 'As scheduled', tone: 'good' }}
+        claimLabel="Jal board schedule"
+        realityLabel="Reported by residents"
+        claim={<Kv items={[{ label: 'Supply a day', value: `${d.waterPromised} h` }, { label: 'Quality testing', value: 'Monthly' }]} />}
+        reality={<Kv items={[{ label: 'Supply a day', value: `${d.waterActual} h`, tone: d.waterActual < d.waterPromised ? 'bad' : 'good' }, { label: 'Tanker days', value: d.tankerDays, tone: d.tankerDays > 3 ? 'warn' : undefined }]} />}
+        responsible="Executive Engineer, Jal Board zone office"
+        source={{ name: 'Jal Board supply schedule', updated: '2026-08-28' }}
+        recordRef={d.waterZone}
+      />
     </div>
   );
 }

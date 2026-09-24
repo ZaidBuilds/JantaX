@@ -12,7 +12,7 @@ export function MpladsProjectTable({ works, showRepresentative = false }: Props)
   if (works.length === 0) {
     return (
       <div className="jantax-card" style={{ padding: '3rem 1.5rem', textAlign: 'center' }}>
-        <p style={{ color: '#64748b', fontSize: '0.95rem', margin: 0 }}>
+        <p style={{ color: 'var(--ink-3)', fontSize: '0.95rem', margin: 0 }}>
           No sanctioned MPLADS/MLALADS projects match the selected criteria.
         </p>
       </div>
@@ -23,7 +23,7 @@ export function MpladsProjectTable({ works, showRepresentative = false }: Props)
     <div className="jantax-table-wrapper">
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
         <thead>
-          <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0', textAlign: 'left', color: '#475569', fontWeight: 700 }}>
+          <tr style={{ background: 'var(--surface-2)', borderBottom: '2px solid var(--border)', textAlign: 'left', color: 'var(--ink-2)', fontWeight: 700 }}>
             <th style={{ padding: '0.85rem 1rem' }}>Sanction Order & Work Description</th>
             <th style={{ padding: '0.85rem 1rem' }}>Sector</th>
             {showRepresentative && <th style={{ padding: '0.85rem 1rem' }}>MP / MLA</th>}
@@ -43,19 +43,19 @@ export function MpladsProjectTable({ works, showRepresentative = false }: Props)
               <tr
                 key={w.id}
                 style={{
-                  borderBottom: '1px solid #f1f5f9',
+                  borderBottom: '1px solid var(--border)',
                   transition: 'background 0.15s ease',
                 }}
               >
                 <td style={{ padding: '1rem', maxWidth: 300 }}>
-                  <div style={{ fontWeight: 700, color: '#0f2d59', marginBottom: '0.2rem', lineHeight: 1.35 }}>
+                  <div style={{ fontWeight: 700, color: 'var(--ink)', marginBottom: '0.2rem', lineHeight: 1.35 }}>
                     {w.workTitle}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', color: '#64748b' }}>
-                    <MapPin size={12} style={{ color: '#f97316' }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', color: 'var(--ink-3)' }}>
+                    <MapPin size={12} style={{ color: 'var(--accent-ink)' }} />
                     <span>PIN {w.pinCode} • {w.district}</span>
                   </div>
-                  <div style={{ fontSize: '0.68rem', color: '#94a3b8', marginTop: '0.2rem' }}>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--ink-4)', marginTop: '0.2rem' }}>
                     Order: {w.sanctionOrderNumber}
                   </div>
                 </td>
@@ -63,8 +63,8 @@ export function MpladsProjectTable({ works, showRepresentative = false }: Props)
                 <td style={{ padding: '1rem' }}>
                   <span
                     style={{
-                      background: '#f1f5f9',
-                      color: '#334155',
+                      background: 'var(--surface-3)',
+                      color: 'var(--ink-2)',
                       padding: '0.2rem 0.5rem',
                       borderRadius: 6,
                       fontSize: '0.72rem',
@@ -77,10 +77,10 @@ export function MpladsProjectTable({ works, showRepresentative = false }: Props)
                 </td>
 
                 {showRepresentative && (
-                  <td style={{ padding: '1rem', fontWeight: 600, color: '#1e293b' }}>
+                  <td style={{ padding: '1rem', fontWeight: 600, color: 'var(--ink)' }}>
                     <Link
                       to={`/mplads/representatives/${w.representativeId}`}
-                      style={{ color: '#2563eb', textDecoration: 'none', fontWeight: 700 }}
+                      style={{ color: 'var(--brand-ink)', textDecoration: 'none', fontWeight: 700 }}
                     >
                       {w.representativeName}
                     </Link>
@@ -88,11 +88,11 @@ export function MpladsProjectTable({ works, showRepresentative = false }: Props)
                 )}
 
                 <td style={{ padding: '1rem', whiteSpace: 'nowrap' }}>
-                  <div style={{ fontWeight: 800, color: '#0f2d59' }}>₹{w.sanctionCostLakhs.toFixed(1)} L</div>
-                  <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Spent: ₹{w.spentAmountLakhs.toFixed(1)} L</div>
+                  <div style={{ fontWeight: 800, color: 'var(--ink)' }}>₹{w.sanctionCostLakhs.toFixed(1)} L</div>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--ink-3)' }}>Spent: ₹{w.spentAmountLakhs.toFixed(1)} L</div>
                 </td>
 
-                <td style={{ padding: '1rem', fontSize: '0.78rem', color: '#475569', maxWidth: 160 }}>
+                <td style={{ padding: '1rem', fontSize: '0.78rem', color: 'var(--ink-2)', maxWidth: 160 }}>
                   {w.executingAgency}
                 </td>
 
@@ -118,8 +118,8 @@ export function MpladsProjectTable({ works, showRepresentative = false }: Props)
                         width: 24,
                         height: 24,
                         borderRadius: '50%',
-                        background: w.groundTruthScore >= 85 ? '#dcfce7' : '#fef3c7',
-                        color: w.groundTruthScore >= 85 ? '#166534' : '#92400e',
+                        background: w.groundTruthScore >= 85 ? 'var(--good-soft)' : 'var(--warn-soft)',
+                        color: w.groundTruthScore >= 85 ? 'var(--good)' : 'var(--warn)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -129,7 +129,7 @@ export function MpladsProjectTable({ works, showRepresentative = false }: Props)
                     >
                       {w.groundTruthScore}
                     </div>
-                    <span style={{ fontSize: '0.7rem', color: '#64748b' }}>/100</span>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--ink-3)' }}>/100</span>
                   </div>
                 </td>
 
@@ -140,8 +140,8 @@ export function MpladsProjectTable({ works, showRepresentative = false }: Props)
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '0.2rem',
-                      background: '#0f2d59',
-                      color: '#ffffff',
+                      background: 'var(--brand)',
+                      color: 'var(--on-solid)',
                       padding: '0.35rem 0.75rem',
                       borderRadius: 8,
                       fontSize: '0.75rem',

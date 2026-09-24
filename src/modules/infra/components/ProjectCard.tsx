@@ -44,13 +44,13 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
   // Sector symbols/icons mapping
   const getSectorIcon = (sec: string) => {
     switch (sec) {
-      case 'Roads': return '🛣️';
-      case 'Railways': return '🎛️';
-      case 'Power': return '⚡';
-      case 'Water': return '💧';
-      case 'Urban': return '🏢';
-      case 'Aviation': return '✈️';
-      default: return '📁';
+      case 'Roads': return '';
+      case 'Railways': return '';
+      case 'Power': return '';
+      case 'Water': return '';
+      case 'Urban': return '';
+      case 'Aviation': return '';
+      default: return '';
     }
   };
 
@@ -73,15 +73,15 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
     e.stopPropagation(); // Stop navigation click
     
     const realityText = citizenConsensus !== null ? `${citizenConsensus}%` : "सुरक्षित / Unverified";
-    const shareText = `🚨 *सड़क/कार्य रिपोर्ट (PROJECT UPDATE)* 🚨\n` +
-                      `📍 *पिन कोड (PIN Code):* ${pinCode}\n` +
-                      `🛣️ *कार्य (Project):* ${nameEnglish}\n` +
-                      `🗣️ *हिन्दी:* ${nameHindi}\n` +
-                      `📈 *सरकारी दावा (Official Claim):* ${progressPhysical}% Complete (₹${budgetAnticipated} Cr)\n` +
-                      `👁️ *जमीनी हकीकत (Reality):* ${realityText}\n` +
-                      `💼 *ठेकेदार (Contractor):* ${leadContractor}\n` +
-                      `👤 *ज़िम्मेदार अधिकारी (Officer):* ${responsibleOfficer} (${responsibleOfficerDesignation})\n` +
-                      `🔗 *सत्यापन लिंक (Source):* ${window.location.origin}/project/${id}`;
+    const shareText = `*सड़क/कार्य रिपोर्ट (PROJECT UPDATE)* \n` +
+                      `*पिन कोड (PIN Code):* ${pinCode}\n` +
+                      `*कार्य (Project):* ${nameEnglish}\n` +
+                      `*हिन्दी:* ${nameHindi}\n` +
+                      `*सरकारी दावा (Official Claim):* ${progressPhysical}% Complete (₹${budgetAnticipated} Cr)\n` +
+                      `*जमीनी हकीकत (Reality):* ${realityText}\n` +
+                      `*ठेकेदार (Contractor):* ${leadContractor}\n` +
+                      `*ज़िम्मेदार अधिकारी (Officer):* ${responsibleOfficer} (${responsibleOfficerDesignation})\n` +
+                      `*सत्यापन लिंक (Source):* ${window.location.origin}/project/${id}`;
 
     // Copy to clipboard
     navigator.clipboard.writeText(shareText);
@@ -123,7 +123,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
             padding: '2px 8px',
             borderRadius: '4px'
           }}>
-            📍 PIN {pinCode}
+            PIN {pinCode}
           </span>
         </div>
         <span className={`status-badge ${getStatusClass(status)}`}>
@@ -149,7 +149,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
           मराठी: {nameRegional}
         </div>
         <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>
-          📍 {district}, {state}
+          {district}, {state}
         </span>
       </div>
 
@@ -193,7 +193,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
           borderRight: '1px solid var(--border-color)',
           paddingRight: '0.5rem'
         }}>
-          <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>📢 सरकारी दावा (Claim)</span>
+          <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>सरकारी दावा (Claim)</span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.2rem' }}>
             <span style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-primary)' }}>{progressPhysical}%</span>
             <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>काम (Work)</span>
@@ -203,7 +203,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
 
         {/* Right Column: Ground Reality */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', paddingLeft: '0.25rem' }}>
-          <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>👁️ जमीनी हकीकत (Reality)</span>
+          <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>जमीनी हकीकत (Reality)</span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.2rem' }}>
             <span style={{ 
               fontSize: '1.25rem', 
@@ -238,7 +238,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
           fontWeight: 600,
           textAlign: 'center'
         }}>
-          ⚠️ सरकारी दावे और जमीनी सच्चाई में अंतर!
+          सरकारी दावे और जमीनी सच्चाई में अंतर!
         </div>
       )}
 
@@ -267,7 +267,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
             background: '#25D366', // Official WhatsApp green
             border: 'none',
             borderRadius: '4px',
-            color: '#ffffff',
+            color: 'var(--on-solid)',
             fontWeight: 700,
             fontSize: '0.7rem',
             cursor: 'pointer',
@@ -279,7 +279,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
           onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
           onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
         >
-          💬 WhatsApp शेयर
+          WhatsApp शेयर
         </button>
       </div>
     </div>

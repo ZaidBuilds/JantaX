@@ -13,10 +13,10 @@ export class ErrorBoundary extends React.Component<Props, State> {
     if (this.state.hasError) {
       return this.props.fallback ?? (
         <div style={{ padding: '2rem', textAlign: 'center', maxWidth: 640, margin: '0 auto' }}>
-          <div style={{ width: 48, height: 48, borderRadius: 12, background: '#fee2e2', color: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', fontSize: 20 }}>⚠️</div>
-          <h3 style={{ color: '#0f172a', margin: '0 0 0.5rem' }}>Something went wrong</h3>
-          <p style={{ color: '#64748b', fontSize: '0.9rem' }}>{this.state.error?.message || 'Unexpected error'}</p>
-          <button onClick={()=>window.location.reload()} style={{ marginTop: '1rem', padding: '0.6rem 1.2rem', background: '#0f2d59', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, cursor: 'pointer' }}>Reload</button>
+          <div style={{ width: 48, height: 48, borderRadius: 12, background: 'var(--bad-soft)', color: 'var(--bad)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem', fontSize: 20 }}></div>
+          <h3 style={{ color: 'var(--ink)', margin: '0 0 0.5rem' }}>Something went wrong</h3>
+          <p style={{ color: 'var(--ink-3)', fontSize: '0.9rem' }}>{this.state.error?.message || 'Unexpected error'}</p>
+          <button onClick={()=>window.location.reload()} style={{ marginTop: '1rem', padding: '0.6rem 1.2rem', background: 'var(--brand)', color: 'var(--on-solid)', border: 'none', borderRadius: 8, fontWeight: 700, cursor: 'pointer' }}>Reload</button>
         </div>
       );
     }

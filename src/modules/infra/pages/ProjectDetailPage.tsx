@@ -55,8 +55,8 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
   if (!project) {
     return (
       <div style={{ padding: '4rem 1.5rem', textAlign: 'center', maxWidth: 600, margin: '0 auto' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a' }}>Project Not Found</h2>
-        <p style={{ color: '#64748b', margin: '0.5rem 0 1.5rem' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--ink)' }}>Project Not Found</h2>
+        <p style={{ color: 'var(--ink-3)', margin: '0.5rem 0 1.5rem' }}>
           The requested infrastructure project ID "{id}" could not be located in the database.
         </p>
         <Link
@@ -64,8 +64,8 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
           style={{
             padding: '0.65rem 1.25rem',
             borderRadius: 10,
-            background: 'var(--gradient-accent)',
-            color: '#ffffff',
+            background: 'var(--brand)',
+            color: 'var(--on-solid)',
             fontWeight: 700,
             textDecoration: 'none'
           }}
@@ -80,15 +80,15 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
     switch (st) {
       case 'Completed':
       case 'Verified':
-        return { bg: '#ecfdf5', border: '#a7f3d0', color: '#047857', icon: <CheckCircle2 size={14} /> };
+        return { bg: 'var(--good-soft)', border: 'var(--good-line)', color: 'var(--good)', icon: <CheckCircle2 size={14} /> };
       case 'Extended':
       case 'Delayed':
-        return { bg: '#fffbebf', border: '#fde68a', color: '#b45309', icon: <Clock size={14} /> };
+        return { bg: '#fffbebf', border: 'var(--warn-line)', color: 'var(--warn)', icon: <Clock size={14} /> };
       case 'Incomplete':
-        return { bg: '#fef2f2', border: '#fecaca', color: '#b91c1c', icon: <Clock size={14} /> };
+        return { bg: 'var(--bad-soft)', border: 'var(--bad-line)', color: 'var(--bad)', icon: <Clock size={14} /> };
       case 'Under Review':
       default:
-        return { bg: '#eff6ff', border: '#bfdbfe', color: '#1d4ed8', icon: <ShieldCheck size={14} /> };
+        return { bg: 'var(--brand-soft)', border: 'var(--brand-line)', color: 'var(--brand-ink)', icon: <ShieldCheck size={14} /> };
     }
   };
 
@@ -104,7 +104,7 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
   };
 
   return (
-    <div style={{ padding: '1.75rem 0', maxWidth: 1200, margin: '0 auto' }}>
+    <div>
       {/* Top Navigation Back Bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <button
@@ -112,7 +112,7 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
           style={{
             background: 'none',
             border: 'none',
-            color: '#2563eb',
+            color: 'var(--brand-ink)',
             fontWeight: 700,
             fontSize: '0.86rem',
             cursor: 'pointer',
@@ -129,13 +129,13 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
           <button
             onClick={handleShare}
             style={{
-              background: '#ffffff',
-              border: '1px solid #cbd5e1',
+              background: 'var(--surface)',
+              border: '1px solid var(--border-strong)',
               borderRadius: 8,
               padding: '0.4rem 0.75rem',
               fontSize: '0.78rem',
               fontWeight: 700,
-              color: '#334155',
+              color: 'var(--ink-2)',
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
@@ -150,7 +150,7 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
             rel="noopener noreferrer"
             style={{
               background: '#0a66c2',
-              color: '#ffffff',
+              color: 'var(--on-solid)',
               borderRadius: 8,
               padding: '0.4rem 0.75rem',
               fontSize: '0.78rem',
@@ -169,8 +169,8 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              background: '#0f2d59',
-              color: '#ffffff',
+              background: 'var(--brand)',
+              color: 'var(--on-solid)',
               borderRadius: 8,
               padding: '0.4rem 0.75rem',
               fontSize: '0.78rem',
@@ -188,9 +188,9 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
 
       {/* Main Project Title Header Card */}
       <div style={{
-        background: '#ffffff',
+        background: 'var(--surface)',
         borderRadius: 20,
-        border: '1px solid #e2e8f0',
+        border: '1px solid var(--border)',
         padding: '1.75rem',
         boxShadow: '0 4px 16px rgba(15,23,42,0.04)',
         marginBottom: '1.5rem'
@@ -212,8 +212,8 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
           </span>
 
           <span style={{
-            background: '#f1f5f9',
-            color: '#475569',
+            background: 'var(--surface-3)',
+            color: 'var(--ink-2)',
             fontSize: '0.76rem',
             fontWeight: 700,
             padding: '0.22rem 0.65rem',
@@ -224,27 +224,27 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
 
           <span style={{
             fontSize: '0.78rem',
-            color: '#64748b',
+            color: 'var(--ink-3)',
             fontWeight: 600,
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.25rem'
           }}>
-            <MapPin size={14} style={{ color: '#ea580c' }} /> PIN {project.pinCode} · {project.locationName}, {project.district}, {project.state}
+            <MapPin size={14} style={{ color: 'var(--accent-ink)' }} /> PIN {project.pinCode} · {project.locationName}, {project.district}, {project.state}
           </span>
         </div>
 
         <h1 style={{
           fontSize: '1.85rem',
           fontWeight: 800,
-          color: '#0f172a',
+          color: 'var(--ink)',
           fontFamily: 'var(--font-heading)',
           lineHeight: 1.3,
           margin: '0.3rem 0 0.2rem'
         }}>
           {project.nameEnglish}
         </h1>
-        <div style={{ fontSize: '1rem', color: '#64748b', fontWeight: 500, marginBottom: '1.25rem' }}>
+        <div style={{ fontSize: '1rem', color: 'var(--ink-3)', fontWeight: 500, marginBottom: '1.25rem' }}>
           {project.nameHindi}
         </div>
 
@@ -253,35 +253,35 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
           gap: '0.85rem',
-          background: '#f8fafc',
+          background: 'var(--surface-2)',
           padding: '1rem 1.15rem',
           borderRadius: 12,
-          border: '1px solid #f1f5f9'
+          border: '1px solid var(--border)'
         }}>
           <div>
-            <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 600 }}>Sanctioned Budget</div>
-            <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginTop: '0.1rem' }}>
+            <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', fontWeight: 600 }}>Sanctioned Budget</div>
+            <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.1rem' }}>
               ₹{(project.budgetOriginalLakhs / 100).toFixed(1)} Cr
             </div>
           </div>
 
           <div>
-            <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 600 }}>Anticipated Budget</div>
-            <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#f97316', marginTop: '0.1rem' }}>
+            <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', fontWeight: 600 }}>Anticipated Budget</div>
+            <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--accent-ink)', marginTop: '0.1rem' }}>
               ₹{(project.budgetAnticipatedLakhs / 100).toFixed(1)} Cr
             </div>
           </div>
 
           <div>
-            <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 600 }}>Physical Progress</div>
-            <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#047857', marginTop: '0.1rem' }}>
+            <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', fontWeight: 600 }}>Physical Progress</div>
+            <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--good)', marginTop: '0.1rem' }}>
               {project.progressPhysical}%
             </div>
           </div>
 
           <div>
-            <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 600 }}>Lead Contractor</div>
-            <div style={{ fontSize: '0.92rem', fontWeight: 700, color: '#1e293b', marginTop: '0.1rem' }}>
+            <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', fontWeight: 600 }}>Lead Contractor</div>
+            <div style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--ink)', marginTop: '0.1rem' }}>
               {project.leadContractor}
             </div>
           </div>
@@ -292,7 +292,7 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
       <div style={{
         display: 'flex',
         gap: '0.5rem',
-        borderBottom: '2px solid #e2e8f0',
+        borderBottom: '2px solid var(--border)',
         marginBottom: '1.5rem',
         overflowX: 'auto',
         paddingBottom: 2
@@ -301,8 +301,8 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
           to={`/projects/${project.id}`}
           style={{
             padding: '0.65rem 1.15rem',
-            borderBottom: activeTab === 'overview' ? '3px solid #f97316' : '3px solid transparent',
-            color: activeTab === 'overview' ? '#f97316' : '#64748b',
+            borderBottom: activeTab === 'overview' ? '3px solid var(--accent)' : '3px solid transparent',
+            color: activeTab === 'overview' ? 'var(--accent-ink)' : 'var(--ink-3)',
             fontWeight: activeTab === 'overview' ? 800 : 600,
             fontSize: '0.88rem',
             textDecoration: 'none',
@@ -320,8 +320,8 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
           to={`/projects/${project.id}/timeline`}
           style={{
             padding: '0.65rem 1.15rem',
-            borderBottom: activeTab === 'timeline' ? '3px solid #f97316' : '3px solid transparent',
-            color: activeTab === 'timeline' ? '#f97316' : '#64748b',
+            borderBottom: activeTab === 'timeline' ? '3px solid var(--accent)' : '3px solid transparent',
+            color: activeTab === 'timeline' ? 'var(--accent-ink)' : 'var(--ink-3)',
             fontWeight: activeTab === 'timeline' ? 800 : 600,
             fontSize: '0.88rem',
             textDecoration: 'none',
@@ -339,8 +339,8 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
           to={`/projects/${project.id}/financials`}
           style={{
             padding: '0.65rem 1.15rem',
-            borderBottom: activeTab === 'financials' ? '3px solid #f97316' : '3px solid transparent',
-            color: activeTab === 'financials' ? '#f97316' : '#64748b',
+            borderBottom: activeTab === 'financials' ? '3px solid var(--accent)' : '3px solid transparent',
+            color: activeTab === 'financials' ? 'var(--accent-ink)' : 'var(--ink-3)',
             fontWeight: activeTab === 'financials' ? 800 : 600,
             fontSize: '0.88rem',
             textDecoration: 'none',
@@ -358,8 +358,8 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
           to={`/projects/${project.id}/evidence`}
           style={{
             padding: '0.65rem 1.15rem',
-            borderBottom: activeTab === 'evidence' ? '3px solid #f97316' : '3px solid transparent',
-            color: activeTab === 'evidence' ? '#f97316' : '#64748b',
+            borderBottom: activeTab === 'evidence' ? '3px solid var(--accent)' : '3px solid transparent',
+            color: activeTab === 'evidence' ? 'var(--accent-ink)' : 'var(--ink-3)',
             fontWeight: activeTab === 'evidence' ? 800 : 600,
             fontSize: '0.88rem',
             textDecoration: 'none',
@@ -377,8 +377,8 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
           to={`/projects/${project.id}/ground-truth`}
           style={{
             padding: '0.65rem 1.15rem',
-            borderBottom: activeTab === 'ground-truth' ? '3px solid #f97316' : '3px solid transparent',
-            color: activeTab === 'ground-truth' ? '#f97316' : '#64748b',
+            borderBottom: activeTab === 'ground-truth' ? '3px solid var(--accent)' : '3px solid transparent',
+            color: activeTab === 'ground-truth' ? 'var(--accent-ink)' : 'var(--ink-3)',
             fontWeight: activeTab === 'ground-truth' ? 800 : 600,
             fontSize: '0.88rem',
             textDecoration: 'none',

@@ -1,184 +1,112 @@
-import React, { useState } from 'react';
+import { useState, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { CheckCircle2, ExternalLink } from 'lucide-react';
 import { getCorrectionRequests, submitCorrectionRequest } from '../services/transparencyService';
 import type { CorrectionRequest } from '../types/transparency';
-import { TransparencyDisclaimer } from '../components/TransparencyDisclaimer';
-import { AlertTriangle, FileText, Send, CheckCircle2, ShieldCheck, Clock, ExternalLink } from 'lucide-react';
+import { TransparencyLayout } from '../components/TransparencyLayout';
+import { Badge, toneForStatus } from '../../../ui';
+
+type Kind = CorrectionRequest['requestType'];
 
 export function CorrectionsPage() {
   const [requests, setRequests] = useState<CorrectionRequest[]>(() => getCorrectionRequests());
-  const [formType, setFormType] = useState<'Citizen Correction Request' | 'Official Data Challenge'>('Citizen Correction Request');
+  const [kind, setKind] = useState<Kind>('Citizen Correction Request');
+  const [params] = useSearchParams();
+  const [form, setForm] = useState({ submitterName: '', organization: '', email: '', entityId: params.get('ref') || '', claimDetails: '', supportingGazetteUrl: '' });
+  const [done, setDone] = useState<CorrectionRequest | null>(null);
+  const set = (k: keyof typeof form) => (e: { target: { value: string } }) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
-  // Form Fields
-  const [submitterName, setSubmitterName] = useState('');
-  const [organization, setOrganization] = useState('');
-  const [email, setEmail] = useState('');
-  const [entityId, setEntityId] = useState('');
-  const [claimDetails, setClaimDetails] = useState('');
-  const [supportingGazetteUrl, setSupportingGazetteUrl] = useState('');
-
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const submit = (e: FormEvent) => {
     e.preventDefault();
     const created = submitCorrectionRequest({
-      requestType: formType,
-      submitterName,
-      organization: organization || undefined,
-      email,
-      entityId,
-      claimDetails,
-      supportingGazetteUrl: supportingGazetteUrl || undefined
+      requestType: kind,
+      submitterName: form.submitterName.trim(),
+      organization: form.organization.trim() || undefined,
+      email: form.email.trim(),
+      entityId: form.entityId.trim(),
+      claimDetails: form.claimDetails.trim(),
+      supportingGazetteUrl: form.supportingGazetteUrl.trim() || undefined,
     });
-
-    setRequests([created, ...requests]);
-    setSubmitted(true);
+    setRequests((r) => [created, ...r]);
+    setDone(created);
+    setForm({ submitterName: '', organization: '', email: '', entityId: '', claimDetails: '', supportingGazetteUrl: '' });
   };
 
   return (
-    <div style={{ padding: '1.75rem 0', maxWidth: 1100, margin: '0 auto' }}>
-      <TransparencyDisclaimer />
-
-      <div style={{ marginBottom: '2rem' }}>
-        <span style={{ background: '#fef3c7', color: '#b45309', fontSize: '0.75rem', fontWeight: 800, padding: '0.25rem 0.75rem', borderRadius: '9999px' }}>
-          RIGHT TO CORRECTION & DATA CHALLENGE
-        </span>
-        <h1 style={{ fontSize: '2.1rem', fontWeight: 800, color: '#0f172a', fontFamily: 'var(--font-heading)', margin: '0.4rem 0 0.4rem' }}>
-          Correction Requests & Official Data Challenge Gateway
-        </h1>
-        <p style={{ fontSize: '0.96rem', color: '#64748b', lineHeight: 1.55 }}>
-          JantaX guarantees the right to correction. Citizens, contractors, builders, and government authorities can challenge any published metric with official gazette proof.
-        </p>
-      </div>
-
-      {/* Main Submission Form */}
-      <div style={{ background: '#ffffff', borderRadius: 20, border: '1px solid #e2e8f0', padding: '1.75rem', marginBottom: '2rem', boxShadow: '0 4px 16px rgba(15,23,42,0.03)' }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', marginTop: 0, marginBottom: '1rem' }}>
-          Submit Correction Request or Data Challenge
-        </h2>
-
-        {/* Type Toggle */}
-        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.25rem' }}>
-          <button
-            type="button"
-            onClick={() => setFormType('Citizen Correction Request')}
-            style={{
-              flex: 1,
-              padding: '0.85rem',
-              borderRadius: 12,
-              border: formType === 'Citizen Correction Request' ? '2px solid #2563eb' : '1px solid #cbd5e1',
-              background: formType === 'Citizen Correction Request' ? '#eff6ff' : '#ffffff',
-              color: formType === 'Citizen Correction Request' ? '#1d4ed8' : '#475569',
-              fontWeight: 800,
-              fontSize: '0.88rem',
-              cursor: 'pointer'
-            }}
-          >
-            Form A: Citizen Data Correction Request
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setFormType('Official Data Challenge')}
-            style={{
-              flex: 1,
-              padding: '0.85rem',
-              borderRadius: 12,
-              border: formType === 'Official Data Challenge' ? '2px solid #ea580c' : '1px solid #cbd5e1',
-              background: formType === 'Official Data Challenge' ? '#fff7ed' : '#ffffff',
-              color: formType === 'Official Data Challenge' ? '#ea580c' : '#475569',
-              fontWeight: 800,
-              fontSize: '0.88rem',
-              cursor: 'pointer'
-            }}
-          >
-            Form B: Contractor / Authority Official Data Challenge
-          </button>
-        </div>
-
-        {submitted ? (
-          <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', color: '#047857', padding: '1.25rem', borderRadius: 12, textAlign: 'center', fontWeight: 700 }}>
-            ✓ Correction request submitted successfully! Your challenge has been recorded in the transparent audit log and assigned to JantaX data ops.
+    <TransparencyLayout
+      current="Corrections"
+      title="Corrections"
+      lede="Anyone can challenge a published figure: residents, contractors, builders or government offices. Disputed records are flagged, the original is kept, and every decision is logged here."
+    >
+      <div className="corrections-grid">
+        <form className="card card-pad-lg stack" onSubmit={submit}>
+          <h2 className="card-title">Request a correction</h2>
+          <div className="segmented" role="group" aria-label="Request type">
+            <button type="button" aria-pressed={kind === 'Citizen Correction Request'} onClick={() => setKind('Citizen Correction Request')}>I am a citizen</button>
+            <button type="button" aria-pressed={kind === 'Official Data Challenge'} onClick={() => setKind('Official Data Challenge')}>I represent an office or firm</button>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} style={{ display: 'grid', gap: '1rem' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.3rem' }}>Your Name *</label>
-                <input type="text" value={submitterName} onChange={(e) => setSubmitterName(e.target.value)} placeholder="Full Name" style={{ width: '100%', padding: '0.6rem 0.85rem', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: '0.88rem' }} required />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.3rem' }}>Email Address *</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@example.com" style={{ width: '100%', padding: '0.6rem 0.85rem', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: '0.88rem' }} required />
-              </div>
+          {done && (
+            <div className="callout callout-good" role="status">
+              <CheckCircle2 size={16} aria-hidden="true" />
+              <span>Request <span className="mono">{done.id}</span> received. We review corrections within 72 hours and log the outcome below.</span>
             </div>
-
-            {formType === 'Official Data Challenge' && (
-              <div>
-                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.3rem' }}>Organization / Legal Designation</label>
-                <input type="text" value={organization} onChange={(e) => setOrganization(e.target.value)} placeholder="e.g. M/s L&T Infra Legal Counsel / PWD Nodal Officer" style={{ width: '100%', padding: '0.6rem 0.85rem', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: '0.88rem' }} />
-              </div>
-            )}
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.3rem' }}>Target Entity / Record ID *</label>
-              <input type="text" value={entityId} onChange={(e) => setEntityId(e.target.value)} placeholder="e.g. Project ID (proj-delhi-elevated-01) or Contractor ID (cont-lt-infra)" style={{ width: '100%', padding: '0.6rem 0.85rem', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: '0.88rem' }} required />
+          )}
+          <div className="grid-2">
+            <div className="field">
+              <label className="label" htmlFor="c-name">Your name</label>
+              <input id="c-name" className="input" required value={form.submitterName} onChange={set('submitterName')} autoComplete="name" />
             </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.3rem' }}>Claim & Discrepancy Details *</label>
-              <textarea rows={4} value={claimDetails} onChange={(e) => setClaimDetails(e.target.value)} placeholder="Explain exact factual discrepancy, date error, or High Court stay order details..." style={{ width: '100%', padding: '0.6rem 0.85rem', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: '0.88rem' }} required />
+            <div className="field">
+              <label className="label" htmlFor="c-email">Email</label>
+              <input id="c-email" type="email" className="input" required value={form.email} onChange={set('email')} autoComplete="email" />
+              <span className="hint">Only used to tell you the outcome.</span>
             </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.3rem' }}>Supporting Gazette / Official Order URL</label>
-              <input type="url" value={supportingGazetteUrl} onChange={(e) => setSupportingGazetteUrl(e.target.value)} placeholder="https://cag.gov.in/stay-order.pdf" style={{ width: '100%', padding: '0.6rem 0.85rem', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: '0.88rem' }} />
+          </div>
+          {kind === 'Official Data Challenge' && (
+            <div className="field">
+              <label className="label" htmlFor="c-org">Office or organisation</label>
+              <input id="c-org" className="input" required value={form.organization} onChange={set('organization')} autoComplete="organization" />
             </div>
+          )}
+          <div className="field">
+            <label className="label" htmlFor="c-entity">Record reference</label>
+            <input id="c-entity" className="input" required placeholder="e.g. project ID, UDISE code or page link" value={form.entityId} onChange={set('entityId')} />
+          </div>
+          <div className="field">
+            <label className="label" htmlFor="c-details">What is wrong, and what should it say?</label>
+            <textarea id="c-details" className="textarea" required minLength={20} value={form.claimDetails} onChange={set('claimDetails')} />
+          </div>
+          <div className="field">
+            <label className="label" htmlFor="c-url">Supporting document link {kind === 'Citizen Correction Request' && <span className="muted">(optional)</span>}</label>
+            <input id="c-url" type="url" className="input" required={kind === 'Official Data Challenge'} placeholder="https://" value={form.supportingGazetteUrl} onChange={set('supportingGazetteUrl')} />
+            <span className="hint">A gazette notification, order or official page that shows the correct figure.</span>
+          </div>
+          <button type="submit" className="btn btn-primary" style={{ alignSelf: 'flex-start' }}>Submit request</button>
+        </form>
 
-            <button type="submit" style={{ padding: '0.75rem 1.5rem', borderRadius: 10, background: formType === 'Official Data Challenge' ? '#ea580c' : 'var(--gradient-accent)', color: '#ffffff', fontWeight: 800, fontSize: '0.88rem', border: 'none', cursor: 'pointer', justifySelf: 'start', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-              <Send size={16} /> Submit Formal Challenge
-            </button>
-          </form>
-        )}
-      </div>
-
-      {/* Public Corrections & Challenge Register Log */}
-      <div style={{ background: '#ffffff', borderRadius: 20, border: '1px solid #e2e8f0', padding: '1.75rem' }}>
-        <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a', marginTop: 0, marginBottom: '1rem' }}>
-          Transparent Correction & Dispute Register Log ({requests.length})
-        </h3>
-
-        <div style={{ display: 'grid', gap: '1rem' }}>
-          {requests.map((r) => (
-            <div key={r.id} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '1.15rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem' }}>
-                <div>
-                  <span style={{ fontSize: '0.74rem', background: '#eff6ff', color: '#1d4ed8', fontWeight: 700, padding: '0.15rem 0.55rem', borderRadius: 4 }}>
-                    {r.requestType}
-                  </span>
-                  <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', margin: '0.3rem 0 0.15rem' }}>
-                    {r.submitterName} {r.organization ? `(${r.organization})` : ''}
-                  </h4>
-                  <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Target ID: {r.entityId} · Submitted: {r.submittedAt}</div>
+        <section aria-labelledby="log-h">
+          <h2 id="log-h" className="section-title" style={{ marginBottom: 'var(--s-3)' }}>Public log</h2>
+          <div className="card list">
+            {requests.map((r) => (
+              <div key={r.id} className="list-row" style={{ alignItems: 'flex-start', flexDirection: 'column', gap: 6 }}>
+                <div className="spread" style={{ width: '100%' }}>
+                  <span className="tiny muted mono">{r.entityId}</span>
+                  <Badge tone={toneForStatus(r.status === 'Accepted & Updated' ? 'resolved' : r.status === 'Rejected' ? 'rejected' : 'review')}>{r.status}</Badge>
                 </div>
-
-                <span style={{ fontSize: '0.76rem', fontWeight: 800, color: r.status === 'Accepted & Updated' ? '#047857' : '#b45309', background: '#ecfdf5', padding: '0.2rem 0.6rem', borderRadius: 6 }}>
-                  Status: {r.status}
-                </span>
-              </div>
-
-              <div style={{ fontSize: '0.84rem', color: '#334155', marginTop: '0.5rem', lineHeight: 1.45 }}>
-                <strong>Claim Details:</strong> {r.claimDetails}
-              </div>
-
-              {r.resolutionNote && (
-                <div style={{ fontSize: '0.8rem', color: '#047857', marginTop: '0.4rem', fontWeight: 600 }}>
-                  ✓ Resolution Note: {r.resolutionNote}
+                <p className="small" style={{ color: 'var(--ink)' }}>{r.claimDetails}</p>
+                {r.resolutionNote && <p className="tiny muted">Outcome: {r.resolutionNote}</p>}
+                <div className="source-row">
+                  <span>{r.requestType === 'Official Data Challenge' ? r.organization || 'Official challenge' : 'Citizen request'}</span>
+                  <span>{r.submittedAt}</span>
+                  {r.supportingGazetteUrl && (
+                    <a href={r.supportingGazetteUrl} target="_blank" rel="noreferrer">Document <ExternalLink size={11} style={{ display: 'inline' }} aria-hidden="true" /></a>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
-        </div>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
-    </div>
+    </TransparencyLayout>
   );
 }

@@ -2,7 +2,7 @@ import { Language } from './types';
 
 export const TRANSLATIONS: Record<Language, Record<string, string>> = {
   en: {
-    brandTitle: 'NAGARSCORECARD',
+    brandTitle: 'Contractor ledger',
     brandSubtitle: 'Open Civic Audit & Defect Liability Platform • All 28 States & 8 UTs',
     pincodeSearchPlaceholder: 'Enter any 6-digit Indian PIN Code (e.g. 110001, 226001, 700001, 600001, 560034)...',
     searchPincodeBtn: 'Audit PIN',
@@ -26,17 +26,17 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     namedAccountabilityBadge: 'Named Contractor & Officer',
     anonymousDropBadge: 'Anonymous Ground Truth Drop',
     whatsAppShareBadge: 'WhatsApp Share Unit',
-    scrapedPublicDataBadge: 'Scraped Public e-Procurement',
+    scrapedPublicDataBadge: 'From public e-procurement',
     
-    btnAnonymousDrop: 'Drop Ground Truth Photo (Anonymous)',
+    btnAnonymousDrop: 'Add a photo anonymously',
     btnShareWhatsApp: 'Share on WhatsApp',
     btnCopyWhatsAppCard: 'Copy WhatsApp Message',
     btnViewClaimVsReality: 'Compare Claim vs Reality',
     btnGenerateRti: 'Generate RTI & Vigilance Notice',
     btnViewDossier: 'Full Audit Dossier',
     
-    headingClaimVsReality: 'Official Government Claim vs Ground Truth Reality',
-    subheadingClaimVsReality: 'Side-by-side evidence exposing substandard bitumen, fake warranties, and inflated measurement books across Indian cities & villages.',
+    headingClaimVsReality: 'Sanctioned specification vs what was found',
+    subheadingClaimVsReality: 'Each public work is shown with its tender specification and warranty beside audit findings and dated citizen photos.',
     officialClaimTitle: 'GOVERNMENT CLAIM / MEASUREMENT BOOK',
     realityTitle: 'GROUND TRUTH / CITIZEN AUDIT',
     sanctionedCost: 'Sanctioned Budget',
@@ -124,7 +124,7 @@ export const TRANSLATIONS: Record<Language, Record<string, string>> = {
     btnViewDossier: 'पूरा ऑडिट विवरण',
     
     headingClaimVsReality: 'सरकारी दावा बनाम ज़मीनी हकीकत',
-    subheadingClaimVsReality: 'कागजों में ₹ करोड़ का सड़क निर्माण, ज़मीन पर पहली बारिश में गड्ढे — असली सच आमने-सामने।',
+    subheadingClaimVsReality: 'हर सार्वजनिक कार्य की टेंडर शर्तें और वारंटी, ऑडिट निष्कर्षों और नागरिकों की दिनांकित तस्वीरों के साथ।',
     officialClaimTitle: 'सरकारी दावा / मेजरमेंट बुक',
     realityTitle: 'ज़मीनी हकीकत / नागरिक ऑडिट',
     sanctionedCost: 'स्वीकृत बजट',

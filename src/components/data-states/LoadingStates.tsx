@@ -99,7 +99,7 @@ export function RetryLoading({
           className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
           style={{
             background: 'var(--color-primary)',
-            color: '#fff',
+            color: 'var(--on-solid)',
           }}
           onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
           onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}

@@ -90,7 +90,7 @@ export function SpineDashboard() {
       {/* Nationwide PIN Search Form */}
       <div className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
         <h3 style={{ fontSize: '1.1rem', marginBottom: '0.75rem' }}>
-          🇮🇳 अखिल भारतीय ५-स्तरीय जवाबदेही खोज (Nationwide 5-Level Spine Search)
+          अखिल भारतीय ५-स्तरीय जवाबदेही खोज (Nationwide 5-Level Spine Search)
         </h3>
         <p style={{ fontSize: '0.8rem', opacity: 0.7, marginBottom: '1rem' }}>
           भारत के किसी भी कोने का ६-अंकीय पिन कोड दर्ज करें। यह प्रणाली उस स्थान के सांसद (MP), विधायक (MLA), जिला परिषद, ब्लॉक पंचायत और ग्राम पंचायत के कोष, कार्यों और ठेकेदारों की श्रृंखला को प्रदर्शित करेगी।
@@ -135,7 +135,7 @@ export function SpineDashboard() {
             </span>
             {currentPin.startsWith('250') && (
               <span style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '4px', background: 'var(--status-construction-bg)', color: 'var(--status-construction)', fontWeight: 700 }}>
-                ⭐ Verified Local Dataset (Meerut Ground Turf)
+                Verified Local Dataset (Meerut Ground Turf)
               </span>
             )}
           </div>
@@ -145,7 +145,7 @@ export function SpineDashboard() {
       {/* Level Selection Tabs */}
       <div className="glass-card" style={{ padding: '1rem', marginBottom: '1.5rem' }}>
         <h3 style={{ fontSize: '0.85rem', marginBottom: '0.75rem', opacity: 0.8 }}>
-          📍 ५-स्तरीय जवाबदेही श्रृंखला (Select Level of Governance)
+          ५-स्तरीय जवाबदेही श्रृंखला (Select Level of Governance)
         </h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
           {(['all', 'union', 'state', 'district', 'block', 'village'] as const).map(level => (
@@ -230,7 +230,7 @@ export function SpineDashboard() {
             {/* Representative Card */}
             <div className="glass-card" style={{ padding: '1.5rem', borderLeft: '4px solid var(--color-primary)' }}>
               <div style={{ fontSize: '0.75rem', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px' }}>
-                👤 REPRESENTATIVE PROFILE · {activeRep.level.toUpperCase()} LEVEL
+                REPRESENTATIVE PROFILE · {activeRep.level.toUpperCase()} LEVEL
               </div>
               <h2 style={{ fontSize: '1.4rem', margin: '0.25rem 0' }}>{activeRep.nameHi} ({activeRep.name})</h2>
               <p style={{ fontSize: '0.85rem', opacity: 0.8 }}>
@@ -245,7 +245,7 @@ export function SpineDashboard() {
                     background: 'rgba(255,255,255,0.06)',
                     border: '1px solid var(--border-color)',
                   }}>
-                    📍 PIN {pin}
+                    PIN {pin}
                   </span>
                 ))}
               </div>
@@ -255,17 +255,17 @@ export function SpineDashboard() {
             {repFunds.map(fund => {
               const fundProjects = getFundProjects(fund.id);
               return (
-                <div key={fund.id} className="glass-card" style={{ padding: '1.25rem', borderLeft: '4px solid #10b981' }}>
+                <div key={fund.id} className="glass-card" style={{ padding: '1.25rem', borderLeft: '4px solid var(--good)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
                     <div>
-                      <div style={{ fontSize: '0.65rem', opacity: 0.6, fontWeight: 700, color: '#10b981', textTransform: 'uppercase' }}>
-                        💰 Sanctioned Fund
+                      <div style={{ fontSize: '0.65rem', opacity: 0.6, fontWeight: 700, color: 'var(--good)', textTransform: 'uppercase' }}>
+                        Sanctioned Fund
                       </div>
                       <h3 style={{ fontSize: '1.05rem', margin: '0.1rem 0' }}>{fund.schemeNameHi}</h3>
                       <div style={{ fontSize: '0.75rem', opacity: 0.6 }}>{fund.schemeName} · FY: {fund.financialYear}</div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#10b981' }}>
+                      <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--good)' }}>
                         ₹{fund.amountSanctionedCr} Cr
                       </div>
                       <div style={{ fontSize: '0.6rem', opacity: 0.5 }}>Sanctioned Limit</div>
@@ -274,7 +274,7 @@ export function SpineDashboard() {
 
                   {/* Projects List under this Fund */}
                   <h4 style={{ fontSize: '0.8rem', opacity: 0.7, marginBottom: '0.75rem', textTransform: 'uppercase' }}>
-                    🚧 Projects Sanctioned ({fundProjects.length})
+                    Projects Sanctioned ({fundProjects.length})
                   </h4>
 
                   <div style={{ display: 'grid', gap: '1rem' }}>
@@ -309,18 +309,18 @@ export function SpineDashboard() {
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '1rem', marginTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '0.75rem' }}>
                             
                             {/* Claim vs Reality Split */}
-                            <div style={{ background: 'rgba(59, 130, 246, 0.04)', padding: '0.5rem', borderRadius: '6px', borderLeft: '3px solid #3b82f6' }}>
-                              <div style={{ fontSize: '0.6rem', fontWeight: 700, color: '#3b82f6', textTransform: 'uppercase' }}>
-                                📈 Govt Claim
+                            <div style={{ background: 'rgba(59, 130, 246, 0.04)', padding: '0.5rem', borderRadius: '6px', borderLeft: '3px solid var(--brand-ink)' }}>
+                              <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'var(--brand-ink)', textTransform: 'uppercase' }}>
+                                Govt Claim
                               </div>
                               <div style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>
                                 Budget: <strong>₹{proj.sanctionedCostLakhs} Lakhs</strong>
                               </div>
                             </div>
 
-                            <div style={{ background: 'rgba(239, 68, 68, 0.04)', padding: '0.5rem', borderRadius: '6px', borderLeft: '3px solid #ef4444' }}>
-                              <div style={{ fontSize: '0.6rem', fontWeight: 700, color: '#ef4444', textTransform: 'uppercase' }}>
-                                👁️ Reality (जमीनी हकीकत)
+                            <div style={{ background: 'rgba(239, 68, 68, 0.04)', padding: '0.5rem', borderRadius: '6px', borderLeft: '3px solid var(--bad)' }}>
+                              <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'var(--bad)', textTransform: 'uppercase' }}>
+                                Reality (जमीनी हकीकत)
                               </div>
                               <div style={{ fontSize: '0.75rem', marginTop: '0.25rem', color: '#fca5a5' }}>
                                 {proj.realityTextHi || 'No reports logged.'}
@@ -339,12 +339,12 @@ export function SpineDashboard() {
                             }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
                                 <div>
-                                  🔨 Contractor: <strong>{contractor.nameHi}</strong>
+                                  Contractor: <strong>{contractor.nameHi}</strong>
                                   <br />
                                   <span style={{ opacity: 0.5 }}>{contractor.registrationNumber} · Past Projects: {contractor.pastProjectsCount}</span>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
-                                  Payment Status: <strong style={{ color: contractor.paymentStatus === 'paid' ? '#10b981' : '#f59e0b' }}>{contractor.paymentStatus.toUpperCase()}</strong>
+                                  Payment Status: <strong style={{ color: contractor.paymentStatus === 'paid' ? 'var(--good)' : 'var(--warn)' }}>{contractor.paymentStatus.toUpperCase()}</strong>
                                 </div>
                               </div>
 
@@ -355,9 +355,9 @@ export function SpineDashboard() {
                                   padding: '0.4rem 0.6rem',
                                   borderRadius: '6px',
                                   background: 'rgba(245, 158, 11, 0.05)',
-                                  borderLeft: '3px solid #f59e0b',
+                                  borderLeft: '3px solid var(--warn)',
                                 }}>
-                                  <span style={{ fontWeight: 600, color: '#f59e0b' }}>⚠️ Cross-Panchayat Contractor Alert:</span>
+                                  <span style={{ fontWeight: 600, color: 'var(--warn)' }}>Cross-Panchayat Contractor Alert:</span>
                                   <div style={{ opacity: 0.8, fontSize: '0.68rem', marginTop: '0.15rem' }}>
                                     This contractor is also awarded projects elsewhere:
                                     <ul style={{ paddingLeft: '1rem', marginTop: '0.1rem' }}>
@@ -386,7 +386,7 @@ export function SpineDashboard() {
                                 cursor: 'pointer',
                               }}
                             >
-                              📤 Share Chain on WhatsApp
+                              Share Chain on WhatsApp
                             </button>
                           </div>
 

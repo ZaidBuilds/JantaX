@@ -17,11 +17,11 @@ export function StationDetailPage() {
   if (!station) {
     return (
       <div style={{ padding: '4rem 1.5rem', textAlign: 'center', maxWidth: 600, margin: '0 auto' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a' }}>Air Monitoring Station Not Found</h2>
-        <p style={{ color: '#64748b', margin: '0.5rem 0 1.5rem' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--ink)' }}>Air Monitoring Station Not Found</h2>
+        <p style={{ color: 'var(--ink-3)', margin: '0.5rem 0 1.5rem' }}>
           The requested station ID "{id}" could not be located in the CPCB CAAQMS network.
         </p>
-        <Link to="/pollution" style={{ color: '#2563eb', fontWeight: 700, textDecoration: 'none' }}>
+        <Link to="/pollution" style={{ color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none' }}>
           ← Back to Air Quality Directory
         </Link>
       </div>
@@ -29,13 +29,12 @@ export function StationDetailPage() {
   }
 
   return (
-    <div style={{ padding: '1.75rem 0', maxWidth: 1100, margin: '0 auto' }}>
-      <TransparencyDisclaimer />
+    <div>
 
       <div style={{ marginBottom: '1rem' }}>
         <Link
           to="/pollution"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: '#64748b', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
         >
           <ArrowLeft size={16} /> Back to Air Quality Directory
         </Link>
@@ -46,35 +45,35 @@ export function StationDetailPage() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
-              <span style={{ background: '#0f2d59', color: '#ffffff', fontSize: '0.78rem', fontWeight: 800, padding: '0.2rem 0.6rem', borderRadius: 6 }}>
+              <span style={{ background: 'var(--brand)', color: 'var(--on-solid)', fontSize: '0.78rem', fontWeight: 800, padding: '0.2rem 0.6rem', borderRadius: 6 }}>
                 CAAQMS ONLINE
               </span>
-              <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>
+              <span style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>
                 {station.operator}
               </span>
             </div>
 
-            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f2d59', fontFamily: 'var(--font-heading)', margin: '0 0 0.3rem', lineHeight: 1.3 }}>
+            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--ink)', fontFamily: 'var(--font-heading)', margin: '0 0 0.3rem', lineHeight: 1.3 }}>
               {station.stationName}
             </h1>
-            <div style={{ fontSize: '0.95rem', color: '#64748b', marginBottom: '0.4rem' }}>
+            <div style={{ fontSize: '0.95rem', color: 'var(--ink-3)', marginBottom: '0.4rem' }}>
               {station.stationNameHi}
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', color: '#334155' }}>
-              <MapPin size={15} style={{ color: '#f97316' }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', color: 'var(--ink-2)' }}>
+              <MapPin size={15} style={{ color: 'var(--accent-ink)' }} />
               <span>PIN {station.pinCode} • {station.city}, {station.state} (Lat: {station.latitude}, Lng: {station.longitude})</span>
             </div>
           </div>
 
           <div style={{ textAlign: 'right', minWidth: 160 }}>
-            <div style={{ fontSize: '0.72rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>
+            <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', textTransform: 'uppercase', fontWeight: 700 }}>
               Live Status
             </div>
-            <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#16a34a', marginTop: '0.2rem' }}>
+            <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--good)', marginTop: '0.2rem' }}>
               ● {station.lastUpdated}
             </div>
-            <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--ink-3)' }}>
               Verified CPCB NAQI Feed
             </div>
           </div>
@@ -88,8 +87,8 @@ export function StationDetailPage() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.4rem',
-              background: '#0f2d59',
-              color: '#ffffff',
+              background: 'var(--brand)',
+              color: 'var(--on-solid)',
               padding: '0.65rem 1.25rem',
               borderRadius: 10,
               fontWeight: 700,
@@ -109,8 +108,8 @@ export function StationDetailPage() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.4rem',
-              background: '#f97316',
-              color: '#ffffff',
+              background: 'var(--accent-solid)',
+              color: 'var(--on-solid)',
               padding: '0.65rem 1.25rem',
               borderRadius: 10,
               fontWeight: 700,

@@ -18,7 +18,7 @@ export function BoothFacilitiesCard({ facilities }: Props) {
 
   return (
     <div className="jantax-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
-      <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f2d59', margin: '0 0 1rem' }}>
+      <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--ink)', margin: '0 0 1rem' }}>
         Assuring Minimum Facilities (AMF) & PwD Accessibility
       </h3>
 
@@ -33,22 +33,22 @@ export function BoothFacilitiesCard({ facilities }: Props) {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: '0.75rem 1rem',
-                background: item.available ? '#f0fdf4' : '#fef2f2',
+                background: item.available ? 'var(--good-soft)' : 'var(--bad-soft)',
                 border: `1px solid ${item.available ? '#bbf7d0' : '#fecaca'}`,
                 borderRadius: 10,
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Icon size={16} style={{ color: item.available ? '#166534' : '#991b1b' }} />
-                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: item.available ? '#166534' : '#991b1b' }}>
+                <Icon size={16} style={{ color: item.available ? 'var(--good)' : 'var(--bad)' }} />
+                <span style={{ fontSize: '0.82rem', fontWeight: 700, color: item.available ? 'var(--good)' : 'var(--bad)' }}>
                   {item.label}
                 </span>
               </div>
 
               {item.available ? (
-                <CheckCircle2 size={16} style={{ color: '#16a34a', flexShrink: 0 }} />
+                <CheckCircle2 size={16} style={{ color: 'var(--good)', flexShrink: 0 }} />
               ) : (
-                <XCircle size={16} style={{ color: '#dc2626', flexShrink: 0 }} />
+                <XCircle size={16} style={{ color: 'var(--bad)', flexShrink: 0 }} />
               )}
             </div>
           );

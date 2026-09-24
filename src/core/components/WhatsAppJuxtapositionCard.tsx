@@ -32,9 +32,9 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
   return (
     <div
       style={{
-        background: '#ffffff',
+        background: 'var(--surface)',
         borderRadius: 18,
-        border: '2px solid #0f2d59',
+        border: '2px solid var(--brand-ink)',
         boxShadow: '0 12px 36px rgba(15,45,89,0.12)',
         overflow: 'hidden',
         marginBottom: '1.75rem',
@@ -43,8 +43,8 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
       {/* Top Banner */}
       <div
         style={{
-          background: 'linear-gradient(135deg, #0f2d59 0%, #1e3a8a 100%)',
-          color: '#ffffff',
+          background: 'linear-gradient(135deg, var(--brand) 0%, var(--brand) 100%)',
+          color: 'var(--on-solid)',
           padding: '1.1rem 1.5rem',
           display: 'flex',
           justifyContent: 'space-between',
@@ -56,8 +56,8 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
           <span
             style={{
-              background: '#f97316',
-              color: '#ffffff',
+              background: 'var(--accent-solid)',
+              color: 'var(--on-solid)',
               fontSize: '0.72rem',
               fontWeight: 900,
               padding: '0.2rem 0.6rem',
@@ -77,8 +77,8 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
           <button
             onClick={() => setLang('hi')}
             style={{
-              background: isHindi ? '#ffffff' : 'rgba(255,255,255,0.15)',
-              color: isHindi ? '#0f2d59' : '#ffffff',
+              background: isHindi ? 'var(--surface)' : 'rgba(255,255,255,0.15)',
+              color: isHindi ? 'var(--ink)' : 'var(--on-solid)',
               border: 'none',
               padding: '0.25rem 0.6rem',
               borderRadius: 6,
@@ -92,8 +92,8 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
           <button
             onClick={() => setLang('en')}
             style={{
-              background: !isHindi ? '#ffffff' : 'rgba(255,255,255,0.15)',
-              color: !isHindi ? '#0f2d59' : '#ffffff',
+              background: !isHindi ? 'var(--surface)' : 'rgba(255,255,255,0.15)',
+              color: !isHindi ? 'var(--ink)' : 'var(--on-solid)',
               border: 'none',
               padding: '0.25rem 0.6rem',
               borderRadius: 6,
@@ -114,8 +114,8 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
             display: 'flex',
             gap: '0.4rem',
             padding: '0.75rem 1.25rem',
-            background: '#f8fafc',
-            borderBottom: '1px solid #e2e8f0',
+            background: 'var(--surface-2)',
+            borderBottom: '1px solid var(--border)',
             overflowX: 'auto',
             whiteSpace: 'nowrap',
           }}
@@ -125,9 +125,9 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
               key={l.id}
               onClick={() => onSelectLens(l.id)}
               style={{
-                background: l.id === lens.id ? '#0f2d59' : '#ffffff',
-                color: l.id === lens.id ? '#ffffff' : '#475569',
-                border: '1px solid #cbd5e1',
+                background: l.id === lens.id ? 'var(--brand)' : 'var(--surface)',
+                color: l.id === lens.id ? 'var(--on-solid)' : 'var(--ink-2)',
+                border: '1px solid var(--border-strong)',
                 padding: '0.35rem 0.75rem',
                 borderRadius: 999,
                 fontSize: '0.74rem',
@@ -135,7 +135,7 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
                 cursor: 'pointer',
               }}
             >
-              {isHindi ? l.titleHi.split(' ')[0] : l.type}: {l.noun.split('—')[0].substring(0, 18)}…
+              {isHindi ? l.titleHi.split(' ')[0] : l.type}: {l.noun.split('-')[0].substring(0, 18)}…
             </button>
           ))}
         </div>
@@ -145,10 +145,10 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
       <div style={{ padding: '1.5rem' }}>
         {/* Noun Tag */}
         <div style={{ marginBottom: '1rem' }}>
-          <span style={{ fontSize: '0.72rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase' }}>
+          <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--ink-3)', textTransform: 'uppercase' }}>
             {isHindi ? 'चिह्नित जवाबदेह निकाय (Named Entity)' : 'Accountable Named Entity'}
           </span>
-          <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f2d59', margin: '0.15rem 0 0' }}>
+          <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ink)', margin: '0.15rem 0 0' }}>
             {lens.noun}
           </h3>
         </div>
@@ -158,16 +158,16 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
           {/* Card 1: Official Claim */}
           <div
             style={{
-              background: '#f0fdf4',
-              border: '1.5px solid #bbf7d0',
+              background: 'var(--good-soft)',
+              border: '1.5px solid var(--good-line)',
               borderRadius: 12,
               padding: '1.2rem',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#16a34a', fontWeight: 800, fontSize: '0.82rem', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--good)', fontWeight: 800, fontSize: '0.82rem', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
               <span>🏛️ {isHindi ? 'सरकारी पोर्टल दावा' : 'Official Portal Claim'}</span>
             </div>
-            <p style={{ fontSize: '0.92rem', color: '#166534', lineHeight: 1.5, margin: 0, fontWeight: 600 }}>
+            <p style={{ fontSize: '0.92rem', color: 'var(--good)', lineHeight: 1.5, margin: 0, fontWeight: 600 }}>
               {isHindi ? lens.officialClaimHi : lens.officialClaim}
             </p>
           </div>
@@ -175,16 +175,16 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
           {/* Card 2: Ground Audit / Reality */}
           <div
             style={{
-              background: '#fef2f2',
-              border: '1.5px solid #fecaca',
+              background: 'var(--bad-soft)',
+              border: '1.5px solid var(--bad-line)',
               borderRadius: 12,
               padding: '1.2rem',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#dc2626', fontWeight: 800, fontSize: '0.82rem', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--bad)', fontWeight: 800, fontSize: '0.82rem', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
               <span>🔍 {isHindi ? 'कैग / धरातल हकीकत' : 'CAG / Ground Audit Reality'}</span>
             </div>
-            <p style={{ fontSize: '0.92rem', color: '#991b1b', lineHeight: 1.5, margin: 0, fontWeight: 600 }}>
+            <p style={{ fontSize: '0.92rem', color: 'var(--bad)', lineHeight: 1.5, margin: 0, fontWeight: 600 }}>
               {isHindi ? lens.auditRealityHi : lens.auditReality}
             </p>
           </div>
@@ -196,12 +196,12 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            background: '#f8fafc',
-            border: '1px solid #e2e8f0',
+            background: 'var(--surface-2)',
+            border: '1px solid var(--border)',
             borderRadius: 10,
             padding: '0.75rem 1rem',
             fontSize: '0.75rem',
-            color: '#64748b',
+            color: 'var(--ink-3)',
             marginBottom: '1.25rem',
             flexWrap: 'wrap',
             gap: '0.5rem',
@@ -212,8 +212,8 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
           </div>
           <span
             style={{
-              background: '#0f2d59',
-              color: '#ffffff',
+              background: 'var(--brand)',
+              color: 'var(--on-solid)',
               padding: '0.15rem 0.5rem',
               borderRadius: 4,
               fontWeight: 700,
@@ -236,7 +236,7 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
               justifyContent: 'center',
               gap: '0.5rem',
               background: '#25D366',
-              color: '#ffffff',
+              color: 'var(--on-solid)',
               border: 'none',
               padding: '0.75rem 1.25rem',
               borderRadius: 12,
@@ -257,8 +257,8 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.4rem',
-              background: copied ? '#10b981' : '#0f2d59',
-              color: '#ffffff',
+              background: copied ? 'var(--good-solid)' : 'var(--brand)',
+              color: 'var(--on-solid)',
               border: 'none',
               padding: '0.75rem 1.25rem',
               borderRadius: 12,

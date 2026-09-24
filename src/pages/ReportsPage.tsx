@@ -1,332 +1,225 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { api } from '../core/services/api';
-import { resolvePincode } from '../core/utils/pinResolver';
-import { SourceBadge } from '../components/UI/SourceBadge';
-import { Layout } from '../shell/Layout';
-import { useLanguage } from '../core/context/LanguageContext';
-import { LoadingOverlay, NoResultsState, ErrorState, SkeletonCard } from '../components/data-states';
-import {
-  FileText,
-  MapPin,
-  Filter,
-  Clock,
-  CheckCircle,
-  AlertCircle,
-  XCircle,
-  Send,
-} from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Megaphone, ThumbsUp, ImageOff, MapPin, SearchX, X } from 'lucide-react';
+import { api, type CitizenReport as ApiReport } from '../core/services/api';
+import { getStoredReports } from '../modules/reporting/services/reportingService';
+import type { CitizenReport } from '../modules/reporting/types/citizenReport';
+import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver';
+import { Badge, EmptyState, PageHeader, reportForDisplay, toneForStatus } from '../ui';
 
-interface Report {
+const CATEGORIES = ['All', 'Road', 'School', 'Healthcare', 'Water', 'Sanitation', 'Electricity', 'Public works', 'Other'] as const;
+const STATUSES = [
+  { id: 'all', label: 'All' },
+  { id: 'published', label: 'Published' },
+  { id: 'review', label: 'Under review' },
+] as const;
+
+interface Row {
   id: string;
-  title?: string;
-  category?: string;
-  description: string;
+  title: string;
+  category: string;
+  pin: string;
+  place: string;
   status: string;
-  module?: string;
   createdAt: string;
-  pincode?: string;
+  upvotes: number;
+  image?: string;
+  local: boolean;
+}
+
+function fromLocal(r: CitizenReport): Row {
+  return {
+    id: r.id,
+    title: r.title,
+    category: r.category,
+    pin: r.location.pinCode,
+    place: [r.location.landmark, r.location.district].filter(Boolean).join(', '),
+    status: r.moderationState,
+    createdAt: r.createdAt,
+    upvotes: r.upvotes,
+    image: r.evidence.find((e) => e.mediaType === 'image')?.url,
+    local: true,
+  };
+}
+
+function fromApi(r: ApiReport): Row {
+  const loc = resolvePincode(r.pincode || '');
+  return {
+    id: r.id,
+    title: r.description?.slice(0, 90) || r.category || 'Citizen report',
+    category: r.category || r.module || 'Other',
+    pin: r.pincode,
+    place: loc.isValid ? loc.district : '',
+    status: r.status,
+    createdAt: r.createdAt,
+    upvotes: 0,
+    local: false,
+  };
+}
+
+function Thumb({ src }: { src?: string }) {
+  const [failed, setFailed] = useState(false);
+  if (!src || failed) {
+    return (
+      <div className="report-thumb report-thumb-empty" aria-hidden="true">
+        <ImageOff size={18} />
+      </div>
+    );
+  }
+  return <img className="report-thumb" src={src} alt="" loading="lazy" onError={() => setFailed(true)} />;
 }
 
 export function ReportsPage() {
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [pinInput, setPinInput] = useState(searchParams.get('pin') || '110001');
-  const [currentPin, setCurrentPin] = useState(searchParams.get('pin') || '110001');
-  const [reports, setReports] = useState<Report[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [filter, setFilter] = useState<string>('all');
-  const { t } = useLanguage();
+  const [params, setParams] = useSearchParams();
+  const pin = params.get('pin') || '';
+  const category = params.get('category') || 'All';
+  const status = params.get('status') || 'all';
+  const [pinDraft, setPinDraft] = useState(pin);
+  const [remote, setRemote] = useState<Row[]>([]);
 
-  const loc = resolvePincode(currentPin);
+  const local = useMemo(() => getStoredReports().map(reportForDisplay).map(fromLocal), []);
 
   useEffect(() => {
-    loadReports();
-  }, [currentPin]);
-
-  const loadReports = () => {
-    setLoading(true);
-    api
-      .getReports(currentPin)
-      .then((r) => {
-        setReports(Array.isArray(r) ? r : []);
-      })
-      .catch(() => setReports([]))
-      .finally(() => setLoading(false));
-  };
-
-  const handlePinSubmit = () => {
-    setCurrentPin(pinInput);
-    setSearchParams({ pin: pinInput });
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status?.toLowerCase()) {
-      case 'approved':
-      case 'resolved':
-        return <CheckCircle size={16} style={{ color: '#10b981' }} />;
-      case 'pending':
-      case 'submitted':
-        return <Clock size={16} style={{ color: '#f59e0b' }} />;
-      case 'rejected':
-        return <XCircle size={16} style={{ color: '#ef4444' }} />;
-      default:
-        return <AlertCircle size={16} style={{ color: '#94a3b8' }} />;
+    setPinDraft(pin);
+    if (!isValidIndianPincode(pin)) {
+      setRemote([]);
+      return;
     }
-  };
-
-  const getStatusBadge = (status: string) => {
-    const statusColors: Record<string, { bg: string; color: string }> = {
-      approved: { bg: 'rgba(16,185,129,0.1)', color: '#10b981' },
-      pending: { bg: 'rgba(245,158,11,0.1)', color: '#f59e0b' },
-      rejected: { bg: 'rgba(239,68,68,0.1)', color: '#ef4444' },
-      resolved: { bg: 'rgba(16,185,129,0.1)', color: '#10b981' },
-      submitted: { bg: 'rgba(14,165,233,0.1)', color: '#0ea5e9' },
+    let alive = true;
+    api
+      .getReports(pin)
+      .then((rows) => alive && setRemote(rows.map(fromApi)))
+      .catch(() => alive && setRemote([]));
+    return () => {
+      alive = false;
     };
-    const colors = statusColors[status?.toLowerCase()] || { bg: '#f1f5f9', color: '#64748b' };
+  }, [pin]);
 
-    return (
-      <span
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '0.3rem',
-          padding: '0.2rem 0.5rem',
-          borderRadius: '9999px',
-          fontSize: '0.7rem',
-          fontWeight: 700,
-          background: colors.bg,
-          color: colors.color,
-        }}
-      >
-        {getStatusIcon(status)}
-        {status}
-      </span>
-    );
+  const update = (key: string, value: string) => {
+    const next = new URLSearchParams(params);
+    if (!value || value === 'All' || value === 'all') next.delete(key);
+    else next.set(key, value);
+    setParams(next, { replace: true });
   };
 
-  const filteredReports =
-    filter === 'all' ? reports : reports.filter((r) => r.status?.toLowerCase() === filter);
+  const rows = useMemo(() => {
+    const seen = new Set<string>();
+    return [...remote, ...local]
+      .filter((r) => (seen.has(r.id) ? false : (seen.add(r.id), true)))
+      .filter((r) => !pin || r.pin === pin)
+      .filter((r) => category === 'All' || r.category === category)
+      .filter((r) => {
+        if (status === 'all') return true;
+        const s = r.status.toLowerCase();
+        return status === 'published' ? /(approved|published|resolved)/.test(s) : /(pending|review|flag|submitted)/.test(s);
+      })
+      .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
+  }, [remote, local, pin, category, status]);
+
+  const loc = isValidIndianPincode(pin) ? resolvePincode(pin) : null;
 
   return (
-    <Layout showBreadcrumbs>
-      <div style={{ padding: '2rem 0', maxWidth: 900, margin: '0 auto' }}>
-        <div
-          style={{
-            borderLeft: '4px solid #ef4444',
-            paddingLeft: '1rem',
-            marginBottom: '1.5rem',
-          }}
-        >
-          <h1 style={{ fontSize: '1.6rem', color: '#0f2d59', margin: 0 }}>
-            {t('reports')}
-          </h1>
-          <p style={{ color: '#475569', marginTop: '0.4rem' }}>
-            Browse citizen reports and ground-truth submissions for any PIN code.
-          </p>
-        </div>
+    <div className="page">
+      <PageHeader
+        crumbs={[{ label: 'Citizen reports' }]}
+        title="Citizen reports"
+        lede="Photo evidence filed by residents about roads, schools, clinics, water and more. Every report is reviewed before it is published."
+        actions={
+          <Link to={`/report-issue${pin ? `?pin=${pin}` : ''}`} className="btn btn-primary">
+            <Megaphone size={16} aria-hidden="true" />
+            Report an issue
+          </Link>
+        }
+      />
 
-        <div
-          style={{
-            background: '#fff',
-            border: '1px solid #eef2f7',
-            borderRadius: 12,
-            padding: '1.25rem',
-            marginBottom: '1.5rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,.04)',
+      <div className="card card-pad reports-toolbar">
+        <form
+          className="field"
+          onSubmit={(e) => {
+            e.preventDefault();
+            update('pin', isValidIndianPincode(pinDraft) ? pinDraft : '');
           }}
         >
-          <h3 style={{ color: '#0f2d59', marginTop: 0, marginBottom: '0.75rem' }}>
-            Search by PIN Code
-          </h3>
-          <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', alignItems: 'center' }}>
-            <input
-              type="text"
-              value={pinInput}
-              onChange={(e) => setPinInput(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              placeholder="Enter 6-digit PIN"
-              maxLength={6}
-              style={{
-                padding: '0.5rem 1rem',
-                border: '1.5px solid #e2e8f0',
-                borderRadius: 8,
-                fontSize: '0.9rem',
-                maxWidth: 160,
-                outline: 'none',
-              }}
-            />
-            <button
-              onClick={handlePinSubmit}
-              style={{
-                padding: '0.5rem 1.25rem',
-                background: 'var(--gradient-accent)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 8,
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              <MapPin size={16} style={{ marginRight: '0.35rem', verticalAlign: -2 }} />
-              Search
-            </button>
+          <label className="label" htmlFor="reports-pin">PIN code</label>
+          <div style={{ display: 'flex', gap: 'var(--s-2)' }}>
+            <div className="input-group" style={{ width: 180 }}>
+              <MapPin size={16} aria-hidden="true" />
+              <input
+                id="reports-pin"
+                className="input num"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="All of India"
+                value={pinDraft}
+                onChange={(e) => setPinDraft(e.target.value.replace(/\D/g, ''))}
+              />
+            </div>
+            <button type="submit" className="btn btn-secondary">Apply</button>
+            {pin && (
+              <button type="button" className="btn btn-ghost" onClick={() => update('pin', '')}>
+                <X size={15} aria-hidden="true" /> Clear
+              </button>
+            )}
           </div>
-          {loc.isValid && (
-            <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '0.5rem' }}>
-              📍 {loc.district} ({loc.state})
-              {loc.stateCode && (
-                <span
-                  style={{
-                    marginLeft: '0.4rem',
-                    background: 'var(--color-primary-50)',
-                    color: 'var(--color-primary-700)',
-                    border: '1px solid var(--color-primary-500)',
-                    padding: '1px 7px',
-                    borderRadius: 999,
-                    fontWeight: 800,
-                    fontSize: '0.62rem',
-                  }}
-                >
-                  {loc.stateCode}
-                </span>
-              )}
-            </p>
-          )}
-        </div>
-
-        <div
-          style={{
-            background: '#fff',
-            border: '1px solid #eef2f7',
-            borderRadius: 12,
-            padding: '1.25rem',
-            boxShadow: '0 1px 3px rgba(0,0,0,.04)',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '1rem',
-              flexWrap: 'wrap',
-              gap: '0.75rem',
-            }}
-          >
-            <h3 style={{ color: '#0f2d59', margin: 0 }}>
-              <FileText size={18} style={{ marginRight: '0.5rem', verticalAlign: -3 }} />
-              Reports for PIN {currentPin}
-            </h3>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Filter size={14} style={{ color: '#64748b' }} />
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                style={{
-                  padding: '0.35rem 0.75rem',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: 8,
-                  fontSize: '0.8rem',
-                  outline: 'none',
-                }}
-              >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-                <option value="resolved">Resolved</option>
-              </select>
-            </div>
+          <span className="hint">{loc ? `${loc.district}, ${loc.state}` : 'Showing reports from every PIN.'}</span>
+        </form>
+        <div className="field">
+          <span className="label">Status</span>
+          <div className="segmented" role="group" aria-label="Status">
+            {STATUSES.map((s) => (
+              <button key={s.id} type="button" aria-pressed={status === s.id} onClick={() => update('status', s.id)}>
+                {s.label}
+              </button>
+            ))}
           </div>
-
-          {loading ? (
-            <div style={{ display: 'grid', gap: '0.85rem' }}>
-              {[1, 2, 3].map((i) => (
-                <SkeletonCard key={i} variant="default" />
-              ))}
-            </div>
-          ) : filteredReports.length === 0 ? (
-            <NoResultsState
-              query={currentPin}
-              onClear={() => setFilter('all')}
-              className=""
-            />
-          ) : (
-            <div style={{ display: 'grid', gap: '0.85rem' }}>
-              {filteredReports.map((report) => (
-                <div
-                  key={report.id}
-                  style={{
-                    border: '1px solid #eef2f7',
-                    borderRadius: 10,
-                    padding: '1rem',
-                    transition: 'box-shadow 0.2s',
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)')
-                  }
-                  onMouseLeave={(e) => (e.currentTarget.style.boxShadow = 'none')}
-                >
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'flex-start',
-                      gap: '0.75rem',
-                      flexWrap: 'wrap',
-                    }}
-                  >
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-                        <span
-                          style={{
-                            fontSize: '0.65rem',
-                            fontWeight: 700,
-                            color: 'var(--color-accent)',
-                            textTransform: 'uppercase',
-                          }}
-                        >
-                          {report.category || report.module || 'General'}
-                        </span>
-                        {getStatusBadge(report.status)}
-                      </div>
-                      <h4
-                        style={{
-                          fontSize: '0.9rem',
-                          fontWeight: 700,
-                          color: '#0f2d59',
-                          margin: '0.15rem 0',
-                        }}
-                      >
-                        {report.title || 'Citizen Report'}
-                      </h4>
-                      <p
-                        style={{
-                          fontSize: '0.82rem',
-                          color: '#475569',
-                          margin: 0,
-                          lineHeight: 1.5,
-                        }}
-                      >
-                        {report.description}
-                      </p>
-                    </div>
-                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <SourceBadge
-                        sourceType="E"
-                        sourceName={`${report.status || 'PENDING'} · ${report.module || 'citizen'}`}
-                      />
-                      <p style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.35rem' }}>
-                        {new Date(report.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </div>
-    </Layout>
+
+      <div className="cluster" role="group" aria-label="Category" style={{ margin: 'var(--s-5) 0 var(--s-4)' }}>
+        {CATEGORIES.map((c) => (
+          <button key={c} type="button" className="chip" aria-pressed={category === c} onClick={() => update('category', c)}>
+            {c}
+          </button>
+        ))}
+      </div>
+
+      <p className="small muted" style={{ marginBottom: 'var(--s-3)' }} aria-live="polite">
+        {rows.length} {rows.length === 1 ? 'report' : 'reports'}
+      </p>
+
+      {rows.length === 0 ? (
+        <div className="card">
+          <EmptyState
+            icon={SearchX}
+            title="No reports match these filters"
+            text={pin ? `Nobody has filed a matching report for PIN ${pin} yet.` : 'Try another category or status.'}
+            action={<Link to={`/report-issue${pin ? `?pin=${pin}` : ''}`} className="btn btn-primary">File the first report</Link>}
+          />
+        </div>
+      ) : (
+        <div className="card list">
+          {rows.map((r) => (
+            <Link key={r.id} to={r.local ? `/reports/${r.id}` : `/reports?pin=${r.pin}`} className="list-row report-row">
+              <Thumb src={r.image} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="strong clamp-2">{r.title}</div>
+                <div className="tiny muted" style={{ marginTop: 2 }}>
+                  {r.category} · PIN {r.pin}
+                  {r.place ? ` · ${r.place}` : ''} · {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </div>
+              </div>
+              <div className="report-row-meta">
+                <Badge tone={toneForStatus(r.status)}>{r.status}</Badge>
+                {r.upvotes > 0 && (
+                  <span className="tiny muted cluster" style={{ gap: 4 }}>
+                    <ThumbsUp size={12} aria-hidden="true" /> {r.upvotes}
+                  </span>
+                )}
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

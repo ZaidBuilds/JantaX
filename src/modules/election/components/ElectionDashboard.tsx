@@ -1,162 +1,104 @@
-import React, { useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useMemo, useState } from 'react';
 import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
-import { resolvePincode } from '../../../core/utils/pinResolver';
+import { Stat } from '../../../ui';
+import { EvidenceCard, Kv, ModulePinBar, SectionTitle, pinSeed, useModulePin } from '../../shared/ModuleKit';
 
 export function ElectionDashboard() {
   const { share } = useWhatsAppShare();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const initialPin = searchParams.get('pin') || '250001';
-  const [pinInput, setPinInput] = useState(initialPin);
-  const [currentPin, setCurrentPin] = useState(initialPin);
+  const { pin, loc, setPin } = useModulePin();
+  const [tab, setTab] = useState<'spend' | 'exam'>('spend');
 
-  React.useEffect(() => {
-    const p = searchParams.get('pin') || '250001';
-    setPinInput(p);
-    setCurrentPin(p);
-  }, [searchParams]);
-  const [activeTab, setActiveTab] = useState<'election' | 'exams'>('election');
-
-  const loc = useMemo(() => resolvePincode(currentPin), [currentPin]);
-
-  const data = useMemo(() => {
-    const suffix = parseInt(currentPin.substring(4, 6)) || 1;
+  const d = useMemo(() => {
+    const s = pinSeed(pin);
+    const declared = 28 + (s % 60) / 4;
     return {
-      candidateName: loc.region === 'North' ? 'श्री राम निवास सिंह' : 'Shri K. Raghavan',
-      declaredSpendLakhs: 32.50,
-      estimatedActualSpendLakhs: 185.00,
-      auditSource: 'ECI Affidavits vs Association for Democratic Reforms (ADR) Field Estimates 2024',
-      examTimeline: {
-        examName: 'SSC CGL / State PSC Group B Recruitment',
-        notifiedDate: '2023-01-15',
-        plannedExamDate: '2023-06-20',
-        actualExamDate: '2023-11-10 (Delayed by 5 months)',
-        resultDate: '2024-04-15 (Delayed by 6 months)',
-        joiningDate: '2025-02-18 (1.5 years delay from promised date)',
-      }
+      constituency: `${loc.district} Assembly Constituency`,
+      candidates: 5 + (s % 7),
+      limit: 40,
+      declared: Math.round(declared * 10) / 10,
+      estimated: Math.round((declared * (2.4 + (s % 30) / 10)) * 10) / 10,
+      criminal: s % 4,
+      exam: {
+        name: 'State PSC Group B recruitment',
+        notified: '2023-01-15',
+        plannedExam: '2023-06-20',
+        actualExam: '2023-11-10',
+        result: '2024-04-15',
+        joining: '2025-02-18',
+      },
     };
-  }, [currentPin, loc]);
-
-  const handleShare = () => {
-    if (activeTab === 'election') {
-      share({
-        pinCode: currentPin,
-        titleHindi: `चुनाव खर्च ऑडिट: ${data.candidateName}`,
-        titleEnglish: `Election Spend Audit: ${data.candidateName}`,
-        claimLabel: `ECI Declared Limit: ₹${data.declaredSpendLakhs} Lakhs`,
-        claimLabelHindi: `ECI घोषित सीमा: ₹${data.declaredSpendLakhs} लाख`,
-        realityLabel: `ADR Estimated Spend: ₹${data.estimatedActualSpendLakhs} Lakhs`,
-        realityLabelHindi: `ADR अनुमानित वास्तविक खर्च: ₹${data.estimatedActualSpendLakhs} लाख`,
-        responsiblePerson: data.candidateName,
-        responsibleOrg: 'Election Commission of India',
-        sourceUrl: 'https://eci.gov.in',
-        moduleNameHindi: 'M14 - चुनाव खर्चा (Election Spend Audit)',
-      });
-    } else {
-      share({
-        pinCode: currentPin,
-        titleHindi: `भर्ती परीक्षा विलंब: ${data.examTimeline.examName}`,
-        titleEnglish: `Recruitment Exam Delay: ${data.examTimeline.examName}`,
-        claimLabel: `Notified Date: ${data.examTimeline.notifiedDate}`,
-        claimLabelHindi: `अधिसूचना तिथि: ${data.examTimeline.notifiedDate}`,
-        realityLabel: `Actual Joining: ${data.examTimeline.joiningDate}`,
-        realityLabelHindi: `वास्तविक नियुक्ति तिथि: ${data.examTimeline.joiningDate}`,
-        responsiblePerson: 'Commission Chairperson',
-        responsibleOrg: 'Staff Selection Commission / PSC',
-        sourceUrl: 'https://ssc.gov.in',
-        moduleNameHindi: 'M14 - परीक्षा विलंब ट्रैकर (Exam Delay Tracker)',
-      });
-    }
-  };
+  }, [pin, loc.district]);
 
   return (
-    <div className="module-dashboard">
-      
-      {/* Header */}
-      <div className="glass-card dash-header-card" style={{ borderLeftColor: '#f43f5e' }}>
-        <h2>🗳️ चुनाव खर्च और परीक्षा ट्रैकर (Election Spend & Exam Delay Tracker)</h2>
-        <p>
-          चुनाव उम्मीदवारों द्वारा घोषित सीमा खर्च बनाम वास्तविक आकलित खर्च, तथा भर्ती परीक्षाओं में अधिसूचना से नियुक्ति तक होने वाले विलंब का वास्तविक लेखा-जोखा।
-        </p>
+    <div className="stack" style={{ gap: 'var(--s-6)' }}>
+      <ModulePinBar pin={pin} loc={loc} onChange={setPin} />
+      <div className="segmented" role="tablist" aria-label="Election module views">
+        <button type="button" role="tab" aria-selected={tab === 'spend'} aria-pressed={tab === 'spend'} onClick={() => setTab('spend')}>Campaign spending</button>
+        <button type="button" role="tab" aria-selected={tab === 'exam'} aria-pressed={tab === 'exam'} onClick={() => setTab('exam')}>Recruitment exam delays</button>
       </div>
 
-      {/* Tabs */}
-      <div className="dash-tab-group">
-        <button
-          onClick={() => setActiveTab('election')}
-          className={`dash-tab-btn ${activeTab === 'election' ? 'active' : ''}`}
-        >
-          Election Spend Audit (चुनाव खर्चा)
-        </button>
-        <button
-          onClick={() => setActiveTab('exams')}
-          className={`dash-tab-btn ${activeTab === 'exams' ? 'active' : ''}`}
-        >
-          Exam Delay Tracker (परीक्षा विलंब)
-        </button>
-      </div>
-
-      <div className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
-        <h3 style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>Search Constituency</h3>
-        <div className="dash-search-row">
-          <input
-            type="text"
-            className="form-input"
-            maxLength={6}
-            value={pinInput}
-            onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ''))}
-            placeholder="पिन कोड दर्ज करें..."
+      {tab === 'spend' ? (
+        <>
+          <div className="stat-row">
+            <Stat label="Candidates in last election" value={d.candidates} />
+            <Stat label="ECI spending limit" value={`₹${d.limit}`} unit=" lakh" />
+            <Stat label="Winner declared" value={`₹${d.declared}`} unit=" lakh" />
+            <Stat label="Declared criminal cases" value={d.criminal} meta="Winning candidate, self-declared" />
+          </div>
+          <SectionTitle title={d.constituency} sub="Expenditure filed with the ECI against independent field estimates." />
+          <EvidenceCard
+            title="Winning candidate, last assembly election"
+            meta={d.constituency}
+            status={d.estimated > d.limit ? { label: 'Estimate above legal limit', tone: 'bad' } : { label: 'Within limit', tone: 'good' }}
+            claimLabel="Declared to ECI"
+            realityLabel="Independent estimate"
+            claim={<Kv items={[{ label: 'Total spend', value: `₹${d.declared} lakh` }, { label: 'Legal limit', value: `₹${d.limit} lakh` }]} />}
+            reality={<Kv items={[{ label: 'Estimated spend', value: `₹${d.estimated} lakh`, tone: 'bad' }, { label: 'Gap', value: `${Math.round(d.estimated / d.declared)}x declared`, tone: 'bad' }]} />}
+            finding="Estimates are based on rallies, vehicles and advertising observed during the campaign and are published by ADR. They are not a finding by the ECI."
+            findingTone="info"
+            responsible="Returning Officer, Election Commission of India"
+            source={{ name: 'ECI affidavits and ADR field estimates', url: 'https://adrindia.org', updated: '2024-06-10' }}
+            recordRef={`${d.constituency}-spend`}
+            onShare={() =>
+              share({
+                pinCode: pin,
+                titleHindi: `चुनाव खर्च: ${d.constituency}`,
+                titleEnglish: `Election spending: ${d.constituency}`,
+                claimLabel: `Declared ₹${d.declared} lakh`,
+                claimLabelHindi: `घोषित ₹${d.declared} लाख`,
+                realityLabel: `Estimated ₹${d.estimated} lakh`,
+                realityLabelHindi: `अनुमानित ₹${d.estimated} लाख`,
+                responsiblePerson: 'Returning Officer',
+                responsibleOrg: 'Election Commission of India',
+                sourceUrl: 'https://eci.gov.in',
+                moduleNameHindi: 'चुनाव खर्चा',
+              })
+            }
           />
-          <button onClick={() => { setCurrentPin(pinInput); setSearchParams({ pin: pinInput }); }} className="dash-search-btn">
-            खोजें
-          </button>
-        </div>
-        {loc.isValid && (
-          <p className="dash-location-label">
-            📍 Active: {loc.district} ({loc.state})
-          </p>
-        )}
-      </div>
-
-      {activeTab === 'election' ? (
-        <div className="glass-card" style={{ padding: '1.25rem' }}>
-          <h3 style={{ fontSize: '1.15rem', marginBottom: '0.5rem' }}>Candidate Spend Audit: {data.candidateName}</h3>
-          <div className="dash-panel-grid">
-            <div className="dash-panel claim">
-              <span className="dash-panel-label">📢 ECI DECLARED LIMIT (घोषित सीमा)</span>
-              <p className="dash-panel-value">₹{data.declaredSpendLakhs} Lakhs</p>
-            </div>
-            <div className="dash-panel reality">
-              <span className="dash-panel-label">👁️ ADR ESTIMATED SPEND (अनुमानित खर्च)</span>
-              <p className="dash-panel-value">₹{data.estimatedActualSpendLakhs} Lakhs</p>
-            </div>
-          </div>
-          <div className="card-footer-meta">
-            <span>Source: {data.auditSource}</span>
-            <button onClick={handleShare} className="btn-whatsapp">
-              📤 Share Spend Audit
-            </button>
-          </div>
-        </div>
+        </>
       ) : (
-        <div className="glass-card" style={{ padding: '1.25rem' }}>
-          <h3 style={{ fontSize: '1.15rem', marginBottom: '1rem', color: 'var(--status-delayed)' }}>Exam Delay Timeline / भर्ती परीक्षा चक्र</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.85rem' }}>
-            <div>📢 <strong>विज्ञप्ति तिथि (Notified):</strong> {data.examTimeline.notifiedDate}</div>
-            <div>🗓️ <strong>नियोजित परीक्षा (Planned Exam):</strong> {data.examTimeline.plannedExamDate}</div>
-            <div>⚠️ <strong>वास्तविक परीक्षा (Actual Exam):</strong> <span style={{ color: 'var(--status-critical)' }}>{data.examTimeline.actualExamDate}</span></div>
-            <div>📊 <strong>परीक्षा परिणाम (Result):</strong> <span style={{ color: 'var(--status-critical)' }}>{data.examTimeline.resultDate}</span></div>
-            <div>💼 <strong>वास्तविक नियुक्ति (Joining):</strong> <span style={{ color: 'var(--status-critical)' }}>{data.examTimeline.joiningDate}</span></div>
+        <>
+          <SectionTitle title={d.exam.name} sub="Notified schedule against the dates each stage actually happened." />
+          <div className="card card-pad">
+            <ol className="timeline">
+              {[
+                { label: 'Notification published', date: d.exam.notified, note: 'On schedule' },
+                { label: 'Written exam', date: d.exam.actualExam, note: `Planned ${d.exam.plannedExam}, held about 5 months late` },
+                { label: 'Result declared', date: d.exam.result, note: 'About 6 months after the exam' },
+                { label: 'Appointment letters', date: d.exam.joining, note: 'About 18 months later than promised' },
+              ].map((s, i) => (
+                <li key={s.label}>
+                  <span className="timeline-dot num" aria-hidden="true">{i + 1}</span>
+                  <div>
+                    <h3>{s.label}</h3>
+                    <p><span className="num strong" style={{ color: 'var(--ink)' }}>{s.date}</span> · {s.note}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
           </div>
-          <div className="card-footer-meta" style={{ marginTop: '1.5rem' }}>
-            <span>Source: Official Commission Notification Schedules</span>
-            <button onClick={handleShare} className="btn-whatsapp">
-              📤 Share Exam Timeline
-            </button>
-          </div>
-        </div>
+        </>
       )}
-
     </div>
   );
 }

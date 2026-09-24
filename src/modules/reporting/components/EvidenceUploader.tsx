@@ -36,18 +36,18 @@ export const EvidenceUploader: React.FC<EvidenceUploaderProps> = ({ files, onCha
     <div style={{ display: 'grid', gap: '1rem' }}>
       {/* Upload Zone Drop Box */}
       <div style={{
-        background: '#f8fafc',
-        border: '2px dashed #cbd5e1',
+        background: 'var(--surface-2)',
+        border: '2px dashed var(--border-strong)',
         borderRadius: 14,
         padding: '1.5rem',
         textAlign: 'center',
         cursor: 'pointer'
       }}>
-        <Camera size={32} style={{ color: '#2563eb', marginBottom: '0.5rem' }} />
-        <div style={{ fontSize: '0.92rem', fontWeight: 700, color: '#0f172a' }}>
+        <Camera size={32} style={{ color: 'var(--brand-ink)', marginBottom: '0.5rem' }} />
+        <div style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--ink)' }}>
           Upload Ground Photo or Short Video Evidence
         </div>
-        <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: '0.2rem', marginBottom: '1rem' }}>
+        <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', marginTop: '0.2rem', marginBottom: '1rem' }}>
           Supports JPG, PNG, MP4 up to 10MB. All uploads undergo automated moderation.
         </div>
 
@@ -62,9 +62,9 @@ export const EvidenceUploader: React.FC<EvidenceUploaderProps> = ({ files, onCha
             style={{
               padding: '0.4rem 0.8rem',
               borderRadius: 8,
-              background: '#eff6ff',
-              border: '1px solid #bfdbfe',
-              color: '#1d4ed8',
+              background: 'var(--brand-soft)',
+              border: '1px solid var(--brand-line)',
+              color: 'var(--brand-ink)',
               fontSize: '0.78rem',
               fontWeight: 700,
               cursor: 'pointer',
@@ -84,9 +84,9 @@ export const EvidenceUploader: React.FC<EvidenceUploaderProps> = ({ files, onCha
             style={{
               padding: '0.4rem 0.8rem',
               borderRadius: 8,
-              background: '#eff6ff',
-              border: '1px solid #bfdbfe',
-              color: '#1d4ed8',
+              background: 'var(--brand-soft)',
+              border: '1px solid var(--brand-line)',
+              color: 'var(--brand-ink)',
               fontSize: '0.78rem',
               fontWeight: 700,
               cursor: 'pointer',
@@ -108,9 +108,9 @@ export const EvidenceUploader: React.FC<EvidenceUploaderProps> = ({ files, onCha
               key={idx}
               style={{
                 borderRadius: 12,
-                border: '1px solid #cbd5e1',
+                border: '1px solid var(--border-strong)',
                 overflow: 'hidden',
-                background: '#ffffff',
+                background: 'var(--surface)',
                 position: 'relative'
               }}
             >
@@ -124,7 +124,7 @@ export const EvidenceUploader: React.FC<EvidenceUploaderProps> = ({ files, onCha
                     top: '0.4rem',
                     right: '0.4rem',
                     background: 'rgba(239, 68, 68, 0.9)',
-                    color: '#ffffff',
+                    color: 'var(--on-solid)',
                     border: 'none',
                     borderRadius: '50%',
                     width: 24,
@@ -139,11 +139,11 @@ export const EvidenceUploader: React.FC<EvidenceUploaderProps> = ({ files, onCha
                 </button>
               </div>
               <div style={{ padding: '0.55rem 0.75rem' }}>
-                <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {file.fileName}
                 </div>
-                <div style={{ fontSize: '0.7rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '0.2rem', marginTop: '0.15rem' }}>
-                  <Clock size={10} style={{ color: '#f59e0b' }} /> Pending Moderation
+                <div style={{ fontSize: '0.7rem', color: 'var(--ink-3)', display: 'flex', alignItems: 'center', gap: '0.2rem', marginTop: '0.15rem' }}>
+                  <Clock size={10} style={{ color: 'var(--warn)' }} /> Pending Moderation
                 </div>
               </div>
             </div>

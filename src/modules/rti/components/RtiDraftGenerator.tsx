@@ -19,10 +19,10 @@ export function RtiDraftGenerator() {
     <div className="jantax-card" style={{ padding: '1.75rem', marginBottom: '1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
         <div>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f2d59', margin: '0 0 0.3rem' }}>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: '0 0 0.3rem' }}>
             Statutory RTI Application & First Appeal Generator
           </h3>
-          <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--ink-3)', margin: 0 }}>
             Generate legally compliant application drafts under Section 6(1), Section 19(1) First Appeal, or 48-Hour Life & Liberty provisos.
           </p>
         </div>
@@ -36,8 +36,8 @@ export function RtiDraftGenerator() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.35rem',
-              background: '#f97316',
-              color: '#ffffff',
+              background: 'var(--accent-solid)',
+              color: 'var(--on-solid)',
               padding: '0.55rem 1.1rem',
               borderRadius: 10,
               fontSize: '0.82rem',
@@ -57,8 +57,8 @@ export function RtiDraftGenerator() {
             key={tpl.applicationType}
             onClick={() => setSelectedTemplateIndex(idx)}
             style={{
-              background: selectedTemplateIndex === idx ? '#0f2d59' : '#f1f5f9',
-              color: selectedTemplateIndex === idx ? '#ffffff' : '#334155',
+              background: selectedTemplateIndex === idx ? 'var(--brand)' : 'var(--surface-3)',
+              color: selectedTemplateIndex === idx ? 'var(--on-solid)' : 'var(--ink-2)',
               border: 'none',
               padding: '0.5rem 1rem',
               borderRadius: 8,
@@ -73,14 +73,14 @@ export function RtiDraftGenerator() {
       </div>
 
       {/* Metadata Alert */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', background: '#f8fafc', padding: '0.85rem 1rem', borderRadius: 10, border: '1px solid #e2e8f0', marginBottom: '1rem', fontSize: '0.78rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', background: 'var(--surface-2)', padding: '0.85rem 1rem', borderRadius: 10, border: '1px solid var(--border)', marginBottom: '1rem', fontSize: '0.78rem' }}>
         <div>
-          <span style={{ color: '#64748b', fontWeight: 700 }}>Statutory Clock:</span>
-          <div style={{ fontWeight: 700, color: '#0f2d59', marginTop: '0.15rem' }}>{activeTemplate.statutoryTimeline}</div>
+          <span style={{ color: 'var(--ink-3)', fontWeight: 700 }}>Statutory Clock:</span>
+          <div style={{ fontWeight: 700, color: 'var(--ink)', marginTop: '0.15rem' }}>{activeTemplate.statutoryTimeline}</div>
         </div>
         <div>
-          <span style={{ color: '#64748b', fontWeight: 700 }}>Statutory Fee:</span>
-          <div style={{ fontWeight: 700, color: '#0f2d59', marginTop: '0.15rem' }}>{activeTemplate.feeRule}</div>
+          <span style={{ color: 'var(--ink-3)', fontWeight: 700 }}>Statutory Fee:</span>
+          <div style={{ fontWeight: 700, color: 'var(--ink)', marginTop: '0.15rem' }}>{activeTemplate.feeRule}</div>
         </div>
       </div>
 
@@ -94,11 +94,11 @@ export function RtiDraftGenerator() {
             width: '100%',
             padding: '1rem',
             borderRadius: 10,
-            border: '1px solid #cbd5e1',
+            border: '1px solid var(--border-strong)',
             fontSize: '0.82rem',
             fontFamily: 'monospace',
             lineHeight: 1.5,
-            background: '#ffffff',
+            background: 'var(--surface)',
           }}
         />
         <button
@@ -110,8 +110,8 @@ export function RtiDraftGenerator() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.3rem',
-            background: copied ? '#10b981' : '#0f2d59',
-            color: '#ffffff',
+            background: copied ? 'var(--good-solid)' : 'var(--brand)',
+            color: 'var(--on-solid)',
             border: 'none',
             padding: '0.4rem 0.8rem',
             borderRadius: 6,
@@ -127,11 +127,11 @@ export function RtiDraftGenerator() {
       </div>
 
       {/* Guidance Notes */}
-      <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10, padding: '0.85rem 1rem' }}>
-        <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#1e3a8a', marginBottom: '0.3rem' }}>
-          💡 Expert Legal Drafting Tips:
+      <div style={{ background: 'var(--brand-soft)', border: '1px solid var(--brand-line)', borderRadius: 10, padding: '0.85rem 1rem' }}>
+        <div style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--ink)', marginBottom: '0.3rem' }}>
+          Expert Legal Drafting Tips:
         </div>
-        <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.78rem', color: '#1e40af', lineHeight: 1.45 }}>
+        <ul style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.78rem', color: 'var(--ink)', lineHeight: 1.45 }}>
           {activeTemplate.guidanceNotes.map((note, i) => (
             <li key={i}>{note}</li>
           ))}

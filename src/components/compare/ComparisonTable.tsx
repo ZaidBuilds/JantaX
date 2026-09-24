@@ -24,12 +24,12 @@ export function ComparisonTable({ data, onEntityClick, showSourceDisclosure = tr
     <div style={{ overflowX: 'auto' }}>
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
         <thead>
-          <tr style={{ borderBottom: '2px solid #e2e8f0' }}>
-            <th style={{ textAlign: 'left', padding: '0.75rem 1rem', minWidth: 180, position: 'sticky', left: 0, background: '#fff', zIndex: 1 }}>
+          <tr style={{ borderBottom: '2px solid var(--border)' }}>
+            <th style={{ textAlign: 'left', padding: '0.75rem 1rem', minWidth: 180, position: 'sticky', left: 0, background: 'var(--surface)', zIndex: 1 }}>
               <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Metric</span>
             </th>
             {entities.map(entity => {
-              const color = ENTITY_COLORS[entity.type] || '#6b7280';
+              const color = ENTITY_COLORS[entity.type] || 'var(--ink-3)';
               return (
                 <th
                   key={entity.id}
@@ -83,9 +83,9 @@ export function ComparisonTable({ data, onEntityClick, showSourceDisclosure = tr
           {rows.map((row, rowIdx) => (
             <tr
               key={row.id}
-              style={{ borderBottom: '1px solid #f1f5f9', background: rowIdx % 2 === 0 ? 'transparent' : '#fafbfc' }}
+              style={{ borderBottom: '1px solid var(--border)', background: rowIdx % 2 === 0 ? 'transparent' : '#fafbfc' }}
             >
-              <td style={{ padding: '0.85rem 1rem', position: 'sticky', left: 0, background: rowIdx % 2 === 0 ? '#fff' : '#fafbfc', zIndex: 1 }}>
+              <td style={{ padding: '0.85rem 1rem', position: 'sticky', left: 0, background: rowIdx % 2 === 0 ? 'var(--surface)' : '#fafbfc', zIndex: 1 }}>
                 <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>{row.category}</div>
                 {row.categoryHi && (
                   <div style={{ fontSize: '0.7rem', opacity: 0.5 }}>{row.categoryHi}</div>
@@ -117,12 +117,12 @@ export function ComparisonTable({ data, onEntityClick, showSourceDisclosure = tr
 
 const ENTITY_COLORS: Record<string, string> = {
   school: '#3b82f6',
-  contractor: '#ef4444',
-  builder: '#ef4444',
-  project: '#f59e0b',
-  location: '#06b6d4',
-  hospital: '#ec4899',
-  rera: '#8b5cf6',
+  contractor: 'var(--bad)',
+  builder: 'var(--bad)',
+  project: 'var(--warn)',
+  location: 'var(--viz-6)',
+  hospital: 'var(--viz-5)',
+  rera: 'var(--viz-4)',
 };
 
 interface ComparisonCellProps {
@@ -130,11 +130,11 @@ interface ComparisonCellProps {
 }
 
 function ComparisonCell({ metric }: ComparisonCellProps) {
-  if (metric.status === 'unavailable' || metric.value === null || metric.value === '—') {
+  if (metric.status === 'unavailable' || metric.value === null || metric.value === '-') {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
-        <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#cbd5e1' }}>—</span>
-        <span style={{ fontSize: '0.6rem', color: '#94a3b8' }}>Unavailable</span>
+        <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--ink-4)' }}>-</span>
+        <span style={{ fontSize: '0.6rem', color: 'var(--ink-4)' }}>Unavailable</span>
       </div>
     );
   }
@@ -151,13 +151,13 @@ function ComparisonCell({ metric }: ComparisonCellProps) {
       </div>
 
       {metric.rank && (
-        <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '1px 6px', borderRadius: 999, background: metric.rank <= 3 ? '#10b98115' : '#f1f5f9', color: metric.rank <= 3 ? '#10b981' : '#64748b' }}>
+        <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '1px 6px', borderRadius: 999, background: metric.rank <= 3 ? '#10b98115' : 'var(--surface-3)', color: metric.rank <= 3 ? 'var(--good)' : 'var(--ink-3)' }}>
           #{metric.rank}
         </span>
       )}
 
       {metric.badge && (
-        <span style={{ fontSize: '0.6rem', fontWeight: 600, padding: '1px 6px', borderRadius: 4, background: `${metric.color || '#6b7280'}15`, color: metric.color || '#6b7280' }}>
+        <span style={{ fontSize: '0.6rem', fontWeight: 600, padding: '1px 6px', borderRadius: 4, background: `${metric.color || '#6b7280'}15`, color: metric.color || 'var(--ink-3)' }}>
           {metric.badge}
         </span>
       )}
@@ -221,9 +221,9 @@ function SourceDisclosure({ rows, entities }: SourceDisclosureProps) {
       style={{
         marginTop: '1.5rem',
         padding: '1rem 1.25rem',
-        background: '#f8fafc',
+        background: 'var(--surface-2)',
         borderRadius: 10,
-        border: '1px solid #e2e8f0',
+        border: '1px solid var(--border)',
       }}
     >
       <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>

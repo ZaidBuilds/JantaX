@@ -14,16 +14,16 @@ interface AccountabilityTimelineProps {
 
 const EVENT_COLORS: Record<string, string> = {
   critical: '#ef4444',
-  construction: '#3b82f6',
-  delayed: '#f97316',
-  completed: '#10b981'
+  construction: 'var(--brand-ink)',
+  delayed: 'var(--accent-ink)',
+  completed: 'var(--good)'
 };
 
 export function AccountabilityTimeline({ events }: AccountabilityTimelineProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'relative', paddingLeft: '1.5rem', borderLeft: '2px solid var(--border-color)' }}>
       {events.map((e, idx) => {
-        const dotColor = EVENT_COLORS[e.status] || '#cbd5e1';
+        const dotColor = EVENT_COLORS[e.status] || 'var(--ink-4)';
         return (
           <div key={idx} style={{ position: 'relative' }}>
             {/* Colored Dot on Left border */}

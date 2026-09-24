@@ -1,285 +1,274 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { api } from '../core/services/api';
-import type { SchoolRecord } from '../modules/school/types';
-import { GraduationCap, Search, MapPin, Download, AlertTriangle, Star, Filter, DownloadCloud } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Search, Check, X, Minus, SearchX, Columns3, ChevronLeft, ChevronRight, Download } from 'lucide-react';
+import { api, type ApiRecord } from '../core/services/api';
+import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver';
+import { Badge, EmptyState, Stat, toneForScore, toneForStatus, useToast } from '../ui';
+import { ModuleFrame } from './ModuleFrame';
 
-/**
- * JantaX Schools Directory Page
- * Replicates Mockup Image 02 exactly:
- * - Left filter sidebar with checkbox counts
- * - Top header row with "Download List" & "+ Report an Issue"
- * - 5 metric overview cards
- * - Search results layout with list items showing thumbnails, tags, UDISE codes, scores & sub-ratings
- * - Pagination bar at bottom
- */
+const SAMPLE_PINS = ['110001', '250001', '560001', '400001', '226001', '800001'];
+const LEVELS = ['All', 'Primary', 'Upper Primary', 'Secondary', 'Higher Secondary'];
+const PAGE_SIZE = 8;
+
+type Sort = 'score-desc' | 'score-asc' | 'name' | 'ptr';
+
+function ptr(s: ApiRecord) {
+  const t = s.officialTeacherCount || 0;
+  return t > 0 ? Math.round((s.officialStudentCount || 0) / t) : null;
+}
+
+function Facility({ ok, label }: { ok: boolean | undefined; label: string }) {
+  const Icon = ok === undefined ? Minus : ok ? Check : X;
+  const tone = ok === undefined ? 'neutral' : ok ? 'good' : 'bad';
+  return (
+    <Badge tone={tone}>
+      <Icon size={11} aria-hidden="true" />
+      {label}
+    </Badge>
+  );
+}
+
+function toCsv(rows: ApiRecord[]) {
+  const head = ['Name', 'UDISE', 'PIN', 'District', 'Level', 'Students', 'Teachers', 'Sanctioned', 'Ground truth score', 'Status'];
+  const body = rows.map((s) =>
+    [s.titleEnglish, s.udiseCode, s.location.pinCode, s.location.district, s.schoolLevel, s.officialStudentCount, s.officialTeacherCount, s.teachersSanctioned, s.groundTruthScore, s.status]
+      .map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`)
+      .join(',')
+  );
+  return [head.join(','), ...body].join('\n');
+}
+
 export function SchoolsDirectory() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const pinFromUrl = searchParams.get('pin') || '';
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSchoolType, setSelectedSchoolType] = useState<string>('all');
-  const [schools, setSchools] = useState<SchoolRecord[]>([]);
+  const toast = useToast();
+  const [params, setParams] = useSearchParams();
+  const pin = params.get('pin') || '';
+  const level = params.get('level') || 'All';
+  const sort = (params.get('sort') as Sort) || 'score-desc';
+  const [pinDraft, setPinDraft] = useState(pin);
+  const [q, setQ] = useState('');
+  const [page, setPage] = useState(1);
+  const [schools, setSchools] = useState<ApiRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<string[]>([]);
 
   useEffect(() => {
-    let cancelled = false;
+    setPinDraft(pin);
+    let alive = true;
     setLoading(true);
-    api.getSchools(pinFromUrl || '').then((res: any) => {
-      if (!cancelled) {
-        setSchools(res.records?.school || []);
-        setLoading(false);
-      }
-    }).catch(() => {
-      if (!cancelled) setLoading(false);
+    const pins = isValidIndianPincode(pin) ? [pin] : SAMPLE_PINS;
+    Promise.all(pins.map((p) => api.getSchools(p).catch(() => [] as ApiRecord[])))
+      .then((lists) => {
+        if (!alive) return;
+        const all = lists.flat();
+        setSchools(all.filter((s, i) => all.findIndex((x) => x.id === s.id) === i));
+      })
+      .finally(() => alive && setLoading(false));
+    return () => {
+      alive = false;
+    };
+  }, [pin]);
+
+  useEffect(() => setPage(1), [pin, level, sort, q]);
+
+  const setParam = (k: string, v: string) => {
+    const next = new URLSearchParams(params);
+    if (!v || v === 'All') next.delete(k);
+    else next.set(k, v);
+    setParams(next, { replace: true });
+  };
+
+  const filtered = useMemo(() => {
+    const needle = q.trim().toLowerCase();
+    const list = schools.filter((s) => {
+      if (level !== 'All' && s.schoolLevel !== level) return false;
+      if (!needle) return true;
+      return [s.titleEnglish, s.titleHindi, s.udiseCode, s.location.pinCode, s.location.district].join(' ').toLowerCase().includes(needle);
     });
-    return () => { cancelled = true; };
-  }, [pinFromUrl]);
-  
-  const statsCards = [
-    { label: 'Total Schools', value: '1,48,732', sub: 'Across India', icon: GraduationCap, color: '#64748b' },
-    { label: 'Schools with Data', value: '1,12,409', sub: '76% of total', icon: Search, color: '#3b82f6' },
-    { label: 'Need Attention', value: '42,871', sub: '29% of total', icon: AlertTriangle, color: '#f97316' },
-    { label: 'Critical Condition', value: '13,245', sub: '9% of total', icon: AlertTriangle, color: '#ef4444' },
-    { label: 'Top Rated Schools', value: '8,732', sub: '6% of total', icon: Star, color: '#8b5cf6' }
-  ];
+    const byName = (a: ApiRecord, b: ApiRecord) => a.titleEnglish.localeCompare(b.titleEnglish);
+    return [...list].sort((a, b) => {
+      if (sort === 'name') return byName(a, b);
+      if (sort === 'score-asc') return a.groundTruthScore - b.groundTruthScore;
+      if (sort === 'ptr') return (ptr(b) ?? 0) - (ptr(a) ?? 0);
+      return b.groundTruthScore - a.groundTruthScore;
+    });
+  }, [schools, level, q, sort]);
 
-  const PAGE_SIZE_SD = 6;
-  const [currentPage, setCurrentPage] = useState(1);
+  const stats = useMemo(() => {
+    const n = filtered.length;
+    const avg = n ? Math.round(filtered.reduce((a, s) => a + s.groundTruthScore, 0) / n) : 0;
+    const attention = filtered.filter((s) => s.groundTruthScore < 75).length;
+    const vacancies = filtered.reduce((a, s) => a + Math.max(0, (s.teachersSanctioned || 0) - (s.officialTeacherCount || 0)), 0);
+    const noPower = filtered.filter((s) => s.hasElectricity === false).length;
+    return { n, avg, attention, vacancies, noPower };
+  }, [filtered]);
 
-  const filteredSchools = useMemo(() => {
-    let list = schools;
-    if (pinFromUrl) {
-      list = list.filter(s => s.location.pinCode === pinFromUrl);
-    }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter(s =>
-        s.titleEnglish.toLowerCase().includes(q) ||
-        s.titleHindi.includes(q) ||
-        s.udiseCode.includes(q) ||
-        s.location.pinCode.includes(q) ||
-        s.location.district.toLowerCase().includes(q)
-      );
-    }
-    if (selectedSchoolType !== 'all') {
-      list = list.filter(s => s.schoolLevel === selectedSchoolType);
-    }
-    return list;
-  }, [pinFromUrl, searchQuery, selectedSchoolType, schools]);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const loc = isValidIndianPincode(pin) ? resolvePincode(pin) : null;
 
-  useEffect(() => { setCurrentPage(1); }, [pinFromUrl, searchQuery, selectedSchoolType]);
+  const toggle = (id: string) =>
+    setSelected((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : cur.length >= 3 ? cur : [...cur, id]));
 
-  const totalPagesSd = Math.max(1, Math.ceil(filteredSchools.length / PAGE_SIZE_SD));
-  const pagedSchools = useMemo(() => {
-    const start = (currentPage - 1) * PAGE_SIZE_SD;
-    return filteredSchools.slice(start, start + PAGE_SIZE_SD);
-  }, [filteredSchools, currentPage]);
+  const download = () => {
+    const blob = new Blob([toCsv(filtered)], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `jantax-schools-${pin || 'sample'}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast(`Downloaded ${filtered.length} schools`);
+  };
 
   return (
-    <div className="container schools-layout" style={{ padding: '2rem 1rem', display: 'flex', gap: '2rem' }}>
-      
-      {/* Left Filter Sidebar */}
-      <aside style={{ width: '260px', flexShrink: 0 }}>
-        <div className="glass-card" style={{ padding: '1.25rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-            <h3 style={{ fontSize: '0.95rem', margin: 0 }}>Filters</h3>
-            <span style={{ fontSize: '0.75rem', color: 'var(--color-accent)', cursor: 'pointer', fontWeight: 600 }}>Clear All</span>
+    <ModuleFrame moduleId="school">
+      <div className="card card-pad schools-toolbar">
+        <form
+          className="field"
+          onSubmit={(e) => {
+            e.preventDefault();
+            setParam('pin', isValidIndianPincode(pinDraft) ? pinDraft : '');
+          }}
+        >
+          <label className="label" htmlFor="schools-pin">PIN code</label>
+          <div style={{ display: 'flex', gap: 'var(--s-2)' }}>
+            <input id="schools-pin" className="input num" style={{ width: 140 }} inputMode="numeric" maxLength={6} placeholder="All sample PINs" value={pinDraft} onChange={(e) => setPinDraft(e.target.value.replace(/\D/g, ''))} />
+            <button type="submit" className="btn btn-secondary">Apply</button>
           </div>
-
-          {/* Location Filters */}
-          <div style={{ marginBottom: '1.25rem', display: 'grid', gap: '0.75rem' }}>
-            <div>
-              <label style={{ fontSize: '0.75rem', opacity: 0.6, display: 'block', marginBottom: '0.25rem' }}>Location</label>
-              <select className="form-input" style={{ fontSize: '0.8rem' }}><option>All States</option></select>
-            </div>
-            <div>
-              <select className="form-input" style={{ fontSize: '0.8rem' }}><option>All Districts</option></select>
-            </div>
-            <div>
-              <select className="form-input" style={{ fontSize: '0.8rem' }}><option>All Blocks</option></select>
-            </div>
-            <div>
-              <input type="text" placeholder="Search city or village" className="form-input" style={{ fontSize: '0.8rem' }} />
-            </div>
-            <div>
-              <input type="text" placeholder="Enter PIN code" className="form-input" style={{ fontSize: '0.8rem' }} />
-            </div>
-          </div>
-
-          {/* School Type Checkboxes */}
-          <div style={{ marginBottom: '1.25rem', borderTop: '1px solid #e2e8f0', paddingTop: '1rem' }}>
-            <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.5rem' }}>School Type</label>
-            <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.8rem' }}>
-              <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span><input type="checkbox" checked={selectedSchoolType === 'all'} onChange={() => setSelectedSchoolType('all')} /> All Types</span>
-                <span style={{ opacity: 0.5 }}>78,231</span>
-              </label>
-              <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span><input type="checkbox" checked={selectedSchoolType === 'Primary'} onChange={() => setSelectedSchoolType('Primary')} /> Primary (1 to 5)</span>
-                <span style={{ opacity: 0.5 }}>45,765</span>
-              </label>
-              <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span><input type="checkbox" checked={selectedSchoolType === 'Upper Primary'} onChange={() => setSelectedSchoolType('Upper Primary')} /> Upper Primary (6 to 8)</span>
-                <span style={{ opacity: 0.5 }}>16,842</span>
-              </label>
-            </div>
-          </div>
-
-          {/* Management Checkboxes */}
-          <div style={{ marginBottom: '1.5rem', borderTop: '1px solid #e2e8f0', paddingTop: '1rem' }}>
-            <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.5rem' }}>Management</label>
-            <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.8rem' }}>
-              <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span><input type="checkbox" defaultChecked /> All</span>
-                <span style={{ opacity: 0.5 }}>1,25,873</span>
-              </label>
-              <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span><input type="checkbox" /> Government</span>
-                <span style={{ opacity: 0.5 }}>15,327</span>
-              </label>
-            </div>
-          </div>
-
-          <button className="search-action-btn" style={{ width: '100%', borderRadius: '8px', fontSize: '0.85rem' }}>Apply Filters</button>
-        </div>
-      </aside>
-
-      {/* Main Content Area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        
-        {/* Header Action row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h2 style={{ fontSize: '1.6rem', color: 'var(--color-primary)', margin: 0 }}>Schools Directory</h2>
-            <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>Find and explore government schools across India with real data and ground truth insights.</span>
-          </div>
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button className="time-tab" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}><DownloadCloud size={14} /> Download List</button>
-            <button className="search-action-btn" style={{ borderRadius: '8px', fontSize: '0.85rem' }} onClick={() => navigate('/module/school')}>+ Report an Issue</button>
+          <span className="hint">{loc ? `${loc.district}, ${loc.state}` : `Sample from ${SAMPLE_PINS.length} cities`}</span>
+        </form>
+        <div className="field" style={{ flex: '1 1 240px' }}>
+          <label className="label" htmlFor="schools-q">Find a school</label>
+          <div className="input-group">
+            <Search size={16} aria-hidden="true" />
+            <input id="schools-q" className="input" type="search" placeholder="Name, UDISE code or district" value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
         </div>
-
-        {/* 5 Stats overview row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.75rem' }}>
-          {statsCards.map((c, idx) => {
-            const Icon = c.icon;
-            return (
-              <div key={idx} className="glass-card" style={{ padding: '1rem', borderTop: `3px solid ${c.color}`, textAlign: 'center' }}>
-                <div style={{ width: 40, height: 40, borderRadius: 12, background: `${c.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 0.5rem' }}>
-                  <Icon size={20} style={{ color: c.color }} />
-                </div>
-                <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--color-primary)', margin: '0.15rem 0' }}>{c.value}</div>
-                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)' }}>{c.label}</div>
-                <div style={{ fontSize: '0.62rem', opacity: 0.5 }}>{c.sub}</div>
-              </div>
-            );
-          })}
+        <div className="field">
+          <label className="label" htmlFor="schools-sort">Sort by</label>
+          <select id="schools-sort" className="select" value={sort} onChange={(e) => setParam('sort', e.target.value === 'score-desc' ? '' : e.target.value)}>
+            <option value="score-desc">Ground truth, highest first</option>
+            <option value="score-asc">Ground truth, lowest first</option>
+            <option value="ptr">Most pupils per teacher</option>
+            <option value="name">Name, A to Z</option>
+          </select>
         </div>
-
-        {/* Search Results list selectors */}
-        <div className="glass-card" style={{ padding: '0.75rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
-          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-            <Search size={14} style={{ position: 'absolute', left: '0.6rem', opacity: 0.5 }} />
-            <input
-              type="text"
-              placeholder="Search within results..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="form-input"
-              style={{ width: '280px', paddingLeft: '2rem' }}
-            />
-          </div>
-
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>Sort by:</span>
-            <select className="form-input" style={{ width: 'auto', padding: '0.25rem 0.5rem', fontSize: '0.8rem', height: 'auto' }}>
-              <option>Health Score (High to Low)</option>
-            </select>
-
-            <button className="time-tab active" style={{ padding: '0.35rem 0.75rem' }}>List View</button>
-            <button className="time-tab" style={{ padding: '0.35rem 0.75rem' }} onClick={() => navigate('/maps')}>Map View</button>
-          </div>
-        </div>
-
-        {/* Results count text */}
-        <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>
-          Showing {(currentPage-1)*PAGE_SIZE_SD + 1} - {Math.min(currentPage*PAGE_SIZE_SD, filteredSchools.length)} of {filteredSchools.length} schools {loading ? '(loading…)' : ''}
-        </div>
-
-        {/* List items cards */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {loading && <div className="glass-card" style={{ padding: '2rem', textAlign: 'center' }}><div className="skeleton" style={{ height: '18px', width: '40%', margin: '0 auto 1rem' }} /><div className="skeleton" style={{ height: '90px' }} /></div>}
-          {!loading && pagedSchools.map((school, idx) => {
-            const scoreColor = school.groundTruthScore >= 70 ? '#10b981' : school.groundTruthScore >= 40 ? '#f97316' : '#ef4444';
-            const badgeBg = school.schoolLevel === 'Primary' ? '#dcfce7' : '#dbeafe';
-            const badgeColor = school.schoolLevel === 'Primary' ? '#166534' : '#1e40af';
-
-            return (
-              <div key={school.id} className="glass-card" style={{ padding: '1.25rem', display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-                {/* Thumbnail */}
-                <div style={{ width: '120px', height: '90px', borderRadius: 'var(--radius-control)', overflow: 'hidden', background: '#cbd5e1', flexShrink: 0 }}>
-                  <img src={idx === 0 ? "https://images.unsplash.com/photo-1577896851231-70ee18881754?auto=format&fit=crop&w=200&q=80" : "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=200&q=80"} alt={school.titleEnglish} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                </div>
-
-                {/* Details */}
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <h4 style={{ fontSize: '1.05rem', margin: 0 }}>{school.titleHindi}</h4>
-                    <span className="badge" style={{ background: badgeBg, color: badgeColor, fontSize: '0.65rem' }}>
-                      {school.schoolLevel}
-                    </span>
-                  </div>
-                  <div style={{ fontSize: '0.72rem', opacity: 0.6, margin: '0.2rem 0', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                    <MapPin size={12} /> {school.location.district} · UDISE: {school.udiseCode} · Students: {school.officialStudentCount} · Teachers: {school.officialTeacherCount}
-                  </div>
-                </div>
-
-                {/* Health Score */}
-                <div style={{ textAlign: 'center', width: '100px' }}>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: scoreColor }}>{school.groundTruthScore}</div>
-                  <div style={{ fontSize: '0.6rem', opacity: 0.5 }}>Health Score</div>
-                </div>
-
-                {/* Sub ratings column breakdown */}
-                <div style={{ display: 'flex', gap: '1rem', fontSize: '0.72rem', width: '200px' }}>
-                  <div style={{ display: 'grid', gap: '0.2rem' }}>
-                    <div><GraduationCap size={11} style={{ verticalAlign: '-1px', marginRight: 2 }} /> Infra: <strong>62/100</strong></div>
-                    <div><GraduationCap size={11} style={{ verticalAlign: '-1px', marginRight: 2 }} /> Teachers: <strong>72/100</strong></div>
-                    <div><GraduationCap size={11} style={{ verticalAlign: '-1px', marginRight: 2 }} /> Attendance: <strong>65/100</strong></div>
-                  </div>
-                </div>
-
-                {/* View Details button */}
-                <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <button className="time-tab active" onClick={() => navigate(`/module/school?id=${school.id}`)}>View Details →</button>
-                  <div style={{ fontSize: '0.62rem', opacity: 0.5, marginTop: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.2rem' }}>
-                    <span style={{ color: '#10b981' }}>✓</span> Data Available
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Pagination bar — Killer functional */}
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', marginTop: '1.5rem', fontSize: '0.85rem', flexWrap: 'wrap' }}>
-          <button className="btn btn-secondary" disabled={currentPage===1} onClick={() => setCurrentPage(p => Math.max(1, p-1))} style={{ padding: '0.35rem 0.75rem', opacity: currentPage===1?0.5:1 }}>‹ Prev</button>
-          {Array.from({ length: Math.min(totalPagesSd, 5) }, (_, i) => {
-            let pageNum: number;
-            if (totalPagesSd <= 5) pageNum = i+1;
-            else if (currentPage <= 3) pageNum = i+1;
-            else if (currentPage >= totalPagesSd-2) pageNum = totalPagesSd -4 + i;
-            else pageNum = currentPage -2 + i;
-            return (
-              <button key={pageNum} onClick={() => setCurrentPage(pageNum)} className={`time-tab ${currentPage===pageNum?'active':''}`} style={{ padding: '0.35rem 0.7rem', minWidth: '34px' }}>{pageNum}</button>
-            );
-          })}
-          {totalPagesSd > 5 && currentPage < totalPagesSd-2 && <span style={{ opacity: 0.5 }}>… {totalPagesSd}</span>}
-          <button className="btn btn-secondary" disabled={currentPage===totalPagesSd} onClick={() => setCurrentPage(p => Math.min(totalPagesSd, p+1))} style={{ padding: '0.35rem 0.75rem', opacity: currentPage===totalPagesSd?0.5:1 }}>Next ›</button>
-        </div>
-
       </div>
-    </div>
+
+      <div className="cluster" role="group" aria-label="School level" style={{ margin: 'var(--s-5) 0' }}>
+        {LEVELS.map((l) => (
+          <button key={l} type="button" className="chip" aria-pressed={level === l} onClick={() => setParam('level', l)}>
+            {l}
+          </button>
+        ))}
+      </div>
+
+      <div className="stat-row" style={{ marginBottom: 'var(--s-6)' }}>
+        <Stat label="Schools listed" value={loading ? '–' : stats.n} />
+        <Stat label="Average ground truth" value={loading ? '–' : stats.avg} unit="/100" />
+        <Stat label="Need attention" value={loading ? '–' : stats.attention} meta="Score below 75" />
+        <Stat label="Teacher posts vacant" value={loading ? '–' : stats.vacancies} meta="Sanctioned minus working" />
+        <Stat label="Without electricity" value={loading ? '–' : stats.noPower} />
+      </div>
+
+      <div className="spread" style={{ marginBottom: 'var(--s-3)', flexWrap: 'wrap' }}>
+        <p className="small muted" aria-live="polite">
+          {loading ? 'Loading schools…' : `Showing ${paged.length ? (page - 1) * PAGE_SIZE + 1 : 0} to ${(page - 1) * PAGE_SIZE + paged.length} of ${filtered.length}`}
+        </p>
+        <div className="cluster">
+          {selected.length > 0 && (
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              disabled={selected.length < 2}
+              onClick={() => navigate(`/compare?type=schools&ids=${selected.join(',')}`)}
+              title={selected.length < 2 ? 'Select at least two schools' : undefined}
+            >
+              <Columns3 size={14} aria-hidden="true" /> Compare {selected.length}
+            </button>
+          )}
+          <button type="button" className="btn btn-secondary btn-sm" onClick={download} disabled={!filtered.length}>
+            <Download size={14} aria-hidden="true" /> CSV
+          </button>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="stack">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="card card-pad stack-sm">
+              <span className="skeleton" style={{ height: 18, width: '45%' }} />
+              <span className="skeleton" style={{ height: 12, width: '70%' }} />
+              <span className="skeleton" style={{ height: 24, width: '35%' }} />
+            </div>
+          ))}
+        </div>
+      ) : paged.length === 0 ? (
+        <div className="card">
+          <EmptyState
+            icon={SearchX}
+            title="No schools match"
+            text={pin ? `We have no government school records for PIN ${pin} with these filters.` : 'Try clearing the search or level filter.'}
+            action={<button type="button" className="btn btn-secondary" onClick={() => { setQ(''); setParams({}, { replace: true }); }}>Reset filters</button>}
+          />
+        </div>
+      ) : (
+        <div className="stack">
+          {paged.map((s) => {
+            const ratio = ptr(s);
+            const isSel = selected.includes(s.id);
+            return (
+              <article key={s.id} className="card school-card">
+                <div className="school-card-main">
+                  <div style={{ minWidth: 0 }}>
+                    <h3 className="card-title">
+                      <Link to={`/module/school?id=${s.id}`} className="school-link">{s.titleEnglish}</Link>
+                    </h3>
+                    <p className="tiny muted" lang="hi">{s.titleHindi}</p>
+                    <p className="small" style={{ color: 'var(--ink-2)', marginTop: 'var(--s-2)' }}>
+                      {s.schoolLevel} · {s.managementType} · UDISE <span className="mono">{s.udiseCode}</span> · PIN {s.location.pinCode}, {s.location.district}
+                    </p>
+                    <div className="cluster" style={{ marginTop: 'var(--s-3)' }}>
+                      <Facility ok={s.hasToilet} label="Toilets" />
+                      <Facility ok={s.hasElectricity} label="Electricity" />
+                      <Facility ok={s.hasDrinkingWater} label="Drinking water" />
+                      <Badge tone={toneForStatus(s.status)}>{s.status}</Badge>
+                    </div>
+                  </div>
+                  <dl className="school-metrics">
+                    <div><dt>Students</dt><dd className="num">{s.officialStudentCount ?? '–'}</dd></div>
+                    <div><dt>Teachers</dt><dd className="num">{s.officialTeacherCount ?? '–'}<span className="muted">/{s.teachersSanctioned ?? '–'}</span></dd></div>
+                    <div><dt>Pupils per teacher</dt><dd className={`num ${ratio && ratio > 30 ? 'text-bad' : ''}`}>{ratio ?? '–'}</dd></div>
+                    <div>
+                      <dt>Ground truth</dt>
+                      <dd className={`score text-${toneForScore(s.groundTruthScore)}`}>{s.groundTruthScore}<small>/100</small></dd>
+                    </div>
+                  </dl>
+                </div>
+                <div className="card-foot">
+                  <label className="check" style={{ padding: 0 }}>
+                    <input type="checkbox" checked={isSel} onChange={() => toggle(s.id)} disabled={!isSel && selected.length >= 3} />
+                    Add to compare
+                  </label>
+                  <Link to={`/module/school?id=${s.id}`} className="link">View school profile</Link>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <nav className="pager" aria-label="Pagination">
+          <button type="button" className="btn btn-secondary btn-sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
+            <ChevronLeft size={15} aria-hidden="true" /> Previous
+          </button>
+          <span className="small muted num">Page {page} of {totalPages}</span>
+          <button type="button" className="btn btn-secondary btn-sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
+            Next <ChevronRight size={15} aria-hidden="true" />
+          </button>
+        </nav>
+      )}
+    </ModuleFrame>
   );
 }

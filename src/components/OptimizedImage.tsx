@@ -24,7 +24,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       position: 'relative',
       width: '100%',
       aspectRatio,
-      backgroundColor: '#f1f5f9',
+      backgroundColor: 'var(--surface-3)',
       borderRadius: 12,
       overflow: 'hidden',
       ...style
@@ -33,7 +33,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
         <div style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 50%, #f1f5f9 100%)',
+          background: 'linear-gradient(90deg, var(--surface-3) 0%, var(--border) 50%, var(--surface-3) 100%)',
           backgroundSize: '200% 100%',
           animation: 'shimmer 1.5s infinite'
         }} />
@@ -47,7 +47,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#94a3b8',
+          color: 'var(--ink-4)',
           fontSize: '0.8rem',
           gap: '0.4rem'
         }}>

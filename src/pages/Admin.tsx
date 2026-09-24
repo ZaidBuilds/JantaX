@@ -1,72 +1,124 @@
-import React, { useEffect, useState } from 'react';
-import { api } from '../core/services/api';
+import { useEffect, useState } from 'react';
+import { Lock, RefreshCw, ShieldCheck, Inbox } from 'lucide-react';
+import { apiUrl } from '../core/services/api';
 import { checkCurrentUserPermission } from '../modules/security/services/rbacService';
+import { Badge, EmptyState, PageHeader, useToast } from '../ui';
+
+interface QueueItem { id: string; title: string; pincodeCode: string; status: string }
+interface SyncSource { sourceId: string; sourceName: string; status: string; lastSuccessfulSync?: string; stale?: boolean }
+
+function authHeaders(): Record<string, string> {
+  const t = localStorage.getItem('jantax_token');
+  return t ? { Authorization: `Bearer ${t}` } : {};
+}
 
 export function AdminPage() {
-  const [queue, setQueue] = useState<any[]>([]);
+  const toast = useToast();
+  const [queue, setQueue] = useState<QueueItem[]>([]);
+  const [pending, setPending] = useState(0);
+  const [sources, setSources] = useState<SyncSource[]>([]);
   const [pin, setPin] = useState('110001');
-  const [followCount, setFollowCount] = useState(0);
-  const [syncSources, setSyncSources] = useState<any[]>([]);
   const isAdmin = checkCurrentUserPermission('ADMIN_ACCESS');
 
-  useEffect(()=>{
-    fetch('/api/moderation').then(r=>r.json()).then(j=>setQueue(j.queue||[])).catch(()=>{});
-    fetch('/api/reports/pending-count').then(r=>r.json()).then(j=>setFollowCount(j.count||0)).catch(()=>{});
-    const t=localStorage.getItem('jantax_token');
-    fetch('/api/admin/sync/status', { headers: t?{Authorization:`Bearer ${t}`}:{} }).then(r=>r.json()).then(j=>{ if(j.sources) setSyncSources(j.sources); }).catch(()=>{});
-  },[]);
+  useEffect(() => {
+    if (!isAdmin) return;
+    fetch(apiUrl('/api/moderation'), { headers: authHeaders() }).then((r) => r.json()).then((j) => setQueue(j.queue || [])).catch(() => {});
+    fetch(apiUrl('/api/reports/pending-count')).then((r) => r.json()).then((j) => setPending(j.count || 0)).catch(() => {});
+    fetch(apiUrl('/api/admin/sync/status'), { headers: authHeaders() }).then((r) => r.json()).then((j) => j.sources && setSources(j.sources)).catch(() => {});
+  }, [isAdmin]);
 
   if (!isAdmin) {
     return (
-      <div style={{ maxWidth: 600, margin: '4rem auto', padding: '2rem', textAlign: 'center', background: '#ffffff', borderRadius: 16, border: '1px solid #e2e8f0' }}>
-        <h2 style={{ fontSize: '1.4rem', color: '#b91c1c', fontWeight: 800 }}>Access Denied — Role Authorization Required</h2>
-        <p style={{ color: '#64748b', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-          This page requires an authorized <strong>ADMIN</strong> Bearer token (<code>jantax_token</code>). You are currently browsing with <code>CITIZEN</code> role permissions.
-        </p>
+      <div className="page page-narrow">
+        <div className="card">
+          <EmptyState icon={Lock} title="Administrators only" text="This page needs an admin sign-in. If you run a JantaX instance, sign in with an administrator token to continue." />
+        </div>
       </div>
     );
   }
-  const createPin = async ()=>{
-    const token = localStorage.getItem('jantax_token');
-    if(!token) return alert('Login as ADMIN first (POST /api/auth/login)');
-    const res = await fetch(`/api/admin/pincode/${pin}?state=Delhi&district=New%20Delhi`, { headers:{ Authorization:`Bearer ${token}` }});
-    const j = await res.json();
-    alert(JSON.stringify(j).slice(0,400));
+
+  const review = async (id: string, status: 'APPROVED' | 'REJECTED') => {
+    const res = await fetch(apiUrl(`/api/reports/${id}/review`), { method: 'PATCH', headers: { 'Content-Type': 'application/json', ...authHeaders() }, body: JSON.stringify({ status }) }).catch(() => null);
+    if (res?.ok) {
+      setQueue((q) => q.filter((x) => x.id !== id));
+      toast(status === 'APPROVED' ? 'Report approved' : 'Report rejected');
+    } else toast('Could not update the report');
   };
+
+  const createPin = async () => {
+    const res = await fetch(apiUrl(`/api/admin/pincode/${pin}?state=Delhi&district=New%20Delhi`), { headers: authHeaders() }).catch(() => null);
+    toast(res?.ok ? `PIN ${pin} created` : 'Could not create the PIN');
+  };
+
+  const sync = async (id: string) => {
+    const res = await fetch(apiUrl(`/api/admin/sync/${id}`), { method: 'POST', headers: authHeaders() }).catch(() => null);
+    toast(res?.ok ? `Sync started for ${id}` : 'Sync request failed');
+  };
+
   return (
-    <div style={{ maxWidth: 860, margin:'0 auto', padding:'2rem 1.25rem' }}>
-      <h1 style={{ color:'#0f2d59' }}>Admin — Data Operations</h1>
-      <p style={{ color:'#475569', fontSize:'0.9rem' }}>Moderation queue · PIN ops (ADMIN only) · Follow analytics · Last synced: 24 Aug 2026</p>
-      <div style={{ background:'#fff', border:'1px solid #eef2f7', borderRadius:12, padding:'1rem', marginTop:'1rem' }}>
-        <h3>Moderation Queue ({queue.length})</h3>
-        {queue.length===0 ? <p style={{ color:'#64748b', fontSize:'0.82rem' }}>No pending reports (try POST /api/reports then GET /api/moderation with MODERATOR token)</p> : queue.map((r:any)=><div key={r.id} style={{ padding:'0.5rem', border:'1px solid #eef2f7', borderRadius:8, marginTop:'0.5rem', fontSize:'0.82rem' }}>{r.title} · {r.pincodeCode} · {r.status}</div>)}
-        <button onClick={async()=>{ const id=prompt('Report id to approve?'); if(!id) return; const t=localStorage.getItem('jantax_token'); await fetch(`/api/reports/${id}/review`,{method:'PATCH', headers:{'Content-Type':'application/json', Authorization:`Bearer ${t}`}, body:JSON.stringify({status:'APPROVED'})}); alert('Reviewed'); }} style={{ marginTop:'0.7rem', padding:'0.5rem 0.9rem', background:'#0f2d59', color:'#fff', border:'none', borderRadius:8, fontWeight:700 }}>Review (PATCH)</button>
-      </div>
-      <div style={{ background:'#fff', border:'1px solid #eef2f7', borderRadius:12, padding:'1rem', marginTop:'1rem' }}>
-        <h3>PIN Ops (ADMIN only)</h3>
-        <div style={{ display:'flex', gap:'0.5rem', marginTop:'0.5rem' }}>
-          <input value={pin} onChange={e=>setPin(e.target.value.replace(/\D/g,'').slice(0,6))} placeholder="110001" style={{ padding:'0.5rem', borderRadius:8, border:'1px solid #e2e8f0' }}/>
-          <button onClick={createPin} style={{ padding:'0.5rem 0.9rem', background:'#0f2d59', color:'#fff', border:'none', borderRadius:8, fontWeight:700 }}>Create PIN (admin)</button>
-        </div>
-        <div style={{ fontSize:'0.72rem', color:'#64748b', marginTop:'0.4rem' }}>Requires Bearer ADMIN token. Auto-create Unknown is now blocked (needs state&district).</div>
-      </div>
-      <div style={{ background:'#fff', border:'1px solid #eef2f7', borderRadius:12, padding:'1rem', marginTop:'1rem' }}>
-        <h3>Follow Analytics</h3>
-        <p style={{ fontSize:'0.82rem', color:'#475569' }}>Pending reports: {followCount} · Sources: CAG, UDISE+, HMIS, RERA, DARPG (see /data-sources) · Cron: nightly 02:00 IST stub in server/src/jobs/cron.ts</p>
-      </div>
-      <div style={{ background:'#fff', border:'1px solid #eef2f7', borderRadius:12, padding:'1rem', marginTop:'1rem' }}>
-        <h3>Sync Observability {syncSources.length?`(${syncSources.length})`:''}</h3>
-        {syncSources.length===0 ? <p style={{ fontSize:'0.82rem', color:'#64748b' }}>No sync data (login as ADMIN to view <code>GET /api/admin/sync/status</code>). Shows lastChecked, lastSuccessfulSync, stale warnings, failure warnings.</p> : (
-          <div style={{ display:'grid', gap:'0.5rem', marginTop:'0.5rem' }}>
-            {syncSources.slice(0,5).map((s:any)=>(
-              <div key={s.sourceId} style={{ display:'flex', justifyContent:'space-between', fontSize:'0.78rem', padding:'0.5rem 0.7rem', border:'1px solid #eef2f7', borderRadius:8, background: s.stale?'#fef3c7':'#f8fafc' }}>
-                <span><strong>{s.sourceName}</strong> <span style={{ color:'#64748b' }}>· {s.sourceId}</span> {s.stale && <span style={{ background:'#f59e0b', color:'#fff', padding:'1px 6px', borderRadius:999, fontSize:'0.62rem', marginLeft:'0.3rem' }}>Stale</span>}</span>
-                <span style={{ color:'#64748b' }}>{s.status} · {s.lastSuccessfulSync ? new Date(s.lastSuccessfulSync).toLocaleDateString() : 'never'}</span>
-              </div>
-            ))}
+    <div className="page">
+      <PageHeader crumbs={[{ label: 'Admin' }]} title="Data operations" lede="Moderation, PIN management and source sync for this JantaX instance." />
+      <div className="grid-2" style={{ alignItems: 'start' }}>
+        <section className="card">
+          <div className="card-head">
+            <h2 className="card-title" style={{ fontSize: 'var(--text-md)' }}>Moderation queue</h2>
+            <Badge tone={pending ? 'warn' : 'good'}>{pending} pending</Badge>
           </div>
-        )}
-        <button onClick={async()=>{ const id=prompt('SourceId to sync (e.g. src_udise_2324)?'); if(!id) return; const t=localStorage.getItem('jantax_token'); const r=await fetch(`/api/admin/sync/${id}`,{method:'POST', headers:{Authorization:`Bearer ${t}`}}); const j=await r.json(); alert(JSON.stringify(j).slice(0,500)); }} style={{ marginTop:'0.7rem', padding:'0.5rem 0.9rem', background:'#0f2d59', color:'#fff', border:'none', borderRadius:8, fontWeight:700 }}>Trigger Sync (ADMIN)</button>
+          {queue.length === 0 ? (
+            <EmptyState icon={Inbox} title="Nothing to review" text="New citizen reports appear here before they are published." />
+          ) : (
+            <div className="list">
+              {queue.map((r) => (
+                <div key={r.id} className="list-row">
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="strong truncate">{r.title}</div>
+                    <div className="tiny muted">PIN {r.pincodeCode} · {r.status}</div>
+                  </div>
+                  <button type="button" className="btn btn-soft btn-sm" onClick={() => review(r.id, 'APPROVED')}>Approve</button>
+                  <button type="button" className="btn btn-danger btn-sm" onClick={() => review(r.id, 'REJECTED')}>Reject</button>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <div className="stack">
+          <section className="card card-pad stack-sm">
+            <h2 className="card-title" style={{ fontSize: 'var(--text-md)' }}>Create a PIN record</h2>
+            <div className="cluster">
+              <input className="input num" style={{ width: 140 }} inputMode="numeric" maxLength={6} value={pin} onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))} aria-label="PIN code" />
+              <button type="button" className="btn btn-primary" onClick={createPin}>Create</button>
+            </div>
+            <p className="hint">State and district are required. Unknown PINs are no longer auto-created.</p>
+          </section>
+
+          <section className="card">
+            <div className="card-head">
+              <h2 className="card-title" style={{ fontSize: 'var(--text-md)' }}>Source sync</h2>
+              <ShieldCheck size={16} className="muted" aria-hidden="true" />
+            </div>
+            {sources.length === 0 ? (
+              <p className="small muted card-body">No sync status yet. The nightly job runs at 02:00 IST.</p>
+            ) : (
+              <div className="list">
+                {sources.map((s) => (
+                  <div key={s.sourceId} className="list-row">
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div className="strong truncate">{s.sourceName}</div>
+                      <div className="tiny muted">
+                        {s.status} · last success {s.lastSuccessfulSync ? new Date(s.lastSuccessfulSync).toLocaleDateString('en-IN') : 'never'}
+                      </div>
+                    </div>
+                    {s.stale && <Badge tone="warn">Stale</Badge>}
+                    <button type="button" className="btn btn-secondary btn-sm" onClick={() => sync(s.sourceId)}>
+                      <RefreshCw size={13} aria-hidden="true" /> Sync
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
       </div>
     </div>
   );

@@ -67,29 +67,29 @@ export function ProjectsSearchPage() {
     switch (st) {
       case 'Completed':
       case 'Verified':
-        return { bg: '#ecfdf5', border: '#a7f3d0', color: '#047857', icon: <CheckCircle2 size={13} /> };
+        return { bg: 'var(--good-soft)', border: 'var(--good-line)', color: 'var(--good)', icon: <CheckCircle2 size={13} /> };
       case 'Extended':
       case 'Delayed':
-        return { bg: '#fffbebf', border: '#fde68a', color: '#b45309', icon: <Clock size={13} /> };
+        return { bg: '#fffbebf', border: 'var(--warn-line)', color: 'var(--warn)', icon: <Clock size={13} /> };
       case 'Incomplete':
-        return { bg: '#fef2f2', border: '#fecaca', color: '#b91c1c', icon: <Clock size={13} /> };
+        return { bg: 'var(--bad-soft)', border: 'var(--bad-line)', color: 'var(--bad)', icon: <Clock size={13} /> };
       case 'Under Review':
       default:
-        return { bg: '#eff6ff', border: '#bfdbfe', color: '#1d4ed8', icon: <ShieldCheck size={13} /> };
+        return { bg: 'var(--brand-soft)', border: 'var(--brand-line)', color: 'var(--brand-ink)', icon: <ShieldCheck size={13} /> };
     }
   };
 
   return (
-    <div style={{ padding: '1.75rem 0', maxWidth: 1200, margin: '0 auto' }}>
+    <div>
       {/* Top Search Breadcrumb Header */}
       <div style={{ marginBottom: '1.5rem' }}>
-        <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600, marginBottom: '0.4rem' }}>
-          <Link to="/projects" style={{ color: '#2563eb', textDecoration: 'none' }}>Projects Directory</Link> / Search & Filter
+        <div style={{ fontSize: '0.8rem', color: 'var(--ink-3)', fontWeight: 600, marginBottom: '0.4rem' }}>
+          <Link to="/projects" style={{ color: 'var(--brand-ink)', textDecoration: 'none' }}>Projects Directory</Link> / Search & Filter
         </div>
-        <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a', fontFamily: 'var(--font-heading)', margin: 0 }}>
+        <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--ink)', fontFamily: 'var(--font-heading)', margin: 0 }}>
           Infrastructure Projects Search Gateway
         </h1>
-        <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '0.3rem' }}>
+        <p style={{ fontSize: '0.9rem', color: 'var(--ink-3)', marginTop: '0.3rem' }}>
           Filter tenders, work orders, contractors, authorities, and status metrics with neutral source attribution.
         </p>
       </div>
@@ -97,9 +97,9 @@ export function ProjectsSearchPage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(280px, 320px) 1fr', gap: '1.5rem' }}>
         {/* Filters Sidebar */}
         <div style={{
-          background: '#ffffff',
+          background: 'var(--surface)',
           borderRadius: 16,
-          border: '1px solid #e2e8f0',
+          border: '1px solid var(--border)',
           padding: '1.25rem',
           boxShadow: '0 2px 10px rgba(15,23,42,0.03)',
           alignSelf: 'start'
@@ -108,19 +108,19 @@ export function ProjectsSearchPage() {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            borderBottom: '1px solid #f1f5f9',
+            borderBottom: '1px solid var(--border)',
             paddingBottom: '0.75rem',
             marginBottom: '1.25rem'
           }}>
-            <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <SlidersHorizontal size={18} style={{ color: '#f97316' }} /> Filter Projects
+            <h2 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ink)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <SlidersHorizontal size={18} style={{ color: 'var(--accent-ink)' }} /> Filter Projects
             </h2>
             <button
               onClick={handleReset}
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#64748b',
+                color: 'var(--ink-3)',
                 fontSize: '0.78rem',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -135,11 +135,11 @@ export function ProjectsSearchPage() {
 
           {/* Search Query Filter */}
           <div style={{ marginBottom: '1.1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               Keyword Search
             </label>
             <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-              <Search size={15} style={{ position: 'absolute', left: '0.75rem', color: '#94a3b8' }} />
+              <Search size={15} style={{ position: 'absolute', left: '0.75rem', color: 'var(--ink-4)' }} />
               <input
                 type="text"
                 placeholder="Name, tender ID, contractor..."
@@ -149,7 +149,7 @@ export function ProjectsSearchPage() {
                   width: '100%',
                   padding: '0.55rem 0.75rem 0.55rem 2.3rem',
                   borderRadius: 10,
-                  border: '1px solid #cbd5e1',
+                  border: '1px solid var(--border-strong)',
                   fontSize: '0.85rem',
                   outline: 'none'
                 }}
@@ -159,7 +159,7 @@ export function ProjectsSearchPage() {
 
           {/* PIN Code Filter */}
           <div style={{ marginBottom: '1.1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               PIN Code Filter
             </label>
             <input
@@ -171,7 +171,7 @@ export function ProjectsSearchPage() {
                 width: '100%',
                 padding: '0.55rem 0.75rem',
                 borderRadius: 10,
-                border: '1px solid #cbd5e1',
+                border: '1px solid var(--border-strong)',
                 fontSize: '0.85rem',
                 outline: 'none'
               }}
@@ -180,7 +180,7 @@ export function ProjectsSearchPage() {
 
           {/* State Dropdown */}
           <div style={{ marginBottom: '1.1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               State / UT
             </label>
             <select
@@ -190,10 +190,10 @@ export function ProjectsSearchPage() {
                 width: '100%',
                 padding: '0.55rem 0.75rem',
                 borderRadius: 10,
-                border: '1px solid #cbd5e1',
+                border: '1px solid var(--border-strong)',
                 fontSize: '0.85rem',
                 outline: 'none',
-                background: '#fff'
+                background: 'var(--surface)'
               }}
             >
               {states.map((st) => (
@@ -204,7 +204,7 @@ export function ProjectsSearchPage() {
 
           {/* Sector Dropdown */}
           <div style={{ marginBottom: '1.1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               Infrastructure Sector
             </label>
             <select
@@ -214,10 +214,10 @@ export function ProjectsSearchPage() {
                 width: '100%',
                 padding: '0.55rem 0.75rem',
                 borderRadius: 10,
-                border: '1px solid #cbd5e1',
+                border: '1px solid var(--border-strong)',
                 fontSize: '0.85rem',
                 outline: 'none',
-                background: '#fff'
+                background: 'var(--surface)'
               }}
             >
               {sectors.map((sec) => (
@@ -228,7 +228,7 @@ export function ProjectsSearchPage() {
 
           {/* Status Neutral Filter */}
           <div style={{ marginBottom: '1.1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               Status (Neutral Categories)
             </label>
             <select
@@ -238,10 +238,10 @@ export function ProjectsSearchPage() {
                 width: '100%',
                 padding: '0.55rem 0.75rem',
                 borderRadius: 10,
-                border: '1px solid #cbd5e1',
+                border: '1px solid var(--border-strong)',
                 fontSize: '0.85rem',
                 outline: 'none',
-                background: '#fff'
+                background: 'var(--surface)'
               }}
             >
               {statuses.map((st) => (
@@ -252,7 +252,7 @@ export function ProjectsSearchPage() {
 
           {/* Contractor Filter */}
           <div style={{ marginBottom: '1.1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               Lead Contractor
             </label>
             <select
@@ -262,10 +262,10 @@ export function ProjectsSearchPage() {
                 width: '100%',
                 padding: '0.55rem 0.75rem',
                 borderRadius: 10,
-                border: '1px solid #cbd5e1',
+                border: '1px solid var(--border-strong)',
                 fontSize: '0.85rem',
                 outline: 'none',
-                background: '#fff'
+                background: 'var(--surface)'
               }}
             >
               {contractors.map((c) => (
@@ -276,7 +276,7 @@ export function ProjectsSearchPage() {
 
           {/* Authority Filter */}
           <div style={{ marginBottom: '1.1rem' }}>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               Implementing Authority
             </label>
             <select
@@ -286,10 +286,10 @@ export function ProjectsSearchPage() {
                 width: '100%',
                 padding: '0.55rem 0.75rem',
                 borderRadius: 10,
-                border: '1px solid #cbd5e1',
+                border: '1px solid var(--border-strong)',
                 fontSize: '0.85rem',
                 outline: 'none',
-                background: '#fff'
+                background: 'var(--surface)'
               }}
             >
               {authorities.map((a) => (
@@ -300,7 +300,7 @@ export function ProjectsSearchPage() {
 
           {/* Sort By Filter */}
           <div>
-            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+            <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               Sort Results By
             </label>
             <select
@@ -310,10 +310,10 @@ export function ProjectsSearchPage() {
                 width: '100%',
                 padding: '0.55rem 0.75rem',
                 borderRadius: 10,
-                border: '1px solid #cbd5e1',
+                border: '1px solid var(--border-strong)',
                 fontSize: '0.85rem',
                 outline: 'none',
-                background: '#fff'
+                background: 'var(--surface)'
               }}
             >
               <option value="budget_desc">Budget Cost: High to Low</option>
@@ -333,15 +333,15 @@ export function ProjectsSearchPage() {
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: '1rem',
-            background: '#ffffff',
+            background: 'var(--surface)',
             padding: '0.85rem 1.25rem',
             borderRadius: 12,
-            border: '1px solid #e2e8f0'
+            border: '1px solid var(--border)'
           }}>
-            <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e293b' }}>
-              Found <span style={{ color: '#f97316' }}>{filteredProjects.length}</span> matching infrastructure projects
+            <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--ink)' }}>
+              Found <span style={{ color: 'var(--accent-ink)' }}>{filteredProjects.length}</span> matching infrastructure projects
             </div>
-            <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>
+            <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>
               Official Sources Connected
             </div>
           </div>
@@ -351,13 +351,13 @@ export function ProjectsSearchPage() {
             <div style={{
               textAlign: 'center',
               padding: '3.5rem 1.5rem',
-              background: '#ffffff',
+              background: 'var(--surface)',
               borderRadius: 16,
-              border: '1px dashed #cbd5e1'
+              border: '1px dashed var(--border-strong)'
             }}>
-              <Search size={36} style={{ color: '#94a3b8', marginBottom: '0.75rem' }} />
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#1e293b' }}>No matching public works found</h3>
-              <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.3rem' }}>
+              <Search size={36} style={{ color: 'var(--ink-4)', marginBottom: '0.75rem' }} />
+              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--ink)' }}>No matching public works found</h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--ink-3)', marginTop: '0.3rem' }}>
                 Try relaxing search filters or clearing the keyword input.
               </p>
               <button
@@ -366,12 +366,12 @@ export function ProjectsSearchPage() {
                   marginTop: '1rem',
                   padding: '0.5rem 1.2rem',
                   borderRadius: 10,
-                  background: '#f1f5f9',
-                  border: '1px solid #cbd5e1',
+                  background: 'var(--surface-3)',
+                  border: '1px solid var(--border-strong)',
                   fontWeight: 700,
                   fontSize: '0.82rem',
                   cursor: 'pointer',
-                  color: '#334155'
+                  color: 'var(--ink-2)'
                 }}
               >
                 Clear Filters
@@ -388,9 +388,9 @@ export function ProjectsSearchPage() {
                   <div
                     key={proj.id}
                     style={{
-                      background: '#ffffff',
+                      background: 'var(--surface)',
                       borderRadius: 16,
-                      border: '1px solid #e2e8f0',
+                      border: '1px solid var(--border)',
                       padding: '1.35rem',
                       boxShadow: '0 2px 8px rgba(15,23,42,0.03)'
                     }}
@@ -412,11 +412,11 @@ export function ProjectsSearchPage() {
                           }}>
                             {badgeStyle.icon} {proj.status}
                           </span>
-                          <span style={{ fontSize: '0.75rem', color: '#475569', fontWeight: 600, background: '#f1f5f9', padding: '0.15rem 0.5rem', borderRadius: 4 }}>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--ink-2)', fontWeight: 600, background: 'var(--surface-3)', padding: '0.15rem 0.5rem', borderRadius: 4 }}>
                             {proj.sector}
                           </span>
-                          <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>
-                            <MapPin size={12} style={{ color: '#ea580c' }} /> PIN {proj.pinCode} · {proj.district}, {proj.state}
+                          <span style={{ fontSize: '0.75rem', color: 'var(--ink-3)', fontWeight: 600 }}>
+                            <MapPin size={12} style={{ color: 'var(--accent-ink)' }} /> PIN {proj.pinCode} · {proj.district}, {proj.state}
                           </span>
                         </div>
 
@@ -425,14 +425,14 @@ export function ProjectsSearchPage() {
                           style={{
                             fontSize: '1.15rem',
                             fontWeight: 800,
-                            color: '#0f172a',
+                            color: 'var(--ink)',
                             cursor: 'pointer',
                             margin: 0
                           }}
                         >
                           {proj.nameEnglish}
                         </h3>
-                        <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.15rem' }}>
+                        <div style={{ fontSize: '0.85rem', color: 'var(--ink-3)', marginTop: '0.15rem' }}>
                           {proj.nameHindi}
                         </div>
                       </div>
@@ -442,12 +442,12 @@ export function ProjectsSearchPage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
-                          background: '#f8fafc',
-                          border: '1px solid #e2e8f0',
+                          background: 'var(--surface-2)',
+                          border: '1px solid var(--border)',
                           borderRadius: 8,
                           padding: '0.35rem 0.6rem',
                           fontSize: '0.72rem',
-                          color: '#0f2d59',
+                          color: 'var(--ink)',
                           fontWeight: 700,
                           textDecoration: 'none',
                           display: 'inline-flex',
@@ -464,30 +464,30 @@ export function ProjectsSearchPage() {
                       display: 'grid',
                       gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
                       gap: '0.75rem',
-                      background: '#f8fafc',
+                      background: 'var(--surface-2)',
                       padding: '0.85rem 1rem',
                       borderRadius: 10,
                       marginBottom: '0.85rem'
                     }}>
                       <div>
-                        <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Contractor</div>
-                        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1e293b' }}>{proj.leadContractor}</div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Contractor</div>
+                        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--ink)' }}>{proj.leadContractor}</div>
                       </div>
                       <div>
-                        <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Implementing Authority</div>
-                        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#1e293b' }}>{proj.implementingAgency}</div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Implementing Authority</div>
+                        <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--ink)' }}>{proj.implementingAgency}</div>
                       </div>
                       <div>
-                        <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Budget (Sanctioned → Anticipated)</div>
-                        <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0f172a' }}>₹{origCr} Cr → ₹{antCr} Cr</div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Budget (Sanctioned → Anticipated)</div>
+                        <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--ink)' }}>₹{origCr} Cr → ₹{antCr} Cr</div>
                       </div>
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-                      <div style={{ display: 'flex', gap: '0.75rem', fontSize: '0.78rem', color: '#475569', fontWeight: 600 }}>
-                        <span>Physical: <strong style={{ color: '#047857' }}>{proj.progressPhysical}%</strong></span>
-                        <span>Financial: <strong style={{ color: '#7c3aed' }}>{proj.progressFinancial}%</strong></span>
-                        <span>Tenders: <strong style={{ color: '#0f172a' }}>{proj.tenders.length}</strong></span>
+                      <div style={{ display: 'flex', gap: '0.75rem', fontSize: '0.78rem', color: 'var(--ink-2)', fontWeight: 600 }}>
+                        <span>Physical: <strong style={{ color: 'var(--good)' }}>{proj.progressPhysical}%</strong></span>
+                        <span>Financial: <strong style={{ color: 'var(--viz-4)' }}>{proj.progressFinancial}%</strong></span>
+                        <span>Tenders: <strong style={{ color: 'var(--ink)' }}>{proj.tenders.length}</strong></span>
                       </div>
 
                       <div style={{ display: 'flex', gap: '0.4rem' }}>
@@ -496,8 +496,8 @@ export function ProjectsSearchPage() {
                           style={{
                             fontSize: '0.76rem',
                             fontWeight: 700,
-                            color: '#2563eb',
-                            background: '#eff6ff',
+                            color: 'var(--brand-ink)',
+                            background: 'var(--brand-soft)',
                             padding: '0.3rem 0.6rem',
                             borderRadius: 6,
                             textDecoration: 'none'
@@ -510,8 +510,8 @@ export function ProjectsSearchPage() {
                           style={{
                             fontSize: '0.76rem',
                             fontWeight: 700,
-                            color: '#2563eb',
-                            background: '#eff6ff',
+                            color: 'var(--brand-ink)',
+                            background: 'var(--brand-soft)',
                             padding: '0.3rem 0.6rem',
                             borderRadius: 6,
                             textDecoration: 'none'
@@ -524,8 +524,8 @@ export function ProjectsSearchPage() {
                           style={{
                             fontSize: '0.76rem',
                             fontWeight: 700,
-                            color: '#ffffff',
-                            background: '#f97316',
+                            color: 'var(--on-solid)',
+                            background: 'var(--accent-solid)',
                             padding: '0.3rem 0.75rem',
                             borderRadius: 6,
                             textDecoration: 'none',

@@ -40,59 +40,13 @@ export function ContractorsDirectoryPage() {
   }, [contractors]);
 
   return (
-    <div style={{ padding: '1.75rem 0', maxWidth: 1200, margin: '0 auto' }}>
+    <div>
       {/* Top Banner */}
-      <div style={{
-        background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
-        borderRadius: 20,
-        padding: '2.25rem 2rem',
-        color: '#ffffff',
-        marginBottom: '2rem',
-        boxShadow: '0 12px 32px rgba(15,23,42,0.18)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.6rem' }}>
-          <span style={{
-            background: 'rgba(249, 115, 22, 0.2)',
-            border: '1px solid rgba(249, 115, 22, 0.5)',
-            color: '#fb923c',
-            fontSize: '0.75rem',
-            fontWeight: 800,
-            padding: '0.25rem 0.75rem',
-            borderRadius: '9999px',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.35rem'
-          }}>
-            <HardHat size={14} /> JANTAX PHASE 21
-          </span>
-          <span style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: 600 }}>
-            Competent Authority Verified Ledger · Evidence-Based Rules
-          </span>
-        </div>
-
-        <h1 style={{
-          fontSize: '2.1rem',
-          fontWeight: 800,
-          fontFamily: 'var(--font-heading)',
-          lineHeight: 1.25,
-          marginBottom: '0.6rem'
-        }}>
-          Contractor Performance & Intelligence Ledger
-        </h1>
-        <p style={{
-          fontSize: '0.96rem',
-          color: '#cbd5e1',
-          maxWidth: 800,
-          lineHeight: 1.55,
-          marginBottom: '1.5rem'
-        }}>
-          Transparent, evidence-based track record of infrastructure contracting entities across India. Performance indicators, project completion rates, extensions, documented penalties, and official debarment records.
-        </p>
-
-        {/* Search Bar & Comparison Action */}
+      <div className="card card-pad module-toolbar">
+{/* Search Bar & Comparison Action */}
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', maxWidth: 740 }}>
           <div style={{ flex: 1, minWidth: 280, position: 'relative', display: 'flex', alignItems: 'center' }}>
-            <Search size={18} style={{ position: 'absolute', left: '1rem', color: '#94a3b8' }} />
+            <Search size={18} style={{ position: 'absolute', left: '1rem', color: 'var(--ink-4)' }} />
             <input
               type="text"
               placeholder="Search company name, registration ID, directors..."
@@ -102,9 +56,9 @@ export function ContractorsDirectoryPage() {
                 width: '100%',
                 padding: '0.75rem 1rem 0.75rem 2.8rem',
                 borderRadius: 12,
-                border: '1px solid rgba(255,255,255,0.2)',
-                background: 'rgba(255, 255, 255, 0.08)',
-                color: '#ffffff',
+                border: '1px solid var(--border-strong)',
+                background: 'var(--surface)',
+                color: 'var(--ink)',
                 fontSize: '0.9rem',
                 outline: 'none',
                 backdropFilter: 'blur(8px)'
@@ -119,8 +73,8 @@ export function ContractorsDirectoryPage() {
               gap: '0.5rem',
               padding: '0.75rem 1.4rem',
               borderRadius: 12,
-              background: 'var(--gradient-accent)',
-              color: '#ffffff',
+              background: 'var(--brand)',
+              color: 'var(--on-solid)',
               fontWeight: 700,
               fontSize: '0.88rem',
               textDecoration: 'none',
@@ -130,7 +84,7 @@ export function ContractorsDirectoryPage() {
             <BarChart3 size={16} /> Contractor Comparison
           </Link>
         </div>
-      </div>
+</div>
 
       {/* Stats Cards */}
       <div style={{
@@ -139,36 +93,36 @@ export function ContractorsDirectoryPage() {
         gap: '1rem',
         marginBottom: '2rem'
       }}>
-        <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 16, border: '1px solid #e2e8f0' }}>
-          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Tracked Contractors</div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginTop: '0.2rem' }}>{stats.totalCount}</div>
-          <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>Class 1 & Special Class</div>
+        <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 16, border: '1px solid var(--border)' }}>
+          <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>Tracked Contractors</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.2rem' }}>{stats.totalCount}</div>
+          <div style={{ fontSize: '0.74rem', color: 'var(--ink-4)' }}>Class 1 & Special Class</div>
         </div>
 
-        <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 16, border: '1px solid #e2e8f0' }}>
-          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Total Contracts Value</div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#10b981', marginTop: '0.2rem' }}>₹{stats.totalValueCr} Cr</div>
-          <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>Awarded Value Cumulative</div>
+        <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 16, border: '1px solid var(--border)' }}>
+          <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>Total Contracts Value</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--good)', marginTop: '0.2rem' }}>₹{stats.totalValueCr} Cr</div>
+          <div style={{ fontSize: '0.74rem', color: 'var(--ink-4)' }}>Awarded Value Cumulative</div>
         </div>
 
-        <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 16, border: '1px solid #e2e8f0' }}>
-          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Average Performance Score</div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#2563eb', marginTop: '0.2rem' }}>{stats.avgScore}%</div>
-          <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>Transparent Index</div>
+        <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 16, border: '1px solid var(--border)' }}>
+          <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>Average Performance Score</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--brand-ink)', marginTop: '0.2rem' }}>{stats.avgScore}%</div>
+          <div style={{ fontSize: '0.74rem', color: 'var(--ink-4)' }}>Transparent Index</div>
         </div>
 
-        <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 16, border: '1px solid #e2e8f0' }}>
-          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Active Debarments</div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: stats.debarmentsCount > 0 ? '#b91c1c' : '#047857', marginTop: '0.2rem' }}>
+        <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 16, border: '1px solid var(--border)' }}>
+          <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>Active Debarments</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: stats.debarmentsCount > 0 ? 'var(--bad)' : 'var(--good)', marginTop: '0.2rem' }}>
             {stats.debarmentsCount}
           </div>
-          <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>Competent Authority Orders</div>
+          <div style={{ fontSize: '0.74rem', color: 'var(--ink-4)' }}>Competent Authority Orders</div>
         </div>
       </div>
 
       {/* Category Chips */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.75rem', marginBottom: '1.5rem' }}>
-        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748b', marginRight: '0.5rem', whiteSpace: 'nowrap' }}>
+        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-3)', marginRight: '0.5rem', whiteSpace: 'nowrap' }}>
           Category:
         </span>
         {categories.map((cat) => (
@@ -178,9 +132,9 @@ export function ContractorsDirectoryPage() {
             style={{
               padding: '0.45rem 0.95rem',
               borderRadius: '9999px',
-              border: category === cat ? '1px solid #f97316' : '1px solid #e2e8f0',
-              background: category === cat ? '#fff7ed' : '#ffffff',
-              color: category === cat ? '#ea580c' : '#475569',
+              border: category === cat ? '1px solid var(--accent)' : '1px solid var(--border)',
+              background: category === cat ? 'var(--accent-soft)' : 'var(--surface)',
+              color: category === cat ? 'var(--accent-ink)' : 'var(--ink-2)',
               fontWeight: category === cat ? 700 : 500,
               fontSize: '0.82rem',
               cursor: 'pointer',
@@ -198,9 +152,9 @@ export function ContractorsDirectoryPage() {
           <div
             key={c.id}
             style={{
-              background: '#ffffff',
+              background: 'var(--surface)',
               borderRadius: 16,
-              border: '1px solid #e2e8f0',
+              border: '1px solid var(--border)',
               padding: '1.5rem',
               boxShadow: '0 2px 10px rgba(15,23,42,0.03)'
             }}
@@ -209,8 +163,8 @@ export function ContractorsDirectoryPage() {
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
                   <span style={{
-                    background: '#eff6ff',
-                    color: '#1d4ed8',
+                    background: 'var(--brand-soft)',
+                    color: 'var(--brand-ink)',
                     fontSize: '0.75rem',
                     fontWeight: 700,
                     padding: '0.18rem 0.6rem',
@@ -218,7 +172,7 @@ export function ContractorsDirectoryPage() {
                   }}>
                     {c.category}
                   </span>
-                  <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--ink-3)', fontWeight: 600 }}>
                     Reg: {c.registrationNumber} · Est. {c.incorporationYear}
                   </span>
                 </div>
@@ -228,30 +182,30 @@ export function ContractorsDirectoryPage() {
                   style={{
                     fontSize: '1.3rem',
                     fontWeight: 800,
-                    color: '#0f172a',
+                    color: 'var(--ink)',
                     cursor: 'pointer',
                     margin: 0
                   }}
                 >
                   {c.companyName}
                 </h3>
-                <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '0.2rem' }}>
+                <div style={{ fontSize: '0.85rem', color: 'var(--ink-3)', marginTop: '0.2rem' }}>
                   Headquarters: {c.headquarters} · Directors: {c.directors.join(', ')}
                 </div>
               </div>
 
               {/* Performance Rating Badge */}
               <div style={{
-                background: '#f8fafc',
-                border: '1px solid #cbd5e1',
+                background: 'var(--surface-2)',
+                border: '1px solid var(--border-strong)',
                 borderRadius: 12,
                 padding: '0.65rem 1rem',
                 textAlign: 'right'
               }}>
-                <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
+                <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
                   Performance Score
                 </div>
-                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f2d59', marginTop: '0.1rem' }}>
+                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.1rem' }}>
                   {c.performanceIndicators.overallScore}%
                 </div>
               </div>
@@ -262,35 +216,35 @@ export function ContractorsDirectoryPage() {
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
               gap: '0.85rem',
-              background: '#f8fafc',
+              background: 'var(--surface-2)',
               padding: '0.85rem 1.1rem',
               borderRadius: 12,
               marginBottom: '1rem'
             }}>
               <div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Total Awarded Value</div>
-                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#0f172a' }}>
+                <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Total Awarded Value</div>
+                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--ink)' }}>
                   ₹{c.performanceIndicators.totalAwardedValueCr.toLocaleString()} Cr ({c.performanceIndicators.totalContractsCount} Projects)
                 </div>
               </div>
 
               <div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Completion Rate</div>
-                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#047857' }}>
+                <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Completion Rate</div>
+                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--good)' }}>
                   {c.performanceIndicators.completionRatePct}% Completed
                 </div>
               </div>
 
               <div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Avg Extension Duration</div>
-                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#b45309' }}>
+                <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Avg Extension Duration</div>
+                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--warn)' }}>
                   {c.performanceIndicators.averageExtensionMonths} Months
                 </div>
               </div>
 
               <div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Documented Penalties</div>
-                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: c.penalties.length > 0 ? '#b91c1c' : '#047857' }}>
+                <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Documented Penalties</div>
+                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: c.penalties.length > 0 ? 'var(--bad)' : 'var(--good)' }}>
                   {c.penalties.length} Order(s)
                 </div>
               </div>
@@ -304,8 +258,8 @@ export function ContractorsDirectoryPage() {
                   style={{
                     padding: '0.35rem 0.75rem',
                     borderRadius: 8,
-                    background: '#eff6ff',
-                    color: '#1d4ed8',
+                    background: 'var(--brand-soft)',
+                    color: 'var(--brand-ink)',
                     fontSize: '0.78rem',
                     fontWeight: 700,
                     textDecoration: 'none'
@@ -318,9 +272,9 @@ export function ContractorsDirectoryPage() {
                   style={{
                     padding: '0.35rem 0.75rem',
                     borderRadius: 8,
-                    background: '#f8fafc',
-                    border: '1px solid #e2e8f0',
-                    color: '#475569',
+                    background: 'var(--surface-2)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--ink-2)',
                     fontSize: '0.78rem',
                     fontWeight: 600,
                     textDecoration: 'none'
@@ -333,9 +287,9 @@ export function ContractorsDirectoryPage() {
                   style={{
                     padding: '0.35rem 0.75rem',
                     borderRadius: 8,
-                    background: '#f8fafc',
-                    border: '1px solid #e2e8f0',
-                    color: '#475569',
+                    background: 'var(--surface-2)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--ink-2)',
                     fontSize: '0.78rem',
                     fontWeight: 600,
                     textDecoration: 'none'
@@ -348,9 +302,9 @@ export function ContractorsDirectoryPage() {
                   style={{
                     padding: '0.35rem 0.75rem',
                     borderRadius: 8,
-                    background: '#f8fafc',
-                    border: '1px solid #e2e8f0',
-                    color: '#475569',
+                    background: 'var(--surface-2)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--ink-2)',
                     fontSize: '0.78rem',
                     fontWeight: 600,
                     textDecoration: 'none'
@@ -365,7 +319,7 @@ export function ContractorsDirectoryPage() {
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#f97316',
+                  color: 'var(--accent-ink)',
                   fontWeight: 700,
                   fontSize: '0.82rem',
                   cursor: 'pointer',

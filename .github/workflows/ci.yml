@@ -29,8 +29,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx prisma generate
+      - run: npx tsc --noEmit -p .
+      - run: npm test
       - run: npm run build
       - env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/jantax?schema=public
         run: npx prisma migrate deploy || echo "no migrate"
+      - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e

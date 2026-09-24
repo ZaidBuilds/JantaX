@@ -48,8 +48,8 @@ export function RtiDashboard() {
 
   return (
     <div className="module-dashboard">
-      <div className="glass-card dash-header-card" style={{ borderLeftColor: '#06b6d4' }}>
-        <h2>📋 सूचना का अधिकार (RTI) विलंब ट्रैकर (RTI Delay Tracker)</h2>
+      <div className="glass-card dash-header-card" style={{ borderLeftColor: 'var(--viz-6)' }}>
+        <h2>सूचना का अधिकार (RTI) विलंब ट्रैकर (RTI Delay Tracker)</h2>
         <p>
           RTI अधिनियम के तहत ३० दिनों में उत्तर देने की कानूनी सीमा बनाम सरकारी कार्यालयों द्वारा सूचना प्रदान करने में लगाए गए वास्तविक समय का ऑडिट।
         </p>
@@ -72,7 +72,7 @@ export function RtiDashboard() {
         </div>
         {loc.isValid && (
           <p className="dash-location-label">
-            📍 Active: {loc.district} ({loc.state}) · {rtiStats.departmentName}
+            Active: {loc.district} ({loc.state}) · {rtiStats.departmentName}
           </p>
         )}
       </div>
@@ -81,24 +81,24 @@ export function RtiDashboard() {
         <h3 style={{ fontSize: '1.15rem', marginBottom: '0.5rem' }}>RTI response timeline / आरटीआई प्रतिक्रिया समय</h3>
         <div className="dash-panel-grid">
           <div className="dash-panel claim">
-            <span className="dash-panel-label">📢 SLA PROMISED (कानूनी सीमा)</span>
+            <span className="dash-panel-label">SLA PROMISED (कानूनी सीमा)</span>
             <p className="dash-panel-value">{rtiStats.promisedResponseDays} Days</p>
           </div>
           <div className="dash-panel reality">
-            <span className="dash-panel-label">👁️ ACTUAL AVERAGE (वास्तविक औसत)</span>
+            <span className="dash-panel-label">ACTUAL AVERAGE (वास्तविक औसत)</span>
             <p className="dash-panel-value">{rtiStats.actualAverageDays} Days</p>
           </div>
         </div>
 
         <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.8rem', marginBottom: '1rem' }}>
-          <div>🔴 <strong>कुल अस्वीकृत आरटीआई (Rejection Rate):</strong> <span style={{ color: 'var(--status-critical)', fontWeight: 700 }}>{rtiStats.rejectedPercentage}% Applications rejected</span></div>
-          <div>📁 <strong>कुल दायर फाइलें (Total Filed):</strong> {rtiStats.totalRtiFiled} filings in last quarter</div>
+          <div><strong>कुल अस्वीकृत आरटीआई (Rejection Rate):</strong> <span style={{ color: 'var(--status-critical)', fontWeight: 700 }}>{rtiStats.rejectedPercentage}% Applications rejected</span></div>
+          <div><strong>कुल दायर फाइलें (Total Filed):</strong> {rtiStats.totalRtiFiled} filings in last quarter</div>
         </div>
 
         <div className="card-footer-meta">
           <span>Source: {rtiStats.source}</span>
           <button onClick={handleShare} className="btn-whatsapp">
-            📤 Share RTI Report
+            Share RTI Report
           </button>
         </div>
       </div>

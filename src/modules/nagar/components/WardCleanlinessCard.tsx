@@ -16,10 +16,10 @@ export function WardCleanlinessCard({ score, services, slaCompliance }: Props) {
     <div className="jantax-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f2d59', margin: 0 }}>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
             Ward Sanitation & Service Delivery Matrix
           </h3>
-          <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>
+          <span style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>
             MoHUA Swachhata Platform & Municipal Corporation Citizen Charter
           </span>
         </div>
@@ -35,58 +35,58 @@ export function WardCleanlinessCard({ score, services, slaCompliance }: Props) {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
-        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: 12, border: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#64748b', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase' }}>
-            <Trash2 size={13} style={{ color: '#16a34a' }} /> Door-to-Door
+        <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase' }}>
+            <Trash2 size={13} style={{ color: 'var(--good)' }} /> Door-to-Door
           </div>
-          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: services.doorToDoorGarbage ? '#16a34a' : '#dc2626', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: services.doorToDoorGarbage ? 'var(--good)' : 'var(--bad)', marginTop: '0.25rem' }}>
             {services.doorToDoorGarbage ? 'Active 100%' : 'Irregular'}
           </div>
-          <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>{services.sweepingFrequency}</span>
+          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>{services.sweepingFrequency}</span>
         </div>
 
-        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: 12, border: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#64748b', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase' }}>
-            <Lightbulb size={13} style={{ color: '#f59e0b' }} /> Streetlights
+        <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase' }}>
+            <Lightbulb size={13} style={{ color: 'var(--warn)' }} /> Streetlights
           </div>
-          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f2d59', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.25rem' }}>
             {services.streetlightCoveragePercent}%
           </div>
-          <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Working LED Luminaires</span>
+          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Working LED Luminaires</span>
         </div>
 
-        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: 12, border: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#64748b', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase' }}>
-            <Waves size={13} style={{ color: '#2563eb' }} /> Waterlogging
+        <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase' }}>
+            <Waves size={13} style={{ color: 'var(--brand-ink)' }} /> Waterlogging
           </div>
-          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: services.waterloggingHotspots === 0 ? '#16a34a' : '#dc2626', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: services.waterloggingHotspots === 0 ? 'var(--good)' : 'var(--bad)', marginTop: '0.25rem' }}>
             {services.waterloggingHotspots} Spots
           </div>
-          <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Monsoon Vulnerability</span>
+          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Monsoon Vulnerability</span>
         </div>
 
-        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: 12, border: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#64748b', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase' }}>
-            <CheckCircle2 size={13} style={{ color: '#2563eb' }} /> 311 SLA Rate
+        <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase' }}>
+            <CheckCircle2 size={13} style={{ color: 'var(--brand-ink)' }} /> 311 SLA Rate
           </div>
-          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: slaCompliance >= 85 ? '#16a34a' : '#f59e0b', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '1.2rem', fontWeight: 800, color: slaCompliance >= 85 ? 'var(--good)' : 'var(--warn)', marginTop: '0.25rem' }}>
             {slaCompliance}%
           </div>
-          <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Within Citizen Charter</span>
+          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Within Citizen Charter</span>
         </div>
       </div>
 
       <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, color: '#475569', marginBottom: '0.4rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.4rem' }}>
           <span>Overall Ward Sanitation Index</span>
           <span>{score} / 100 Quality Benchmark</span>
         </div>
-        <div style={{ width: '100%', height: 8, background: '#e2e8f0', borderRadius: 9999, overflow: 'hidden' }}>
+        <div style={{ width: '100%', height: 8, background: 'var(--border)', borderRadius: 9999, overflow: 'hidden' }}>
           <div
             style={{
               width: `${score}%`,
               height: '100%',
-              background: isHigh ? '#10b981' : isModerate ? '#f59e0b' : '#ef4444',
+              background: isHigh ? 'var(--good-solid)' : isModerate ? 'var(--warn-solid)' : 'var(--bad-solid)',
               borderRadius: 9999,
             }}
           />

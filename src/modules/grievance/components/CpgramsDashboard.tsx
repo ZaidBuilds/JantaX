@@ -1,186 +1,131 @@
-import React, { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { Share2 } from 'lucide-react';
 import { monthlyMinistries, monthlyStates } from '../data/cpgramsData';
 import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
 import { getUpdatedGrievances } from '../../../core/utils/autoUpdater';
+import { SourceLine, Stat } from '../../../ui';
+import { SectionTitle, pct } from '../../shared/ModuleKit';
+
+type Row = {
+  id: string;
+  name: string;
+  nameHi: string;
+  totalGrievances: number;
+  resolvedCount: number;
+  pendingCount: number;
+  avgDisposalDays: number;
+  backlogOver30Days: number;
+  worst: string;
+};
+
+type SortKey = 'avgDisposalDays' | 'backlogOver30Days' | 'resolvedPct';
 
 export function CpgramsDashboard() {
   const { share } = useWhatsAppShare();
-  const [activeTab, setActiveTab] = useState<'ministry' | 'state'>('ministry');
+  const [tab, setTab] = useState<'ministry' | 'state'>('ministry');
+  const [sort, setSort] = useState<SortKey>('avgDisposalDays');
 
-  // Compute daily auto-updated caseload statistics
-  const updatedMinistries = useMemo(() => getUpdatedGrievances(monthlyMinistries), []);
-  const updatedStates = useMemo(() => getUpdatedGrievances(monthlyStates), []);
-
-  const handleShareWhatsApp = (item: any, type: 'ministry' | 'state') => {
-    const title = type === 'ministry' ? item.nameHi : item.nameHi;
-    const statLabel = `Avg Resolution: ${item.avgDisposalDays} Days`;
-    const statLabelHi = `औसत निपटान समय: ${item.avgDisposalDays} दिन`;
-    const realityLabel = `Backlog Over 30 Days: ${item.backlogOver30Days.toLocaleString('hi-IN')} cases`;
-    const realityLabelHi = `३० दिनों से अधिक लंबित: ${item.backlogOver30Days.toLocaleString('hi-IN')} मामले`;
-
-    share({
-      pinCode: '000000', // Central index
-      titleHindi: `CPGRAMS रिपोर्ट कार्ड: ${title}`,
-      titleEnglish: `CPGRAMS Grievance Performance: ${item.name}`,
-      claimLabel: statLabel,
-      claimLabelHindi: statLabelHi,
-      realityLabel: realityLabel,
-      realityLabelHindi: realityLabelHi,
-      responsiblePerson: type === 'ministry' ? 'Ministry Secretary' : 'State Nodal Officer',
-      responsibleOrg: item.name,
-      sourceUrl: 'https://pgportal.gov.in',
-      moduleNameHindi: 'M15 - CPGRAMS Shame Index (शिकायत विलंब सूचकांक)',
+  const rows = useMemo<Row[]>(() => {
+    const src =
+      tab === 'ministry'
+        ? getUpdatedGrievances(monthlyMinistries).map((m) => ({ ...m, worst: m.worstCategoryEn }))
+        : getUpdatedGrievances(monthlyStates).map((s) => ({ ...s, worst: s.worstDistrictEn }));
+    return [...src].sort((a, b) => {
+      if (sort === 'resolvedPct') return pct(a.resolvedCount, a.totalGrievances) - pct(b.resolvedCount, b.totalGrievances);
+      return b[sort] - a[sort];
     });
-  };
+  }, [tab, sort]);
+
+  const total = rows.reduce((a, r) => a + r.totalGrievances, 0);
+  const backlog = rows.reduce((a, r) => a + r.backlogOver30Days, 0);
+  const avg = Math.round(rows.reduce((a, r) => a + r.avgDisposalDays, 0) / Math.max(1, rows.length));
 
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto', padding: '1rem' }}>
-      
-      {/* Module Title */}
-      <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '2rem', borderLeft: '4px solid #ef4444' }}>
-        <h2 style={{ fontSize: '1.6rem', marginBottom: '0.5rem' }}>
-          📉 CPGRAMS Shame Index (शिकायत विलंब सूचकांक)
-        </h2>
-        <p style={{ opacity: 0.8, fontSize: '0.9rem', lineHeight: 1.5 }}>
-          <strong>M15 - स्व-मूल्यांकन रिपोर्ट:</strong> भारत सरकार के प्रशासनिक सुधार विभाग (DARPG) द्वारा जारी मासिक डेटा। सरकारी मंत्रालयों और राज्यों के शिकायत निपटान प्रदर्शन की पोल खोलता सूचकांक।
-        </p>
+    <div className="stack" style={{ gap: 'var(--s-6)' }}>
+      <div className="spread" style={{ flexWrap: 'wrap' }}>
+        <div className="segmented" role="tablist" aria-label="Rank by">
+          <button type="button" role="tab" aria-selected={tab === 'ministry'} aria-pressed={tab === 'ministry'} onClick={() => setTab('ministry')}>Union ministries</button>
+          <button type="button" role="tab" aria-selected={tab === 'state'} aria-pressed={tab === 'state'} onClick={() => setTab('state')}>State governments</button>
+        </div>
+        <div className="cluster">
+          <label htmlFor="griev-sort" className="small muted">Sort by</label>
+          <select id="griev-sort" className="select select-sm" style={{ width: 'auto' }} value={sort} onChange={(e) => setSort(e.target.value as SortKey)}>
+            <option value="avgDisposalDays">Slowest to resolve</option>
+            <option value="backlogOver30Days">Largest 30-day backlog</option>
+            <option value="resolvedPct">Lowest resolution rate</option>
+          </select>
+        </div>
       </div>
-
-      {/* Switch Tabs */}
-      <div className="dash-tab-group">
-        <button
-          onClick={() => setActiveTab('ministry')}
-          className={`dash-tab-btn ${activeTab === 'ministry' ? 'active' : ''}`}
-        >
-          Worst Performing Ministries (केंद्रीय मंत्रालय)
-        </button>
-        <button
-          onClick={() => setActiveTab('state')}
-          className={`dash-tab-btn ${activeTab === 'state' ? 'active' : ''}`}
-        >
-          Worst Performing States (राज्य सरकारें)
-        </button>
+      <div className="stat-row">
+        <Stat label="Grievances this month" value={total.toLocaleString('en-IN')} />
+        <Stat label="Pending over 30 days" value={backlog.toLocaleString('en-IN')} />
+        <Stat label="Average time to resolve" value={avg} unit=" days" meta="CPGRAMS target is 21 days" />
       </div>
-
-      {/* Rankings List */}
-      <div style={{ display: 'grid', gap: '1.5rem' }}>
-        {activeTab === 'ministry' ? (
-          updatedMinistries.map(item => (
-            <div key={item.id} className="glass-card" style={{ padding: '1.25rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
-                <div>
-                  <span style={{
-                    fontSize: '0.75rem',
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    background: 'rgba(239, 68, 68, 0.15)',
-                    color: '#ef4444',
-                    fontWeight: 700,
-                    marginRight: '0.5rem',
-                  }}>
-                    SHAME RANK #{item.rank}
-                  </span>
-                  <h3 style={{ fontSize: '1.15rem', display: 'inline-block', margin: 0 }}>{item.nameHi}</h3>
-                  <div style={{ fontSize: '0.75rem', opacity: 0.6, marginTop: '0.2rem' }}>{item.name}</div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#ef4444' }}>
-                    {item.avgDisposalDays} Days
-                  </div>
-                  <div style={{ fontSize: '0.6rem', opacity: 0.5 }}>Average Disposal Time</div>
-                </div>
-              </div>
-
-              {/* Stats Split Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                <div className="stat-box">
-                  <div style={{ fontSize: '0.65rem', opacity: 0.5 }}>Total Caseload / कुल मामले</div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 700, marginTop: '0.25rem' }}>
-                    {item.totalGrievances.toLocaleString('hi-IN')}
-                  </div>
-                </div>
-
-                <div style={{ background: 'var(--status-critical-bg)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.15)' }}>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--status-critical)' }}>Backlog Over 30 Days / ३०+ दिन लंबित</div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#ef4444', marginTop: '0.25rem' }}>
-                    {item.backlogOver30Days.toLocaleString('hi-IN')} cases
-                  </div>
-                </div>
-              </div>
-
-              {/* Worst performing category */}
-              <div style={{ fontSize: '0.75rem', padding: '0.5rem 0.75rem', borderRadius: '6px', background: 'rgba(245, 158, 11, 0.05)', borderLeft: '3px solid #f59e0b', marginBottom: '1rem' }}>
-                ⚠️ <strong>सर्वाधिक विफलता श्रेणी (Worst Category):</strong> {item.worstCategoryHi} ({item.worstCategoryEn})
-              </div>
-
-              {/* Share block */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <button onClick={() => handleShareWhatsApp(item, 'ministry')} className="btn-whatsapp">
-                  📤 Send Shame Card on WhatsApp
-                </button>
-              </div>
-            </div>
-          ))
-        ) : (
-          updatedStates.map(item => (
-            <div key={item.id} className="glass-card" style={{ padding: '1.25rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
-                <div>
-                  <span style={{
-                    fontSize: '0.75rem',
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    background: 'rgba(239, 68, 68, 0.15)',
-                    color: '#ef4444',
-                    fontWeight: 700,
-                    marginRight: '0.5rem',
-                  }}>
-                    SHAME RANK #{item.rank}
-                  </span>
-                  <h3 style={{ fontSize: '1.15rem', display: 'inline-block', margin: 0 }}>{item.nameHi}</h3>
-                  <div style={{ fontSize: '0.75rem', opacity: 0.6, marginTop: '0.2rem' }}>{item.name}</div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#ef4444' }}>
-                    {item.avgDisposalDays} Days
-                  </div>
-                  <div style={{ fontSize: '0.6rem', opacity: 0.5 }}>Average Disposal Time</div>
-                </div>
-              </div>
-
-              {/* Stats Split Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                <div className="stat-box">
-                  <div style={{ fontSize: '0.65rem', opacity: 0.5 }}>Total Caseload / कुल मामले</div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 700, marginTop: '0.25rem' }}>
-                    {item.totalGrievances.toLocaleString('hi-IN')}
-                  </div>
-                </div>
-
-                <div style={{ background: 'var(--status-critical-bg)', padding: '0.75rem', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.15)' }}>
-                  <div style={{ fontSize: '0.65rem', color: 'var(--status-critical)' }}>Backlog Over 30 Days / ३०+ दिन लंबित</div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#ef4444', marginTop: '0.25rem' }}>
-                    {item.backlogOver30Days.toLocaleString('hi-IN')} cases
-                  </div>
-                </div>
-              </div>
-
-              {/* Worst performing district */}
-              <div style={{ fontSize: '0.75rem', padding: '0.5rem 0.75rem', borderRadius: '6px', background: 'rgba(245, 158, 11, 0.05)', borderLeft: '3px solid #f59e0b', marginBottom: '1rem' }}>
-                ⚠️ <strong>सर्वाधिक विफलता जिला (Worst District Area):</strong> {item.worstDistrictHi} ({item.worstDistrictEn})
-              </div>
-
-              {/* Share block */}
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <button onClick={() => handleShareWhatsApp(item, 'state')} className="btn-whatsapp">
-                  📤 Send Shame Card on WhatsApp
-                </button>
-              </div>
-            </div>
-          ))
-        )}
+      <SectionTitle title={tab === 'ministry' ? 'Union ministries' : 'State governments'} sub="Ranked on DARPG's monthly CPGRAMS report. Longer disposal times appear first." />
+      <div className="card">
+        <div className="table-wrap" style={{ border: 0, borderRadius: 0 }}>
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col" style={{ width: 48 }}>#</th>
+                <th scope="col">{tab === 'ministry' ? 'Ministry' : 'State'}</th>
+                <th scope="col" style={{ textAlign: 'right' }}>Received</th>
+                <th scope="col" style={{ textAlign: 'right' }}>Resolved</th>
+                <th scope="col" style={{ textAlign: 'right' }}>Over 30 days</th>
+                <th scope="col" style={{ textAlign: 'right' }}>Avg. days</th>
+                <th scope="col"><span className="visually-hidden">Share</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r, i) => {
+                const resolved = pct(r.resolvedCount, r.totalGrievances);
+                return (
+                  <tr key={r.id}>
+                    <td className="num muted">{i + 1}</td>
+                    <td>
+                      <div className="strong">{r.name}</div>
+                      <div className="tiny muted">
+                        <span lang="hi">{r.nameHi}</span> · Most complaints: {r.worst}
+                      </div>
+                    </td>
+                    <td className="num" style={{ textAlign: 'right' }}>{r.totalGrievances.toLocaleString('en-IN')}</td>
+                    <td className={`num ${resolved < 75 ? 'text-bad' : ''}`} style={{ textAlign: 'right' }}>{resolved}%</td>
+                    <td className="num" style={{ textAlign: 'right' }}>{r.backlogOver30Days.toLocaleString('en-IN')}</td>
+                    <td className={`num ${r.avgDisposalDays > 21 ? 'text-bad' : 'text-good'}`} style={{ textAlign: 'right', fontWeight: 600 }}>{r.avgDisposalDays}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-icon btn-sm"
+                        aria-label={`Share ${r.name} on WhatsApp`}
+                        onClick={() =>
+                          share({
+                            pinCode: '000000',
+                            titleHindi: `CPGRAMS: ${r.nameHi}`,
+                            titleEnglish: `CPGRAMS: ${r.name}`,
+                            claimLabel: 'Target: resolve within 21 days',
+                            claimLabelHindi: 'लक्ष्य: 21 दिन में निपटान',
+                            realityLabel: `Average ${r.avgDisposalDays} days; ${r.backlogOver30Days} pending over 30 days`,
+                            realityLabelHindi: `औसत ${r.avgDisposalDays} दिन; 30 दिन से अधिक ${r.backlogOver30Days} लंबित`,
+                            responsiblePerson: tab === 'ministry' ? 'Ministry grievance officer' : 'State nodal officer',
+                            responsibleOrg: r.name,
+                            sourceUrl: 'https://pgportal.gov.in',
+                            moduleNameHindi: 'शिकायत स्कोर',
+                          })
+                        }
+                      >
+                        <Share2 size={14} aria-hidden="true" />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+        <div className="card-foot">
+          <SourceLine source="DARPG CPGRAMS monthly report" url="https://pgportal.gov.in" updated="2026-08-31" />
+        </div>
       </div>
-
     </div>
   );
 }

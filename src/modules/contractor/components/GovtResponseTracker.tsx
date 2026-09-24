@@ -19,8 +19,8 @@ export const GovtResponseTracker: React.FC<{ reports: ReportItem[] }> = React.me
 
   if (reports.length === 0) {
     return (
-      <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
-        No government responses yet — submit a report to start the accountability loop (Submitted → Acknowledged → Action → Verified).
+      <p style={{ fontSize: '0.85rem', color: 'var(--ink-4)' }}>
+        No government responses yet · submit a report to start the accountability loop (Submitted → Acknowledged → Action → Verified).
       </p>
     );
   }
@@ -28,15 +28,15 @@ export const GovtResponseTracker: React.FC<{ reports: ReportItem[] }> = React.me
   return (
     <div style={{ display: 'grid', gap: '0.75rem' }}>
       {enriched.map(({ report, stage, delayDays, originalKept }) => (
-        <div key={report.id} style={{ border: '1px solid #eef2f7', borderRadius: 10, padding: '0.85rem' }}>
+        <div key={report.id} style={{ border: '1px solid var(--border)', borderRadius: 10, padding: '0.85rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <strong style={{ fontSize: '0.85rem', color: '#0f2d59' }}>
+            <strong style={{ fontSize: '0.85rem', color: 'var(--ink)' }}>
               {report.category || report.title || 'Citizen Report'}
             </strong>
             <SourceBadge sourceType="D" sourceName={`Govt Response · ${stageLabel(stage)}`} />
           </div>
 
-          <p style={{ fontSize: '0.82rem', color: '#475569', margin: '0.4rem 0 0.6rem' }}>{report.description}</p>
+          <p style={{ fontSize: '0.82rem', color: 'var(--ink-2)', margin: '0.4rem 0 0.6rem' }}>{report.description}</p>
 
           {/* Lifecycle bar */}
           <div style={{ display: 'flex', gap: '4px', marginBottom: '0.5rem' }}>
@@ -49,7 +49,7 @@ export const GovtResponseTracker: React.FC<{ reports: ReportItem[] }> = React.me
                     flex: 1,
                     height: 6,
                     borderRadius: 3,
-                    background: reached ? '#0f2d59' : '#e2e8f0',
+                    background: reached ? 'var(--brand)' : 'var(--border)',
                   }}
                   title={stageLabel(s)}
                 />
@@ -57,10 +57,10 @@ export const GovtResponseTracker: React.FC<{ reports: ReportItem[] }> = React.me
             })}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: '#64748b', flexWrap: 'wrap', gap: '0.4rem' }}>
-            <span>📍 {report.pincode} · {report.module}</span>
-            <span>⏱ Filed→Resolved: <strong style={{ color: '#ef4444' }}>{delayDays} days</strong></span>
-            <span>{originalKept ? '🗂 Original kept (never deleted)' : ''}</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--ink-3)', flexWrap: 'wrap', gap: '0.4rem' }}>
+            <span>{report.pincode} · {report.module}</span>
+            <span>Filed→Resolved: <strong style={{ color: 'var(--bad)' }}>{delayDays} days</strong></span>
+            <span>{originalKept ? 'Original kept (never deleted)' : ''}</span>
           </div>
         </div>
       ))}

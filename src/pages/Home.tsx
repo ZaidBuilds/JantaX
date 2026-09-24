@@ -1,575 +1,323 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { api } from '../core/services/api';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Search,
-  MapPin,
-  GraduationCap,
-  Construction,
-  HardHat,
-  Hospital,
-  Building2,
-  Wheat,
-  Scale,
-  FileText,
-  ChevronRight,
-  RefreshCw,
-  ExternalLink,
-  CheckCircle2,
-  AlertTriangle,
-  Clock,
+  LocateFixed,
   ArrowRight,
+  MapPin,
+  Scale,
+  Share2,
+  FileSearch,
   ShieldCheck,
-  Flame,
-  Droplets,
-  Users,
-  Compass,
+  EyeOff,
+  Landmark,
+  Link2,
+  ImageOff,
 } from 'lucide-react';
-import { usePinSearch } from '../core/hooks/usePinSearch';
-import { useCatalog } from '../core/hooks/useCatalog';
-import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver';
+import { api, type PincodeInfo } from '../core/services/api';
 import { usePin } from '../core/context/PinContext';
-import { MOCK_CITIZEN_REPORTS } from '../modules/reporting/data/mockReports';
+import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver';
+import { getBottleneckLensesForPin } from '../core/services/bottleneckService';
+import { getStoredReports } from '../modules/reporting/services/reportingService';
+import { Badge, ClaimReality, ModuleIcon, MODULE_GROUPS, getModule, moduleHref, reportForDisplay, toneForStatus } from '../ui';
+
+const POPULAR = [
+  { pin: '110001', city: 'New Delhi' },
+  { pin: '400001', city: 'Mumbai' },
+  { pin: '560001', city: 'Bengaluru' },
+  { pin: '226001', city: 'Lucknow' },
+  { pin: '800001', city: 'Patna' },
+  { pin: '250001', city: 'Meerut' },
+];
+
+function AreaPreview({ pin }: { pin: string }) {
+  const [info, setInfo] = useState<PincodeInfo | null>(null);
+  useEffect(() => {
+    let alive = true;
+    setInfo(null);
+    api.getPincode(pin).then((i) => alive && setInfo(i));
+    return () => {
+      alive = false;
+    };
+  }, [pin]);
+  const loc = resolvePincode(pin);
+  const lens = useMemo(() => getBottleneckLensesForPin(pin).lenses.find((l) => l.severity === 'CRITICAL') || getBottleneckLensesForPin(pin).lenses[0], [pin]);
+  const counts = info
+    ? [
+        { label: 'Schools', value: info.counts.schools },
+        { label: 'Public works', value: info.counts.infraProjects },
+        { label: 'Health centres', value: info.counts.hospitals },
+        { label: 'Grievances', value: info.counts.grievances },
+      ]
+    : null;
+
+  return (
+    <div className="card area-preview">
+      <div className="card-body">
+        <div className="spread">
+          <div>
+            <div className="tiny muted">Your area</div>
+            <div className="area-preview-pin">
+              <span className="num">{pin}</span>
+              <span>{loc.district}, {loc.state}</span>
+            </div>
+          </div>
+          <Link to={`/pin/${pin}`} className="btn btn-soft btn-sm">
+            Open <ArrowRight size={14} aria-hidden="true" />
+          </Link>
+        </div>
+        <div className="area-preview-counts">
+          {(counts || [0, 1, 2, 3].map(() => null)).map((c, i) => (
+            <div key={i}>
+              <div className="stat-value num" style={{ fontSize: 'var(--text-xl)' }}>
+                {c ? c.value : <span className="skeleton" style={{ display: 'inline-block', width: 28, height: 22 }} />}
+              </div>
+              <div className="tiny muted">{c ? c.label : ' '}</div>
+            </div>
+          ))}
+        </div>
+        {lens && (
+          <div className="stack-sm" style={{ marginTop: 'var(--s-4)' }}>
+            <div className="spread">
+              <span className="small strong">{lens.title}</span>
+              <Badge tone={lens.severity === 'CRITICAL' ? 'bad' : 'warn'}>{lens.severity === 'CRITICAL' ? 'Needs attention' : 'Watch'}</Badge>
+            </div>
+            <ClaimReality
+              claim={<p className="tiny" style={{ color: 'var(--ink)' }}>{lens.officialClaim}</p>}
+              reality={<p className="tiny" style={{ color: 'var(--ink)' }}>{lens.auditReality}</p>}
+            />
+          </div>
+        )}
+      </div>
+      {lens && (
+        <div className="card-foot">
+          <span>{lens.source}</span>
+          <span>{lens.asOfDate}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ReportThumb({ src }: { src?: string }) {
+  const [failed, setFailed] = useState(false);
+  if (!src || failed) {
+    return (
+      <div className="report-thumb report-thumb-empty" aria-hidden="true">
+        <ImageOff size={18} />
+      </div>
+    );
+  }
+  return <img className="report-thumb" src={src} alt="" loading="lazy" onError={() => setFailed(true)} />;
+}
 
 export function Home() {
   const navigate = useNavigate();
-  const { query, search } = usePinSearch();
-  const [searchText, setSearchText] = useState('');
-  const { selectedPin, setSelectedPin, detectLocation, isDetecting } = usePin();
+  const { selectedPin, setSelectedPin, detectLocation, isDetecting, detectionError } = usePin();
+  const [q, setQ] = useState('');
+  const [error, setError] = useState('');
 
-  const activePin = selectedPin || '110001';
-  const resolvedLoc = resolvePincode(activePin);
-  const { records: catalogRecords } = useCatalog();
+  const reports = useMemo(
+    () =>
+      getStoredReports()
+        .filter((r) => /approved|published/i.test(r.moderationState))
+        .slice(0, 3)
+        .map(reportForDisplay),
+    []
+  );
 
-  const [pinCounts, setPinCounts] = useState({
-    schools: 14,
-    infraProjects: 8,
-    reraProjects: 12,
-    hospitals: 4,
-    pdsShops: 6,
-    grievances: 5,
-    citizenReports: 3,
-  });
-  const [countsLoading, setCountsLoading] = useState(false);
-  const [countsLastUpdated, setCountsLastUpdated] = useState<Date | null>(new Date());
-
-  const [reports, setReports] = useState<any[]>(MOCK_CITIZEN_REPORTS.slice(0, 4));
-  const [reportsLoading, setReportsLoading] = useState(false);
-
-  const submitSearch = (value: string) => {
-    const trimmed = value.trim();
-    if (!trimmed) return;
-    if (isValidIndianPincode(trimmed)) {
-      setSelectedPin(trimmed);
-      navigate(`/pin/${trimmed}`);
-    } else {
-      navigate(`/search?q=${encodeURIComponent(trimmed)}`);
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    const value = q.trim();
+    if (!value) {
+      setError('Type a PIN code, or the name of a school, project or contractor.');
+      return;
     }
+    setError('');
+    if (/^\d+$/.test(value)) {
+      if (!isValidIndianPincode(value)) {
+        setError('A PIN code has six digits and does not start with 0.');
+        return;
+      }
+      setSelectedPin(value);
+      navigate(`/pin/${value}`);
+      return;
+    }
+    navigate(`/search?q=${encodeURIComponent(value)}`);
   };
 
-  const loadPinData = useCallback(async () => {
-    if (!activePin) return;
-    let alive = true;
-    setCountsLoading(true);
-    try {
-      const info = await api.getPincode(activePin);
-      if (alive && info?.counts) {
-        setPinCounts({
-          schools: info.counts.schools || 14,
-          infraProjects: info.counts.infraProjects || 8,
-          reraProjects: info.counts.reraProjects || 12,
-          hospitals: info.counts.hospitals || 4,
-          pdsShops: info.counts.pdsShops || 6,
-          grievances: info.counts.grievances || 5,
-          citizenReports: info.counts.citizenReports || 3,
-        });
-        setCountsLastUpdated(new Date());
-      }
-    } catch {
-      // Retain fallback numbers
-    } finally {
-      if (alive) setCountsLoading(false);
-    }
-  }, [activePin]);
-
-  const loadReports = useCallback(async () => {
-    if (!activePin) return;
-    let alive = true;
-    setReportsLoading(true);
-    try {
-      const data = await api.getReports(activePin);
-      if (alive && Array.isArray(data) && data.length > 0) {
-        setReports(data.slice(0, 4));
-      } else {
-        setReports(MOCK_CITIZEN_REPORTS.slice(0, 4));
-      }
-    } catch {
-      setReports(MOCK_CITIZEN_REPORTS.slice(0, 4));
-    } finally {
-      if (alive) setReportsLoading(false);
-    }
-  }, [activePin]);
-
-  useEffect(() => {
-    loadPinData();
-    loadReports();
-  }, [loadPinData, loadReports]);
-
-  const pinSchools = catalogRecords.filter(
-    (record) => record.moduleId === 'school' && record.location.pinCode === activePin
-  );
-  const pinProjects = catalogRecords.filter(
-    (project) => project.moduleId === 'infra' && project.location.pinCode === activePin
-  );
-
-  const sectors = [
-    {
-      id: 'school',
-      title: 'Schools & Education',
-      count: `${pinCounts.schools} schools`,
-      desc: 'Classroom infrastructure, functional toilets, electricity, and pupil-teacher ratios.',
-      source: 'UDISE+ / Ministry of Education',
-      route: `/schools?pin=${activePin}`,
-    },
-    {
-      id: 'infra',
-      title: 'Roads & Public Works',
-      count: `${pinCounts.infraProjects} projects`,
-      desc: 'Highway expansions, rural road maintenance, contractor tenders, and completion delays.',
-      source: 'PMGSY / State PWD',
-      route: `/module/infra?pin=${activePin}`,
-    },
-    {
-      id: 'hospital',
-      title: 'Healthcare Centers (PHC/CHC)',
-      count: `${pinCounts.hospitals} centers`,
-      desc: 'Primary health centers, doctor availability, bed counts, and medicine distribution.',
-      source: 'HMIS / MoHFW',
-      route: `/module/hospital?pin=${activePin}`,
-    },
-    {
-      id: 'rera',
-      title: 'RERA Housing Projects',
-      count: `${pinCounts.reraProjects} projects`,
-      desc: 'Builder delivery timelines, occupancy certificates, and buyer complaints.',
-      source: 'State RERA Authorities',
-      route: `/module/rera?pin=${activePin}`,
-    },
-    {
-      id: 'ration',
-      title: 'Fair Price Shops (PDS)',
-      count: `${pinCounts.pdsShops} outlets`,
-      desc: 'Food grain allocations, active ration cards, and stock delivery latency.',
-      source: 'NFSA / State Food Dept',
-      route: `/module/ration?pin=${activePin}`,
-    },
-    {
-      id: 'contractor',
-      title: 'Contractor Transparency',
-      count: 'Active Ledger',
-      desc: 'Public procurement records, contract values, performance history, and blacklists.',
-      source: 'Central / State Portals',
-      route: `/module/contractor?pin=${activePin}`,
-    },
-    {
-      id: 'courts',
-      title: 'Courts & Case Filings (CNR)',
-      count: 'District Courts',
-      desc: 'Case pendency, daily cause lists, disposal rates, and judicial tracking.',
-      source: 'eCourts Services / NJDG',
-      route: `/module/courts?pin=${activePin}`,
-    },
-    {
-      id: 'rti',
-      title: 'RTI & Public Filings',
-      count: 'CPIO Clock',
-      desc: 'Right to Information appeal response times, draft templates, and disclosures.',
-      source: 'Central Information Commission',
-      route: `/module/rti?pin=${activePin}`,
-    },
-    {
-      id: 'grievance',
-      title: 'Public Grievances (CPGRAMS)',
-      count: `${pinCounts.grievances} tickets`,
-      desc: 'Departmental resolution speed, pending citizen complaints, and disposal latency.',
-      source: 'DARPG / CPGRAMS',
-      route: `/module/grievance?pin=${activePin}`,
-    },
-    {
-      id: 'pollution',
-      title: 'Air Quality & Pollution (AQI)',
-      count: 'Live Stations',
-      desc: 'Real-time particulate matter (PM2.5 / PM10), station sensors, and GRAP stages.',
-      source: 'CPCB / State PCBs',
-      route: `/module/pollution?pin=${activePin}`,
-    },
-    {
-      id: 'nagar',
-      title: 'Ward & Municipal Services',
-      count: 'Local Body',
-      desc: 'Sanitation, streetlights, property tax rates, and councillor contact ledger.',
-      source: 'State Urban Dev Depts',
-      route: `/module/nagar?pin=${activePin}`,
-    },
-    {
-      id: 'mplads',
-      title: 'MPLADS Fund Tracker',
-      count: 'Constituency',
-      desc: 'Parliamentarian fund allocation, recommended works, and unspent balances.',
-      source: 'MoSPI / MPLADS Portal',
-      route: `/module/mplads?pin=${activePin}`,
-    },
-  ];
+  const locate = async () => {
+    const pin = await detectLocation();
+    if (pin) navigate(`/pin/${pin}`);
+  };
 
   return (
-    <div className="home-root">
-      {/* 1. PUBLIC UTILITY SEARCH HERO */}
-      <section className="search-hero">
-        <div className="container">
-          <h1 className="hero-headline">
-            Search Public Records & Civic Data Across India
-          </h1>
-          <p className="hero-subhead">
-            Open government data on schools, healthcare, roads, RERA housing, and public works by PIN code, district, or project name.
-          </p>
+    <div className="home">
+      <section className="home-hero">
+        <div className="home-hero-inner">
+          <div className="home-hero-copy">
+            <h1 className="home-title">
+              See what your government records say about <span className="home-title-em">your PIN code</span>.
+            </h1>
+            <p className="home-lede">
+              Schools, clinics, roads, ration shops and courts. Official data beside what citizens found on the ground.
+            </p>
 
-          {/* Clean Search Form */}
-          <form
-            className="main-search-form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              submitSearch(searchText || query);
-            }}
-          >
-            <div className="search-input-wrapper">
-              <Search size={18} className="search-icon-inside" />
-              <input
-                type="text"
-                aria-label="Search by PIN Code, school, hospital, contractor or project"
-                placeholder="Enter 6-digit PIN Code (e.g. 110001), school, hospital, or contractor name..."
-                value={searchText || query}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setSearchText(val);
-                  if (/^\d{0,6}$/.test(val)) search(val);
-                }}
-                className="search-input-main"
-              />
-            </div>
+            <form role="search" onSubmit={submit} className="home-search" noValidate>
+              <div className="search-field">
+                <Search size={20} aria-hidden="true" />
+                <input
+                  type="search"
+                  value={q}
+                  onChange={(e) => {
+                    setQ(e.target.value);
+                    if (error) setError('');
+                  }}
+                  placeholder="PIN code, school, project or contractor"
+                  aria-label="Search by PIN code or name"
+                  aria-invalid={!!error || undefined}
+                  aria-describedby="home-search-help"
+                />
+                <button type="submit" className="btn btn-primary btn-lg">
+                  Search
+                </button>
+              </div>
+              <div id="home-search-help" className={error ? 'error-text' : 'hint'} style={{ marginTop: 'var(--s-2)' }}>
+                {error || detectionError || 'Tip: press / anywhere to jump to search.'}
+              </div>
+            </form>
 
-            <button type="submit" className="search-submit-btn">
-              Search Records
-            </button>
-          </form>
-
-          {/* Example lookups */}
-          <div className="search-examples">
-            <span>Examples:</span>
-            {[
-              { label: 'Delhi (110001)', pin: '110001' },
-              { label: 'Bengaluru (560001)', pin: '560001' },
-              { label: 'Mumbai (400001)', pin: '400001' },
-              { label: 'Lucknow (226001)', pin: '226001' },
-              { label: 'Patna (800001)', pin: '800001' },
-              { label: 'Hyderabad (500001)', pin: '500001' },
-            ].map((ex) => (
-              <button
-                key={ex.pin}
-                type="button"
-                className="search-example-link"
-                onClick={() => {
-                  setSearchText(ex.pin);
-                  submitSearch(ex.pin);
-                }}
-              >
-                {ex.label}
+            <div className="home-quick">
+              <button type="button" className="btn btn-secondary" onClick={locate} disabled={isDetecting}>
+                <LocateFixed size={16} aria-hidden="true" />
+                {isDetecting ? 'Finding your area…' : 'Use my location'}
               </button>
-            ))}
+              <div className="cluster" aria-label="Popular PIN codes">
+                {POPULAR.map((p) => (
+                  <Link key={p.pin} to={`/pin/${p.pin}`} className="chip" onClick={() => setSelectedPin(p.pin)}>
+                    <span className="num strong">{p.pin}</span>
+                    <span className="muted">{p.city}</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="home-hero-aside">
+            <AreaPreview pin={selectedPin} />
           </div>
         </div>
       </section>
 
-      <main className="container" id="main">
-        {/* 2. LOCAL AREA INTELLIGENCE SUMMARY TABLE */}
-        <section className="data-summary-box">
-          <div className="data-summary-header">
-            <div className="data-summary-title">
-              <span>Official Records for PIN</span>
-              <span className="pin-code-badge">{activePin}</span>
-              {resolvedLoc.isValid && (
-                <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
-                  ({resolvedLoc.district}, {resolvedLoc.state})
-                </span>
-              )}
-            </div>
-
-            <div className="data-summary-actions">
-              {countsLastUpdated && (
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  Data refreshed: {countsLastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </span>
-              )}
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={loadPinData}
-                disabled={countsLoading}
-                title="Refresh latest data"
-              >
-                <RefreshCw size={13} className={countsLoading ? 'animate-spin' : ''} />
-                <span>Refresh</span>
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={() => {
-                  const p = prompt('Enter 6-digit Indian PIN Code:', activePin);
-                  if (p && isValidIndianPincode(p)) setSelectedPin(p);
-                }}
-              >
-                Change PIN
-              </button>
-            </div>
-          </div>
-
-          <div className="data-table-wrap" style={{ border: 'none', borderRadius: 0 }}>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th style={{ width: '28%' }}>Sector / Category</th>
-                  <th style={{ width: '18%' }}>Recorded Count</th>
-                  <th style={{ width: '32%' }}>Official Source</th>
-                  <th style={{ width: '22%' }}>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <strong>Government Schools</strong>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Classrooms, toilets & PTR</div>
-                  </td>
-                  <td>
-                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.schools}</span>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> schools</span>
-                  </td>
-                  <td>
-                    <span className="source-tag">
-                      <strong>UDISE+</strong> • Ministry of Education
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      className="source-link"
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                      onClick={() => navigate(`/schools?pin=${activePin}`)}
-                    >
-                      View schools →
-                    </button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <strong>Roads & Public Works</strong>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Maintenance & highway tenders</div>
-                  </td>
-                  <td>
-                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.infraProjects}</span>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> projects</span>
-                  </td>
-                  <td>
-                    <span className="source-tag">
-                      <strong>PMGSY / PWD</strong> • MoRD
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      className="source-link"
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                      onClick={() => navigate(`/module/infra?pin=${activePin}`)}
-                    >
-                      View works →
-                    </button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <strong>Healthcare Centers (PHC)</strong>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Primary health clinic status</div>
-                  </td>
-                  <td>
-                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.hospitals}</span>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> facilities</span>
-                  </td>
-                  <td>
-                    <span className="source-tag">
-                      <strong>HMIS</strong> • MoHFW
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      className="source-link"
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                      onClick={() => navigate(`/module/hospital?pin=${activePin}`)}
-                    >
-                      View centers →
-                    </button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <strong>RERA Registered Housing</strong>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Builder delivery & delays</div>
-                  </td>
-                  <td>
-                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.reraProjects}</span>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> projects</span>
-                  </td>
-                  <td>
-                    <span className="source-tag">
-                      <strong>State RERA</strong> • Housing Ministry
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      className="source-link"
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                      onClick={() => navigate(`/module/rera?pin=${activePin}`)}
-                    >
-                      View housing →
-                    </button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <strong>Fair Price Shops (PDS)</strong>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Ration distribution outlets</div>
-                  </td>
-                  <td>
-                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.pdsShops}</span>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> outlets</span>
-                  </td>
-                  <td>
-                    <span className="source-tag">
-                      <strong>NFSA</strong> • Dept of Food & Public Distribution
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      className="source-link"
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                      onClick={() => navigate(`/module/ration?pin=${activePin}`)}
-                    >
-                      View PDS →
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* 3. EXPLORE ALL SECTORS DIRECTORY */}
-        <section className="section-block">
-          <h2 className="section-title">Explore Public Data by Sector</h2>
-          <p className="section-description">
-            Search and verify official databases across national and state public utilities.
-          </p>
-
-          <div className="sector-list-grid">
-            {sectors.map((sec) => (
-              <div
-                key={sec.id}
-                className="sector-item-card"
-                onClick={() => navigate(sec.route)}
-                role="button"
-                tabIndex={0}
-              >
-                <div className="sector-item-top">
-                  <span className="sector-item-title">{sec.title}</span>
-                  <span className="sector-item-count">{sec.count}</span>
-                </div>
-                <p className="sector-item-desc">{sec.desc}</p>
-                <div className="sector-item-source">
-                  <span>Source: {sec.source}</span>
-                  <span style={{ color: 'var(--color-accent)', fontWeight: 600 }}>Explore →</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* 4. RECENT CITIZEN GROUND-TRUTH REPORTS */}
-        <section className="section-block">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+      <div className="page" style={{ paddingTop: 0 }}>
+        <section className="section" aria-labelledby="questions-h">
+          <div className="section-head">
             <div>
-              <h2 className="section-title">Recent Ground-Truth Entries</h2>
-              <p className="section-description" style={{ marginBottom: 0 }}>
-                Citizen-submitted photo verifications and infrastructure audit records.
-              </p>
+              <h2 id="questions-h" className="section-title">Start with a question</h2>
+              <p className="section-sub">Eighteen modules, each tied to a public dataset and a named office.</p>
             </div>
-            <button
-              type="button"
-              className="btn btn-secondary btn-sm"
-              onClick={() => navigate('/reports')}
-            >
-              View all reports →
-            </button>
+            <Link to="/explore" className="link small">
+              Browse all modules <ArrowRight size={14} aria-hidden="true" />
+            </Link>
           </div>
-
-          <div className="evidence-list">
-            {reports.map((rep) => (
-              <div
-                key={rep.id}
-                className="evidence-row"
-                onClick={() => navigate(`/reports/${rep.id}`)}
-                style={{ cursor: 'pointer' }}
-              >
-                <div className="evidence-main">
-                  <div className="evidence-title">
-                    {rep.title || rep.description.slice(0, 80)}
-                  </div>
-                  <div className="evidence-meta">
-                    <span>Category: {rep.category || rep.module}</span>
-                    <span>•</span>
-                    <span>PIN {rep.location?.pinCode || rep.pincode || activePin}</span>
-                    <span>•</span>
-                    <span>{new Date(rep.createdAt).toLocaleDateString()}</span>
-                  </div>
+          <div className="grid-3">
+            {MODULE_GROUPS.map((g) => (
+              <div key={g.id} className="card">
+                <div className="card-body" style={{ paddingBottom: 'var(--s-3)' }}>
+                  <h3 className="card-title">{g.title}</h3>
+                  <p className="card-sub">{g.description}</p>
                 </div>
-                <span className="badge-status official">
-                  {rep.moderationState || rep.status || 'Verified'}
-                </span>
+                <div className="list">
+                  {g.modules.map((id) => {
+                    const m = getModule(id);
+                    if (!m) return null;
+                    return (
+                      <Link key={id} to={moduleHref(id, selectedPin)} className="list-row" style={{ padding: '10px var(--s-5)' }}>
+                        <ModuleIcon id={id} size="sm" />
+                        <span className="small" style={{ flex: 1, color: 'var(--ink)', fontWeight: 500 }}>{m.shortName}</span>
+                        <ArrowRight size={14} className="muted" aria-hidden="true" />
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
             ))}
           </div>
         </section>
 
-        {/* 5. NOTICE & CORRECTIONS CALLOUT */}
-        <section className="notice-box">
-          <div className="notice-text">
-            <strong>Found a discrepancy in official government records?</strong>
-            <p style={{ marginTop: '0.2rem', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
-              Citizens can submit timestamped photo evidence to corroborate or dispute local school facilities, road quality, or clinic operations.
-            </p>
-          </div>
-          <button
-            type="button"
-            className="btn btn-primary btn-sm"
-            onClick={() => navigate('/report-issue')}
-          >
-            Submit Ground Evidence
-          </button>
+        <section className="section" aria-labelledby="how-h">
+          <h2 id="how-h" className="section-title" style={{ marginBottom: 'var(--s-4)' }}>How it works</h2>
+          <ol className="how-strip">
+            <li>
+              <span className="icon-tile" style={{ ['--tile' as string]: 'var(--brand-ink)' }}><MapPin size={20} aria-hidden="true" /></span>
+              <div>
+                <h3>Open your PIN</h3>
+                <p>We resolve it to your district and pull every matching record from UDISE+, HMIS, PMGSY, RERA, NJDG and more.</p>
+              </div>
+            </li>
+            <li>
+              <span className="icon-tile" style={{ ['--tile' as string]: 'var(--accent)' }}><Scale size={20} aria-hidden="true" /></span>
+              <div>
+                <h3>Compare claim and reality</h3>
+                <p>Each official figure sits next to audit findings and verified citizen check-ins, with the source and date.</p>
+              </div>
+            </li>
+            <li>
+              <span className="icon-tile" style={{ ['--tile' as string]: 'var(--good)' }}><Share2 size={20} aria-hidden="true" /></span>
+              <div>
+                <h3>Act on it</h3>
+                <p>File a photo report, draft an RTI or a CPGRAMS grievance, or share the evidence with your ward.</p>
+              </div>
+            </li>
+          </ol>
         </section>
-      </main>
+
+        <section className="section home-reports" aria-labelledby="reports-h">
+          <div>
+            <div className="section-head">
+              <div>
+                <h2 id="reports-h" className="section-title">Latest from citizens</h2>
+                <p className="section-sub">Published after moderation. Faces and number plates are blurred.</p>
+              </div>
+              <Link to="/reports" className="link small">
+                All reports <ArrowRight size={14} aria-hidden="true" />
+              </Link>
+            </div>
+            <div className="card list">
+              {reports.map((r) => (
+                <Link key={r.id} to={`/reports/${r.id}`} className="list-row report-row">
+                  <ReportThumb src={r.evidence.find((e) => e.mediaType === 'image')?.url} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="strong clamp-2">{r.title}</div>
+                    <div className="tiny muted" style={{ marginTop: 2 }}>
+                      {r.category} · PIN {r.location.pinCode} · {r.location.district}
+                    </div>
+                  </div>
+                  <Badge tone={toneForStatus(r.moderationState)} className="hide-mobile">Published</Badge>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <aside className="card card-pad-lg home-cta">
+            <span className="icon-tile lg" style={{ ['--tile' as string]: 'var(--accent)' }}>
+              <FileSearch size={24} aria-hidden="true" />
+            </span>
+            <h3 className="card-title" style={{ fontSize: 'var(--text-xl)' }}>Found something the records miss?</h3>
+            <p className="small" style={{ color: 'var(--ink-2)' }}>
+              A dated photo from you can confirm or dispute an official claim. It takes about two minutes.
+            </p>
+            <Link to="/report-issue" className="btn btn-primary btn-block">Report an issue</Link>
+          </aside>
+        </section>
+
+        <section className="section" aria-label="Our principles">
+          <ul className="principles">
+            <li><Link2 size={18} aria-hidden="true" /><div><strong>Every number is sourced</strong><span>Each figure links to the public document it came from.</span></div></li>
+            <li><Landmark size={18} aria-hidden="true" /><div><strong>Non-partisan</strong><span>We place claims and audits side by side. We do not editorialise.</span></div></li>
+            <li><EyeOff size={18} aria-hidden="true" /><div><strong>Anonymous by default</strong><span>Reporters are never named publicly. Photo metadata is stripped.</span></div></li>
+            <li><ShieldCheck size={18} aria-hidden="true" /><div><strong>Open corrections</strong><span>Anyone can challenge a record. Every change is logged.</span></div></li>
+          </ul>
+        </section>
+      </div>
     </div>
   );
 }

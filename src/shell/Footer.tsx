@@ -1,46 +1,69 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { Brand } from './Header';
+
+const COLUMNS = [
+  {
+    title: 'Explore',
+    links: [
+      { label: 'Government schools', to: '/schools' },
+      { label: 'Roads and public works', to: '/module/infra' },
+      { label: 'Hospitals and PHCs', to: '/module/hospital' },
+      { label: 'RERA housing', to: '/module/rera' },
+      { label: 'District courts', to: '/module/courts' },
+      { label: 'All 18 modules', to: '/explore' },
+    ],
+  },
+  {
+    title: 'Transparency',
+    links: [
+      { label: 'Data sources', to: '/sources' },
+      { label: 'Methodology', to: '/transparency/methodology' },
+      { label: 'How scores work', to: '/transparency/scoring' },
+      { label: 'Evidence standards', to: '/transparency/evidence' },
+      { label: 'Data freshness', to: '/transparency/freshness' },
+      { label: 'Corrections log', to: '/transparency/corrections' },
+    ],
+  },
+  {
+    title: 'Take part',
+    links: [
+      { label: 'Report an issue', to: '/report-issue' },
+      { label: 'Citizen reports', to: '/reports' },
+      { label: 'Compare areas', to: '/compare' },
+      { label: 'About JantaX', to: '/about' },
+      { label: 'Privacy', to: '/privacy' },
+    ],
+  },
+];
 
 export function Footer() {
-  const navigate = useNavigate();
-
   return (
-    <footer className="site-footer" role="contentinfo">
-      <div className="container">
-        <div className="footer-columns">
-          <div>
-            <div className="footer-col-title">About JantaX</div>
-            <p style={{ lineHeight: 1.6, color: 'var(--text-secondary)', maxWidth: '480px' }}>
-              JantaX is an independent, non-partisan public data utility aggregating official Indian government records across education, healthcare, infrastructure, RERA housing, and public procurement.
+    <footer className="site-footer">
+      <div className="footer-inner">
+        <div className="footer-grid">
+          <div className="footer-about">
+            <Brand />
+            <p>
+              An independent, non-partisan public data utility. Official Indian government records on one side,
+              citizen ground truth on the other, organised by PIN code.
             </p>
           </div>
-
-          <div>
-            <div className="footer-col-title">Public Observatories</div>
-            <div className="footer-nav">
-              <button type="button" onClick={() => navigate('/schools')}>Schools</button>
-              <button type="button" onClick={() => navigate('/power')}>Power</button>
-              <button type="button" onClick={() => navigate('/land')}>Land</button>
-              <button type="button" onClick={() => navigate('/air')}>Air Quality</button>
+          {COLUMNS.map((col) => (
+            <div key={col.title} className="footer-col">
+              <h2>{col.title}</h2>
+              <ul>
+                {col.links.map((l) => (
+                  <li key={l.to}>
+                    <Link to={l.to}>{l.label}</Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
-
-          <div>
-            <div className="footer-col-title">Standards & Legal</div>
-            <div className="footer-nav">
-              <button type="button" onClick={() => navigate('/data-sources')}>Data Sources & Provenance</button>
-              <button type="button" onClick={() => navigate('/about')}>About & FAQ</button>
-            </div>
-          </div>
+          ))}
         </div>
-
         <div className="footer-bottom">
-          <div>
-            © {new Date().getFullYear()} JantaX Public Data Utility. Published under Open Data guidelines.
-          </div>
-          <div>
-            Government records are sourced directly from official open APIs & gazettes.
-          </div>
+          <span>© {new Date().getFullYear()} JantaX. Government data reused under the Government Open Data License, India.</span>
+          <span>Every figure links to its source. Spotted an error? <Link to="/transparency/corrections">Request a correction</Link>.</span>
         </div>
       </div>
     </footer>

@@ -89,11 +89,11 @@ JantaX is a comprehensive platform designed to streamline interactions between c
 JantaX follows a modern, scalable architecture with clearly separated concerns:
 
 ### Frontend Layer
-- **React 18** with TypeScript for type safety
-- **Vite** for lightning-fast development builds
-- **Tailwind CSS** for responsive, utility-first styling
-- **React Query** for efficient data fetching and caching
-- **Zod** for runtime validation
+- **React 18** with TypeScript and **React Router 7**, each screen lazy-loaded
+- **Vite 5** for development and production builds
+- **Design system** in plain CSS variables with light and dark themes (`src/tokens.css`, `src/components.css`), shared React primitives in `src/ui/`, and Tailwind utilities mapped to the same tokens. See [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)
+- **Offline-first data layer**: when the API is unreachable, `src/core/services/api.ts` falls back to bundled sample records and a local search index, and the UI says so
+- **Leaflet** maps, **lucide-react** icons, self-hosted Inter and Anek fonts
 
 ### Backend Layer
 - **Node.js** with **Express.js** for robust API handling

@@ -1,6 +1,13 @@
 import { resolvePincode as _resolvePincode } from '../utils/pinResolver';
+import { getStoredProjects } from '../../modules/infra/services/projectService';
+import { localSearch, localAutocomplete } from './localSearch';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
+/** Absolute URL for an API path. Use this instead of fetch('/api/...'). */
+export function apiUrl(path: string): string {
+  return `${BASE_URL}${path}`;
+}
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('jantax_token') : null;
@@ -20,8 +27,9 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 // --- Resilient mock fallback when backend is down (so PIN never shows red error) ---
-function markOffline() { try { if (typeof window !== 'undefined') localStorage.setItem('jantax_offline','1'); } catch {} }
-function clearOffline() { try { if (typeof window !== 'undefined' && navigator.onLine) localStorage.removeItem('jantax_offline'); } catch {} }
+function notifyDataMode() { try { window.dispatchEvent(new Event('jantax:data-mode')); } catch {} }
+function markOffline() { try { if (typeof window !== 'undefined') { localStorage.setItem('jantax_offline','1'); notifyDataMode(); } } catch {} }
+function clearOffline() { try { if (typeof window !== 'undefined' && navigator.onLine) { localStorage.removeItem('jantax_offline'); notifyDataMode(); } } catch {} }
 function hashSeed(s: string): number {
   let h = 0; for (let i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i)) >>>0; return h;
 }
@@ -53,34 +61,52 @@ function mockPincodeInfo(code: string): PincodeInfo {
 function mockRecords(code: string, module?: string): RecordsResponse {
   markOffline();
   const h = hashSeed(code);
-  const mkSchool = (i:number): ApiRecord => ({
-    id: `mock-school-${code}-${i}`,
-    moduleId: 'school',
-    location: { pinCode: code, state: 'Delhi', district: 'New Delhi' },
-    titleEnglish: i===0 ? 'Govt. Primary School Narela Sector A9' : `Govt. School ${code} - ${i}`,
-    titleHindi: i===0 ? 'राजकीय प्राथमिक विद्यालय नरेला सेक्टर ए9' : `सरकारी स्कूल ${code} - ${i}`,
-    status: i%2===0 ? 'Looking Steady' : 'Needs Attention',
-    groundTruthScore: 65 + (h+i*7)%35,
-    reality: { evidenceCount: i+1 },
-    claim: { value: 100 },
-    updatedAt: new Date().toISOString(),
-    udiseCode: `07010${code.slice(2)}${i}0${i}`,
-    schoolLevel: 'Primary',
-    managementType: 'Government',
-    officialStudentCount: 80 + i*20,
-    officialTeacherCount: 4 + i,
-    teachersSanctioned: 5 + i,
-    hasToilet: true,
-    hasElectricity: i!==1,
-    hasDrinkingWater: true,
-    lastCheckIn: new Date().toISOString(),
-  });
+  const place = (() => { try { const l = _resolvePincode(code); return l.isValid ? l : null; } catch { return null; } })();
+  const state = place?.state || 'Delhi';
+  const district = place?.district || 'New Delhi';
+  const SCHOOL_TYPES = [
+    { en: 'Govt. Primary School', hi: 'राजकीय प्राथमिक विद्यालय', level: 'Primary' },
+    { en: 'Govt. Upper Primary School', hi: 'राजकीय उच्च प्राथमिक विद्यालय', level: 'Upper Primary' },
+    { en: 'Govt. Senior Secondary School', hi: 'राजकीय वरिष्ठ माध्यमिक विद्यालय', level: 'Higher Secondary' },
+    { en: 'Govt. Girls High School', hi: 'राजकीय कन्या उच्च विद्यालय', level: 'Secondary' },
+  ];
+  const mkSchool = (i:number): ApiRecord => {
+    const t = SCHOOL_TYPES[(h + i) % SCHOOL_TYPES.length];
+    const ward = 2 + ((h >> (i + 1)) % 38);
+    const narela = code === '110001' && i === 0;
+    const students = 60 + ((h >> i) % 6) * 22 + i * 12;
+    const sanctioned = 4 + ((h >> (i + 2)) % 6);
+    const working = Math.max(2, sanctioned - ((h >> (i + 3)) % 3));
+    const score = 58 + ((h + i * 13) % 40);
+    return {
+      id: `mock-school-${code}-${i}`,
+      moduleId: 'school',
+      location: { pinCode: code, state, district },
+      titleEnglish: narela ? 'Govt. Primary School Narela Sector A9' : `${t.en}, ${district} Ward ${ward}`,
+      titleHindi: narela ? 'राजकीय प्राथमिक विद्यालय नरेला सेक्टर ए9' : `${t.hi}, वार्ड ${ward}`,
+      status: score >= 75 ? 'Looking Steady' : 'Needs Attention',
+      groundTruthScore: score,
+      reality: { evidenceCount: i+1 },
+      claim: { value: 100 },
+      updatedAt: new Date().toISOString(),
+      udiseCode: `${String(10 + (h % 26)).padStart(2, '0')}${code.slice(1)}${String(i + 1).padStart(3, '0')}`,
+      schoolLevel: narela ? 'Primary' : t.level,
+      managementType: 'Government',
+      officialStudentCount: students,
+      officialTeacherCount: working,
+      teachersSanctioned: sanctioned,
+      hasToilet: (h + i) % 5 !== 0,
+      hasElectricity: (h + i) % 4 !== 1,
+      hasDrinkingWater: (h + i) % 6 !== 2,
+      lastCheckIn: new Date().toISOString(),
+    };
+  };
   const mkInfra = (i:number): ApiRecord => {
     let p: any;
     try {
-      const { getStoredProjects } = require('../../modules/infra/services/projectService');
-      const allProjects = getStoredProjects();
-      p = allProjects[i % allProjects.length];
+      // Only reuse stored projects that actually sit in this PIN.
+      const inPin = getStoredProjects().filter((x) => x.pinCode === code);
+      if (i < inPin.length) p = inPin[i];
     } catch {}
 
     if (p) {
@@ -110,9 +136,9 @@ function mockRecords(code: string, module?: string): RecordsResponse {
     return {
       id: `mock-infra-${code}-${i}`,
       moduleId: 'infra',
-      location: { pinCode: code, state: 'Delhi', district: 'New Delhi' },
-      titleEnglish: i===0 ? 'Construction of Elevated Corridor Phase-2' : `PMGSY Road Project ${code}-${i}`,
-      titleHindi: i===0 ? 'एलिवेटेड कॉरिडोर निर्माण' : `सड़क परियोजना ${code}-${i}`,
+      location: { pinCode: code, state, district },
+      titleEnglish: i===0 ? `${district} Elevated Corridor, Phase 2` : `PMGSY Link Road ${i}, ${district}`,
+      titleHindi: i===0 ? 'एलिवेटेड कॉरिडोर, चरण 2' : `पीएमजीएसवाई संपर्क सड़क ${i}`,
       status: ['Construction','Delayed','Completed'][i%3],
       groundTruthScore: 70 + (h+i*5)%30,
       reality: { evidenceCount: i },
@@ -132,7 +158,7 @@ function mockRecords(code: string, module?: string): RecordsResponse {
   const records: RecordsResponse['records'] = {};
   const wantSchool = !module || module==='school';
   const wantInfra = !module || module==='infra';
-  if (wantSchool) records.school = [mkSchool(0), mkSchool(1)].slice(0, 2 + (h%1));
+  if (wantSchool) records.school = Array.from({ length: 2 + (h % 3) }, (_, i) => mkSchool(i));
   if (wantInfra) records.infra = [mkInfra(0), mkInfra(1)];
   if (!module) {
     records.rera = [{ id:`mock-rera-${code}`, reraNumber:`RERA-${code}`, name:`Builder Project ${code}` } as any];
@@ -142,6 +168,11 @@ function mockRecords(code: string, module?: string): RecordsResponse {
     records.contractor = [{ id:`mock-cont-${code}`, name:`Contractor ${code}` } as any];
   }
   return { pincode: code, records };
+}
+
+/** Sample school records for a handful of well-known PINs, used by offline search. */
+function sampleSchools(): ApiRecord[] {
+  return ['110001', '250001', '560001', '400001', '226001'].flatMap((pin) => mockRecords(pin, 'school').records.school || []);
 }
 
 export interface PincodeInfo {
@@ -334,12 +365,22 @@ export const api = {
     if (params.state) sp.set('state', params.state);
     if (params.district) sp.set('district', params.district);
     if (params.status) sp.set('status', params.status);
-    return apiFetch<SearchResponse>(`/api/search?${sp.toString()}`);
+    return apiFetch<SearchResponse>(`/api/search?${sp.toString()}`)
+      .then((r) => {
+        clearOffline();
+        return r;
+      })
+      .catch(() => {
+        markOffline();
+        return localSearch(params, sampleSchools());
+      });
   },
 
   searchAutocomplete: (q: string, pincode?: string) => {
     const sp = new URLSearchParams({ q, ...(pincode ? { pincode } : {}) });
-    return apiFetch<AutocompleteResponse>(`/api/search/autocomplete?${sp.toString()}`);
+    return apiFetch<AutocompleteResponse>(`/api/search/autocomplete?${sp.toString()}`).catch(() => ({
+      suggestions: localAutocomplete(q, sampleSchools()),
+    } as AutocompleteResponse));
   },
 
   login: (email: string, password: string) => apiFetch<{ token: string }>('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
@@ -353,7 +394,9 @@ export const api = {
 export type { PincodeInfo as PincodeDataType };
 
 // --- Search Types ---
-export type SearchEntityType = 'school' | 'infra' | 'rera' | 'hospital' | 'pds' | 'contractor' | 'source' | 'issue' | 'grievance';
+export type SearchEntityType =
+  | 'school' | 'infra' | 'rera' | 'hospital' | 'pds' | 'contractor' | 'source' | 'issue' | 'grievance'
+  | 'location' | 'mplads' | 'court' | 'booth' | 'ward' | 'station' | 'authority';
 
 export type MatchType = 'exact' | 'related' | 'location';
 

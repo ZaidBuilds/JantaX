@@ -28,22 +28,22 @@ export function DataFreshnessBadge({
 
   if (hoursSinceUpdate < 24) {
     freshness = 'fresh';
-    freshnessColor = '#10b981';
+    freshnessColor = 'var(--good)';
     freshnessBg = 'rgba(16, 185, 129, 0.1)';
     freshnessLabel = 'Updated recently';
   } else if (hoursSinceUpdate < 72) {
     freshness = 'aging';
-    freshnessColor = '#f59e0b';
+    freshnessColor = 'var(--warn)';
     freshnessBg = 'rgba(245, 158, 11, 0.1)';
     freshnessLabel = `${Math.floor(hoursSinceUpdate)}h ago`;
   } else if (daysSinceUpdate < 7) {
     freshness = 'stale';
-    freshnessColor = '#f97316';
+    freshnessColor = 'var(--accent-ink)';
     freshnessBg = 'rgba(249, 115, 22, 0.1)';
     freshnessLabel = `${Math.floor(daysSinceUpdate)}d ago`;
   } else {
     freshness = 'critical';
-    freshnessColor = '#ef4444';
+    freshnessColor = 'var(--bad)';
     freshnessBg = 'rgba(239, 68, 68, 0.1)';
     freshnessLabel = `${Math.floor(daysSinceUpdate)}d ago`;
   }
@@ -126,9 +126,9 @@ export function StaleDataBadge({
         borderColor: 'rgba(249, 115, 22, 0.2)',
       }}
     >
-      <AlertTriangle size={14} style={{ color: '#f97316' }} />
+      <AlertTriangle size={14} style={{ color: 'var(--accent-ink)' }} />
       <div className="flex-1">
-        <p style={{ fontSize: '0.75rem', fontWeight: 600, color: '#f97316' }}>
+        <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-ink)' }}>
           Data may be outdated
         </p>
         <p style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
@@ -171,10 +171,10 @@ export function SourceUnavailable({
         className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
         style={{ background: 'rgba(239, 68, 68, 0.1)' }}
       >
-        <Database size={16} style={{ color: '#ef4444' }} />
+        <Database size={16} style={{ color: 'var(--bad)' }} />
       </div>
       <div className="flex-1 min-w-0">
-        <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#ef4444' }}>
+        <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--bad)' }}>
           {sourceName} unavailable
         </p>
         {failedAtDate && (
@@ -189,7 +189,7 @@ export function SourceUnavailable({
           style={{
             fontSize: '0.72rem',
             fontWeight: 600,
-            color: '#ef4444',
+            color: 'var(--bad)',
             background: 'transparent',
             border: '1px solid rgba(239, 68, 68, 0.3)',
             borderRadius: 6,
@@ -227,9 +227,9 @@ export function PartialDataNotice({
         borderColor: 'rgba(245, 158, 11, 0.2)',
       }}
     >
-      <Info size={16} style={{ color: '#f59e0b', marginTop: 2, flexShrink: 0 }} />
+      <Info size={16} style={{ color: 'var(--warn)', marginTop: 2, flexShrink: 0 }} />
       <div className="flex-1 min-w-0">
-        <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#f59e0b', marginBottom: 4 }}>
+        <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--warn)', marginBottom: 4 }}>
           Partial data available
         </p>
         <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
@@ -247,7 +247,7 @@ export function PartialDataNotice({
             style={{
               fontSize: '0.7rem',
               fontWeight: 600,
-              color: '#f59e0b',
+              color: 'var(--warn)',
               background: 'transparent',
               border: 'none',
               padding: '4px 0',
@@ -284,9 +284,9 @@ export function VerificationPending({
     >
       <div
         className="w-2 h-2 rounded-full animate-pulse"
-        style={{ background: '#0ea5e9' }}
+        style={{ background: 'var(--viz-6)' }}
       />
-      <p style={{ fontSize: '0.75rem', fontWeight: 500, color: '#0ea5e9' }}>
+      <p style={{ fontSize: '0.75rem', fontWeight: 500, color: 'var(--viz-6)' }}>
         Verification pending
       </p>
       {submittedAt && (

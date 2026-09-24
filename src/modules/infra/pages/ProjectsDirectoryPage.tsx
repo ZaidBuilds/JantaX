@@ -72,73 +72,23 @@ export function ProjectsDirectoryPage() {
     switch (status) {
       case 'Completed':
       case 'Verified':
-        return { bg: '#ecfdf5', border: '#a7f3d0', color: '#047857', icon: <CheckCircle2 size={13} /> };
+        return { bg: 'var(--good-soft)', border: 'var(--good-line)', color: 'var(--good)', icon: <CheckCircle2 size={13} /> };
       case 'Extended':
       case 'Delayed':
-        return { bg: '#fffbebf', border: '#fde68a', color: '#b45309', icon: <Clock size={13} /> };
+        return { bg: '#fffbebf', border: 'var(--warn-line)', color: 'var(--warn)', icon: <Clock size={13} /> };
       case 'Incomplete':
-        return { bg: '#fef2f2', border: '#fecaca', color: '#b91c1c', icon: <Clock size={13} /> };
+        return { bg: 'var(--bad-soft)', border: 'var(--bad-line)', color: 'var(--bad)', icon: <Clock size={13} /> };
       case 'Under Review':
       default:
-        return { bg: '#eff6ff', border: '#bfdbfe', color: '#1d4ed8', icon: <ShieldCheck size={13} /> };
+        return { bg: 'var(--brand-soft)', border: 'var(--brand-line)', color: 'var(--brand-ink)', icon: <ShieldCheck size={13} /> };
     }
   };
 
   return (
-    <div style={{ padding: '1.75rem 0', maxWidth: 1200, margin: '0 auto' }}>
+    <div>
       {/* Top Header Banner */}
-      <div style={{
-        background: 'linear-gradient(135deg, #0f2d59 0%, #1e3a8a 50%, #0f172a 100%)',
-        borderRadius: 20,
-        padding: '2.25rem 2rem',
-        color: '#ffffff',
-        marginBottom: '2rem',
-        boxShadow: '0 12px 32px rgba(15, 45, 89, 0.18)',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
-        <div style={{ position: 'relative', zIndex: 2 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.6rem' }}>
-            <span style={{
-              background: 'rgba(249, 115, 22, 0.2)',
-              border: '1px solid rgba(249, 115, 22, 0.5)',
-              color: '#fb923c',
-              fontSize: '0.75rem',
-              fontWeight: 800,
-              padding: '0.25rem 0.75rem',
-              borderRadius: '9999px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.35rem'
-            }}>
-              <Construction size={14} /> JANTAX PHASE 20
-            </span>
-            <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600 }}>
-              Government Data Gateway · MoSPI & CPPP Connected
-            </span>
-          </div>
-
-          <h1 style={{
-            fontSize: '2.1rem',
-            fontWeight: 800,
-            fontFamily: 'var(--font-heading)',
-            lineHeight: 1.25,
-            marginBottom: '0.6rem',
-            letterSpacing: '-0.02em'
-          }}>
-            Public Works & Infrastructure Directory
-          </h1>
-          <p style={{
-            fontSize: '0.96rem',
-            color: '#cbd5e1',
-            maxWidth: 780,
-            lineHeight: 1.55,
-            marginBottom: '1.5rem'
-          }}>
-            Track high-value central & state sector infrastructure projects across India. Neutral, source-linked history linking official tenders, work orders, budgets, extensions, and ground-truth verification.
-          </p>
-
-          {/* Quick Search Input */}
+      <div className="card card-pad module-toolbar">
+{/* Quick Search Input */}
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', maxWidth: 720 }}>
             <div style={{
               flex: 1,
@@ -147,7 +97,7 @@ export function ProjectsDirectoryPage() {
               display: 'flex',
               alignItems: 'center'
             }}>
-              <Search size={18} style={{ position: 'absolute', left: '1rem', color: '#94a3b8' }} />
+              <Search size={18} style={{ position: 'absolute', left: '1rem', color: 'var(--ink-4)' }} />
               <input
                 type="text"
                 placeholder="Search project name, PIN code, contractor, ministry..."
@@ -157,9 +107,9 @@ export function ProjectsDirectoryPage() {
                   width: '100%',
                   padding: '0.75rem 1rem 0.75rem 2.8rem',
                   borderRadius: 12,
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  background: 'rgba(255, 255, 255, 0.08)',
-                  color: '#ffffff',
+                  border: '1px solid var(--border-strong)',
+                  background: 'var(--surface)',
+                  color: 'var(--ink)',
                   fontSize: '0.9rem',
                   outline: 'none',
                   backdropFilter: 'blur(8px)'
@@ -174,8 +124,8 @@ export function ProjectsDirectoryPage() {
                 gap: '0.5rem',
                 padding: '0.75rem 1.4rem',
                 borderRadius: 12,
-                background: 'var(--gradient-accent)',
-                color: '#ffffff',
+                background: 'var(--brand)',
+                color: 'var(--on-solid)',
                 fontWeight: 700,
                 fontSize: '0.88rem',
                 textDecoration: 'none',
@@ -185,8 +135,8 @@ export function ProjectsDirectoryPage() {
               <Filter size={16} /> Advanced Search Page
             </Link>
           </div>
-        </div>
-      </div>
+        
+</div>
 
       {/* Metrics Cards Grid */}
       <div style={{
@@ -196,59 +146,59 @@ export function ProjectsDirectoryPage() {
         marginBottom: '2rem'
       }}>
         <div style={{
-          background: '#ffffff',
+          background: 'var(--surface)',
           borderRadius: 16,
           padding: '1.25rem',
-          border: '1px solid #e2e8f0',
+          border: '1px solid var(--border)',
           boxShadow: '0 2px 8px rgba(15,23,42,0.03)'
         }}>
-          <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600, marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <Building2 size={16} style={{ color: '#3b82f6' }} /> Tracked Projects
+          <div style={{ fontSize: '0.8rem', color: 'var(--ink-3)', fontWeight: 600, marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <Building2 size={16} style={{ color: 'var(--brand-ink)' }} /> Tracked Projects
           </div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a' }}>{stats.totalProjects}</div>
-          <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.2rem' }}>Nationwide & State Sector</div>
+          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--ink)' }}>{stats.totalProjects}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--ink-4)', marginTop: '0.2rem' }}>Nationwide & State Sector</div>
         </div>
 
         <div style={{
-          background: '#ffffff',
+          background: 'var(--surface)',
           borderRadius: 16,
           padding: '1.25rem',
-          border: '1px solid #e2e8f0',
+          border: '1px solid var(--border)',
           boxShadow: '0 2px 8px rgba(15,23,42,0.03)'
         }}>
-          <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600, marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <IndianRupee size={16} style={{ color: '#10b981' }} /> Sanctioned Budget
+          <div style={{ fontSize: '0.8rem', color: 'var(--ink-3)', fontWeight: 600, marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <IndianRupee size={16} style={{ color: 'var(--good)' }} /> Sanctioned Budget
           </div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a' }}>₹{stats.totalSanctionedCr} Cr</div>
-          <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.2rem' }}>Anticipated: ₹{stats.totalAnticipatedCr} Cr</div>
+          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--ink)' }}>₹{stats.totalSanctionedCr} Cr</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--ink-4)', marginTop: '0.2rem' }}>Anticipated: ₹{stats.totalAnticipatedCr} Cr</div>
         </div>
 
         <div style={{
-          background: '#ffffff',
+          background: 'var(--surface)',
           borderRadius: 16,
           padding: '1.25rem',
-          border: '1px solid #e2e8f0',
+          border: '1px solid var(--border)',
           boxShadow: '0 2px 8px rgba(15,23,42,0.03)'
         }}>
-          <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600, marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <Clock size={16} style={{ color: '#f59e0b' }} /> Neutral Monitoring
+          <div style={{ fontSize: '0.8rem', color: 'var(--ink-3)', fontWeight: 600, marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <Clock size={16} style={{ color: 'var(--warn)' }} /> Neutral Monitoring
           </div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a' }}>{stats.underReviewCount}</div>
-          <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.2rem' }}>Delayed / Extended / Under Review</div>
+          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--ink)' }}>{stats.underReviewCount}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--ink-4)', marginTop: '0.2rem' }}>Delayed / Extended / Under Review</div>
         </div>
 
         <div style={{
-          background: '#ffffff',
+          background: 'var(--surface)',
           borderRadius: 16,
           padding: '1.25rem',
-          border: '1px solid #e2e8f0',
+          border: '1px solid var(--border)',
           boxShadow: '0 2px 8px rgba(15,23,42,0.03)'
         }}>
-          <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600, marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <CheckCircle2 size={16} style={{ color: '#059669' }} /> Verified / Complete
+          <div style={{ fontSize: '0.8rem', color: 'var(--ink-3)', fontWeight: 600, marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <CheckCircle2 size={16} style={{ color: 'var(--good)' }} /> Verified / Complete
           </div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a' }}>{stats.verifiedCount}</div>
-          <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.2rem' }}>Physical Audit Completed</div>
+          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--ink)' }}>{stats.verifiedCount}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--ink-4)', marginTop: '0.2rem' }}>Physical Audit Completed</div>
         </div>
       </div>
 
@@ -261,7 +211,7 @@ export function ProjectsDirectoryPage() {
         paddingBottom: '0.75rem',
         marginBottom: '1.5rem'
       }}>
-        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748b', marginRight: '0.5rem', whiteSpace: 'nowrap' }}>
+        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-3)', marginRight: '0.5rem', whiteSpace: 'nowrap' }}>
           Sectors:
         </span>
         {sectors.map((sec) => (
@@ -271,9 +221,9 @@ export function ProjectsDirectoryPage() {
             style={{
               padding: '0.45rem 0.95rem',
               borderRadius: '9999px',
-              border: selectedSector === sec ? '1px solid #2563eb' : '1px solid #e2e8f0',
-              background: selectedSector === sec ? '#eff6ff' : '#ffffff',
-              color: selectedSector === sec ? '#1d4ed8' : '#475569',
+              border: selectedSector === sec ? '1px solid var(--brand-ink)' : '1px solid var(--border)',
+              background: selectedSector === sec ? 'var(--brand-soft)' : 'var(--surface)',
+              color: selectedSector === sec ? 'var(--brand-ink)' : 'var(--ink-2)',
               fontWeight: selectedSector === sec ? 700 : 500,
               fontSize: '0.82rem',
               cursor: 'pointer',
@@ -290,7 +240,7 @@ export function ProjectsDirectoryPage() {
       <div style={{
         display: 'flex',
         gap: '0.5rem',
-        borderBottom: '1px solid #e2e8f0',
+        borderBottom: '1px solid var(--border)',
         marginBottom: '1.75rem',
         overflowX: 'auto'
       }}>
@@ -301,9 +251,9 @@ export function ProjectsDirectoryPage() {
             style={{
               padding: '0.6rem 1rem',
               border: 'none',
-              borderBottom: selectedStatus === st ? '2px solid #f97316' : '2px solid transparent',
+              borderBottom: selectedStatus === st ? '2px solid var(--accent)' : '2px solid transparent',
               background: 'transparent',
-              color: selectedStatus === st ? '#f97316' : '#64748b',
+              color: selectedStatus === st ? 'var(--accent-ink)' : 'var(--ink-3)',
               fontWeight: selectedStatus === st ? 700 : 600,
               fontSize: '0.86rem',
               cursor: 'pointer',
@@ -320,13 +270,13 @@ export function ProjectsDirectoryPage() {
         <div style={{
           textAlign: 'center',
           padding: '4rem 1.5rem',
-          background: '#ffffff',
+          background: 'var(--surface)',
           borderRadius: 16,
-          border: '1px dashed #cbd5e1'
+          border: '1px dashed var(--border-strong)'
         }}>
-          <Layers size={40} style={{ color: '#94a3b8', marginBottom: '0.75rem' }} />
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1e293b' }}>No projects match your filter</h3>
-          <p style={{ fontSize: '0.88rem', color: '#64748b', marginTop: '0.3rem' }}>
+          <Layers size={40} style={{ color: 'var(--ink-4)', marginBottom: '0.75rem' }} />
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--ink)' }}>No projects match your filter</h3>
+          <p style={{ fontSize: '0.88rem', color: 'var(--ink-3)', marginTop: '0.3rem' }}>
             Try resetting your search query or choosing another sector filter.
           </p>
         </div>
@@ -341,9 +291,9 @@ export function ProjectsDirectoryPage() {
               <div
                 key={proj.id}
                 style={{
-                  background: '#ffffff',
+                  background: 'var(--surface)',
                   borderRadius: 16,
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid var(--border)',
                   padding: '1.5rem',
                   boxShadow: '0 3px 12px rgba(15,23,42,0.04)',
                   transition: 'all 0.2s ease',
@@ -377,8 +327,8 @@ export function ProjectsDirectoryPage() {
                       </span>
 
                       <span style={{
-                        background: '#f1f5f9',
-                        color: '#475569',
+                        background: 'var(--surface-3)',
+                        color: 'var(--ink-2)',
                         fontSize: '0.74rem',
                         fontWeight: 600,
                         padding: '0.2rem 0.6rem',
@@ -392,10 +342,10 @@ export function ProjectsDirectoryPage() {
                         alignItems: 'center',
                         gap: '0.25rem',
                         fontSize: '0.76rem',
-                        color: '#64748b',
+                        color: 'var(--ink-3)',
                         fontWeight: 600
                       }}>
-                        <MapPin size={13} style={{ color: '#ea580c' }} />
+                        <MapPin size={13} style={{ color: 'var(--accent-ink)' }} />
                         PIN {proj.pinCode} · {proj.district}, {proj.state}
                       </span>
                     </div>
@@ -405,7 +355,7 @@ export function ProjectsDirectoryPage() {
                       style={{
                         fontSize: '1.25rem',
                         fontWeight: 800,
-                        color: '#0f172a',
+                        color: 'var(--ink)',
                         cursor: 'pointer',
                         lineHeight: 1.35,
                         margin: 0
@@ -413,7 +363,7 @@ export function ProjectsDirectoryPage() {
                     >
                       {proj.nameEnglish}
                     </h2>
-                    <div style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '0.2rem', fontWeight: 500 }}>
+                    <div style={{ fontSize: '0.9rem', color: 'var(--ink-3)', marginTop: '0.2rem', fontWeight: 500 }}>
                       {proj.nameHindi}
                     </div>
                   </div>
@@ -424,12 +374,12 @@ export function ProjectsDirectoryPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
-                      background: '#f8fafc',
-                      border: '1px solid #e2e8f0',
+                      background: 'var(--surface-2)',
+                      border: '1px solid var(--border)',
                       borderRadius: 10,
                       padding: '0.45rem 0.75rem',
                       fontSize: '0.75rem',
-                      color: '#0f2d59',
+                      color: 'var(--ink)',
                       fontWeight: 700,
                       textDecoration: 'none',
                       display: 'inline-flex',
@@ -449,21 +399,21 @@ export function ProjectsDirectoryPage() {
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
                   gap: '1rem',
-                  background: '#f8fafc',
+                  background: 'var(--surface-2)',
                   padding: '1rem 1.1rem',
                   borderRadius: 12,
                   marginBottom: '1rem'
                 }}>
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '0.3rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.3rem' }}>
                       <span>Physical Progress</span>
                       <span>{proj.progressPhysical}%</span>
                     </div>
-                    <div style={{ height: 8, background: '#e2e8f0', borderRadius: 999, overflow: 'hidden' }}>
+                    <div style={{ height: 8, background: 'var(--border)', borderRadius: 999, overflow: 'hidden' }}>
                       <div style={{
                         height: '100%',
                         width: `${proj.progressPhysical}%`,
-                        background: proj.progressPhysical >= 90 ? '#10b981' : '#3b82f6',
+                        background: proj.progressPhysical >= 90 ? 'var(--good-solid)' : 'var(--brand)',
                         borderRadius: 999,
                         transition: 'width 0.5s ease'
                       }} />
@@ -471,15 +421,15 @@ export function ProjectsDirectoryPage() {
                   </div>
 
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '0.3rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.3rem' }}>
                       <span>Financial Progress</span>
                       <span>{proj.progressFinancial}%</span>
                     </div>
-                    <div style={{ height: 8, background: '#e2e8f0', borderRadius: 999, overflow: 'hidden' }}>
+                    <div style={{ height: 8, background: 'var(--border)', borderRadius: 999, overflow: 'hidden' }}>
                       <div style={{
                         height: '100%',
                         width: `${proj.progressFinancial}%`,
-                        background: '#8b5cf6',
+                        background: 'var(--viz-4)',
                         borderRadius: 999,
                         transition: 'width 0.5s ease'
                       }} />
@@ -487,9 +437,9 @@ export function ProjectsDirectoryPage() {
                   </div>
 
                   <div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>Sanctioned / Anticipated Cost</div>
-                    <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#0f172a', marginTop: '0.1rem' }}>
-                      ₹{origCr} Cr <span style={{ color: '#94a3b8', fontWeight: 500 }}>→ ₹{antCr} Cr</span>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--ink-3)', fontWeight: 600 }}>Sanctioned / Anticipated Cost</div>
+                    <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.1rem' }}>
+                      ₹{origCr} Cr <span style={{ color: 'var(--ink-4)', fontWeight: 500 }}>→ ₹{antCr} Cr</span>
                     </div>
                   </div>
                 </div>
@@ -498,9 +448,9 @@ export function ProjectsDirectoryPage() {
                 {proj.neutralDelaySummary && (
                   <div style={{
                     fontSize: '0.82rem',
-                    color: '#475569',
-                    background: '#fefce8',
-                    borderLeft: '3px solid #f59e0b',
+                    color: 'var(--ink-2)',
+                    background: 'var(--warn-soft)',
+                    borderLeft: '3px solid var(--warn)',
                     padding: '0.55rem 0.85rem',
                     borderRadius: '0 8px 8px 0',
                     marginBottom: '1rem',
@@ -516,7 +466,7 @@ export function ProjectsDirectoryPage() {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: '0.5rem',
-                  borderTop: '1px solid #f1f5f9',
+                  borderTop: '1px solid var(--border)',
                   paddingTop: '0.85rem',
                   flexWrap: 'wrap'
                 }}>
@@ -526,8 +476,8 @@ export function ProjectsDirectoryPage() {
                       style={{
                         padding: '0.35rem 0.7rem',
                         borderRadius: 8,
-                        background: '#eff6ff',
-                        color: '#1d4ed8',
+                        background: 'var(--brand-soft)',
+                        color: 'var(--brand-ink)',
                         fontSize: '0.78rem',
                         fontWeight: 700,
                         textDecoration: 'none',
@@ -543,9 +493,9 @@ export function ProjectsDirectoryPage() {
                       style={{
                         padding: '0.35rem 0.7rem',
                         borderRadius: 8,
-                        background: '#f8fafc',
-                        border: '1px solid #e2e8f0',
-                        color: '#475569',
+                        background: 'var(--surface-2)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--ink-2)',
                         fontSize: '0.78rem',
                         fontWeight: 600,
                         textDecoration: 'none',
@@ -561,9 +511,9 @@ export function ProjectsDirectoryPage() {
                       style={{
                         padding: '0.35rem 0.7rem',
                         borderRadius: 8,
-                        background: '#f8fafc',
-                        border: '1px solid #e2e8f0',
-                        color: '#475569',
+                        background: 'var(--surface-2)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--ink-2)',
                         fontSize: '0.78rem',
                         fontWeight: 600,
                         textDecoration: 'none',
@@ -579,9 +529,9 @@ export function ProjectsDirectoryPage() {
                       style={{
                         padding: '0.35rem 0.7rem',
                         borderRadius: 8,
-                        background: '#f8fafc',
-                        border: '1px solid #e2e8f0',
-                        color: '#475569',
+                        background: 'var(--surface-2)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--ink-2)',
                         fontSize: '0.78rem',
                         fontWeight: 600,
                         textDecoration: 'none',
@@ -597,9 +547,9 @@ export function ProjectsDirectoryPage() {
                       style={{
                         padding: '0.35rem 0.7rem',
                         borderRadius: 8,
-                        background: '#f8fafc',
-                        border: '1px solid #e2e8f0',
-                        color: '#475569',
+                        background: 'var(--surface-2)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--ink-2)',
                         fontSize: '0.78rem',
                         fontWeight: 600,
                         textDecoration: 'none',
@@ -617,7 +567,7 @@ export function ProjectsDirectoryPage() {
                     style={{
                       background: 'none',
                       border: 'none',
-                      color: '#f97316',
+                      color: 'var(--accent-ink)',
                       fontWeight: 700,
                       fontSize: '0.82rem',
                       cursor: 'pointer',

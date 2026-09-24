@@ -27,27 +27,27 @@ interface MetricCardProps {
 export function MetricCard({
   metric,
   icon,
-  color = '#6b7280',
+  color = 'var(--ink-3)',
   onViewDetails,
   isLoading = false,
   className = '',
 }: MetricCardProps) {
-  const isAvailable = metric.status !== 'unavailable' && metric.value !== null && metric.value !== '—';
+  const isAvailable = metric.status !== 'unavailable' && metric.value !== null && metric.value !== '-';
   const isStale = metric.status === 'stale' || (metric.freshness && !isFresh(metric.freshness));
 
   const displayValue = isLoading
     ? null
     : metric.value === null || metric.value === undefined
-    ? '—'
+    ? '-'
     : metric.value;
 
   const statusColor = !isAvailable
-    ? '#94a3b8'
+    ? 'var(--ink-4)'
     : metric.status === 'stale'
-    ? '#f97316'
+    ? 'var(--accent-ink)'
     : metric.status === 'partial'
-    ? '#f59e0b'
-    : '#10b981';
+    ? 'var(--warn)'
+    : 'var(--good)';
 
   return (
     <div
@@ -60,7 +60,7 @@ export function MetricCard({
       }}
     >
       {icon && (
-        <div style={{ marginBottom: '0.75rem', color: isAvailable ? color : '#94a3b8' }}>
+        <div style={{ marginBottom: '0.75rem', color: isAvailable ? color : 'var(--ink-4)' }}>
           {icon}
         </div>
       )}
@@ -77,7 +77,7 @@ export function MetricCard({
             style={{
               fontSize: '2rem',
               fontWeight: 800,
-              color: isAvailable ? 'var(--color-primary)' : '#cbd5e1',
+              color: isAvailable ? 'var(--color-primary)' : 'var(--ink-4)',
               lineHeight: 1.1,
               marginBottom: '0.35rem',
             }}
@@ -106,7 +106,7 @@ export function MetricCard({
               style={{
                 fontSize: '0.65rem',
                 fontWeight: 700,
-                color: '#ef4444',
+                color: 'var(--bad)',
                 marginBottom: '0.35rem',
               }}
             >
@@ -122,9 +122,9 @@ export function MetricCard({
                 gap: '0.25rem',
                 fontSize: '0.65rem',
                 fontWeight: 600,
-                color: '#94a3b8',
+                color: 'var(--ink-4)',
                 padding: '2px 8px',
-                background: '#f1f5f9',
+                background: 'var(--surface-3)',
                 borderRadius: 999,
                 marginBottom: '0.35rem',
               }}
@@ -138,7 +138,7 @@ export function MetricCard({
               style={{
                 fontSize: '0.65rem',
                 fontWeight: 600,
-                color: '#f97316',
+                color: 'var(--accent-ink)',
                 marginBottom: '0.35rem',
               }}
             >
@@ -250,8 +250,8 @@ export function LocationHeader({
               onClick={handleChangePin}
               style={{
                 padding: '0.4rem 1rem',
-                background: '#f1f5f9',
-                border: '1px solid #cbd5e1',
+                background: 'var(--surface-3)',
+                border: '1px solid var(--border-strong)',
                 borderRadius: '8px',
                 cursor: 'pointer',
                 fontSize: '0.8rem',
@@ -270,8 +270,8 @@ export function LocationHeader({
             onClick={actions.onShare}
             className="time-tab"
             style={{
-              background: '#ffffff',
-              border: '1px solid #e2e8f0',
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
               display: 'flex',
               alignItems: 'center',
               gap: '0.35rem',
@@ -307,8 +307,8 @@ export function LocationHeader({
             onClick={actions.onLocate}
             className="time-tab"
             style={{
-              background: '#ffffff',
-              border: '1px solid #e2e8f0',
+              background: 'var(--surface)',
+              border: '1px solid var(--border)',
               display: 'flex',
               alignItems: 'center',
               gap: '0.35rem',
@@ -338,7 +338,7 @@ export function LocationHeader({
               display: 'flex',
               alignItems: 'center',
               gap: '0.35rem',
-              background: following ? '#10b981' : 'var(--color-primary)',
+              background: following ? 'var(--good-solid)' : 'var(--color-primary)',
             }}
           >
             {following ? (
@@ -381,7 +381,7 @@ export function AboutLocationCard({
   isLoading = false,
 }: AboutLocationCardProps) {
   const formatDate = (d: Date | string | null | undefined) => {
-    if (!d) return '—';
+    if (!d) return '-';
     const date = typeof d === 'string' ? new Date(d) : d;
     return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
   };
@@ -389,9 +389,9 @@ export function AboutLocationCard({
   const infoRows = [
     { label: 'Location', value: `${location.district}, ${location.state}`, badge: location.stateCode },
     { label: 'District', value: location.district },
-    { label: 'Region', value: location.region || '—' },
-    { label: 'Area Type', value: location.areaType || '—' },
-    { label: 'Population (Est.)', value: population || '—' },
+    { label: 'Region', value: location.region || '-' },
+    { label: 'Area Type', value: location.areaType || '-' },
+    { label: 'Population (Est.)', value: population || '-' },
     { label: 'Last Updated', value: formatDate(lastUpdated) },
   ];
 

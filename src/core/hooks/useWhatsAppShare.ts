@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 /**
- * WhatsApp share hook — generates the formatted JanCheck share card.
+ * WhatsApp share hook: generates the formatted JantaX share card.
  * Copies to clipboard and opens WhatsApp API link.
  */
 
@@ -22,7 +22,7 @@ interface ShareData {
 export function useWhatsAppShare() {
   const generateCard = useCallback((data: ShareData): string => {
     return [
-      `🚨 *${data.moduleNameHindi} — JanCheck रिपोर्ट* 🚨`,
+      `*${data.moduleNameHindi} · JantaX रिपोर्ट*`,
       ``,
       `📍 *पिन कोड:* ${data.pinCode}`,
       `📋 *${data.titleHindi}*`,
@@ -38,8 +38,9 @@ export function useWhatsAppShare() {
       `   ${data.responsibleOrg}`,
       ``,
       `🔗 *सत्यापन:* ${data.sourceUrl}`,
+      `🔎 *JantaX:* https://jantax.in/pin/${data.pinCode}`,
       ``,
-      `— JanCheck (जनचेक) | "Pin code dalo, hisaab lo"`,
+      `JantaX | PIN code dalo, hisaab lo`,
     ].join('\n');
   }, []);
 

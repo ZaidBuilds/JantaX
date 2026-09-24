@@ -79,9 +79,9 @@ export function ReportForm() {
   };
 
   return (
-    <div style={{ background: '#ffffff', borderRadius: 20, border: '1px solid #e2e8f0', padding: '2rem', boxShadow: '0 4px 20px rgba(15,23,42,0.04)' }}>
+    <div style={{ background: 'var(--surface)', borderRadius: 20, border: '1px solid var(--border)', padding: '2rem', boxShadow: '0 4px 20px rgba(15,23,42,0.04)' }}>
       {/* Wizard Progress Bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '1rem', overflowX: 'auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem', overflowX: 'auto' }}>
         {[
           { num: 1, label: 'Location' },
           { num: 2, label: 'Category' },
@@ -95,8 +95,8 @@ export function ReportForm() {
               width: 28,
               height: 28,
               borderRadius: '50%',
-              background: step === s.num ? '#f97316' : step > s.num ? '#10b981' : '#f1f5f9',
-              color: step >= s.num ? '#ffffff' : '#64748b',
+              background: step === s.num ? 'var(--accent-solid)' : step > s.num ? 'var(--good-solid)' : 'var(--surface-3)',
+              color: step >= s.num ? 'var(--on-solid)' : 'var(--ink-3)',
               fontWeight: 800,
               fontSize: '0.8rem',
               display: 'flex',
@@ -105,7 +105,7 @@ export function ReportForm() {
             }}>
               {step > s.num ? '✓' : s.num}
             </div>
-            <span style={{ fontSize: '0.82rem', fontWeight: step === s.num ? 700 : 500, color: step === s.num ? '#0f172a' : '#64748b' }}>
+            <span style={{ fontSize: '0.82rem', fontWeight: step === s.num ? 700 : 500, color: step === s.num ? 'var(--ink)' : 'var(--ink-3)' }}>
               {s.label}
             </span>
           </div>
@@ -115,12 +115,12 @@ export function ReportForm() {
       {/* STEP 1: Select Location */}
       {step === 1 && (
         <div style={{ display: 'grid', gap: '1.25rem' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <MapPin size={20} style={{ color: '#ea580c' }} /> Step 1: Select Defect Location
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <MapPin size={20} style={{ color: 'var(--accent-ink)' }} /> Step 1: Select Defect Location
           </h3>
 
           <div>
-            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               Pincode *
             </label>
             <input
@@ -128,12 +128,12 @@ export function ReportForm() {
               placeholder="6-digit Indian PIN code"
               value={pinCode}
               onChange={(e) => handlePinChange(e.target.value)}
-              style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: '0.9rem' }}
+              style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid var(--border-strong)', fontSize: '0.9rem' }}
             />
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               Landmark / Specific Location *
             </label>
             <input
@@ -141,18 +141,18 @@ export function ReportForm() {
               placeholder="e.g. Near Mayur Vihar Exit Ramp, Main Road Junction..."
               value={landmark}
               onChange={(e) => setLandmark(e.target.value)}
-              style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: '0.9rem' }}
+              style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid var(--border-strong)', fontSize: '0.9rem' }}
             />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>District</label>
-              <input type="text" value={district} onChange={(e) => setDistrict(e.target.value)} style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: '0.9rem' }} />
+              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>District</label>
+              <input type="text" value={district} onChange={(e) => setDistrict(e.target.value)} style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid var(--border-strong)', fontSize: '0.9rem' }} />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>State</label>
-              <input type="text" value={state} onChange={(e) => setState(e.target.value)} style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: '0.9rem' }} />
+              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>State</label>
+              <input type="text" value={state} onChange={(e) => setState(e.target.value)} style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid var(--border-strong)', fontSize: '0.9rem' }} />
             </div>
           </div>
 
@@ -163,8 +163,8 @@ export function ReportForm() {
             style={{
               padding: '0.75rem 1.5rem',
               borderRadius: 10,
-              background: 'var(--gradient-accent)',
-              color: '#ffffff',
+              background: 'var(--brand)',
+              color: 'var(--on-solid)',
               fontWeight: 700,
               fontSize: '0.88rem',
               border: 'none',
@@ -185,8 +185,8 @@ export function ReportForm() {
       {/* STEP 2: Select Category */}
       {step === 2 && (
         <div style={{ display: 'grid', gap: '1.25rem' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <Layers size={20} style={{ color: '#2563eb' }} /> Step 2: Select Defect Category
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <Layers size={20} style={{ color: 'var(--brand-ink)' }} /> Step 2: Select Defect Category
           </h3>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
@@ -198,9 +198,9 @@ export function ReportForm() {
                 style={{
                   padding: '1.1rem 1rem',
                   borderRadius: 12,
-                  border: category === cat ? '2px solid #f97316' : '1px solid #e2e8f0',
-                  background: category === cat ? '#fff7ed' : '#ffffff',
-                  color: category === cat ? '#ea580c' : '#1e293b',
+                  border: category === cat ? '2px solid var(--accent)' : '1px solid var(--border)',
+                  background: category === cat ? 'var(--accent-soft)' : 'var(--surface)',
+                  color: category === cat ? 'var(--accent-ink)' : 'var(--ink)',
                   fontWeight: category === cat ? 800 : 600,
                   fontSize: '0.95rem',
                   cursor: 'pointer',
@@ -213,10 +213,10 @@ export function ReportForm() {
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
-            <button type="button" onClick={() => setStep(1)} style={{ padding: '0.65rem 1.25rem', borderRadius: 10, background: '#f1f5f9', border: '1px solid #cbd5e1', fontWeight: 700, cursor: 'pointer' }}>
+            <button type="button" onClick={() => setStep(1)} style={{ padding: '0.65rem 1.25rem', borderRadius: 10, background: 'var(--surface-3)', border: '1px solid var(--border-strong)', fontWeight: 700, cursor: 'pointer' }}>
               <ArrowLeft size={14} /> Back
             </button>
-            <button type="button" onClick={() => setStep(3)} style={{ padding: '0.75rem 1.5rem', borderRadius: 10, background: 'var(--gradient-accent)', color: '#ffffff', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+            <button type="button" onClick={() => setStep(3)} style={{ padding: '0.75rem 1.5rem', borderRadius: 10, background: 'var(--brand)', color: 'var(--on-solid)', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
               Next: Describe Issue <ArrowRight size={16} />
             </button>
           </div>
@@ -226,12 +226,12 @@ export function ReportForm() {
       {/* STEP 3: Describe Issue */}
       {step === 3 && (
         <div style={{ display: 'grid', gap: '1.25rem' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <FileText size={20} style={{ color: '#10b981' }} /> Step 3: Describe Issue & Impact
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <FileText size={20} style={{ color: 'var(--good)' }} /> Step 3: Describe Issue & Impact
           </h3>
 
           <div>
-            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               Issue Headline / Short Title *
             </label>
             <input
@@ -239,12 +239,12 @@ export function ReportForm() {
               placeholder="e.g. Deep Pothole Cluster near Flyover Exit..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: '0.9rem' }}
+              style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid var(--border-strong)', fontSize: '0.9rem' }}
             />
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.35rem' }}>
+            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               Detailed Description & Ground Impact *
             </label>
             <textarea
@@ -252,15 +252,15 @@ export function ReportForm() {
               placeholder="Describe physical defect condition, safety hazards to commuters or students..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: '0.9rem', outline: 'none' }}
+              style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid var(--border-strong)', fontSize: '0.9rem', outline: 'none' }}
             />
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
-            <button type="button" onClick={() => setStep(2)} style={{ padding: '0.65rem 1.25rem', borderRadius: 10, background: '#f1f5f9', border: '1px solid #cbd5e1', fontWeight: 700, cursor: 'pointer' }}>
+            <button type="button" onClick={() => setStep(2)} style={{ padding: '0.65rem 1.25rem', borderRadius: 10, background: 'var(--surface-3)', border: '1px solid var(--border-strong)', fontWeight: 700, cursor: 'pointer' }}>
               <ArrowLeft size={14} /> Back
             </button>
-            <button type="button" onClick={() => setStep(4)} disabled={!description.trim()} style={{ padding: '0.75rem 1.5rem', borderRadius: 10, background: 'var(--gradient-accent)', color: '#ffffff', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', opacity: !description.trim() ? 0.6 : 1 }}>
+            <button type="button" onClick={() => setStep(4)} disabled={!description.trim()} style={{ padding: '0.75rem 1.5rem', borderRadius: 10, background: 'var(--brand)', color: 'var(--on-solid)', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', opacity: !description.trim() ? 0.6 : 1 }}>
               Next: Upload Evidence <ArrowRight size={16} />
             </button>
           </div>
@@ -270,17 +270,17 @@ export function ReportForm() {
       {/* STEP 4: Upload Evidence */}
       {step === 4 && (
         <div style={{ display: 'grid', gap: '1.25rem' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <Camera size={20} style={{ color: '#8b5cf6' }} /> Step 4: Upload Media Evidence
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <Camera size={20} style={{ color: 'var(--viz-4)' }} /> Step 4: Upload Media Evidence
           </h3>
 
           <EvidenceUploader files={evidenceFiles} onChange={(f) => setEvidenceFiles(f)} />
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
-            <button type="button" onClick={() => setStep(3)} style={{ padding: '0.65rem 1.25rem', borderRadius: 10, background: '#f1f5f9', border: '1px solid #cbd5e1', fontWeight: 700, cursor: 'pointer' }}>
+            <button type="button" onClick={() => setStep(3)} style={{ padding: '0.65rem 1.25rem', borderRadius: 10, background: 'var(--surface-3)', border: '1px solid var(--border-strong)', fontWeight: 700, cursor: 'pointer' }}>
               <ArrowLeft size={14} /> Back
             </button>
-            <button type="button" onClick={() => setStep(5)} style={{ padding: '0.75rem 1.5rem', borderRadius: 10, background: 'var(--gradient-accent)', color: '#ffffff', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
+            <button type="button" onClick={() => setStep(5)} style={{ padding: '0.75rem 1.5rem', borderRadius: 10, background: 'var(--brand)', color: 'var(--on-solid)', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
               Next: Review & Submit <ArrowRight size={16} />
             </button>
           </div>
@@ -290,12 +290,12 @@ export function ReportForm() {
       {/* STEP 5: Review & Anonymity Settings */}
       {step === 5 && (
         <div style={{ display: 'grid', gap: '1.25rem' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
             Step 5: Review & Anonymity Selection
           </h3>
 
-          <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 14, border: '1px solid #e2e8f0' }}>
-            <div style={{ fontSize: '0.86rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.75rem' }}>
+          <div style={{ background: 'var(--surface-2)', padding: '1.25rem', borderRadius: 14, border: '1px solid var(--border)' }}>
+            <div style={{ fontSize: '0.86rem', fontWeight: 700, color: 'var(--ink)', marginBottom: '0.75rem' }}>
               Choose Reporter Identity Privacy:
             </div>
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
@@ -306,8 +306,8 @@ export function ReportForm() {
                   flex: 1,
                   padding: '1rem',
                   borderRadius: 12,
-                  border: isAnonymous ? '2px solid #2563eb' : '1px solid #cbd5e1',
-                  background: isAnonymous ? '#eff6ff' : '#ffffff',
+                  border: isAnonymous ? '2px solid var(--brand-ink)' : '1px solid var(--border-strong)',
+                  background: isAnonymous ? 'var(--brand-soft)' : 'var(--surface)',
                   fontWeight: 700,
                   fontSize: '0.88rem',
                   cursor: 'pointer',
@@ -316,7 +316,7 @@ export function ReportForm() {
                   gap: '0.5rem'
                 }}
               >
-                <EyeOff size={18} style={{ color: '#2563eb' }} /> Anonymous Submission (Recommended)
+                <EyeOff size={18} style={{ color: 'var(--brand-ink)' }} /> Anonymous Submission (Recommended)
               </button>
 
               <button
@@ -326,8 +326,8 @@ export function ReportForm() {
                   flex: 1,
                   padding: '1rem',
                   borderRadius: 12,
-                  border: !isAnonymous ? '2px solid #2563eb' : '1px solid #cbd5e1',
-                  background: !isAnonymous ? '#eff6ff' : '#ffffff',
+                  border: !isAnonymous ? '2px solid var(--brand-ink)' : '1px solid var(--border-strong)',
+                  background: !isAnonymous ? 'var(--brand-soft)' : 'var(--surface)',
                   fontWeight: 700,
                   fontSize: '0.88rem',
                   cursor: 'pointer',
@@ -336,19 +336,19 @@ export function ReportForm() {
                   gap: '0.5rem'
                 }}
               >
-                <UserCheck size={18} style={{ color: '#2563eb' }} /> Public Auditor Profile
+                <UserCheck size={18} style={{ color: 'var(--brand-ink)' }} /> Public Auditor Profile
               </button>
             </div>
 
             {!isAnonymous && (
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem', marginTop: '1rem' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '0.3rem' }}>Your Name</label>
-                  <input type="text" value={reporterName} onChange={(e) => setReporterName(e.target.value)} placeholder="Full Name" style={{ width: '100%', padding: '0.55rem 0.75rem', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.3rem' }}>Your Name</label>
+                  <input type="text" value={reporterName} onChange={(e) => setReporterName(e.target.value)} placeholder="Full Name" style={{ width: '100%', padding: '0.55rem 0.75rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.85rem' }} />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: '#334155', marginBottom: '0.3rem' }}>Email / Phone</label>
-                  <input type="text" value={reporterContact} onChange={(e) => setReporterContact(e.target.value)} placeholder="Email or Phone" style={{ width: '100%', padding: '0.55rem 0.75rem', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: '0.85rem' }} />
+                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.3rem' }}>Email / Phone</label>
+                  <input type="text" value={reporterContact} onChange={(e) => setReporterContact(e.target.value)} placeholder="Email or Phone" style={{ width: '100%', padding: '0.55rem 0.75rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.85rem' }} />
                 </div>
               </div>
             )}
@@ -369,10 +369,10 @@ export function ReportForm() {
           />
 
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
-            <button type="button" onClick={() => setStep(4)} style={{ padding: '0.65rem 1.25rem', borderRadius: 10, background: '#f1f5f9', border: '1px solid #cbd5e1', fontWeight: 700, cursor: 'pointer' }}>
+            <button type="button" onClick={() => setStep(4)} style={{ padding: '0.65rem 1.25rem', borderRadius: 10, background: 'var(--surface-3)', border: '1px solid var(--border-strong)', fontWeight: 700, cursor: 'pointer' }}>
               <ArrowLeft size={14} /> Back
             </button>
-            <button type="button" onClick={handleFinalSubmit} style={{ padding: '0.75rem 1.75rem', borderRadius: 10, background: 'var(--gradient-accent)', color: '#ffffff', fontWeight: 800, border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 4px 14px rgba(249,115,22,0.35)' }}>
+            <button type="button" onClick={handleFinalSubmit} style={{ padding: '0.75rem 1.75rem', borderRadius: 10, background: 'var(--brand)', color: 'var(--on-solid)', fontWeight: 800, border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 4px 14px rgba(249,115,22,0.35)' }}>
               <Send size={16} /> Confirm & Submit Report
             </button>
           </div>
@@ -382,20 +382,20 @@ export function ReportForm() {
       {/* STEP 6: Confirmation & Moderation Pipeline */}
       {step === 6 && createdReport && (
         <div style={{ display: 'grid', gap: '1.25rem', textAlign: 'center', padding: '1rem 0' }}>
-          <div style={{ width: 64, height: 64, borderRadius: '50%', background: '#ecfdf5', color: '#047857', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontSize: '2rem' }}>
+          <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--good-soft)', color: 'var(--good)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontSize: '2rem' }}>
             <CheckCircle2 size={36} />
           </div>
 
-          <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+          <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
             Report Submitted Successfully!
           </h3>
 
-          <p style={{ fontSize: '0.92rem', color: '#475569', maxWidth: 600, margin: '0 auto', lineHeight: 1.55 }}>
+          <p style={{ fontSize: '0.92rem', color: 'var(--ink-2)', maxWidth: 600, margin: '0 auto', lineHeight: 1.55 }}>
             Report Reference ID: <strong>{createdReport.id}</strong>. Your evidence has entered the automated moderation pipeline.
           </p>
 
           {duplicateWarning && (
-            <div style={{ background: '#fffbebf', border: '1px solid #fde68a', borderRadius: 12, padding: '1rem', color: '#b45309', fontSize: '0.86rem', textAlign: 'left', maxWidth: 650, margin: '0 auto' }}>
+            <div style={{ background: '#fffbebf', border: '1px solid var(--warn-line)', borderRadius: 12, padding: '1rem', color: 'var(--warn)', fontSize: '0.86rem', textAlign: 'left', maxWidth: 650, margin: '0 auto' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 800, marginBottom: '0.3rem' }}>
                 <AlertTriangle size={16} /> Similar Existing Report Detected!
               </div>
@@ -406,13 +406,13 @@ export function ReportForm() {
           <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginTop: '1rem' }}>
             <button
               onClick={() => navigate(`/reports/${createdReport.id}`)}
-              style={{ padding: '0.75rem 1.5rem', borderRadius: 10, background: '#0f2d59', color: '#ffffff', fontWeight: 700, border: 'none', cursor: 'pointer' }}
+              style={{ padding: '0.75rem 1.5rem', borderRadius: 10, background: 'var(--brand)', color: 'var(--on-solid)', fontWeight: 700, border: 'none', cursor: 'pointer' }}
             >
               View Report & Moderation Status
             </button>
             <button
               onClick={() => navigate(`/reports/${createdReport.id}/action`)}
-              style={{ padding: '0.75rem 1.5rem', borderRadius: 10, background: 'var(--gradient-accent)', color: '#ffffff', fontWeight: 700, border: 'none', cursor: 'pointer' }}
+              style={{ padding: '0.75rem 1.5rem', borderRadius: 10, background: 'var(--brand)', color: 'var(--on-solid)', fontWeight: 700, border: 'none', cursor: 'pointer' }}
             >
               Take Official Action (CPGRAMS / State Portal)
             </button>

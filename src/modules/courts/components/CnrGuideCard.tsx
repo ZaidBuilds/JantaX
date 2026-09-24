@@ -9,10 +9,10 @@ export function CnrGuideCard() {
     <div className="jantax-card" style={{ padding: '1.75rem', marginBottom: '1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
         <div>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f2d59', margin: '0 0 0.3rem' }}>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: '0 0 0.3rem' }}>
             How to Track Your Case via 16-Digit CNR Number on eCourts
           </h3>
-          <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--ink-3)', margin: 0 }}>
             Every pending district court case in India has a unique CNR number allowing instant tracking of daily order sheets and cause lists.
           </p>
         </div>
@@ -26,8 +26,8 @@ export function CnrGuideCard() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.35rem',
-              background: '#f97316',
-              color: '#ffffff',
+              background: 'var(--accent-solid)',
+              color: 'var(--on-solid)',
               padding: '0.55rem 1.1rem',
               borderRadius: 10,
               fontSize: '0.82rem',
@@ -46,8 +46,8 @@ export function CnrGuideCard() {
           <div
             key={s.stepNumber}
             style={{
-              background: '#f8fafc',
-              border: '1px solid #e2e8f0',
+              background: 'var(--surface-2)',
+              border: '1px solid var(--border)',
               borderRadius: 12,
               padding: '1.25rem',
             }}
@@ -58,8 +58,8 @@ export function CnrGuideCard() {
                   width: 26,
                   height: 26,
                   borderRadius: '50%',
-                  background: '#0f2d59',
-                  color: '#ffffff',
+                  background: 'var(--brand)',
+                  color: 'var(--on-solid)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -69,16 +69,16 @@ export function CnrGuideCard() {
               >
                 {s.stepNumber}
               </div>
-              <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#0f2d59', margin: 0 }}>
+              <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
                 {s.title}
               </h4>
             </div>
 
-            <p style={{ fontSize: '0.82rem', color: '#475569', lineHeight: 1.45, marginBottom: '0.6rem' }}>
+            <p style={{ fontSize: '0.82rem', color: 'var(--ink-2)', lineHeight: 1.45, marginBottom: '0.6rem' }}>
               {s.description}
             </p>
 
-            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: 6, padding: '0.4rem 0.6rem', fontSize: '0.72rem', color: '#2563eb', fontWeight: 600 }}>
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, padding: '0.4rem 0.6rem', fontSize: '0.72rem', color: 'var(--brand-ink)', fontWeight: 600 }}>
               {s.example}
             </div>
           </div>

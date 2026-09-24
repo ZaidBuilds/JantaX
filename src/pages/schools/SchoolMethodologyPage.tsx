@@ -41,7 +41,7 @@ const DIMENSIONS = [
       { min: 40, status: 'Needs Attention', description: '40-59% posts filled' },
       { min: -Infinity, status: 'Critical', description: '<40% posts filled' },
     ],
-    confidence: 'High — official government data',
+    confidence: 'High · official government data',
     limitations: 'Official counts may lag actual teacher deployments by 1-2 months. Para-teacher data updated quarterly.',
   },
   {
@@ -61,7 +61,7 @@ const DIMENSIONS = [
       { min: 25, status: 'Needs Attention', description: '25-49: Significant issues reported' },
       { min: -Infinity, status: 'Critical', description: '<25: Major deficiencies reported' },
     ],
-    confidence: 'Varies — minimum 5 reports across 3 days required for display',
+    confidence: 'Varies · minimum 5 reports across 3 days required for display',
     limitations: 'Crowdsourced. Contributors are self-selected. Seasonal variation (monsoon, summer) affects reports. NOT statistically representative.',
   },
 ];
@@ -73,8 +73,8 @@ export function SchoolMethodologyPage() {
     <div className="container" style={{ padding: '2rem 1.25rem', maxWidth: 900 }}>
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', margin: 0 }}>School Health Score — Methodology</h2>
-          <span style={{ fontFamily: 'monospace', background: '#f8fafc', border: '1px solid #e2e8f0', padding: '2px 7px', borderRadius: 4, fontSize: '0.72rem' }}>{SCORING_VERSION}</span>
+          <h2 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', margin: 0 }}>School Health Score · Methodology</h2>
+          <span style={{ fontFamily: 'monospace', background: 'var(--surface-2)', border: '1px solid var(--border)', padding: '2px 7px', borderRadius: 4, fontSize: '0.72rem' }}>{SCORING_VERSION}</span>
         </div>
         <p style={{ fontSize: '0.85rem', opacity: 0.7 }}>
           Transparent explanation of how JantaX calculates school health scores. No black boxes.
@@ -82,7 +82,7 @@ export function SchoolMethodologyPage() {
       </div>
 
       <div style={{ display: 'grid', gap: '1rem', marginBottom: '2rem' }}>
-        <div className="glass-card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid #10b981' }}>
+        <div className="glass-card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid var(--good)' }}>
           <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 0.5rem' }}>What this is NOT</h3>
           <ul style={{ fontSize: '0.85rem', opacity: 0.8, margin: 0, paddingLeft: '1.25rem', display: 'grid', gap: '0.3rem' }}>
             <li>This score is NOT a government rating or official certification</li>
@@ -92,7 +92,7 @@ export function SchoolMethodologyPage() {
           </ul>
         </div>
 
-        <div className="glass-card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid #2563eb' }}>
+        <div className="glass-card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid var(--brand-ink)' }}>
           <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 0.5rem' }}>What this IS</h3>
           <ul style={{ fontSize: '0.85rem', opacity: 0.8, margin: 0, paddingLeft: '1.25rem', display: 'grid', gap: '0.3rem' }}>
             <li>A weighted composite of measurable, source-attributed indicators</li>
@@ -107,7 +107,7 @@ export function SchoolMethodologyPage() {
 
       <div style={{ display: 'grid', gap: '0.75rem', marginBottom: '2rem' }}>
         {DIMENSIONS.map(dim => (
-          <div key={dim.id} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' }}>
+          <div key={dim.id} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
             <button
               onClick={() => setExpandedDim(expandedDim === dim.id ? null : dim.id)}
               style={{ width: '100%', padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
@@ -123,19 +123,19 @@ export function SchoolMethodologyPage() {
             </button>
 
             {expandedDim === dim.id && (
-              <div style={{ padding: '0 1.25rem 1.25rem', borderTop: '1px solid #f1f5f9' }}>
+              <div style={{ padding: '0 1.25rem 1.25rem', borderTop: '1px solid var(--border)' }}>
                 <div style={{ marginTop: '1rem' }}>
-                  <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Formula</div>
-                  <code style={{ fontSize: '0.85rem', background: '#f8fafc', padding: '0.5rem 0.75rem', borderRadius: 8, display: 'block', border: '1px solid #e2e8f0', fontFamily: 'monospace' }}>
+                  <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Formula</div>
+                  <code style={{ fontSize: '0.85rem', background: 'var(--surface-2)', padding: '0.5rem 0.75rem', borderRadius: 8, display: 'block', border: '1px solid var(--border)', fontFamily: 'monospace' }}>
                     {dim.formula}
                   </code>
                 </div>
 
                 <div style={{ marginTop: '1rem' }}>
-                  <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Inputs & Weights</div>
+                  <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Inputs & Weights</div>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
                     <thead>
-                      <tr style={{ color: '#64748b', borderBottom: '1px solid #f1f5f9' }}>
+                      <tr style={{ color: 'var(--ink-3)', borderBottom: '1px solid var(--border)' }}>
                         <th style={{ textAlign: 'left', padding: '0.4rem 0.5rem', fontWeight: 600 }}>Input</th>
                         <th style={{ textAlign: 'left', padding: '0.4rem 0.5rem', fontWeight: 600 }}>Source</th>
                         <th style={{ textAlign: 'center', padding: '0.4rem 0.5rem', fontWeight: 600 }}>Weight</th>
@@ -143,10 +143,10 @@ export function SchoolMethodologyPage() {
                     </thead>
                     <tbody>
                       {dim.inputs.map((inp, i) => (
-                        <tr key={i} style={{ borderBottom: '1px solid #f8fafc' }}>
+                        <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
                           <td style={{ padding: '0.4rem 0.5rem', fontWeight: 600 }}>{inp.name}</td>
                           <td style={{ padding: '0.4rem 0.5rem', fontSize: '0.75rem', opacity: 0.7 }}>{inp.source}</td>
-                          <td style={{ padding: '0.4rem 0.5rem', textAlign: 'center', fontWeight: 700, color: '#2563eb' }}>{inp.weight}</td>
+                          <td style={{ padding: '0.4rem 0.5rem', textAlign: 'center', fontWeight: 700, color: 'var(--brand-ink)' }}>{inp.weight}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -154,11 +154,11 @@ export function SchoolMethodologyPage() {
                 </div>
 
                 <div style={{ marginTop: '1rem' }}>
-                  <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Status Thresholds</div>
+                  <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Status Thresholds</div>
                   <div style={{ display: 'grid', gap: '0.4rem' }}>
                     {dim.statusThresholds.map((t, i) => (
                       <div key={i} style={{ display: 'flex', gap: '0.75rem', fontSize: '0.82rem' }}>
-                        <span style={{ fontWeight: 800, minWidth: 120, color: t.status === 'Stable' ? '#166534' : t.status === 'Watch' ? '#92400e' : t.status === 'Needs Attention' ? '#c2410c' : '#991b1b' }}>
+                        <span style={{ fontWeight: 800, minWidth: 120, color: t.status === 'Stable' ? 'var(--good)' : t.status === 'Watch' ? 'var(--warn)' : t.status === 'Needs Attention' ? 'var(--accent-ink)' : 'var(--bad)' }}>
                           {t.status}
                         </span>
                         <span style={{ opacity: 0.7 }}>{t.description}</span>
@@ -167,10 +167,10 @@ export function SchoolMethodologyPage() {
                   </div>
                 </div>
 
-                <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', alignItems: 'flex-start', padding: '0.75rem', background: '#fef3c7', borderRadius: 8 }}>
-                  <AlertTriangle size={14} style={{ color: '#92400e', flexShrink: 0, marginTop: 2 }} />
+                <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', alignItems: 'flex-start', padding: '0.75rem', background: 'var(--warn-soft)', borderRadius: 8 }}>
+                  <AlertTriangle size={14} style={{ color: 'var(--warn)', flexShrink: 0, marginTop: 2 }} />
                   <div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#92400e', marginBottom: '0.2rem' }}>Limitations</div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--warn)', marginBottom: '0.2rem' }}>Limitations</div>
                     <div style={{ fontSize: '0.78rem', opacity: 0.8 }}>{dim.limitations}</div>
                   </div>
                 </div>
@@ -184,10 +184,10 @@ export function SchoolMethodologyPage() {
         <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '1rem' }}>Status Labels</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem' }}>
           {[
-            { status: 'Stable', color: '#166534', bg: '#dcfce7', desc: '≥75 score. Conditions generally satisfactory.', icon: CheckCircle2 },
-            { status: 'Watch', color: '#92400e', bg: '#fef3c7', desc: '50-74 score. Some concerns present.', icon: Info },
-            { status: 'Needs Attention', color: '#c2410c', bg: '#ffedd5', desc: '25-49 score. Significant issues reported.', icon: AlertTriangle },
-            { status: 'Critical', color: '#991b1b', bg: '#fee2e2', desc: '<25 score. Major deficiencies requiring urgent action.', icon: AlertTriangle },
+            { status: 'Stable', color: 'var(--good)', bg: 'var(--good-soft)', desc: '≥75 score. Conditions generally satisfactory.', icon: CheckCircle2 },
+            { status: 'Watch', color: 'var(--warn)', bg: 'var(--warn-soft)', desc: '50-74 score. Some concerns present.', icon: Info },
+            { status: 'Needs Attention', color: 'var(--accent-ink)', bg: 'var(--accent-soft)', desc: '25-49 score. Significant issues reported.', icon: AlertTriangle },
+            { status: 'Critical', color: 'var(--bad)', bg: 'var(--bad-soft)', desc: '<25 score. Major deficiencies requiring urgent action.', icon: AlertTriangle },
           ].map(item => (
             <div key={item.status} style={{ background: item.bg, borderRadius: 10, padding: '1rem' }}>
               <div style={{ fontWeight: 800, fontSize: '0.88rem', color: item.color, marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
@@ -209,7 +209,7 @@ export function SchoolMethodologyPage() {
             { name: 'Citizen Check-ins', type: 'C' as const, desc: 'GPS-tagged observations submitted by citizens through JantaX app. Voluntary, not statistically representative.' },
             { name: 'MDM Portal', type: 'B' as const, desc: 'Mid-day meal serving records. Self-reported by schools. Covers meal uptake and feeding days.' },
           ].map(src => (
-            <div key={src.name} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start', padding: '0.75rem', background: '#f8fafc', borderRadius: 8 }}>
+            <div key={src.name} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start', padding: '0.75rem', background: 'var(--surface-2)', borderRadius: 8 }}>
               <SourceBadge sourceType={src.type} sourceName={src.name} />
               <p style={{ fontSize: '0.82rem', opacity: 0.7, margin: 0 }}>{src.desc}</p>
             </div>
@@ -217,12 +217,12 @@ export function SchoolMethodologyPage() {
         </div>
       </div>
 
-      <div className="glass-card" style={{ padding: '1.25rem', borderLeft: '4px solid #64748b' }}>
+      <div className="glass-card" style={{ padding: '1.25rem', borderLeft: '4px solid var(--border-strong)' }}>
         <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Versioning</h3>
         <p style={{ fontSize: '0.82rem', opacity: 0.7, margin: 0 }}>
-          This methodology version is <code style={{ background: '#f1f5f9', padding: '1px 4px', borderRadius: 3 }}>{SCORING_VERSION}</code>.
+          This methodology version is <code style={{ background: 'var(--surface-3)', padding: '1px 4px', borderRadius: 3 }}>{SCORING_VERSION}</code>.
           Scores are recalculated whenever underlying data changes. Methodology changes are documented here with prior versions archived.
-          Schools are never re-scored retroactively with new methodology — a new version creates new scores while preserving old ones.
+          Schools are never re-scored retroactively with new methodology · a new version creates new scores while preserving old ones.
         </p>
       </div>
     </div>

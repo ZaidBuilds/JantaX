@@ -9,25 +9,25 @@ interface SchoolDashProps {
 }
 
 const METRIC_LABELS: Record<string, { en: string; hi: string; icon: string }> = {
-  teacherPresent: { en: 'Teacher Present', hi: 'शिक्षक मौजूद', icon: '👨‍🏫' },
-  toiletUsable: { en: 'Toilet Usable', hi: 'शौचालय चालू', icon: '🚻' },
-  mdmServed: { en: 'MDM Served', hi: 'मिड-डे मील', icon: '🍱' },
-  learningMaterials: { en: 'Materials Available', hi: 'सामग्री उपलब्ध', icon: '📚' },
-  classroomReady: { en: 'Classroom Ready', hi: 'कक्षा तैयार', icon: '🏫' },
+  teacherPresent: { en: 'Teacher Present', hi: 'शिक्षक मौजूद', icon: '' },
+  toiletUsable: { en: 'Toilet Usable', hi: 'शौचालय चालू', icon: '' },
+  mdmServed: { en: 'MDM Served', hi: 'मिड-डे मील', icon: '' },
+  learningMaterials: { en: 'Materials Available', hi: 'सामग्री उपलब्ध', icon: '' },
+  classroomReady: { en: 'Classroom Ready', hi: 'कक्षा तैयार', icon: '' },
 };
 
 const STATUS_COLORS: Record<string, string> = {
   'Needs Attention': '#ef4444',
-  'Mixed Signals': '#f59e0b',
-  'Looking Steady': '#10b981',
+  'Mixed Signals': 'var(--warn)',
+  'Looking Steady': 'var(--good)',
 };
 
 function MetricBadge({ state }: { state: string }) {
   const colors: Record<string, { bg: string; text: string; label: string }> = {
-    yes: { bg: '#dcfce7', text: '#166534', label: '✅ हां' },
-    no: { bg: '#fecaca', text: '#991b1b', label: '❌ नहीं' },
-    not_sure: { bg: '#fef3c7', text: '#92400e', label: '❓ पता नहीं' },
-    no_data: { bg: '#f3f4f6', text: '#6b7280', label: '— डेटा नहीं' },
+    yes: { bg: 'var(--good-soft)', text: 'var(--good)', label: '✓ हां' },
+    no: { bg: 'var(--bad-line)', text: 'var(--bad)', label: '✕ नहीं' },
+    not_sure: { bg: 'var(--warn-soft)', text: 'var(--warn)', label: 'पता नहीं' },
+    no_data: { bg: 'var(--surface-3)', text: 'var(--ink-3)', label: '- डेटा नहीं' },
   };
   const c = colors[state] || colors.no_data;
   return (
@@ -111,12 +111,12 @@ export function SchoolDashboard({ onSelectSchool, pinFilter }: SchoolDashProps) 
   return (
     <div className="module-dashboard">
       {/* Module Title & Icon Header */}
-      <div className="module-header" style={{ borderLeft: '4px solid #3b82f6', paddingLeft: '1rem', marginBottom: '1.5rem' }}>
+      <div className="module-header" style={{ borderLeft: '4px solid var(--brand-ink)', paddingLeft: '1rem', marginBottom: '1.5rem' }}>
         <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-primary)' }}>
-          <span>🏫</span> स्कूल ठीक करो — School Scorecard
+          <span></span> स्कूल ठीक करो · School Scorecard
         </h2>
         <p style={{ margin: '0.25rem 0 0', opacity: 0.7, fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-          सरकारी स्कूल गुणवत्ता — UDISE+ डेटा बनाम अभिभावक जांच (CPSS Core Metric)
+          सरकारी स्कूल गुणवत्ता · UDISE+ डेटा बनाम अभिभावक जांच (CPSS Core Metric)
         </p>
       </div>
 
@@ -126,13 +126,13 @@ export function SchoolDashboard({ onSelectSchool, pinFilter }: SchoolDashProps) 
           onClick={() => setActiveView('list')}
           className={`time-tab ${activeView === 'list' ? 'active' : ''}`}
         >
-          🏫 Schools List (स्कूल सूची)
+          Schools List (स्कूल सूची)
         </button>
         <button
           onClick={() => setActiveView('district')}
           className={`time-tab ${activeView === 'district' ? 'active' : ''}`}
         >
-          📊 District Dashboard (ज़िला स्कोरकार्ड)
+          District Dashboard (ज़िला स्कोरकार्ड)
         </button>
       </div>
 
@@ -142,7 +142,7 @@ export function SchoolDashboard({ onSelectSchool, pinFilter }: SchoolDashProps) 
           <div className="search-bar" style={{ margin: '0 0 1.5rem 0' }}>
             <input
               type="text"
-              placeholder="🔍 पिन कोड / UDISE कोड / स्कूल / ज़िला खोजें (Search school, UDISE, PIN)..."
+              placeholder="पिन कोड / UDISE कोड / स्कूल / ज़िला खोजें (Search school, UDISE, PIN)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="form-input"
@@ -170,23 +170,23 @@ export function SchoolDashboard({ onSelectSchool, pinFilter }: SchoolDashProps) 
           {/* Aggregated Stats Grid */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
             
-            <div className="glass-card" style={{ padding: '1.25rem', textAlign: 'center', borderTop: '3px solid #3b82f6' }}>
+            <div className="glass-card" style={{ padding: '1.25rem', textAlign: 'center', borderTop: '3px solid var(--brand-ink)' }}>
               <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--color-primary)' }}>{filtered.length}</div>
               <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Total Tracked Schools</div>
             </div>
 
-            <div className="glass-card" style={{ padding: '1.25rem', textAlign: 'center', borderTop: '3px solid #10b981' }}>
-              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#10b981' }}>{districtStats.avgScore} / 100</div>
+            <div className="glass-card" style={{ padding: '1.25rem', textAlign: 'center', borderTop: '3px solid var(--good)' }}>
+              <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--good)' }}>{districtStats.avgScore} / 100</div>
               <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Average School Score</div>
             </div>
 
-            <div className="glass-card" style={{ padding: '1.25rem', textAlign: 'center', borderTop: '3px solid #06b6d4' }}>
-              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#06b6d4' }}>{districtStats.toiletRate}%</div>
+            <div className="glass-card" style={{ padding: '1.25rem', textAlign: 'center', borderTop: '3px solid var(--viz-6)' }}>
+              <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--viz-6)' }}>{districtStats.toiletRate}%</div>
               <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Usable Toilets Claimed</div>
             </div>
 
-            <div className="glass-card" style={{ padding: '1.25rem', textAlign: 'center', borderTop: '3px solid #ef4444' }}>
-              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#ef4444' }}>{districtStats.criticalCount}</div>
+            <div className="glass-card" style={{ padding: '1.25rem', textAlign: 'center', borderTop: '3px solid var(--bad)' }}>
+              <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--bad)' }}>{districtStats.criticalCount}</div>
               <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-secondary)', marginTop: '0.25rem' }}>Critical Schools (&lt;50 Score)</div>
             </div>
 
@@ -194,8 +194,8 @@ export function SchoolDashboard({ onSelectSchool, pinFilter }: SchoolDashProps) 
 
           {/* Critical schools list section */}
           <div className="glass-card" style={{ padding: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              ⚠️ Critical Attention Required / तत्काल ध्यान देने योग्य स्कूल
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: 'var(--bad)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              Critical Attention Required / तत्काल ध्यान देने योग्य स्कूल
             </h3>
             <p style={{ fontSize: '0.8rem', opacity: 0.7, marginBottom: '1.25rem' }}>
               ज़िले के सबसे कम स्कोर वाले सरकारी स्कूल जहाँ शौचालय, पानी या शिक्षकों की भारी कमी है।
@@ -213,7 +213,7 @@ export function SchoolDashboard({ onSelectSchool, pinFilter }: SchoolDashProps) 
                     background: 'rgba(239, 68, 68, 0.04)',
                     borderRadius: '8px',
                     border: '1px solid rgba(239, 68, 68, 0.15)',
-                    borderLeft: '4px solid #ef4444',
+                    borderLeft: '4px solid var(--bad)',
                     cursor: 'pointer',
                   }}
                 >
@@ -222,7 +222,7 @@ export function SchoolDashboard({ onSelectSchool, pinFilter }: SchoolDashProps) 
                     <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>DISE: {school.udiseCode} · PIN: {school.location.pinCode}</span>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#ef4444' }}>{school.groundTruthScore}</span>
+                    <span style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--bad)' }}>{school.groundTruthScore}</span>
                     <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>/100</span>
                   </div>
                 </div>
@@ -238,8 +238,8 @@ export function SchoolDashboard({ onSelectSchool, pinFilter }: SchoolDashProps) 
 
 function SchoolCard({ school, onClick }: { school: SchoolRecord; onClick: () => void }) {
   const { language } = useLanguage();
-  const statusColor = STATUS_COLORS[school.status] || '#6b7280';
-  const scoreColor = school.groundTruthScore >= 70 ? '#10b981' : school.groundTruthScore >= 40 ? '#f59e0b' : '#ef4444';
+  const statusColor = STATUS_COLORS[school.status] || 'var(--ink-3)';
+  const scoreColor = school.groundTruthScore >= 70 ? 'var(--good)' : school.groundTruthScore >= 40 ? 'var(--warn)' : 'var(--bad)';
 
   return (
     <div
@@ -251,7 +251,7 @@ function SchoolCard({ school, onClick }: { school: SchoolRecord; onClick: () => 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
         <div>
           <div style={{ fontSize: '0.7rem', opacity: 0.6, letterSpacing: '1px', textTransform: 'uppercase' }}>
-            📍 PIN {school.location.pinCode} · {school.location.district}
+            PIN {school.location.pinCode} · {school.location.district}
           </div>
           <h3 style={{ margin: '0.25rem 0', fontSize: '1rem', lineHeight: 1.3 }}>
             {language === 'hi' ? school.titleHindi : school.titleEnglish}
@@ -285,7 +285,7 @@ function SchoolCard({ school, onClick }: { school: SchoolRecord; onClick: () => 
         color: statusColor,
         marginBottom: '0.75rem',
       }}>
-        {school.statusHindi} — {school.status}
+        {school.statusHindi} · {school.status}
       </div>
 
       {/* Claim vs Reality */}
@@ -299,10 +299,10 @@ function SchoolCard({ school, onClick }: { school: SchoolRecord; onClick: () => 
           padding: '0.5rem',
           borderRadius: '8px',
           background: 'rgba(59, 130, 246, 0.08)',
-          borderLeft: '3px solid #3b82f6',
+          borderLeft: '3px solid var(--brand-ink)',
         }}>
-          <div style={{ fontSize: '0.6rem', fontWeight: 700, color: '#3b82f6', marginBottom: '0.25rem' }}>
-            📈 सरकारी दावा
+          <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'var(--brand-ink)', marginBottom: '0.25rem' }}>
+            सरकारी दावा
           </div>
           <div style={{ fontSize: '0.72rem', lineHeight: 1.4 }}>
             {school.claim.labelHindi}
@@ -312,10 +312,10 @@ function SchoolCard({ school, onClick }: { school: SchoolRecord; onClick: () => 
           padding: '0.5rem',
           borderRadius: '8px',
           background: 'rgba(239, 68, 68, 0.08)',
-          borderLeft: '3px solid #ef4444',
+          borderLeft: '3px solid var(--bad)',
         }}>
-          <div style={{ fontSize: '0.6rem', fontWeight: 700, color: '#ef4444', marginBottom: '0.25rem' }}>
-            👁️ जमीनी हकीकत
+          <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'var(--bad)', marginBottom: '0.25rem' }}>
+            जमीनी हकीकत
           </div>
           <div style={{ fontSize: '0.72rem', lineHeight: 1.4 }}>
             {school.reality.labelHindi}
@@ -350,7 +350,7 @@ function SchoolCard({ school, onClick }: { school: SchoolRecord; onClick: () => 
         borderTop: '1px solid rgba(255,255,255,0.08)',
         paddingTop: '0.5rem',
       }}>
-        <span>👤 {school.responsiblePerson}</span>
+        <span>{school.responsiblePerson}</span>
         <span>{school.totalCheckIns} check-ins · {school.confidenceLevel}</span>
       </div>
     </div>
