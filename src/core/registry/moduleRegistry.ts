@@ -20,8 +20,13 @@ import {
 import type { ModuleMeta } from '../types';
 
 /**
- * Master registry of all 14 JanCheck modules.
+ * Master registry of all JantaX domain modules.
  * This drives the Home page grid, sidebar navigation, and URL routing.
+ *
+ * `dataStatus` MUST reflect reality: 'live' means the module is served from
+ * the database via the API; 'demo' means it renders local fixture data and
+ * must be labelled as such in the UI. Never mark a fixture-backed module
+ * 'live' — see docs/MODULE_EXPANSION_PROTOCOL.md (no fabricated data).
  */
 export const MODULE_REGISTRY: ModuleMeta[] = [
   {
@@ -33,8 +38,9 @@ export const MODULE_REGISTRY: ModuleMeta[] = [
     description: 'Track roads, bridges, highways — claim vs reality',
     descriptionHindi: 'सड़कें, पुल, राजमार्ग — दावा बनाम हकीकत',
     dataSource: 'MoSPI Flash Reports, PMGSY, NHAI',
+    dataStatus: 'live',
     isLive: true,
-    recordCount: 15,
+    recordCount: 18,
   },
   {
     id: 'school',
@@ -45,6 +51,7 @@ export const MODULE_REGISTRY: ModuleMeta[] = [
     description: 'Government school quality — UDISE+ vs parent check-ins',
     descriptionHindi: 'सरकारी स्कूल गुणवत्ता — सरकारी डेटा बनाम अभिभावक जांच',
     dataSource: 'UDISE+, ASER Reports',
+    dataStatus: 'live',
     isLive: true,
     recordCount: 8,
   },
@@ -57,7 +64,8 @@ export const MODULE_REGISTRY: ModuleMeta[] = [
     description: 'Municipal services — water, garbage, roads, drains',
     descriptionHindi: 'नगरपालिका सेवाएं — पानी, कचरा, सड़कें, नाले',
     dataSource: 'Swachh Survekshan, AMRUT',
-    isLive: true,
+    dataStatus: 'demo',
+    isLive: false,
     recordCount: 15,
   },
   {
@@ -69,6 +77,7 @@ export const MODULE_REGISTRY: ModuleMeta[] = [
     description: 'Where does your PIN code tax money go?',
     descriptionHindi: 'आपके पिन कोड का टैक्स पैसा कहां जाता है?',
     dataSource: 'Union/State Budget PDFs, Expenditure Reports',
+    dataStatus: 'live',
     isLive: true,
     recordCount: 5,
   },
@@ -81,20 +90,9 @@ export const MODULE_REGISTRY: ModuleMeta[] = [
     description: 'Who got the contract? How much? Delivered what?',
     descriptionHindi: 'ठेका किसको मिला? कितने में? क्या दिया?',
     dataSource: 'GeM, CPPP Tender Awards',
+    dataStatus: 'live',
     isLive: true,
     recordCount: 25,
-  },
-  {
-    id: 'andhbhakt',
-    nameHindi: 'अंधभक्त स्टेट',
-    nameEnglish: 'State CM Accountability',
-    icon: Landmark,
-    color: '#dc2626',
-    description: 'State Chief Ministers claims vs CAG audits & RTIs side-by-side',
-    descriptionHindi: 'मुख्यमंत्रियों के दावे बनाम CAG ऑडिट और RTI हकीकत',
-    dataSource: 'CAG State Reports, PIB, Twitter, RTIs',
-    isLive: true,
-    recordCount: 13,
   },
   {
     id: 'hospital',
@@ -105,6 +103,7 @@ export const MODULE_REGISTRY: ModuleMeta[] = [
     description: 'Is your PHC open? Doctor present? Medicines available?',
     descriptionHindi: 'आपका PHC खुला है? डॉक्टर है? दवाइयां हैं?',
     dataSource: 'HMIS, NHM Facility Registry',
+    dataStatus: 'live',
     isLive: true,
     recordCount: 12,
   },
@@ -117,6 +116,7 @@ export const MODULE_REGISTRY: ModuleMeta[] = [
     description: 'Builder promise vs possession reality',
     descriptionHindi: 'बिल्डर का वादा बनाम कब्ज़ा हकीकत',
     dataSource: 'State RERA Portals',
+    dataStatus: 'live',
     isLive: true,
     recordCount: 8,
   },
@@ -129,8 +129,9 @@ export const MODULE_REGISTRY: ModuleMeta[] = [
     description: 'Ration shop open? Full quota given? Quality OK?',
     descriptionHindi: 'राशन दुकान खुली? पूरा कोटा? गुणवत्ता?',
     dataSource: 'NFSA Portal, State ePOS',
+    dataStatus: 'live',
     isLive: true,
-    recordCount: 22,
+    recordCount: 18,
   },
   {
     id: 'utility',
@@ -141,7 +142,8 @@ export const MODULE_REGISTRY: ModuleMeta[] = [
     description: 'Power cuts, water hours, bill disputes',
     descriptionHindi: 'बिजली कटौती, पानी के घंटे, bill विवाद',
     dataSource: 'State Discom/Jal Board Portals',
-    isLive: true,
+    dataStatus: 'demo',
+    isLive: false,
     recordCount: 14,
   },
   {
@@ -153,7 +155,8 @@ export const MODULE_REGISTRY: ModuleMeta[] = [
     description: 'Filed RTI? Track response time and quality',
     descriptionHindi: 'RTI दाखिल किया? जवाब का समय और गुणवत्ता देखें',
     dataSource: 'RTI Online Portal',
-    isLive: true,
+    dataStatus: 'demo',
+    isLive: false,
     recordCount: 10,
   },
   {
@@ -165,7 +168,8 @@ export const MODULE_REGISTRY: ModuleMeta[] = [
     description: 'Real-time AQI and river water quality for your area',
     descriptionHindi: 'आपके इलाके का AQI और नदी का पानी',
     dataSource: 'CPCB Real-time AQI, River BOD',
-    isLive: true,
+    dataStatus: 'demo',
+    isLive: false,
     recordCount: 16,
   },
   {
@@ -177,7 +181,8 @@ export const MODULE_REGISTRY: ModuleMeta[] = [
     description: 'Land records, mutation status, encroachment alerts',
     descriptionHindi: 'ज़मीन रिकॉर्ड, म्यूटेशन, अतिक्रमण अलर्ट',
     dataSource: 'State Bhulekh/Dharitree Portals',
-    isLive: true,
+    dataStatus: 'demo',
+    isLive: false,
     recordCount: 18,
   },
   {
@@ -189,20 +194,26 @@ export const MODULE_REGISTRY: ModuleMeta[] = [
     description: 'Candidate declared vs actual election spending',
     descriptionHindi: 'उम्मीदवार का घोषित खर्चा बनाम असली',
     dataSource: 'ECI Affidavits, ADR Data',
-    isLive: true,
+    dataStatus: 'demo',
+    isLive: false,
     recordCount: 12,
   },
   {
     id: 'grievance',
     nameHindi: 'शिकायत स्कोर',
-    nameEnglish: 'CPGRAMS Shame Index',
+    nameEnglish: 'CPGRAMS Response Tracker',
     icon: TrendingDown,
     color: '#0ea5e9',
     description: 'Worst performing ministries & states ranked by backlog & delays',
     descriptionHindi: 'शिकायत विलंब सूचकांक — केंद्रीय मंत्रालय और राज्य सरकारें',
     dataSource: 'DARPG CPGRAMS Monthly Reports',
-    isLive: true,
-    recordCount: 9,
+    // Mixed: per-PIN grievance records are live from the database, but the
+    // national ministry/state rankings that headline this module have no table
+    // behind them. Stays 'demo' until those aggregates are ingested — the page
+    // labels each section separately.
+    dataStatus: 'demo',
+    isLive: false,
+    recordCount: 27,
   },
   {
     id: 'mplads',
@@ -213,7 +224,8 @@ export const MODULE_REGISTRY: ModuleMeta[] = [
     description: 'Track constituency development projects and sanctioned funds',
     descriptionHindi: 'सांसद एवं विधायक विकास निधि और विकास कार्यों की जांच',
     dataSource: 'Ministry of Statistics (MoSPI) MPLADS Portal',
-    isLive: true,
+    dataStatus: 'demo',
+    isLive: false,
     recordCount: 20,
   },
   {
@@ -225,7 +237,8 @@ export const MODULE_REGISTRY: ModuleMeta[] = [
     description: 'Locate polling station room number, BLO phone, and PwD ramps',
     descriptionHindi: 'मतदान केंद्र, कमरा संख्या और बीएलओ संपर्क विवरण',
     dataSource: 'Election Commission of India (ECI) Electoral Roll',
-    isLive: true,
+    dataStatus: 'demo',
+    isLive: false,
     recordCount: 15,
   },
   {
@@ -237,7 +250,8 @@ export const MODULE_REGISTRY: ModuleMeta[] = [
     description: 'Track 5+ year case backlogs, judge vacancies, and clearance rates',
     descriptionHindi: 'अदालती देरी, जज रिक्तियां और केस निपटान दर',
     dataSource: 'National Judicial Data Grid (NJDG) / eCourts Services',
-    isLive: true,
+    dataStatus: 'demo',
+    isLive: false,
     recordCount: 18,
   },
 ];

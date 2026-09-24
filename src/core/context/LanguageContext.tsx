@@ -9,17 +9,21 @@ export interface Language {
   dir: 'ltr';
 }
 
+/**
+ * Languages actually offered in the picker.
+ *
+ * Only English and Hindi have translations: user-facing strings are written as
+ * `tr(english, hindi)` pairs throughout the app. The eight other languages were
+ * listed here but had no strings behind them, so selecting one silently
+ * rendered English — a language picker that visibly does nothing.
+ *
+ * `LanguageCode` deliberately keeps the wider union so the architecture stays
+ * translation-ready (Notion V1 §4F). Add a language here only once its strings
+ * exist.
+ */
 export const SUPPORTED_LANGUAGES: Language[] = [
   { code: 'en', label: 'English', labelLocal: 'English', dir: 'ltr' },
   { code: 'hi', label: 'Hindi', labelLocal: 'हिन्दी', dir: 'ltr' },
-  { code: 'mr', label: 'Marathi', labelLocal: 'मराठी', dir: 'ltr' },
-  { code: 'ta', label: 'Tamil', labelLocal: 'தமிழ்', dir: 'ltr' },
-  { code: 'te', label: 'Telugu', labelLocal: 'తెలుగు', dir: 'ltr' },
-  { code: 'bn', label: 'Bengali', labelLocal: 'বাংলা', dir: 'ltr' },
-  { code: 'gu', label: 'Gujarati', labelLocal: 'ગુજરાતી', dir: 'ltr' },
-  { code: 'kn', label: 'Kannada', labelLocal: 'ಕನ್ನಡ', dir: 'ltr' },
-  { code: 'pa', label: 'Punjabi', labelLocal: 'ਪੰਜਾਬੀ', dir: 'ltr' },
-  { code: 'ml', label: 'Malayalam', labelLocal: 'മലയാളം', dir: 'ltr' },
 ];
 
 export const DEFAULT_LANGUAGE: LanguageCode = 'en';

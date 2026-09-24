@@ -16,7 +16,12 @@ export function signToken(payload: { id: string; email: string; role: UserRole; 
   return jwt.sign(payload, config.jwtSecret, { expiresIn: config.jwtExpiresIn });
 }
 
-export function requireAuth(req: AuthenticatedRequest, _res: Response, next: NextFunction) {
+/**
+ * Optional authentication. Decodes a Bearer token when one is present and
+ * attaches `req.user`; anonymous requests pass straight through. Public
+ * endpoints stay public — use `requireRole()` to actually gate a route.
+ */
+export function attachUser(req: AuthenticatedRequest, _res: Response, next: NextFunction) {
   const header = req.headers.authorization;
 
   if (!header || !header.startsWith('Bearer ')) {

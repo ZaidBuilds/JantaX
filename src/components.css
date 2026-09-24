@@ -75,17 +75,18 @@
 }
 
 .section-title {
-  font-size: 1.25rem;
+  font-size: var(--text-h2);
   font-weight: 700;
+  line-height: 1.2;
   color: var(--text-primary);
-  margin-bottom: 0.35rem;
+  margin-bottom: var(--space-1);
   letter-spacing: -0.01em;
 }
 
 .section-description {
-  font-size: 0.9rem;
+  font-size: var(--text-body);
   color: var(--text-secondary);
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
   line-height: 1.5;
 }
 
@@ -213,17 +214,52 @@
   border-color: var(--border-focus);
 }
 
-/* Container */
-.container {
-  width: 100%;
-  max-width: var(--max-width-content);
-  margin: 0 auto;
-  padding: 0 1.25rem;
-}
-
+/* Container
+   NOTE: `.container` and `.container-narrow` are layout primitives defined
+   once in index.css. Only the wide variant lives here. */
 .container-wide {
   width: 100%;
   max-width: var(--max-width-wide);
   margin: 0 auto;
   padding: 0 1.25rem;
 }
+
+/* ── National Accountability Map (India SVG) ── */
+.jx-accountability-map {
+  background: var(--map-water, #f6f8fb);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle, #e2e8f0);
+}
+.jx-map-counter {
+  position: absolute; top: 12px; left: 12px;
+  display: flex; flex-direction: column; gap: 2px;
+  background: rgba(255,255,255,0.92); backdrop-filter: blur(6px);
+  padding: 10px 14px; border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08); pointer-events: none;
+}
+.jx-map-counter__total { font-size: 1.6rem; font-weight: 800; line-height: 1; color: var(--text-primary, #0f172a); }
+.jx-map-counter__label { font-size: 0.72rem; color: var(--text-secondary, #64748b); text-transform: uppercase; letter-spacing: 0.04em; }
+.jx-map-counter__resolved { font-size: 0.78rem; font-weight: 600; color: #10b981; margin-top: 2px; }
+.jx-map-legend {
+  position: absolute; bottom: 12px; left: 12px;
+  display: flex; flex-wrap: wrap; gap: 10px;
+  background: rgba(255,255,255,0.92); backdrop-filter: blur(6px);
+  padding: 8px 12px; border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08); pointer-events: none;
+}
+.jx-map-legend__item { display: inline-flex; align-items: center; gap: 5px; font-size: 0.76rem; color: var(--text-secondary, #475569); }
+.jx-map-legend__item i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.jx-map-legend__item b { color: var(--text-primary, #0f172a); }
+.jx-map-card {
+  position: absolute; top: 12px; right: 12px; max-width: 260px;
+  display: flex; gap: 10px; align-items: flex-start;
+  background: rgba(255,255,255,0.96); backdrop-filter: blur(6px);
+  padding: 12px 14px; border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+.jx-map-card__dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.jx-map-card strong { font-size: 0.9rem; color: var(--text-primary, #0f172a); }
+.jx-map-card p { margin: 2px 0 4px; font-size: 0.78rem; color: var(--text-secondary, #64748b); }
+.jx-map-card__module { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-primary, #6366f1); font-weight: 700; }
+.jx-map-attribution { position: absolute; bottom: 6px; right: 10px; margin: 0; font-size: 0.62rem; color: var(--text-tertiary, #94a3b8); pointer-events: none; }

@@ -212,8 +212,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={onOpenAboutModal}
               className="border-2 border-[#1A1A1A] bg-white hover:bg-black/5 text-[#1A1A1A] p-1.5 text-xs font-bold uppercase transition-colors cursor-pointer"
               title="About Defect Liability Period (DLP) & Methodology"
+              aria-label="About Defect Liability Period and methodology"
             >
-              <HelpCircle className="w-4 h-4" />
+              <HelpCircle className="w-4 h-4" aria-hidden="true" />
             </button>
 
           </div>

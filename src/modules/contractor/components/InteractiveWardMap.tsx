@@ -30,7 +30,7 @@ export const InteractiveWardMap: React.FC<InteractiveWardMapProps> = ({
 }) => {
   const [selectedWardId, setSelectedWardId] = useState<string>('ward-151');
   const [selectedRoadId, setSelectedRoadId] = useState<string>('wo-101');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('DLP_BREACH_UNRESOLVED');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   const currentWard = wards.find(w => w.id === selectedWardId) || wards[0];
@@ -124,7 +124,6 @@ export const InteractiveWardMap: React.FC<InteractiveWardMapProps> = ({
               onChange={(e) => setStatusFilter(e.target.value)}
               className="w-full bg-[#FAFAFA] border-2 border-[#1A1A1A] px-3 py-2 text-xs font-bold text-[#1A1A1A] focus:outline-none focus:bg-white cursor-pointer uppercase"
             >
-              <option value="all">All Road Statuses</option>
               <option value="DLP_BREACH_UNRESOLVED">Active DLP Breaches (Red)</option>
               <option value="ACTIVE_DLP_PROTECTED">Protected & Intact (Green)</option>
             </select>

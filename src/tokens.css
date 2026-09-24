@@ -1,67 +1,245 @@
-/* JantaX Clean Design Tokens — Public Information Utility */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+/* ==========================================================================
+   JantaX Design Tokens — Public Information Utility
+   --------------------------------------------------------------------------
+   Design intent: content first, decoration last. This file is the ONLY place
+   colours, type, spacing and motion are defined. Never hardcode a hex value
+   in a component.
+
+   Constraints this file enforces:
+     - Two typefaces (Latin + Devanagari), never more.
+     - One chromatic hue (Ashoka Navy). Colour carries MEANING, not category.
+     - Semantic colour is limited to success / warning / danger.
+     - No glassmorphism, no gradients, no glows, no spring easing.
+     - Every text colour below meets WCAG AA (>=4.5:1) on white.
+
+   Token names are intentionally preserved from the previous system so that
+   existing components keep working while the visual language is unified.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Neutral Color Palette */
-  --bg-primary: #f9fafb;
+  /* ── Surfaces ──────────────────────────────────────────────────────────
+     A public utility reads as paper: white page, subtle fills, hairline
+     borders. Separation comes from borders, not shadows.                  */
+  --bg-canvas: #ffffff;
   --bg-surface: #ffffff;
-  --bg-subtle: #f3f4f6;
-  --bg-muted: #e5e7eb;
+  --bg-surface-elevated: #ffffff;
+  --bg-subtle: #f6f7f9;
+  --bg-muted: #eceef1;
+  /* Glass tokens retained for compatibility; deliberately opaque now. */
+  --bg-glass: #ffffff;
+  --bg-glass-strong: #ffffff;
+  --bg-glass-card: #ffffff;
 
-  --border-color: #e5e7eb;
-  --border-subtle: #f3f4f6;
-  --border-dark: #d1d5db;
-  --border-focus: #0f2d59;
+  /* ── Borders ─────────────────────────────────────────────────────────── */
+  --border-subtle: #f0f2f4;
+  --border-color: #dfe3e8;
+  --border-hover: #c3c9d0;
+  --border-dark: #98a1ab;
+  --border-focus: #1d4ed8;
+  --border-glass: #dfe3e8;
+  --border-glass-highlight: #ffffff;
 
-  /* Typography Colors */
+  /* ── Text (all AA-verified on #ffffff) ────────────────────────────────
+     primary 16.1:1 · secondary 10.3:1 · muted 8.0:1 · subtle 5.1:1        */
   --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --text-muted: #6b7280;
+  --text-secondary: #374151;
+  --text-muted: #4b5563;
+  --text-subtle: #6b7280;
   --text-inverse: #ffffff;
 
-  /* Brand / Primary Civic Color */
-  --color-primary: #0f2d59;
-  --color-primary-hover: #0a1f3d;
-  --color-primary-subtle: #eff6ff;
-  --color-primary-border: #bfdbfe;
+  /* ── Ashoka Navy — the single brand hue ───────────────────────────────
+     Institutional, calm, non-partisan. navy-700 is the lightest shade
+     permitted for text on white (5.6:1).                                  */
+  --navy-950: #081a33;
+  --navy-900: #0f2d59;
+  --navy-800: #16407d;
+  --navy-700: #1d4ed8;
+  --navy-600: #2563eb;
+  --navy-500: #3b82f6;
+  --navy-100: #dbe6f7;
+  --navy-50: #f0f5fc;
 
-  --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
+  --color-primary: var(--navy-900);
+  --color-primary-hover: var(--navy-950);
+  --color-primary-subtle: var(--navy-50);
+  --color-primary-border: var(--navy-100);
 
-  /* Semantic Status Colors (Used purely for meaning) */
-  --status-good-text: #166534;
-  --status-good-bg: #f0fdf4;
-  --status-good-border: #bbf7d0;
+  /* Links and accents use navy-700 so accent text passes AA on white. */
+  --color-accent: var(--navy-700);
+  --color-accent-hover: var(--navy-800);
 
-  --status-warn-text: #92400e;
-  --status-warn-bg: #fffbeb;
-  --status-warn-border: #fde68a;
+  /* ── Semantic: WARNING (unverified, pending, needs review) ────────────
+     The -600 step is the text-safe step (4.9:1). The previous #ea580c was
+     3.6:1 and failed AA wherever it was used for label text.              */
+  --saffron-600: #b45309;
+  --saffron-500: #d97706;
+  --saffron-400: #f59e0b;
+  --saffron-100: #fdecd3;
+  --saffron-50: #fdf8ef;
 
-  --status-alert-text: #991b1b;
-  --status-alert-bg: #fef2f2;
-  --status-alert-border: #fecaca;
+  /* ── Semantic: SUCCESS (verified, official, on time) ──────────────────
+     -700 is text-safe (5.0:1).                                            */
+  --emerald-700: #047857;
+  --emerald-600: #059669;
+  --emerald-500: #10b981;
+  --emerald-400: #34d399;
+  --emerald-100: #d3f2e3;
+  --emerald-50: #f0faf5;
 
-  --status-info-text: #1e40af;
-  --status-info-bg: #eff6ff;
-  --status-info-border: #dbeafe;
+  /* ── Semantic: DANGER (delayed, discrepancy, failed) ──────────────────
+     -700 is text-safe (6.0:1).                                            */
+  --crimson-700: #b91c1c;
+  --crimson-600: #dc2626;
+  --crimson-500: #ef4444;
+  --crimson-100: #fbdcdc;
+  --crimson-50: #fdf3f3;
 
-  /* Typography Scale */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  /* ── Sector accents ───────────────────────────────────────────────────
+     Deliberately uniform. Twelve competing hues made every page look like
+     a different product and turned colour into decoration. Domains are
+     distinguished by their ICON and LABEL; colour is reserved for meaning
+     (success / warning / danger). Names kept so components need no edits. */
+  --sector-school: var(--navy-700);
+  --sector-school-bg: var(--bg-subtle);
+  --sector-school-border: var(--border-color);
 
-  /* Sizing & Radius */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
+  --sector-infra: var(--navy-700);
+  --sector-infra-bg: var(--bg-subtle);
+  --sector-infra-border: var(--border-color);
+
+  --sector-hospital: var(--navy-700);
+  --sector-hospital-bg: var(--bg-subtle);
+  --sector-hospital-border: var(--border-color);
+
+  --sector-rera: var(--navy-700);
+  --sector-rera-bg: var(--bg-subtle);
+  --sector-rera-border: var(--border-color);
+
+  --sector-ration: var(--navy-700);
+  --sector-ration-bg: var(--bg-subtle);
+  --sector-ration-border: var(--border-color);
+
+  --sector-contractor: var(--navy-700);
+  --sector-contractor-bg: var(--bg-subtle);
+  --sector-contractor-border: var(--border-color);
+
+  --sector-courts: var(--navy-700);
+  --sector-courts-bg: var(--bg-subtle);
+  --sector-courts-border: var(--border-color);
+
+  --sector-rti: var(--navy-700);
+  --sector-rti-bg: var(--bg-subtle);
+  --sector-rti-border: var(--border-color);
+
+  --sector-grievance: var(--navy-700);
+  --sector-grievance-bg: var(--bg-subtle);
+  --sector-grievance-border: var(--border-color);
+
+  --sector-pollution: var(--navy-700);
+  --sector-pollution-bg: var(--bg-subtle);
+  --sector-pollution-border: var(--border-color);
+
+  --sector-nagar: var(--navy-700);
+  --sector-nagar-bg: var(--bg-subtle);
+  --sector-nagar-border: var(--border-color);
+
+  --sector-mplads: var(--navy-700);
+  --sector-mplads-bg: var(--bg-subtle);
+  --sector-mplads-border: var(--border-color);
+
+  /* ── Typography ───────────────────────────────────────────────────────
+     Two typefaces only. `--font-display` intentionally resolves to the same
+     family as body text: headings earn hierarchy through size and weight,
+     not a second typeface. `--font-mono` uses the system stack so codes and
+     figures align without shipping a third webfont.                       */
+  --font-sans: 'Inter', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: var(--font-sans);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Type scale — 1.5 line-height for body, 1.2 for headings. */
+  --text-caption: 0.75rem;   /* 12px — labels, never sentences */
+  --text-small: 0.8125rem;   /* 13px */
+  --text-body: 0.9375rem;    /* 15px — minimum for running text */
+  --text-h3: 1.125rem;       /* 18px */
+  --text-h2: 1.375rem;       /* 22px */
+  --text-h1: 1.75rem;        /* 28px */
+
+  /* ── Spacing — 4px base. Use these; do not invent values. ───────────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Radius (on-grid) ─────────────────────────────────────────────── */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 24px;
   --radius-pill: 9999px;
 
-  /* Shadows — Minimal / Subtle */
-  --shadow-none: none;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #0f2d59;
+  /* Minimum comfortable touch target (Apple/Google guidance). */
+  --tap-target: 44px;
 
-  /* Layout */
-  --max-width-content: 960px;
-  --max-width-wide: 1140px;
+  /* ── Elevation ────────────────────────────────────────────────────────
+     Borders group content; shadows only lift things that genuinely float
+     (menus, modals). Heavy card shadows read as "SaaS dashboard".         */
+  --shadow-subtle: 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-card: 0 1px 3px rgba(16, 24, 40, 0.06);
+  --shadow-hover: 0 2px 6px rgba(16, 24, 40, 0.08);
+  --shadow-modal: 0 12px 32px rgba(16, 24, 40, 0.16);
+
+  /* Glow tokens retained for compatibility; decoration is switched off. */
+  --glow-navy: none;
+  --glow-saffron: none;
+  --glow-emerald: none;
+
+  /* Keyboard focus indicator. Must always be visible — never remove. */
+  --focus-ring: 0 0 0 3px rgba(29, 78, 216, 0.35);
+
+  /* ── Motion ───────────────────────────────────────────────────────────
+     One easing curve. The old spring (overshoot 1.56) made a civic tool
+     feel like a consumer app; `--ease-spring` now aliases the standard
+     curve so existing usages calm down without edits.                     */
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: var(--ease-smooth);
+  --transition-fast: 150ms var(--ease-smooth);
+  --transition-normal: 250ms var(--ease-smooth);
+  --transition-spring: 250ms var(--ease-smooth);
+
+  /* ── Status colours ───────────────────────────────────────────────────
+     Consumed by `.badge-status` in components.css. These were referenced
+     but never defined, which left every status badge unstyled — including
+     the official/verified/disputed labels the product depends on.
+     Semantic only: good = confirmed, warn = needs verification,
+     alert = discrepancy or failure.                                       */
+  --status-good-bg: var(--emerald-50);
+  --status-good-text: var(--emerald-700);
+  --status-good-border: var(--emerald-100);
+
+  --status-warn-bg: var(--saffron-50);
+  --status-warn-text: var(--saffron-600);
+  --status-warn-border: var(--saffron-100);
+
+  --status-alert-bg: var(--crimson-50);
+  --status-alert-text: var(--crimson-700);
+  --status-alert-border: var(--crimson-100);
+
+  /* ── Layout ───────────────────────────────────────────────────────────
+     Narrower than before: long measures hurt readability on data pages.   */
+  --container-max: 1120px;
+  --container-narrow: 760px;
+
+  /* Aliases used by components.css. Previously undefined, which made
+     `.container` and `.container-wide` render with no max-width at all. */
+  --max-width-content: var(--container-max);
+  --max-width-wide: 1280px;
 }

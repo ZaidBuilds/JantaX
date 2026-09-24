@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { prisma } from '../prisma';
+import { ProjectStatus } from '@prisma/client';
 import { requireRole } from '../middleware/auth';
 
 // Project response types
@@ -101,20 +102,19 @@ router.get('/', async (req: Request, res: Response) => {
     
     // Get infrastructure projects if requested or if no type specified
     if (!projectType || projectType === 'infra') {
+      const whereInfra: any = {};
+      if (pincode) whereInfra.pincodeCode = String(pincode).replace(/\D/g, '');
+      if (status && Object.values(ProjectStatus).includes(status as any)) {
+        whereInfra.status = status as ProjectStatus;
+      }
+      if (minBudget !== undefined || maxBudget !== undefined) {
+        whereInfra.budget = {};
+        if (minBudget !== undefined) whereInfra.budget.gte = parseFloat(minBudget);
+        if (maxBudget !== undefined) whereInfra.budget.lte = parseFloat(maxBudget);
+      }
+
       const infraProjects = await prisma.infraProject.findMany({
-        where: {
-          ...(pincode ? { pincodeCode: String(pincode).replace(/\D/g, '') } : {}),
-          ...(status ? { status } : {}),
-          ...(minBudget !== undefined && maxBudget !== undefined ? {
-            budget: { gte: parseFloat(minBudget), lte: parseFloat(maxBudget) }
-          } : {}),
-          ...(minBudget !== undefined ? {
-            budget: { gte: parseFloat(minBudget) }
-          } : {}),
-          ...(maxBudget !== undefined ? {
-            budget: { lte: parseFloat(maxBudget) }
-          } : {})
-        },
+        where: whereInfra,
         select: {
           id: true,
           titleEnglish: true,
@@ -179,14 +179,14 @@ router.get('/', async (req: Request, res: Response) => {
     
     // Get RERA projects if requested or if no type specified
     if (!projectType || projectType === 'rera') {
+      const whereRera: any = {};
+      if (pincode) whereRera.pincodeCode = String(pincode).replace(/\D/g, '');
+      if (status && Object.values(ProjectStatus).includes(status as any)) {
+        whereRera.status = status as ProjectStatus;
+      }
+
       const reraProjects = await prisma.reraProject.findMany({
-        where: {
-          ...(pincode ? { pincodeCode: String(pincode).replace(/\D/g, '') } : {}),
-          ...(status ? { status } : {}),
-          ...(minBudget !== undefined && maxBudget !== undefined ? {
-            // RERA doesn't have budget in the same format, skip for now
-          } : {})
-        },
+        where: whereRera,
         select: {
           id: true,
           name: true,
@@ -232,16 +232,16 @@ router.get('/', async (req: Request, res: Response) => {
           progress: {
             completionPercentage: null,
             milestone: p.delayMonths !== null && p.delayMonths !== 0 ? 
-              Delayed by  months : 
-              'On schedule'
+              `Delayed by ${p.delayMonths} months` : 
+              null
           },
           metadata: {
             promoter: p.promoter,
             reraNumber: p.reraNumber,
-            delayMonths: p.delayMonths
+            source: 'State RERA Portal'
           },
           sourceInfo: {
-            name: 'RERA',
+            name: 'State RERA Portal',
             freshness: p.updatedAt.toISOString(),
             reliability: 'high'
           }
@@ -252,29 +252,21 @@ router.get('/', async (req: Request, res: Response) => {
     // Get contractor projects if requested or if no type specified
     if (!projectType || projectType === 'contractor') {
       const contractorProjects = await prisma.contractorProject.findMany({
-        where: {
-          ...(pincode ? { pincodeCode: String(pincode).replace(/\D/g, '') } : {}),
-          ...(status ? { status } : {}),
-          ...(minBudget !== undefined && maxBudget !== undefined ? {
-            // ContractorProject doesn't have budget in the same format, skip for now
-          } : {})
-        },
+        where: status ? { status: status as ProjectStatus } : {},
         select: {
           id: true,
-          name: true,
-          projectName: true,
+          workOrderNo: true,
+          workName: true,
+          workNameHi: true,
+          sanctionedLakhs: true,
+          paymentReleased: true,
           status: true,
-          pincode: {
-            select: {
-              code: true,
-              state: true,
-              district: true
-            }
-          },
-          updatedAt: true,
+          delayMonths: true,
+          defectReports: true,
           contractor: {
             select: {
-              name: true
+              name: true,
+              registeredState: true
             }
           }
         }
@@ -283,19 +275,19 @@ router.get('/', async (req: Request, res: Response) => {
       contractorProjects.forEach(p => {
         projects.push({
           id: p.id,
-          projectId: null,
-          title: p.projectName || p.name,
+          projectId: p.workOrderNo,
+          title: p.workName,
           description: null,
           projectType: 'contractor',
           status: p.status,
-          location: p.pincode ? {
-            pincode: p.pincode.code,
-            state: p.pincode.state,
-            district: p.pincode.district
+          location: p.contractor?.registeredState ? {
+            pincode: '',
+            state: p.contractor.registeredState,
+            district: ''
           } : null,
           financial: {
-            budget: null,
-            expenditure: null
+            budget: p.sanctionedLakhs ? p.sanctionedLakhs / 100 : null,
+            expenditure: p.paymentReleased ? p.paymentReleased / 100 : null
           },
           timeline: {
             startDate: null,
@@ -304,15 +296,16 @@ router.get('/', async (req: Request, res: Response) => {
           },
           progress: {
             completionPercentage: null,
-            milestone: null
+            milestone: p.delayMonths && p.delayMonths > 0 ? `Delayed by ${p.delayMonths} months` : null
           },
           metadata: {
             contractorName: p.contractor?.name,
-            projectName: p.projectName
+            workOrderNo: p.workOrderNo,
+            defectReports: p.defectReports
           },
           sourceInfo: {
             name: 'Contractor Project Registry',
-            freshness: p.updatedAt.toISOString(),
+            freshness: new Date().toISOString(),
             reliability: 'medium'
           }
         });
@@ -436,20 +429,18 @@ router.get('/:id', async (req: Request, res: Response) => {
           where: { id: projectId },
           select: {
             id: true,
-            name: true,
-            projectName: true,
+            workOrderNo: true,
+            workName: true,
+            workNameHi: true,
             status: true,
-            pincode: {
-              select: {
-                code: true,
-                state: true,
-                district: true
-              }
-            },
-            updatedAt: true,
+            sanctionedLakhs: true,
+            paymentReleased: true,
+            delayMonths: true,
+            defectReports: true,
             contractor: {
               select: {
-                name: true
+                name: true,
+                registeredState: true
               }
             }
           }
@@ -532,7 +523,7 @@ router.get('/:id', async (req: Request, res: Response) => {
         progress: {
           completionPercentage: null,
           milestone: project.delayMonths !== null && project.delayMonths !== 0 ? 
-            Delayed by  months : 
+            `Delayed by ${project.delayMonths} months` : 
             'On schedule'
         },
         metadata: {
@@ -549,19 +540,19 @@ router.get('/:id', async (req: Request, res: Response) => {
     } else if (projectType === 'contractor') {
       formattedProject = {
         id: project.id,
-        projectId: null,
-        title: project.projectName || project.name,
+        projectId: project.workOrderNo,
+        title: project.workName,
         description: null,
         projectType: 'contractor',
         status: project.status,
-        location: project.pincode ? {
-          pincode: project.pincode.code,
-          state: project.pincode.state,
-          district: project.pincode.district
+        location: project.contractor?.registeredState ? {
+          pincode: '',
+          state: project.contractor.registeredState,
+          district: ''
         } : null,
         financial: {
-          budget: null,
-          expenditure: null
+          budget: project.sanctionedLakhs ? project.sanctionedLakhs / 100 : null,
+          expenditure: project.paymentReleased ? project.paymentReleased / 100 : null
         },
         timeline: {
           startDate: null,
@@ -570,15 +561,16 @@ router.get('/:id', async (req: Request, res: Response) => {
         },
         progress: {
           completionPercentage: null,
-          milestone: null
+          milestone: project.delayMonths > 0 ? `Delayed by ${project.delayMonths} months` : null
         },
         metadata: {
           contractorName: project.contractor?.name,
-          projectName: project.projectName
+          workOrderNo: project.workOrderNo,
+          defectReports: project.defectReports
         },
         sourceInfo: {
           name: 'Contractor Project Registry',
-          freshness: project.updatedAt.toISOString(),
+          freshness: new Date().toISOString(),
           reliability: 'medium'
         }
       };

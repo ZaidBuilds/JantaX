@@ -59,7 +59,7 @@ const router = Router();
  *   sortBy: field to sort by (default: organization)
  *   sortOrder: asc or desc (default: asc)
  */
-router.get('/sources', async (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
     const {
       sourceType,
@@ -117,8 +117,8 @@ router.get('/sources', async (req: Request, res: Response) => {
           organization: true,
           sourceType: true,
           status: true,
-          description: true,
-          website: true,
+          notes: true,
+          sourceUrl: true,
           apiUrl: true,
           datasetUrl: true,
           license: true,
@@ -147,8 +147,8 @@ router.get('/sources', async (req: Request, res: Response) => {
       organization: source.organization,
       sourceType: source.sourceType,
       status: source.status,
-      description: source.description,
-      website: source.website,
+      description: source.notes,
+      website: source.sourceUrl,
       apiUrl: source.apiUrl,
       datasetUrl: source.datasetUrl,
       license: source.license,
@@ -202,7 +202,7 @@ router.get('/sources', async (req: Request, res: Response) => {
  * GET /api/sources/:id
  * Get a specific source by ID
  */
-router.get('/sources/:id', async (req: Request, res: Response) => {
+router.get('/:id', async (req: Request, res: Response) => {
   try {
     const sourceId = String(req.params.id);
     
@@ -214,8 +214,8 @@ router.get('/sources/:id', async (req: Request, res: Response) => {
         organization: true,
         sourceType: true,
         status: true,
-        description: true,
-        website: true,
+        notes: true,
+        sourceUrl: true,
         apiUrl: true,
         datasetUrl: true,
         license: true,
@@ -245,8 +245,8 @@ router.get('/sources/:id', async (req: Request, res: Response) => {
       organization: source.organization,
       sourceType: source.sourceType,
       status: source.status,
-      description: source.description,
-      website: source.website,
+      description: source.notes,
+      website: source.sourceUrl,
       apiUrl: source.apiUrl,
       datasetUrl: source.datasetUrl,
       license: source.license,
@@ -258,7 +258,7 @@ router.get('/sources/:id', async (req: Request, res: Response) => {
       expectedRefreshInterval: source.expectedRefreshInterval,
       lastChecked: source.lastChecked?.toISOString() ?? null,
       lastSuccessfulSync: source.lastSuccessfulSync?.toISOString() ?? null,
-      records: source.records?.map(record => ({
+      records: (source as any).records?.map((record: any) => ({
         id: record.id,
         entityType: record.entityType,
         entityId: record.entityId,
@@ -267,7 +267,7 @@ router.get('/sources/:id', async (req: Request, res: Response) => {
         capturedAt: record.capturedAt?.toISOString()
       })) ?? [],
       metadata: {
-        recordsCount: source.records?.length ?? 0,
+        recordsCount: (source as any).records?.length ?? 0,
         daysSinceLastCheck: source.lastChecked ? 
           Math.floor((Date.now() - source.lastChecked.getTime()) / (1000 * 60 * 60 * 24)) : 
           null

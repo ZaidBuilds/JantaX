@@ -129,6 +129,7 @@ export function createUdiseMockConnector(): SourceConnector {
             hasElectricity: n.data.hasElectricity,
             hasDrinkingWater: n.data.hasDrinkingWater,
             pincodeCode: n.data.pincodeCode,
+            isSample: true, // mock CSV — never real UDISE+ data
           }
         });
         inserted++;
@@ -143,6 +144,7 @@ export function createUdiseMockConnector(): SourceConnector {
             teachersWorking: after.data.teachersWorking,
             groundTruthScore: after.data.groundTruthScore,
             hasToilet: after.data.hasToilet,
+            isSample: true,
           }
         });
         updated++;

@@ -241,8 +241,10 @@ function DimensionCard({
             <button
               onClick={onToggle}
               style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 2, display: 'flex', alignItems: 'center' }}
+              aria-expanded={isExpanded}
+              aria-label={`${isExpanded ? 'Hide' : 'Show'} details for ${config.label}`}
             >
-              {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              {isExpanded ? <ChevronUp size={14} aria-hidden="true" /> : <ChevronDown size={14} aria-hidden="true" />}
             </button>
           </div>
         </div>

@@ -82,31 +82,31 @@ export default function App() {
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState<boolean>(false);
   const [selectedCompareIds, setSelectedCompareIds] = useState<string[]>(['cont-001', 'cont-006']);
 
-  // Fetch live state from API on load — with deterministic mock fallback
+  /**
+   * Loads the contractor workspace.
+   *
+   * This module renders demonstration data, deliberately.
+   *
+   * `/api/contractors` is real and returns 4 seeded records, but this screen's
+   * `Contractor` type needs monsoonFailureRate, dlpViolationRate,
+   * wardMonopolyIndex, activeDlpViolationsCount and per-ward notices — none of
+   * which exist on the Prisma `Contractor` model. Mapping the API onto this
+   * shape would mean inventing adverse performance metrics about named
+   * construction firms, which Rule 22 forbids. The module therefore stays on
+   * clearly-labelled fixtures until the schema carries those fields.
+   *
+   * Previously this also fetched /api/work-orders, /api/wards and /api/defects.
+   * Those endpoints have never existed on this server (they belonged to the
+   * reference project this module was ported from), so every load fired three
+   * requests that 404'd before silently falling back to the same fixtures.
+   * They are removed rather than left failing.
+   */
   const refreshData = async () => {
     const fallback = generateMockContractorDataset(selectedPincode);
-    let hasRealData = false;
-    try {
-      const [cRes, wRes, warRes, dRes] = await Promise.all([
-        fetch('/api/contractors'),
-        fetch('/api/work-orders'),
-        fetch('/api/wards'),
-        fetch('/api/defects'),
-      ]);
-      if (cRes.ok) { const j = await cRes.json(); if (Array.isArray(j) && j.length) { setContractors(j); hasRealData = true; } }
-      if (wRes.ok) { const j = await wRes.json(); if (Array.isArray(j) && j.length) setWorkOrders(j); }
-      if (warRes.ok) { const j = await warRes.json(); if (Array.isArray(j) && j.length) setWards(j); }
-      if (dRes.ok) { const j = await dRes.json(); if (Array.isArray(j) && j.length) setDefects(j); }
-    } catch (err) {
-      console.warn('Using local dataset fallback:', err);
-    }
-    if (!hasRealData) {
-      // Seed with PIN-driven deterministic mocks so UI never blank
-      setContractors(fallback.contractors);
-      setWorkOrders(fallback.workOrders);
-      setWards(fallback.wards);
-      setDefects(fallback.defects);
-    }
+    setContractors(fallback.contractors);
+    setWorkOrders(fallback.workOrders);
+    setWards(fallback.wards);
+    setDefects(fallback.defects);
   };
 
   useEffect(() => {

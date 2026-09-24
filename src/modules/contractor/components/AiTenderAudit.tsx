@@ -24,12 +24,23 @@ export const AiTenderAudit: React.FC<AiTenderAuditProps> = ({
   const [customText] = useState<string>('');
   const [auditResult, setAuditResult] = useState<AiAuditResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const selectedWo = workOrders.find(w => w.id === selectedWorkOrderId) || workOrders[0];
   const selectedCont = contractors.find(c => c.id === selectedWo?.contractorId);
 
+  /**
+   * Calls the tender-audit service.
+   *
+   * NOTE: `/api/ai/audit-tender` is not implemented on this server — it came
+   * from the reference project this module was ported from. Until an analysis
+   * service exists, this reports the failure to the reader instead of leaving
+   * the button doing nothing. An empty result must never be presented as
+   * "no issues found": absence of an audit is not a clean audit.
+   */
   const handleRunAudit = async () => {
     setIsLoading(true);
+    setErrorMessage(null);
     try {
       const res = await fetch('/api/ai/audit-tender', {
         method: 'POST',
@@ -40,10 +51,18 @@ export const AiTenderAudit: React.FC<AiTenderAuditProps> = ({
           tenderText: customText || selectedWo?.title,
         }),
       });
+      if (!res.ok) {
+        setErrorMessage(
+          'Tender analysis is not available yet — this service is not connected. No audit was run.'
+        );
+        return;
+      }
       const data = await res.json();
       setAuditResult(data);
-    } catch (err) {
-      console.error('Audit error:', err);
+    } catch {
+      setErrorMessage(
+        'Tender analysis is not available yet — this service is not connected. No audit was run.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -130,6 +149,23 @@ export const AiTenderAudit: React.FC<AiTenderAuditProps> = ({
       </div>
 
       {/* Audit Findings Container */}
+      {errorMessage && (
+        <div
+          role="alert"
+          style={{
+            padding: 'var(--space-3)',
+            borderRadius: 'var(--radius-md)',
+            background: 'var(--status-warn-bg)',
+            border: '1px solid var(--status-warn-border)',
+            color: 'var(--status-warn-text)',
+            fontSize: 'var(--text-small)',
+            fontWeight: 600,
+          }}
+        >
+          {errorMessage}
+        </div>
+      )}
+
       {auditResult && (
         <div className="space-y-4">
           

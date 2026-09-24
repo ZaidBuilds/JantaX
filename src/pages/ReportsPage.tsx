@@ -35,7 +35,7 @@ export function ReportsPage() {
   const [currentPin, setCurrentPin] = useState(searchParams.get('pin') || '110001');
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filter, setFilter] = useState<string>('all');
+  const [filter, setFilter] = useState<string>('');
   const { t } = useLanguage();
 
   const loc = resolvePincode(currentPin);
@@ -106,7 +106,7 @@ export function ReportsPage() {
   };
 
   const filteredReports =
-    filter === 'all' ? reports : reports.filter((r) => r.status?.toLowerCase() === filter);
+    !filter ? reports : reports.filter((r) => r.status?.toLowerCase() === filter);
 
   return (
     <Layout showBreadcrumbs>
@@ -230,11 +230,11 @@ export function ReportsPage() {
                   outline: 'none',
                 }}
               >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-                <option value="resolved">Resolved</option>
+                <option value="">Verified & Active Evidence</option>
+                <option value="pending">Under Verification (Pending)</option>
+                <option value="approved">Approved Ground Evidence</option>
+                <option value="resolved">Resolved with Action</option>
+                <option value="rejected">Debunked / Rejected</option>
               </select>
             </div>
           </div>
@@ -248,7 +248,7 @@ export function ReportsPage() {
           ) : filteredReports.length === 0 ? (
             <NoResultsState
               query={currentPin}
-              onClear={() => setFilter('all')}
+              onClear={() => setFilter('')}
               className=""
             />
           ) : (

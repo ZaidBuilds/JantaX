@@ -30,7 +30,10 @@ export const ContractorLeaderboard: React.FC<ContractorLeaderboardProps> = ({
   selectedCompareIds,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedRisk, setSelectedRisk] = useState<string>('all');
+  const [selectedRisk, setSelectedRisk] = useState<string>(() => {
+    const found = contractors.find(c => c.riskTier === 'CRITICAL_RISK' || c.riskTier === 'HIGH_RISK');
+    return found ? found.riskTier : 'HIGH_RISK';
+  });
   const [sortBy, setSortBy] = useState<'integrity_asc' | 'integrity_desc' | 'monsoon_desc' | 'budget_desc' | 'dlp_desc'>('integrity_asc');
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 8;
@@ -42,7 +45,7 @@ export const ContractorLeaderboard: React.FC<ContractorLeaderboardProps> = ({
       c.registrationNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.primaryWard.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesRisk = selectedRisk === 'all' || c.riskTier === selectedRisk;
+    const matchesRisk = c.riskTier === selectedRisk;
     return matchesSearch && matchesRisk;
   });
 
@@ -117,7 +120,7 @@ export const ContractorLeaderboard: React.FC<ContractorLeaderboardProps> = ({
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#1A1A1A] mt-1">
-              Contractor Scorecards & Hall of Shame
+              Contractor Scorecards
             </h2>
             <p className="text-xs text-[#1A1A1A]/70 mt-1 max-w-2xl font-serif">
               Cross-referenced from State e-Procurement + GeM + Municipal Work Orders. Scored against Indian Road Congress (IRC) Defect Liability enforcement and first-monsoon collapse records.
@@ -132,7 +135,7 @@ export const ContractorLeaderboard: React.FC<ContractorLeaderboardProps> = ({
               onChange={(e: any) => setSortBy(e.target.value)}
               className="bg-[#FAFAFA] border-2 border-[#1A1A1A] text-xs font-bold text-[#1A1A1A] px-3 py-1.5 focus:outline-none cursor-pointer uppercase tracking-tight"
             >
-              <option value="integrity_asc">Worst Integrity First (Hall of Shame)</option>
+              <option value="integrity_asc">Lowest score first</option>
               <option value="monsoon_desc">Highest Monsoon Failure Rate</option>
               <option value="dlp_desc">Most Active DLP Breaches</option>
               <option value="budget_desc">Highest Public Funds (₹ Cr)</option>
@@ -164,7 +167,6 @@ export const ContractorLeaderboard: React.FC<ContractorLeaderboardProps> = ({
               onChange={(e) => setSelectedRisk(e.target.value)}
               className="w-full bg-[#FAFAFA] border-2 border-[#1A1A1A] pl-9 pr-3 py-2 text-xs font-bold text-[#1A1A1A] focus:outline-none focus:bg-white cursor-pointer uppercase"
             >
-              <option value="all">All Risk Tiers</option>
               <option value="CRITICAL_RISK">Critical Risk (0-30)</option>
               <option value="HIGH_RISK">High Risk (31-50)</option>
               <option value="MODERATE">Moderate (51-70)</option>

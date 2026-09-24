@@ -1,3 +1,34 @@
+> # ⚠️ SUPERSEDED — do not implement from this document
+>
+> This audit (2026-05-11) drove the UI toward dense, pixel-matched dashboards:
+> "Glass, premium shadows, killer gradients", a 7-colour status palette, and
+> 3-column 1200px layouts. That direction was **reversed**.
+>
+> The current direction is the **public-information-utility** design in the
+> JantaX Notion pages (Master Blueprint §39/§41, V1 Source of Truth §14):
+> content first, one brand hue, minimal decoration, source and freshness
+> visible, mobile-first.
+>
+> **Specifically rejected from this document:**
+> - "Generate deterministic mock roster in `records.ts` mapper" — JantaX does
+>   not invent records. Inventing named teachers at named government schools
+>   breaks Rule 40 (no fabricated data) and Rule 37 (privacy).
+> - The expanded multi-colour palette and glass/gradient tokens.
+>
+> **Now factually stale:**
+> - "`requireAuth` incorrectly requires auth" — false; it is optional auth and
+>   calls `next()` for anonymous requests. Renamed `attachUser`.
+> - "Data freshness not surfaced" — `/api/pincode/:code` now returns per-domain
+>   `lastUpdated` and `retrievedAt`.
+> - "15 modules" — 17 registry entries, each carrying an honest `dataStatus`.
+>
+> **Still valid and worth doing:** School as the first deep vertical, a
+> persistent left nav on the School Profile, per-field source + "last updated",
+> loading/empty/error/stale states, responsive QA at 1280/768/375, and wiring
+> Map/Compare to real API data instead of hardcoded arrays.
+>
+> Kept for historical context only.
+
 # JantaX — UI/UX Audit vs Reference Images
 Generated: 2026-05-11 | Route & Component Forensics
 

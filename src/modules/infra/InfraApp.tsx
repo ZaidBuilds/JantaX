@@ -425,7 +425,7 @@ export function InfraApp() {
 
       {/* Modern footer details */}
       <footer style={{ marginTop: '4rem', textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-        <p>Bharat Vikas Project Tracker • Developed for Citizens of India</p>
+        <p>JantaX Infrastructure Tracker • Developed for Citizens of India</p>
         <p style={{ marginTop: '0.25rem', fontSize: '0.75rem', color: 'rgba(255,255,255,0.1)' }}>Official parameters sourced abstractly from central reporting systems.</p>
       </footer>
     </div>

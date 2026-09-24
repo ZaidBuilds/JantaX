@@ -406,7 +406,7 @@ export function SearchPage() {
           value={filters.status || ''}
           onChange={e => updateFilter('status', e.target.value || undefined)}
         >
-          <option value="">All Statuses</option>
+          <option value="">Filter by Status...</option>
           <option value="active">Active</option>
           <option value="completed">Completed</option>
           <option value="delayed">Delayed</option>

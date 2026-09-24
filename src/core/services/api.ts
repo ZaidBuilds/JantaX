@@ -1,6 +1,8 @@
-import { resolvePincode as _resolvePincode } from '../utils/pinResolver';
+import { resolvePincode as _resolvePincode, resolvePincodeAccurate } from '../utils/pinResolver';
+import { getStoredProjects } from '../../modules/infra/services/projectService';
+import { getCoordinateForPin } from '../utils/pinCoordinates';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+const BASE_URL = import.meta.env.VITE_API_URL || '';
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('jantax_token') : null;
@@ -25,122 +27,194 @@ function clearOffline() { try { if (typeof window !== 'undefined' && navigator.o
 function hashSeed(s: string): number {
   let h = 0; for (let i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i)) >>>0; return h;
 }
-function mockPincodeInfo(code: string): PincodeInfo {
+
+function mockPincodeInfo(code: string, locAccurate?: any): PincodeInfo {
   markOffline();
-  let loc: any = { state: 'Delhi', district: 'New Delhi', region: 'North' };
-  try { loc = _resolvePincode(code); } catch {}
+  let loc: any = locAccurate || { state: 'India', district: 'Local District', region: 'Central' };
+  if (!locAccurate) {
+    try { loc = _resolvePincode(code); } catch {}
+  }
   const h = hashSeed(code);
-  const lat = 28.6 + (h % 100)/500;
-  const lng = 77.2 + (h % 100)/500;
+  const coords = getCoordinateForPin(code);
+  const areaLabel = loc.postOffice ? `${loc.postOffice} (${loc.block && loc.block !== 'NA' ? loc.block : 'Taluk'})` : (h % 2 === 0 ? 'Urban Sector' : 'Rural Block');
   return {
     code,
-    state: (loc as any).state || 'Delhi',
-    district: (loc as any).district || 'New Delhi',
-    region: (loc as any).region || 'North',
-    areaType: h %2===0 ? 'Urban' : 'Rural',
-    lat, lng,
+    state: loc.state || coords.state || 'India',
+    district: loc.district || coords.district || 'Local District',
+    region: loc.region || 'North',
+    areaType: areaLabel,
+    lat: coords.lat,
+    lng: coords.lng,
     counts: {
-      schools: 2 + (h % 3),
-      infraProjects: 1 + (h % 3),
-      reraProjects: h % 3,
-      hospitals: 1 + (h % 2),
+      schools: 3 + (h % 3),
+      infraProjects: 2 + (h % 3),
+      reraProjects: 1 + (h % 3),
+      hospitals: 2 + (h % 2),
       pdsShops: 2 + (h % 2),
       grievances: 3 + (h % 5),
-      citizenReports: h % 4,
+      citizenReports: 1 + (h % 4),
     }
   };
 }
-function mockRecords(code: string, module?: string): RecordsResponse {
+
+function mockRecords(code: string, module?: string, locAccurate?: any): RecordsResponse {
   markOffline();
   const h = hashSeed(code);
-  const mkSchool = (i:number): ApiRecord => ({
+  let loc: any = locAccurate || { state: 'India', district: 'Local District', region: 'Central', stateCode: 'IN' };
+  if (!locAccurate) {
+    try { loc = _resolvePincode(code); } catch {}
+  }
+  const coords = getCoordinateForPin(code);
+  const subArea = loc.postOffice ? `${loc.postOffice}, ` : '';
+  const localPlace = loc.postOffice || loc.block || loc.district;
+
+  const mkSchool = (i: number): ApiRecord => ({
     id: `mock-school-${code}-${i}`,
     moduleId: 'school',
-    location: { pinCode: code, state: 'Delhi', district: 'New Delhi' },
-    titleEnglish: i===0 ? 'Govt. Primary School Narela Sector A9' : `Govt. School ${code} - ${i}`,
-    titleHindi: i===0 ? 'राजकीय प्राथमिक विद्यालय नरेला सेक्टर ए9' : `सरकारी स्कूल ${code} - ${i}`,
-    status: i%2===0 ? 'Looking Steady' : 'Needs Attention',
-    groundTruthScore: 65 + (h+i*7)%35,
-    reality: { evidenceCount: i+1 },
+    location: { pinCode: code, state: loc.state, district: loc.district },
+    titleEnglish: i === 0 ? `Govt. Composite Model School (${subArea}${loc.district})` : `PM SHRI Govt. Primary School (${subArea}${loc.district})`,
+    titleHindi: i === 0 ? `राजकीय कम्पोजिट मॉडल विद्यालय (${subArea}${loc.district})` : `पीएम श्री सरकारी प्राथमिक विद्यालय (${subArea}${loc.district})`,
+    status: i % 2 === 0 ? 'Looking Steady' : 'Needs Attention',
+    groundTruthScore: 68 + (h + i * 7) % 30,
+    reality: { evidenceCount: i + 1 },
     claim: { value: 100 },
     updatedAt: new Date().toISOString(),
-    udiseCode: `07010${code.slice(2)}${i}0${i}`,
-    schoolLevel: 'Primary',
-    managementType: 'Government',
-    officialStudentCount: 80 + i*20,
-    officialTeacherCount: 4 + i,
-    teachersSanctioned: 5 + i,
+    udiseCode: `09${code.slice(0, 4)}${i + 1}01`,
+    schoolLevel: i === 0 ? 'Upper Primary' : 'Primary',
+    managementType: 'Department of School Education',
+    officialStudentCount: 140 + i * 45,
+    officialTeacherCount: 5 + i * 2,
+    teachersSanctioned: 6 + i * 2,
     hasToilet: true,
-    hasElectricity: i!==1,
+    hasElectricity: true,
     hasDrinkingWater: true,
     lastCheckIn: new Date().toISOString(),
   });
-  const mkInfra = (i:number): ApiRecord => {
-    let p: any;
-    try {
-      const { getStoredProjects } = require('../../modules/infra/services/projectService');
-      const allProjects = getStoredProjects();
-      p = allProjects[i % allProjects.length];
-    } catch {}
 
-    if (p) {
-      return {
-        id: p.id,
-        moduleId: 'infra',
-        location: { pinCode: p.pinCode, state: p.state, district: p.district },
-        titleEnglish: p.nameEnglish,
-        titleHindi: p.nameHindi,
-        status: p.status,
-        groundTruthScore: p.groundTruth.physicalScore,
-        reality: { evidenceCount: p.evidenceDocuments.length },
-        claim: { value: p.progressPhysical },
-        updatedAt: p.originalSource.lastUpdated || new Date().toISOString(),
-        department: p.implementingAgency,
-        ministry: p.ministry,
-        budget: `₹${(p.budgetAnticipatedLakhs/100).toFixed(1)} Cr`,
-        startDate: p.startDate,
-        expectedCompletion: p.anticipatedCompletionDate,
-        claimCompletionPct: p.progressPhysical,
-        responsibleOfficer: `${p.responsibleOfficer} (${p.responsibleOfficerDesignation})`,
-        evidenceCount: p.evidenceDocuments.length,
-        sourceUrl: p.originalSource.url,
-      };
-    }
-
+  const mkInfra = (i: number): ApiRecord => {
     return {
       id: `mock-infra-${code}-${i}`,
       moduleId: 'infra',
-      location: { pinCode: code, state: 'Delhi', district: 'New Delhi' },
-      titleEnglish: i===0 ? 'Construction of Elevated Corridor Phase-2' : `PMGSY Road Project ${code}-${i}`,
-      titleHindi: i===0 ? 'एलिवेटेड कॉरिडोर निर्माण' : `सड़क परियोजना ${code}-${i}`,
-      status: ['Construction','Delayed','Completed'][i%3],
-      groundTruthScore: 70 + (h+i*5)%30,
-      reality: { evidenceCount: i },
-      claim: { value: 60 + i*10 },
+      location: { pinCode: code, state: loc.state, district: loc.district },
+      titleEnglish: i === 0 ? `PMGSY Road & Drainage Network (${subArea}${loc.district})` : `PWD Connecting Highway Corridor ${code}-${i + 1}`,
+      titleHindi: i === 0 ? `पीएमजीएसवाई ग्रामीण सड़क एवं नाली निर्माण (${subArea}${loc.district})` : `लोक निर्माण मुख्य मार्ग संपर्क पैकेज ${code}-${i + 1}`,
+      status: ['Construction', 'Delayed', 'Completed'][i % 3],
+      groundTruthScore: 65 + (h + i * 5) % 32,
+      reality: { evidenceCount: i + 1 },
+      claim: { value: 60 + i * 15 },
       updatedAt: new Date().toISOString(),
-      department: 'PWD',
-      ministry: 'Ministry of Road Transport',
-      budget: `${20+i*15} Cr`,
-      startDate: '2022-03-15',
-      expectedCompletion: '2024-12-31',
-      claimCompletionPct: 60 + i*10,
-      responsibleOfficer: 'EE, PWD',
-      evidenceCount: i,
-      sourceUrl: 'https://mospi.gov.in',
+      department: i === 0 ? 'PMGSY / Rural Works' : 'Public Works Department (PWD)',
+      ministry: i === 0 ? 'Ministry of Rural Development' : 'Ministry of Road Transport & Highways',
+      budget: `₹${14 + (h % 20) + i * 8} Cr`,
+      startDate: '2023-04-15',
+      expectedCompletion: '2025-06-30',
+      claimCompletionPct: 60 + i * 15,
+      responsibleOfficer: `Executive Engineer (${loc.district})`,
+      evidenceCount: i + 1,
+      sourceUrl: 'https://omms.nic.in',
     };
   };
+
   const records: RecordsResponse['records'] = {};
-  const wantSchool = !module || module==='school';
-  const wantInfra = !module || module==='infra';
-  if (wantSchool) records.school = [mkSchool(0), mkSchool(1)].slice(0, 2 + (h%1));
+  const wantSchool = !module || module === 'school';
+  const wantInfra = !module || module === 'infra';
+  const wantRera = !module || module === 'rera';
+  const wantHospital = !module || module === 'hospital';
+  const wantPds = !module || module === 'pds';
+  const wantGrievance = !module || module === 'grievance';
+  const wantContractor = !module || module === 'contractor';
+
+  if (wantSchool) records.school = [mkSchool(0), mkSchool(1)];
   if (wantInfra) records.infra = [mkInfra(0), mkInfra(1)];
-  if (!module) {
-    records.rera = [{ id:`mock-rera-${code}`, reraNumber:`RERA-${code}`, name:`Builder Project ${code}` } as any];
-    records.hospital = [{ id:`mock-hosp-${code}`, name:`CHC ${code}` } as any];
-    records.pds = [{ id:`mock-pds-${code}`, shopName:`FPS ${code}` } as any];
-    records.grievance = [{ id:`mock-griev-${code}`, ministry:'Urban Development' } as any];
-    records.contractor = [{ id:`mock-cont-${code}`, name:`Contractor ${code}` } as any];
+  if (wantRera) {
+    records.rera = [
+      {
+        id: `mock-rera-${code}-1`,
+        reraNumber: `RERA-${loc.stateCode || 'IN'}-${code}-01`,
+        name: `${localPlace} Green Heights Residency`,
+        promoter: `${loc.district} Infra Developers`,
+        status: 'Ongoing',
+        district: loc.district,
+        state: loc.state,
+        delayMonths: 8,
+        complaints: 4,
+        possessionDate: '2025-12-31'
+      } as any,
+      {
+        id: `mock-rera-${code}-2`,
+        reraNumber: `RERA-${loc.stateCode || 'IN'}-${code}-02`,
+        name: `${localPlace} Eco Smart Township`,
+        promoter: `Balaji Realcon Developers`,
+        status: 'Delayed',
+        district: loc.district,
+        state: loc.state,
+        delayMonths: 14,
+        complaints: 11,
+        possessionDate: '2024-06-30'
+      } as any,
+    ];
   }
+  if (wantHospital) {
+    records.hospital = [
+      {
+        id: `mock-hosp-${code}-1`,
+        name: `District Civil Hospital, ${loc.district}`,
+        type: 'DISTRICT_HOSPITAL',
+        beds: 200,
+        bedsTotal: 200,
+        bedsOccupied: 164,
+        doctorsPresent: 18,
+        doctorPresent: true,
+        medicinesAvailable: true,
+        district: loc.district,
+        state: loc.state,
+      } as any,
+      {
+        id: `mock-hosp-${code}-2`,
+        name: `Community Health Centre (CHC) ${localPlace}`,
+        type: 'CHC',
+        beds: 30,
+        bedsTotal: 30,
+        bedsOccupied: 22,
+        doctorsPresent: 4,
+        doctorPresent: true,
+        medicinesAvailable: true,
+        district: loc.district,
+        state: loc.state,
+      } as any,
+    ];
+  }
+  if (wantPds) {
+    records.pds = [
+      {
+        id: `mock-pds-${code}-1`,
+        shopName: `Fair Price Ration Shop #108 (${localPlace})`,
+        dealerName: 'Shri Ram PDS Seva Kendra',
+        district: loc.district,
+        state: loc.state,
+        beneficiaries: 1420,
+        quotaDistributedPct: 94,
+        activeRationCards: 1420,
+      } as any,
+      {
+        id: `mock-pds-${code}-2`,
+        shopName: `Fair Price Ration Outlet #42 (${loc.district})`,
+        dealerName: 'Kisan Sahkari PDS Outlet',
+        district: loc.district,
+        state: loc.state,
+        beneficiaries: 980,
+        quotaDistributedPct: 91,
+        activeRationCards: 980,
+      } as any,
+    ];
+  }
+  if (wantGrievance) {
+    records.grievance = [{ id: `mock-griev-${code}`, ministry: 'Urban Development & Civic Amenities' } as any];
+  }
+  if (wantContractor) {
+    records.contractor = [{ id: `mock-cont-${code}`, name: `${loc.district} Civil Infratech Pvt Ltd`, rating: 4.2 } as any];
+  }
+
   return { pincode: code, records };
 }
 
@@ -161,6 +235,8 @@ export interface PincodeInfo {
     grievances: number;
     citizenReports: number;
   };
+  /** Rule 40: rows per domain that are fixtures. > 0 → badge "Sample data". */
+  sampleCounts?: PincodeInfo['counts'];
 }
 
 export interface SchoolRecord {
@@ -258,14 +334,28 @@ export interface CitizenReport {
 
 export const api = {
   getPincode: async (code: string) => {
-    try { const r = await apiFetch<PincodeInfo>(`/api/pincode/${code}`); clearOffline(); return r; }
-    catch { return mockPincodeInfo(code); }
+    try {
+      const r = await apiFetch<PincodeInfo>(`/api/pincode/${code}`);
+      clearOffline();
+      return r;
+    } catch {
+      let accurateLoc;
+      try { accurateLoc = await resolvePincodeAccurate(code); } catch {}
+      return mockPincodeInfo(code, accurateLoc);
+    }
   },
 
   getRecords: async (code: string, module?: string) => {
     const q = module ? `?module=${module}` : '';
-    try { const r = await apiFetch<RecordsResponse>(`/api/pincode/${code}/records${q}`); clearOffline(); return r; }
-    catch { return mockRecords(code, module); }
+    try {
+      const r = await apiFetch<RecordsResponse>(`/api/pincode/${code}/records${q}`);
+      clearOffline();
+      return r;
+    } catch {
+      let accurateLoc;
+      try { accurateLoc = await resolvePincodeAccurate(code); } catch {}
+      return mockRecords(code, module, accurateLoc);
+    }
   },
 
   getRecord: async (module: string, id: string) => {
@@ -292,6 +382,72 @@ export const api = {
   getInfraProjects: async (code: string) => {
     try { const r = await apiFetch<RecordsResponse>(`/api/pincode/${code}/records?module=infra`); return r.records.infra || []; }
     catch { return mockRecords(code,'infra').records.infra || []; }
+  },
+
+  getReraProjects: async (code?: string, page = 1, limit = 10) => {
+    const q = new URLSearchParams();
+    if (code) q.set('pincode', code);
+    q.set('page', String(page));
+    q.set('limit', String(limit));
+    try {
+      return await apiFetch<{ rera: any[]; pagination: { total: number; page: number; totalPages: number } }>(`/api/rera?${q.toString()}`);
+    } catch {
+      const pin = code || '110001';
+      const r = (mockRecords(pin).records as any).rera || [];
+      return { rera: r, pagination: { total: r.length, page: 1, totalPages: 1 } };
+    }
+  },
+
+  getReraProject: async (id: string) => {
+    return apiFetch<any>(`/api/rera/${id}`);
+  },
+
+  getHospitals: async (code: string) => {
+    try {
+      const r = await apiFetch<RecordsResponse>(`/api/pincode/${code}/records?module=hospital`);
+      return (r.records as any).hospital || [];
+    } catch {
+      return (mockRecords(code).records as any).hospital || [];
+    }
+  },
+
+  getPdsShops: async (code: string) => {
+    try {
+      const r = await apiFetch<RecordsResponse>(`/api/pincode/${code}/records?module=pds`);
+      return (r.records as any).pds || [];
+    } catch {
+      return (mockRecords(code).records as any).pds || [];
+    }
+  },
+
+  getGrievances: async (code: string) => {
+    try {
+      const r = await apiFetch<RecordsResponse>(`/api/pincode/${code}/records?module=grievance`);
+      return (r.records as any).grievance || [];
+    } catch {
+      return (mockRecords(code).records as any).grievance || [];
+    }
+  },
+
+  getContractors: async (params?: { state?: string; minScore?: number; page?: number; limit?: number }) => {
+    const q = new URLSearchParams();
+    if (params?.state) q.set('state', params.state);
+    if (params?.minScore) q.set('minScore', String(params.minScore));
+    if (params?.page) q.set('page', String(params.page));
+    if (params?.limit) q.set('limit', String(params.limit));
+    return apiFetch<{ contractors: any[]; pagination: { total: number; page: number; totalPages: number } }>(`/api/contractors?${q.toString()}`);
+  },
+
+  getContractor: async (id: string) => {
+    return apiFetch<any>(`/api/contractors/${id}`);
+  },
+
+  getSources: async (params?: { page?: number; limit?: number; sourceType?: string }) => {
+    const q = new URLSearchParams();
+    if (params?.sourceType) q.set('sourceType', params.sourceType);
+    if (params?.page) q.set('page', String(params.page));
+    if (params?.limit) q.set('limit', String(params.limit));
+    return apiFetch<{ sources: any[]; pagination: { total: number; page: number; totalPages: number } }>(`/api/sources?${q.toString()}`);
   },
 
   submitReport: (data: { pincode?: string; pinCode?: string; module?: string; moduleId?: string; category?: string; title?: string; description: string; media?: string[] | Array<{ type: string; url: string; caption?: string }> }) => {

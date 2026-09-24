@@ -45,7 +45,7 @@ export const POSTAL_CIRCLES: Record<string, IndianPostalCircleInfo> = {
     statutoryAct: 'Haryana Municipal Corporation Act, 1994',
     statutoryClause: 'Section 138 (Contractor Defect Liability Enforcement)',
     lokayuktaAuthority: 'Haryana Lokayukta',
-    cagReportPrefix: 'CAG Report No. 3 of 2024 (Haryana Local Bodies)',
+    cagReportPrefix: 'CAG local bodies audit (example reference) (Haryana Local Bodies)',
     regionalLanguage: 'hi',
   },
   '13': {
@@ -60,7 +60,7 @@ export const POSTAL_CIRCLES: Record<string, IndianPostalCircleInfo> = {
     statutoryAct: 'Haryana Municipal Corporation Act, 1994',
     statutoryClause: 'Section 138 (Contractor Defect Liability Enforcement)',
     lokayuktaAuthority: 'Haryana Lokayukta',
-    cagReportPrefix: 'CAG Report No. 3 of 2024 (Haryana Local Bodies)',
+    cagReportPrefix: 'CAG local bodies audit (example reference) (Haryana Local Bodies)',
     regionalLanguage: 'hi',
   },
   '14': {
@@ -167,7 +167,7 @@ export const POSTAL_CIRCLES: Record<string, IndianPostalCircleInfo> = {
     statutoryAct: 'Uttar Pradesh Municipal Corporation Act, 1959',
     statutoryClause: 'Section 355 & 192 (Guarantee on Public Works)',
     lokayuktaAuthority: 'Uttar Pradesh Lokayukta',
-    cagReportPrefix: 'CAG Report No. 5 (UP Local Bodies & PWD Audits)',
+    cagReportPrefix: 'CAG local bodies audit (example reference) (UP Local Bodies & PWD Audits)',
     regionalLanguage: 'hi',
   },
   '24': {
@@ -197,7 +197,7 @@ export const POSTAL_CIRCLES: Record<string, IndianPostalCircleInfo> = {
     statutoryAct: 'Uttar Pradesh Municipal Corporation Act, 1959',
     statutoryClause: 'Section 355 (Contractor Liability)',
     lokayuktaAuthority: 'Uttar Pradesh Lokayukta',
-    cagReportPrefix: 'CAG Report No. 5 (UP Municipal Audit)',
+    cagReportPrefix: 'CAG local bodies audit (example reference) (UP Municipal Audit)',
     regionalLanguage: 'hi',
   },
 
@@ -276,7 +276,7 @@ export const POSTAL_CIRCLES: Record<string, IndianPostalCircleInfo> = {
     statutoryAct: 'Maharashtra Municipal Corporations Act, 1949',
     statutoryClause: 'Section 294 (Warranty & Defect Liability Enforcement)',
     lokayuktaAuthority: 'Maharashtra Lokayukta',
-    cagReportPrefix: 'CAG Report No. 2 of 2024 (Maharashtra Local Bodies)',
+    cagReportPrefix: 'CAG local bodies audit (example reference) (Maharashtra Local Bodies)',
     regionalLanguage: 'mr',
   },
   '45': {
@@ -383,7 +383,7 @@ export const POSTAL_CIRCLES: Record<string, IndianPostalCircleInfo> = {
     statutoryAct: 'Karnataka Municipal Corporations (KMC) Act, 1976 / BBMP Act 2020',
     statutoryClause: 'Section 166 (Personal Liability for Substandard Execution) & Section 303',
     lokayuktaAuthority: 'Karnataka Lokayukta (Justice B.S. Patil Commission)',
-    cagReportPrefix: 'CAG Report No. 4 of 2024 (Local Bodies Karnataka)',
+    cagReportPrefix: 'CAG local bodies audit (example reference) (Local Bodies Karnataka)',
     regionalLanguage: 'kn',
   },
   '57': {
@@ -430,7 +430,7 @@ export const POSTAL_CIRCLES: Record<string, IndianPostalCircleInfo> = {
     statutoryAct: 'Tamil Nadu Urban Local Bodies Act, 1998',
     statutoryClause: 'Section 383 (Defect Liability)',
     lokayuktaAuthority: 'Tamil Nadu Lokayukta',
-    cagReportPrefix: 'CAG Report No. 3 (TN Municipal Audit)',
+    cagReportPrefix: 'CAG local bodies audit (example reference) (TN Municipal Audit)',
     regionalLanguage: 'ta',
   },
   '68': {
@@ -524,7 +524,7 @@ export const POSTAL_CIRCLES: Record<string, IndianPostalCircleInfo> = {
     statutoryAct: 'Bihar Municipal Act, 2007',
     statutoryClause: 'Section 276 & Section 487 (Zero Tolerance Defect Clause)',
     lokayuktaAuthority: 'Bihar Lokayukta',
-    cagReportPrefix: 'CAG Report No. 4 of 2024 (Bihar Urban Local Bodies)',
+    cagReportPrefix: 'CAG local bodies audit (example reference) (Bihar Urban Local Bodies)',
     regionalLanguage: 'hi',
   },
   '83': {

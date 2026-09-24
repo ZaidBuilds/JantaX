@@ -1,7 +1,106 @@
 import type { InfraProject, CitizenReport, NeutralStatus } from '../types/projectInfra';
 import { MOCK_INFRA_PROJECTS } from '../data/mockProjects';
+import { api } from '../../../core/services/api';
 
 const STORAGE_KEY = 'jantax_infra_projects_v2';
+
+/**
+ * Maps the database ProjectStatus enum onto the UI's neutral status vocabulary.
+ * The wording stays deliberately non-accusatory (Rule 22): a project is
+ * "Delayed" or "Under Review", never "failed" or "corrupt".
+ */
+function toNeutralStatus(status: string): NeutralStatus {
+  switch ((status || '').toUpperCase()) {
+    case 'COMPLETED':
+      return 'Completed';
+    case 'DELAYED':
+      return 'Delayed';
+    case 'STALLED':
+    case 'ONGOING':
+    default:
+      return 'Under Review';
+  }
+}
+
+/**
+ * Fetches real InfraProject records for a PIN from the API.
+ *
+ * The database model (prisma `InfraProject`) holds 15 fields. The UI type is
+ * much richer — tenders, work orders, extensions, payments, clearances. That
+ * detail is NOT stored anywhere, so those collections are returned EMPTY and
+ * the UI must render "not published" for them. Do not synthesise them: an
+ * invented tender or payment row against a real public project is fabricated
+ * procurement data (Rule 40).
+ *
+ * Returns null when the API is unreachable, so callers can decide whether to
+ * fall back to clearly-labelled demonstration fixtures.
+ */
+export async function fetchProjectsForPin(pinCode: string): Promise<InfraProject[] | null> {
+  try {
+    const res: any = await api.getRecords(pinCode, 'infra');
+    const rows: any[] = res?.records?.infra ?? [];
+
+    return rows.map((r): InfraProject => {
+      const budgetLakhs = Number(r.budget) || 0;
+      const physical = typeof r.groundTruthScore === 'number' ? r.groundTruthScore : 0;
+      const claimed = typeof r.claimCompletionPct === 'number' ? r.claimCompletionPct : 0;
+
+      return {
+        id: r.id,
+        pinCode: r.pincodeCode || pinCode,
+        nameEnglish: r.titleEnglish || '',
+        nameHindi: r.titleHindi || '',
+        sector: 'Roads & Highways',
+        state: r.location?.state || '',
+        district: r.location?.district || '',
+        locationName: r.location?.district || '',
+        coordinates: { lat: 0, lng: 0 },
+        status: toNeutralStatus(r.status),
+        statusHindi: '',
+        ministry: r.ministry || r.department || '',
+        implementingAgency: r.implementingAgency || r.department || '',
+        sanctioningBody: r.department || '',
+        responsibleOfficer: r.responsibleOfficer || '',
+        responsibleOfficerDesignation: '',
+        leadContractor: '',
+        contractorDetails: {} as InfraProject['contractorDetails'],
+        budgetOriginalLakhs: budgetLakhs,
+        budgetAnticipatedLakhs: budgetLakhs,
+        contractValueOriginalLakhs: budgetLakhs,
+        contractValueRevisedLakhs: budgetLakhs,
+        expenditureToDateLakhs: 0,
+        progressPhysical: physical,
+        progressFinancial: claimed,
+        startDate: r.startDate || '',
+        originalCompletionDate: r.expectedCompletion || '',
+        anticipatedCompletionDate: r.expectedCompletion || '',
+        clearances: {
+          landAcquisition: 0,
+          forestClearance: 'N/A',
+          environmentalClearance: 'N/A',
+          utilityShifting: 'N/A',
+        },
+        neutralDelaySummary: '',
+        neutralDelaySummaryHindi: '',
+        // Not stored in the database — must render as "not published".
+        tenders: [],
+        workOrders: [],
+        extensions: [],
+        payments: [],
+        evidenceDocuments: [],
+        history: [],
+        groundTruth: {} as InfraProject['groundTruth'],
+        originalSource: {
+          name: r.department || 'Public Works Department',
+          url: r.sourceUrl || '',
+          lastUpdated: r.updatedAt || '',
+        },
+      };
+    });
+  } catch {
+    return null;
+  }
+}
 
 export function getStoredProjects(): InfraProject[] {
   if (typeof window === 'undefined') return MOCK_INFRA_PROJECTS;

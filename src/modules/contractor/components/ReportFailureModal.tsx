@@ -25,8 +25,17 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
   preselectedWorkOrder,
   onSubmitSuccess,
 }) => {
-  const [filterState, setFilterState] = useState<string>('all-india');
-  const [filterCity, setFilterCity] = useState<string>('all');
+  const [filterState, setFilterState] = useState<string>(() => {
+    if (preselectedWorkOrder?.city) {
+      const match = INDIAN_STATES.find(s => s.cities.some(c => c.name.toLowerCase() === preselectedWorkOrder.city.toLowerCase()));
+      if (match) return match.id;
+    }
+    return 'ka';
+  });
+  const [filterCity, setFilterCity] = useState<string>(() => {
+    if (preselectedWorkOrder?.city) return preselectedWorkOrder.city;
+    return 'Bengaluru';
+  });
   const [selectedWoId, setSelectedWoId] = useState<string>(
     preselectedWorkOrder?.id || workOrders[0]?.id || 'wo-101'
   );
@@ -38,6 +47,9 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
     'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=600&auto=format&fit=crop&q=80'
   );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  // Set when the report could not be lodged. The citizen must be told — a
+  // dropped report that looks submitted is worse than no form at all (Rule 21).
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState<boolean>(false);
 
   if (!isOpen) return null;
@@ -45,13 +57,14 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
   const availableCities = getCitiesByState(filterState);
 
   // Filter work orders by state / city if specified
-  const filteredWorkOrders = workOrders.filter(wo => {
-    if (filterCity !== 'all' && filterCity !== 'all-cities') {
+  const matchedWorkOrders = workOrders.filter(wo => {
+    if (filterCity) {
       const cityKeyword = filterCity.toLowerCase();
-      if (!wo.city.toLowerCase().includes(cityKeyword)) return false;
+      if (wo.city.toLowerCase().includes(cityKeyword)) return true;
     }
-    return true;
+    return false;
   });
+  const filteredWorkOrders = matchedWorkOrders.length > 0 ? matchedWorkOrders : workOrders;
 
   const currentWo = workOrders.find(w => w.id === selectedWoId) || filteredWorkOrders[0] || workOrders[0];
 
@@ -91,9 +104,17 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
           onSubmitSuccess();
           onClose();
         }, 1800);
+      } else {
+        setSubmitError(
+          'This report could not be lodged — the reporting service is not connected yet. ' +
+            'Nothing was submitted. Please raise it on the official portal: https://pgportal.gov.in'
+        );
       }
-    } catch (err) {
-      console.error('Failed to submit defect report:', err);
+    } catch {
+      setSubmitError(
+        'This report could not be lodged — the reporting service is not connected yet. ' +
+          'Nothing was submitted. Please raise it on the official portal: https://pgportal.gov.in'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -152,12 +173,15 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
                 <select
                   value={filterState}
                   onChange={(e) => {
-                    setFilterState(e.target.value);
-                    setFilterCity('all');
+                    const newState = e.target.value;
+                    setFilterState(newState);
+                    const cities = getCitiesByState(newState);
+                    if (cities.length > 0) {
+                      setFilterCity(cities[0].name);
+                    }
                   }}
                   className="w-full bg-white border border-[#1A1A1A] px-2 py-1 text-xs font-mono font-bold text-[#1A1A1A] cursor-pointer"
                 >
-                  <option value="all-india">All States & UTs (Pan-India)</option>
                   {INDIAN_STATES.filter(s => s.id !== 'all-india').map((st) => (
                     <option key={st.id} value={st.id}>
                       {st.name}
@@ -176,7 +200,6 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
                   onChange={(e) => setFilterCity(e.target.value)}
                   className="w-full bg-white border border-[#1A1A1A] px-2 py-1 text-xs font-mono font-bold text-[#1A1A1A] cursor-pointer"
                 >
-                  <option value="all">All Cities in State</option>
                   {availableCities.map((ct) => (
                     <option key={ct.id} value={ct.name}>
                       {ct.name}
@@ -292,6 +315,25 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
 
             {/* Submit Button */}
             <div className="pt-3 border-t-2 border-[#1A1A1A] flex items-center justify-between">
+              {submitError && (
+                <div
+                  role="alert"
+                  style={{
+                    flexBasis: '100%',
+                    padding: 'var(--space-3)',
+                    marginBottom: 'var(--space-3)',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'var(--status-alert-bg)',
+                    border: '1px solid var(--status-alert-border)',
+                    color: 'var(--status-alert-text)',
+                    fontSize: 'var(--text-small)',
+                    fontWeight: 600,
+                  }}
+                >
+                  {submitError}
+                </div>
+              )}
+
               <button
                 type="button"
                 onClick={onClose}

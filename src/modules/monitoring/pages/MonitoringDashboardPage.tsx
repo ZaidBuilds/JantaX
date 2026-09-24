@@ -17,10 +17,10 @@ export function MonitoringDashboardPage({ initialTab }: MonitoringDashboardPageP
 
   const [alerts, setAlerts] = useState<InternalAlert[]>(() => getStoredAlerts());
   const [snapshots, setSnapshots] = useState<DatasetSnapshot[]>(() => getStoredSnapshots());
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('new_school_records');
 
   const currentPath = location.pathname;
-  let activeTab: 'all' | 'quarantine' | 'snapshots' = initialTab || 'all';
+  let activeTab: 'stream' | 'quarantine' | 'snapshots' = initialTab === 'quarantine' || initialTab === 'snapshots' ? initialTab : 'stream';
   if (currentPath.endsWith('/quarantine')) activeTab = 'quarantine';
   else if (currentPath.endsWith('/snapshots')) activeTab = 'snapshots';
 
@@ -37,10 +37,7 @@ export function MonitoringDashboardPage({ initialTab }: MonitoringDashboardPageP
     setAlerts(newAlerts);
   };
 
-  const filteredAlerts = alerts.filter((a) => {
-    if (selectedCategory === 'all') return true;
-    return a.category === selectedCategory;
-  });
+  const filteredAlerts = alerts.filter((a) => a.category === selectedCategory);
 
   return (
     <div style={{ padding: '1.75rem 0', maxWidth: 1200, margin: '0 auto' }}>
@@ -94,14 +91,14 @@ export function MonitoringDashboardPage({ initialTab }: MonitoringDashboardPageP
           to="/monitoring"
           style={{
             padding: '0.65rem 1.15rem',
-            borderBottom: activeTab === 'all' ? '3px solid #f97316' : '3px solid transparent',
-            color: activeTab === 'all' ? '#f97316' : '#64748b',
-            fontWeight: activeTab === 'all' ? 800 : 600,
+            borderBottom: activeTab === 'stream' ? '3px solid #f97316' : '3px solid transparent',
+            color: activeTab === 'stream' ? '#f97316' : '#64748b',
+            fontWeight: activeTab === 'stream' ? 800 : 600,
             fontSize: '0.9rem',
             textDecoration: 'none'
           }}
         >
-          All System Alerts ({alerts.length})
+          Live Ingestion Stream ({alerts.length})
         </Link>
 
         <Link
@@ -139,28 +136,33 @@ export function MonitoringDashboardPage({ initialTab }: MonitoringDashboardPageP
         </Link>
       </div>
 
-      {/* Tab 1: All Internal Alerts */}
-      {activeTab === 'all' && (
+      {/* Tab 1: Live Ingestion Alerts */}
+      {activeTab === 'stream' && (
         <div style={{ display: 'grid', gap: '1.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748b' }}>Filter Category:</span>
-            {['all', 'new_school_records', 'new_tenders', 'new_rera_orders', 'new_documents'].map((cat) => (
+            {[
+              { id: 'new_school_records', label: 'School Records' },
+              { id: 'new_tenders', label: 'PMGSY Tenders' },
+              { id: 'new_rera_orders', label: 'RERA Gazettes' },
+              { id: 'new_documents', label: 'Statutory Docs' }
+            ].map((cat) => (
               <button
-                key={cat}
+                key={cat.id}
                 type="button"
-                onClick={() => setSelectedCategory(cat)}
+                onClick={() => setSelectedCategory(cat.id)}
                 style={{
                   padding: '0.35rem 0.85rem',
                   borderRadius: '9999px',
-                  border: selectedCategory === cat ? '1px solid #0f172a' : '1px solid #cbd5e1',
-                  background: selectedCategory === cat ? '#0f172a' : '#ffffff',
-                  color: selectedCategory === cat ? '#ffffff' : '#475569',
+                  border: selectedCategory === cat.id ? '1.5px solid #0f172a' : '1px solid #cbd5e1',
+                  background: selectedCategory === cat.id ? '#0f172a' : '#ffffff',
+                  color: selectedCategory === cat.id ? '#ffffff' : '#475569',
                   fontWeight: 700,
                   fontSize: '0.78rem',
                   cursor: 'pointer'
                 }}
               >
-                {cat}
+                {cat.label}
               </button>
             ))}
           </div>

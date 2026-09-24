@@ -94,7 +94,7 @@ export function generateMockContractorDataset(pincode: string = '560034'): {
         sanctionedSpecs: 'VG-30, 50mm BC, 3-yr DLP + IRC SP:98 certificate',
         officialClaim: `₹${sanctioned} Lakhs • VG-30 complete with 3-year warranty`,
         officialSourceDoc: `BBMP/2024-25/EE/RD/WO-${9941+i}`,
-        cagAuditReference: 'CAG Report No. 4 of 2024, Para 3.2.1',
+        cagAuditReference: 'CAG local bodies audit (example reference), Para 3.2.1',
         cagFindingSnippet: 'Core cut tests showed bitumen 3.8% vs mandated 5.4%',
         realityGroundTruth: `${Math.floor(rnd()*15)} craters after first monsoon, 4 months after handover`,
         discrepancyPercentage: Math.floor(20 + rnd()*50),

@@ -197,8 +197,9 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
                   : 'bg-white border-[#1A1A1A] hover:bg-black/5 text-[#1A1A1A]'
               }`}
               title="Listen to Audio Audit (Accessible for all citizens)"
+              aria-label={isSpeaking ? 'Stop reading this summary aloud' : 'Read this summary aloud'}
             >
-              {isSpeaking ? <VolumeX className="w-4 h-4 text-[#D43F33]" /> : <Volume2 className="w-4 h-4 text-[#1A1A1A]" />}
+              {isSpeaking ? <VolumeX className="w-4 h-4 text-[#D43F33]" aria-hidden="true" /> : <Volume2 className="w-4 h-4 text-[#1A1A1A]" aria-hidden="true" />}
               <span>{isSpeaking ? 'Stop Audio' : getTranslation(language, 'listenAudioAudit')}</span>
             </button>
 

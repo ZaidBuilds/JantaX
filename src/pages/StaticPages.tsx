@@ -1,119 +1,395 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import {
+  ShieldCheck,
+  Database,
+  Lock,
+  Search,
+  ExternalLink,
+  CheckCircle2,
+  FileText,
+  Clock,
+  Layers,
+  Sparkles,
+  ArrowRight,
+  Globe2,
+  HelpCircle,
+  Eye,
+  Camera,
+  Scale,
+} from 'lucide-react';
 import { api } from '../core/services/api';
-import { resolvePincode } from '../core/utils/pinResolver';
-import { SourceBadge } from '../components/UI/SourceBadge';
-import { GovtResponseTracker } from '../modules/contractor/components/GovtResponseTracker';
-
-const pageStyle: React.CSSProperties = { maxWidth: 860, margin: '0 auto', padding: '2rem 1.25rem', lineHeight: 1.6 };
-const cardStyle: React.CSSProperties = { background: '#fff', border: '1px solid #eef2f7', borderRadius: 12, padding: '1.25rem', boxShadow: '0 1px 3px rgba(0,0,0,.04)', marginBottom: '1rem' };
 
 export function AboutPage() {
   return (
-    <div style={pageStyle}>
-      <div style={{ borderLeft: '4px solid #0f2d59', paddingLeft: '1rem', marginBottom: '1.5rem' }}>
-        <h1 style={{ fontSize: '1.6rem', color: '#0f2d59', margin: 0 }}>About JantaX</h1>
-        <p style={{ color: '#475569', marginTop: '0.4rem' }}>India, Explained by Where You Live — See What Your Government Data Says.</p>
-      </div>
-      <div style={cardStyle}>
-        <h3 style={{ color: '#0f2d59' }}>Mission</h3>
-        <p style={{ color: '#334155', fontSize: '0.92rem' }}>JantaX is a citizen-powered, non-partisan <strong>Pin-Code Accountability OS</strong>. Every Indian PIN reveals a different India — schools, hospitals, RERA, ration shops, power feeders. We stitch official records (CAG, UDISE+, HMIS, RERA, DARPG CPGRAMS, CPCB) side-by-side with <em>ground truth</em> — anonymous citizen photo drops stripped of EXIF — so you can see <strong>दावा vs हकीकत</strong> and act.</p>
-        <p style={{ color: '#334155', fontSize: '0.92rem' }}>Inspired by <strong>Andhbhakt.org</strong> architecture: 28 State CM claims vs audits, PIN→State resolver, category filters, split claim/reality cards, WhatsApp-forward cards, dark premium evidence vault. We extend that pattern to 15 modules, always citing source documents, never making standalone allegations.</p>
-      </div>
-      <div style={cardStyle}>
-        <h3 style={{ color: '#0f2d59' }}>How it works</h3>
-        <ol style={{ color: '#475569', fontSize: '0.9rem', paddingLeft: '1.2rem' }}>
-          <li><strong>Enter PIN</strong> → resolved to state/district/region (PIN prefix map) + lat/lng.</li>
-          <li><strong>Pick module</strong> (School, Infra, Contractor, Hospital, RERA, etc.) → live `GET /api/pincode/:code/records?module=` or resilient local mock when offline.</li>
-          <li><strong>Compare</strong> official claim vs ground truth (e.g., UDISE+ `toilet functional` vs parent check-in, or CM `5 lakh ICU beds` vs `CAG Report 2024 Para 3.7: 2 beds`).</li>
-          <li><strong>Act</strong>: Share WhatsApp card, drop anonymous photo (`POST /api/reports` → moderation PENDING), follow PIN for alerts.</li>
-        </ol>
-      </div>
-      <div style={cardStyle}>
-        <h3 style={{ color: '#0f2d59' }}>Principles</h3>
-        <ul style={{ color: '#475569', fontSize: '0.9rem' }}>
-          <li><strong>100% Open Data</strong> — every number cites a public document (CAG, UDISE+, HMS, RERA, CPGRAMS).</li>
-          <li><strong>Citizen Powered</strong> — anonymous by default, SHA-256 IP hash, EXIF stripped.</li>
-          <li><strong>Non-Partisan</strong> — we list claims and audits side-by-side, we do not editorialize.</li>
-          <li><strong>For Every Indian</strong> — Hindi-first, mobile-first, 44px taps, offline mock fallback so PIN never shows red error.</li>
-        </ul>
+    <div style={{ padding: '3rem 0 5rem' }}>
+      <div className="container" style={{ maxWidth: 940 }}>
+        {/* Mission Hero */}
+        <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+          <div className="hero-pill-badge" style={{ margin: '0 auto 1.25rem' }}>
+            <span className="hero-pill-dot"></span>
+            <span>Non-Partisan Civic OS for India</span>
+          </div>
+
+          <h1 style={{ fontSize: 'clamp(2.2rem, 4vw, 3.2rem)', fontWeight: 900, color: 'var(--navy-950)', marginBottom: '1rem', lineHeight: 1.15 }}>
+            India, Explained by <br />
+            <span style={{ color: 'var(--navy-600)' }}>Where You Live.</span>
+          </h1>
+
+          <p style={{ fontSize: '1.15rem', color: 'var(--text-secondary)', maxWidth: 680, margin: '0 auto', lineHeight: 1.6 }}>
+            Every Indian PIN code reveals a different India — schools, hospitals, RERA housing, roads, and welfare. We stitch official government records side-by-side with ground reality so you can see <strong>दावा बनाम हकीकत</strong> and hold public systems accountable.
+          </p>
+        </div>
+
+        {/* 4-Step Architecture Workflow */}
+        <div
+          style={{
+            background: '#ffffff',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-2xl)',
+            padding: '2.5rem 2rem',
+            boxShadow: 'var(--shadow-card)',
+            marginBottom: '3.5rem',
+          }}
+        >
+          <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+            <h2 style={{ fontSize: '1.6rem', color: 'var(--navy-950)', marginBottom: '0.4rem' }}>
+              How JantaX Works (कार्यप्रणाली)
+            </h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.92rem' }}>
+              From official government gazettes to verified citizen ground truth in four verifiable steps.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', position: 'relative' }}>
+            {/* Step 1 */}
+            <div style={{ padding: '1.25rem', background: 'var(--bg-subtle)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--navy-900)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', marginBottom: '1rem' }}>
+                1
+              </div>
+              <h3 style={{ fontSize: '1.05rem', color: 'var(--navy-950)', marginBottom: '0.4rem' }}>
+                Open Data Ingest
+              </h3>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                We ingest official datasets from UDISE+, PMGSY, RERA, HMIS, NFSA, DARPG CPGRAMS, and CPCB.
+              </p>
+            </div>
+
+            {/* Step 2 */}
+            <div style={{ padding: '1.25rem', background: 'var(--bg-subtle)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--navy-900)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', marginBottom: '1rem' }}>
+                2
+              </div>
+              <h3 style={{ fontSize: '1.05rem', color: 'var(--navy-950)', marginBottom: '0.4rem' }}>
+                Zero-EXIF Anonymity
+              </h3>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                When citizens drop field photos, EXIF metadata is permanently stripped and IP is SHA-256 hashed.
+              </p>
+            </div>
+
+            {/* Step 3 */}
+            <div style={{ padding: '1.25rem', background: 'var(--bg-subtle)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--navy-900)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', marginBottom: '1rem' }}>
+                3
+              </div>
+              <h3 style={{ fontSize: '1.05rem', color: 'var(--navy-950)', marginBottom: '0.4rem' }}>
+                दावा बनाम हकीकत
+              </h3>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                Official claims are rendered side-by-side with CAG audit findings and geotagged parent/resident proof.
+              </p>
+            </div>
+
+            {/* Step 4 */}
+            <div style={{ padding: '1.25rem', background: 'var(--bg-subtle)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--emerald-600)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.9rem', marginBottom: '1rem' }}>
+                4
+              </div>
+              <h3 style={{ fontSize: '1.05rem', color: 'var(--navy-950)', marginBottom: '0.4rem' }}>
+                Citizen Action & RTI
+              </h3>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                Citizens generate one-click Section 6(1) RTI drafts, municipal complaints, and viral WhatsApp cards.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 4 Core Pillars */}
+        <div style={{ marginBottom: '3.5rem' }}>
+          <h2 style={{ fontSize: '1.5rem', color: 'var(--navy-950)', marginBottom: '1.5rem', textAlign: 'center' }}>
+            Our Four Core Principles (चार मूल सिद्धांत)
+          </h2>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem' }}>
+            <div style={{ background: '#ffffff', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-xl)', padding: '1.5rem', boxShadow: 'var(--shadow-card)' }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: 'var(--navy-50)', color: 'var(--navy-600)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+                <Database size={22} />
+              </div>
+              <h3 style={{ fontSize: '1.15rem', color: 'var(--navy-950)', marginBottom: '0.4rem' }}>100% Open Data</h3>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                Every single metric cites a public government document (CAG reports, gazettes, UDISE+, HMIS, NFSA). We never make standalone allegations.
+              </p>
+            </div>
+
+            <div style={{ background: '#ffffff', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-xl)', padding: '1.5rem', boxShadow: 'var(--shadow-card)' }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: 'var(--emerald-50)', color: 'var(--emerald-600)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+                <Camera size={22} />
+              </div>
+              <h3 style={{ fontSize: '1.15rem', color: 'var(--navy-950)', marginBottom: '0.4rem' }}>Citizen Powered</h3>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                Anonymous by default. We protect citizens while allowing authentic field verification of public works, school toilets, and hospital beds.
+              </p>
+            </div>
+
+            <div style={{ background: '#ffffff', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-xl)', padding: '1.5rem', boxShadow: 'var(--shadow-card)' }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: 'var(--saffron-50)', color: 'var(--saffron-600)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+                <Scale size={22} />
+              </div>
+              <h3 style={{ fontSize: '1.15rem', color: 'var(--navy-950)', marginBottom: '0.4rem' }}>Strictly Non-Partisan</h3>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                We do not editorialize or endorse any political party. We present official government records and audits transparently side-by-side.
+              </p>
+            </div>
+
+            <div style={{ background: '#ffffff', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-xl)', padding: '1.5rem', boxShadow: 'var(--shadow-card)' }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: 'var(--sector-rti-bg)', color: 'var(--sector-rti)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+                <Globe2 size={22} />
+              </div>
+              <h3 style={{ fontSize: '1.15rem', color: 'var(--navy-950)', marginBottom: '0.4rem' }}>For Every Indian</h3>
+              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                Bilingual in Hindi and English, optimized for 3G mobile connections, resilient offline architecture, and accessible 44px tap targets.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Direct Action Banner */}
+        <div
+          style={{
+            background: 'linear-gradient(135deg, var(--navy-900) 0%, var(--navy-700) 100%)',
+            borderRadius: 'var(--radius-2xl)',
+            padding: '2.5rem',
+            color: '#ffffff',
+            textAlign: 'center',
+          }}
+        >
+          <h3 style={{ color: '#ffffff', fontSize: '1.6rem', fontWeight: 800, marginBottom: '0.75rem' }}>
+            Explore What Your PIN Code Reveals
+          </h3>
+          <p style={{ color: '#cbd5e1', fontSize: '1rem', maxWidth: 520, margin: '0 auto 1.5rem' }}>
+            Check public schools, PMGSY road progress, and RERA real estate delivery in your home locality today.
+          </p>
+          <Link to="/" className="btn" style={{ background: 'var(--saffron-500)', color: '#ffffff', fontWeight: 700, padding: '0.75rem 1.75rem', fontSize: '1rem' }}>
+            <span>Search Your PIN Code</span>
+            <ArrowRight size={18} />
+          </Link>
+        </div>
       </div>
     </div>
   );
 }
 
 export function DataSourcesPage() {
-  const [sources, setSources] = React.useState<any[] | null>(null);
-  const [filterTier, setFilterTier] = React.useState<string>('');
-  React.useEffect(()=>{
-    fetch('/api/sources').then(r=>r.json()).then(j=>{ if(j.sources) setSources(j.sources); }).catch(()=>{
-      // fallback to hardcoded when offline
-      setSources([
-        { sourceId:'src_cag_mh_2024', organization:'CAG', sourceName:'CAG Audit Report No.4 2023-24', sourceUrl:'https://cag.gov.in/en/audit-reports', sourceType:'C-document', license:'Fair-use-quotation', attributionRequirement:'Source: CAG Report No.4 of 2024, Para 3.7', reusePermission:'store: excerpt ≤200 chars, display: quote + link, redistribute: no', dataSensitivity:'public', updateFrequency:'annual', expectedRefreshInterval:'365d', lastChecked:new Date().toISOString(), lastSuccessfulSync:new Date().toISOString(), lastPublishedDate:'2024-03-14', parserVersion:'cag_pdf_tabula_v0.8', status:'active', owner:'data-ops', governmentLevel:'state' },
-        { sourceId:'src_udise_2324', organization:'Ministry of Education', sourceName:'UDISE+ 2023-24', sourceUrl:'https://udiseplus.gov.in', datasetUrl:'https://udiseplus.gov.in/p/dataset', sourceType:'A-dataset', license:'GODL-India', attributionRequirement:'Source: UDISE+ 2023-24 | GODL', reusePermission:'store/transform/display/redistribute: yes', dataSensitivity:'public', updateFrequency:'annual', expectedRefreshInterval:'365d', lastChecked:new Date().toISOString(), lastSuccessfulSync:new Date().toISOString(), lastPublishedDate:'2024-08-15', parserVersion:'udise_csv_v1.2', status:'active', owner:'data-ops', governmentLevel:'union' },
-        { sourceId:'src_hmis_2024', organization:'MoHFW', sourceName:'HMIS Facility Registry 2024', sourceUrl:'https://hmis.mohfw.gov.in', sourceType:'A-dataset', license:'GODL-India', attributionRequirement:'Source: HMIS 2024 | GODL', reusePermission:'store/transform/display/redistribute: yes', dataSensitivity:'public', updateFrequency:'monthly', expectedRefreshInterval:'30d', lastChecked:new Date().toISOString(), lastSuccessfulSync:new Date().toISOString(), lastPublishedDate:'2024-08-01', parserVersion:'hmis_api_v1.0', status:'active', owner:'data-ops', governmentLevel:'union' },
-        { sourceId:'src_cpcb_aqi', organization:'CPCB', sourceName:'CPCB AQI API', sourceUrl:'https://cpcb.nic.in', apiUrl:'https://api.cpcb.nic.in/aqi', sourceType:'B-api', license:'GODL-India', attributionRequirement:'Source: CPCB | GODL', reusePermission:'store: cache 1h, display: yes', dataSensitivity:'public', updateFrequency:'realtime', expectedRefreshInterval:'1h', lastChecked:new Date().toISOString(), lastSuccessfulSync:new Date().toISOString(), lastPublishedDate:'2024-08-25', parserVersion:'cpcb_api_v1.0', status:'active', owner:'data-ops', governmentLevel:'union' },
-        { sourceId:'src_community_school', organization:'JantaX', sourceName:'Parent Check-in', sourceUrl:'https://jantax.in/report', sourceType:'E-community', license:'Community-CC0', attributionRequirement:'Anon • SHA-256+salt', reusePermission:'store: anon, transform: aggregate, display: aggregate', dataSensitivity:'community_anon', updateFrequency:'realtime', expectedRefreshInterval:'1d', lastChecked:new Date().toISOString(), lastSuccessfulSync:new Date().toISOString(), lastPublishedDate:'2024-08-25', parserVersion:'community_v1.0', status:'active', owner:'moderation@jantax.in', governmentLevel:'community' },
-      ]);
+  const [sources, setSources] = useState<any[] | null>(null);
+  const [filterTier, setFilterTier] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    api.getSources().then((res) => {
+      if (res.sources) setSources(res.sources);
+    }).catch(() => {
+      setSources([]);
     });
-  },[]);
-  const filtered = sources ? sources.filter(s=> !filterTier || s.sourceType.startsWith(filterTier)) : [];
-  const tierColor: Record<string,string> = { A:'#10b981', B:'#0ea5e9', C:'#f59e0b', D:'#8b5cf6', E:'#ec4899' };
+  }, []);
+
+  const filtered = useMemo(() => {
+    if (!sources) return [];
+    return sources.filter((s) => {
+      const matchesTier = !filterTier || s.sourceType?.startsWith(filterTier);
+      const matchesQuery = !searchQuery || s.sourceName?.toLowerCase().includes(searchQuery.toLowerCase()) || s.organization?.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesTier && matchesQuery;
+    });
+  }, [sources, filterTier, searchQuery]);
+
+  const tierBadgeColor: Record<string, { bg: string; text: string }> = {
+    A: { bg: '#ecfdf5', text: '#059669' },
+    B: { bg: '#eff6ff', text: '#2563eb' },
+    C: { bg: '#fffbeb', text: '#d97706' },
+    D: { bg: '#faf5ff', text: '#9333ea' },
+    E: { bg: '#fdf2f8', text: '#db2777' },
+  };
+
   return (
-    <div style={pageStyle}>
-      <div style={{ borderLeft: '4px solid #0ea5e9', paddingLeft: '1rem', marginBottom: '1.5rem' }}>
-        <h1 style={{ fontSize: '1.6rem', color: '#0f2d59', margin: 0 }}>Data Sources — Governance</h1>
-        <p style={{ color: '#475569' }}>Every figure traces to a <code>Source</code> record (21 fields). No standalone allegations — only side-by-side citations with freshness.</p>
-        <div style={{ display:'flex', gap:'0.4rem', flexWrap:'wrap', marginTop:'0.6rem' }}>
-          {['', 'A','B','C','D','E'].map(t=>(
-            <button key={t||'all'} onClick={()=>setFilterTier(t)} style={{ padding:'4px 10px', borderRadius:999, border: filterTier===t?'1px solid #0f2d59':'1px solid #e2e8f0', background: filterTier===t?'#0f2d59':'#fff', color: filterTier===t?'#fff':'#475569', fontWeight:700, fontSize:'0.72rem', cursor:'pointer' }}>{t?`Tier ${t}`:'All Tiers'}</button>
-          ))}
-          <span style={{ fontSize:'0.68rem', color:'#94a3b8', alignSelf:'center' }}>Tier A: GODL datasets • B: Official API • C: Webpage/PDF (quote+link) • D: Independent CC-BY • E: Community CC0</span>
+    <div style={{ padding: '3rem 0 5rem' }}>
+      <div className="container">
+        {/* Header */}
+        <div style={{ marginBottom: '2.5rem' }}>
+          <div className="hero-pill-badge">
+            <span className="hero-pill-dot"></span>
+            <span>GODL-India Open Data Provenance</span>
+          </div>
+
+          <h1 style={{ fontSize: '2.4rem', fontWeight: 900, color: 'var(--navy-950)', marginBottom: '0.6rem' }}>
+            Data Sources & Governance Directory
+          </h1>
+          <p style={{ fontSize: '1.05rem', color: 'var(--text-secondary)', maxWidth: 780, lineHeight: 1.6 }}>
+            Every statistic on JantaX is backed by a verified 21-field <code>Source</code> entity. We do not publish standalone allegations — only verifiable government records side-by-side with audit citations.
+          </p>
         </div>
-      </div>
-      {!sources ? <div style={cardStyle}>Loading sources…</div> : (
-        <div style={{ display: 'grid', gap: '0.85rem' }}>
-          {filtered.map((s:any)=>{
+
+        {/* Filter Toolbar */}
+        <div
+          style={{
+            background: '#ffffff',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-xl)',
+            padding: '1.25rem',
+            boxShadow: 'var(--shadow-card)',
+            marginBottom: '2rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '1rem',
+          }}
+        >
+          {/* Tier Buttons */}
+          <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+            {[
+              { id: '', label: 'All Sources' },
+              { id: 'A', label: 'Tier A: Official Datasets (UDISE+/HMIS)' },
+              { id: 'B', label: 'Tier B: Live APIs (CPCB/PMGSY)' },
+              { id: 'C', label: 'Tier C: Audit Reports (CAG/RERA)' },
+            ].map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setFilterTier(t.id)}
+                style={{
+                  padding: '0.45rem 0.9rem',
+                  borderRadius: 'var(--radius-pill)',
+                  border: filterTier === t.id ? '1.5px solid var(--navy-600)' : '1px solid var(--border-color)',
+                  background: filterTier === t.id ? 'var(--navy-50)' : '#ffffff',
+                  color: filterTier === t.id ? 'var(--navy-900)' : 'var(--text-secondary)',
+                  fontWeight: 700,
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Search */}
+          <div style={{ position: 'relative', width: 260 }}>
+            <Search size={16} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+            <input
+              type="text"
+              placeholder="Search sources..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.5rem 0.85rem 0.5rem 2.4rem',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: '0.85rem',
+                outline: 'none',
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Sources Cards Grid */}
+        <div style={{ display: 'grid', gap: '1.25rem' }}>
+          {filtered.map((s) => {
             const tier = s.sourceType?.[0] || 'A';
-            const stale = s.lastSuccessfulSync && (Date.now() - new Date(s.lastSuccessfulSync).getTime())/(1000*60*60*24) > parseInt(s.expectedRefreshInterval)||0*1.5;
-            const failed = s.status==='failed' || s.status==='degraded';
+            const colors = tierBadgeColor[tier] || { bg: '#f1f5f9', text: '#334155' };
             return (
-              <div key={s.sourceId} style={{ ...cardStyle, borderLeft:`4px solid ${tierColor[tier]||'#64748b'}` }}>
-                <div style={{ display:'flex', justifyContent:'space-between', flexWrap:'wrap', gap:'0.5rem' }}>
-                  <a href={s.sourceUrl} target="_blank" rel="noreferrer" style={{ fontWeight: 800, color: '#0f2d59', fontSize: '0.95rem' }}>{s.sourceName} ↗</a>
-                  <span style={{ display:'flex', gap:'0.35rem', alignItems:'center' }}>
-                    <span style={{ background:`${tierColor[tier]}15`, color:tierColor[tier], border:`1px solid ${tierColor[tier]}30`, padding:'2px 7px', borderRadius:999, fontSize:'0.62rem', fontWeight:800 }}>Tier {tier} · {s.sourceType}</span>
-                    <span style={{ background: s.status==='active'?'#dcfce7':'#fef3c7', color: s.status==='active'?'#166534':'#92400e', border:`1px solid ${s.status==='active'?'#bbf7d0':'#fde68a'}`, padding:'2px 7px', borderRadius:999, fontSize:'0.62rem', fontWeight:800 }}>{s.status}</span>
-                    {stale && <span style={{ background:'#fef3c7', color:'#92400e', border:'1px solid #fde68a', padding:'2px 7px', borderRadius:999, fontSize:'0.62rem', fontWeight:800 }}>Stale • {Math.floor((Date.now()-new Date(s.lastSuccessfulSync).getTime())/(1000*60*60*24))}d</span>}
-                    {failed && <span style={{ background:'#fee2e2', color:'#991b1b', border:'1px solid #fecaca', padding:'2px 7px', borderRadius:999, fontSize:'0.62rem', fontWeight:800 }}>Source failure — showing last successful {new Date(s.lastSuccessfulSync).toLocaleDateString()}</span>}
-                  </span>
+              <div
+                key={s.sourceId}
+                style={{
+                  background: '#ffffff',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-xl)',
+                  padding: '1.5rem',
+                  boxShadow: 'var(--shadow-card)',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '0.75rem' }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.35rem' }}>
+                      <span
+                        style={{
+                          fontSize: '0.72rem',
+                          fontWeight: 800,
+                          padding: '0.2rem 0.6rem',
+                          borderRadius: 'var(--radius-pill)',
+                          background: colors.bg,
+                          color: colors.text,
+                        }}
+                      >
+                        Tier {tier} · {s.sourceType}
+                      </span>
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--emerald-700)', background: 'var(--emerald-50)', padding: '0.15rem 0.5rem', borderRadius: 'var(--radius-sm)' }}>
+                        {s.status}
+                      </span>
+                    </div>
+
+                    <h3 style={{ fontSize: '1.2rem', color: 'var(--navy-950)', margin: 0 }}>
+                      <a href={s.sourceUrl} target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'none' }}>
+                        {s.sourceName} ↗
+                      </a>
+                    </h3>
+                  </div>
+
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                    {s.organization} · {s.governmentLevel} Govt
+                  </div>
                 </div>
-                <div style={{ fontSize: '0.78rem', color: '#475569', marginTop: '0.3rem' }}>{s.organization}{s.department?` · ${s.department}`:''} · {s.governmentLevel} · {s.sourceType}</div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop:'0.3rem' }}><strong>License:</strong> {s.license} {s.termsUrl && <a href={s.termsUrl} target="_blank" rel="noreferrer" style={{ color:'#2563eb' }}>{s.termsUrl} ↗</a>} · <strong>Attribution:</strong> {s.attributionRequirement}</div>
-                <div style={{ fontSize:'0.68rem', color:'#64748b', marginTop:'0.3rem' }}><strong>Reuse:</strong> {s.reusePermission} · <strong>Sensitivity:</strong> {s.dataSensitivity} · <strong>Parser:</strong> {s.parserVersion} · <strong>Owner:</strong> {s.owner}</div>
-                <div style={{ fontSize:'0.68rem', color:'#64748b', marginTop:'0.3rem', display:'flex', gap:'0.6rem', flexWrap:'wrap' }}>
-                  <span>Update: {s.updateFrequency} (expected {s.expectedRefreshInterval})</span>
-                  <span>· Last checked: {new Date(s.lastChecked).toLocaleString()}</span>
-                  <span>· Last sync: {s.lastSuccessfulSync ? new Date(s.lastSuccessfulSync).toLocaleString() : '—'}</span>
-                  <span>· Published: {s.lastPublishedDate || '—'}</span>
-                  {s.apiUrl && <><span>·</span><a href={s.apiUrl} target="_blank" rel="noreferrer" style={{ color:'#2563eb' }}>API ↗</a></>}
-                  {s.datasetUrl && <><span>·</span><a href={s.datasetUrl} target="_blank" rel="noreferrer" style={{ color:'#2563eb' }}>Dataset ↗</a></>}
+
+                <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', marginBottom: '1rem', lineHeight: 1.5 }}>
+                  {s.description || 'Public government registry dataset accessed under the Government Open Data License - India.'}
+                </p>
+
+                <div
+                  style={{
+                    borderTop: '1px solid var(--border-subtle)',
+                    paddingTop: '0.75rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    gap: '0.75rem',
+                    fontSize: '0.78rem',
+                    color: 'var(--text-muted)',
+                  }}
+                >
+                  <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                    <span><strong>License:</strong> {s.license}</span>
+                    <span><strong>Frequency:</strong> {s.updateFrequency}</span>
+                    <span><strong>Last Checked:</strong> {new Date(s.lastChecked).toLocaleDateString()}</span>
+                  </div>
+
+                  <a
+                    href={s.sourceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ fontWeight: 700, color: 'var(--navy-600)', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
+                  >
+                    <span>View Official Portal</span>
+                    <ExternalLink size={13} />
+                  </a>
                 </div>
-                {s.notes && <div style={{ fontSize:'0.68rem', color:'#92400e', background:'#fef3c7', border:'1px solid #fde68a', borderRadius:6, padding:'0.35rem 0.5rem', marginTop:'0.4rem' }}>Note: {s.notes}</div>}
-                <div style={{ fontSize:'0.68rem', color:'#2563eb', marginTop:'0.4rem' }}><a href={`/data-sources#${s.sourceId}`} style={{ color:'#2563eb' }}>Methodology for {s.sourceName} →</a> · <span style={{ color:'#64748b' }}>Citation: {s.attributionRequirement} · freshness: {new Date(s.lastSuccessfulSync).toLocaleDateString()} · <a href={s.sourceUrl} target="_blank" rel="noreferrer" style={{ color:'#0f2d59' }}>Source ↗</a></span></div>
               </div>
             );
           })}
         </div>
-      )}
-      <div style={{ ...cardStyle, background:'#f8fafc' }}>
-        <h3 style={{ color:'#0f2d59', fontSize:'0.95rem' }}>How we use sources</h3>
-        <ul style={{ fontSize:'0.82rem', color:'#475569' }}>
-          <li><strong>Can we store?</strong> Tier A/B: yes (GODL). Tier C: excerpt ≤200 chars + link, not full PDF. Tier E: anon only.</li>
-          <li><strong>Can we transform/display/redistribute/link/attribute/permission?</strong> Per `reusePermission` decision — never assume public = unrestricted.</li>
-          <li>Every public data point has DataPoint (source_id, observed_at, source_published_at, recalc_at, scoringVersion) → ProvenanceBar triple timestamp.</li>
-          <li><strong>Source failure warning:</strong> if `lastSuccessfulSync` stale &gt; `expectedRefreshInterval×1.5` → amber `Stale` + per-card `Source degraded`.</li>
-        </ul>
       </div>
     </div>
   );
@@ -121,161 +397,38 @@ export function DataSourcesPage() {
 
 export function PrivacyPage() {
   return (
-    <div style={pageStyle}>
-      <div style={{ borderLeft: '4px solid #10b981', paddingLeft: '1rem', marginBottom: '1.5rem' }}>
-        <h1 style={{ fontSize: '1.6rem', color: '#0f2d59', margin: 0 }}>Privacy & Terms</h1>
-        <p style={{ color: '#475569' }}>Anonymous by default, audited by design.</p>
-      </div>
-      <div style={cardStyle}>
-        <h3 style={{ color: '#0f2d59' }}>Privacy</h3>
-        <ul style={{ fontSize: '0.9rem', color: '#334155' }}>
-          <li>No login required to browse. Search history not stored.</li>
-          <li>Photo drops: EXIF stripped (GPS/timestamp/device), IP hashed SHA-256 + salt, never shown. Stored `PENDING` → moderation → `APPROVED/REJECTED`.</li>
-          <li>PIN queries resolved client-side where possible; proxied via cache, rate-limited (IP bucket) to prevent scraping.</li>
-          <li>Follow PIN is local `localStorage` + anonymized `Follow` row (no PII).</li>
-        </ul>
-      </div>
-      <div style={cardStyle}>
-        <h3 style={{ color: '#0f2d59' }}>Terms</h3>
-        <ul style={{ fontSize: '0.9rem', color: '#334155' }}>
-          <li>We cite CAG/RTI/official PDFs verbatim; we do not make independent accusations.</li>
-          <li>Citizen reports are <em>observations</em>, not verdicts. Confidence displayed (building/strong) with sample size & agreement.</li>
-          <li>Dispute path: `Report Data Issue →` correction queued, audit trail preserved, original never silently deleted.</li>
-          <li>Abuse: burst detection, duplicate IP/device gating, photo redaction queue, trail retained 90 days.</li>
-        </ul>
-      </div>
-    </div>
-  );
-}
-
-export function ReportIssuePage() {
-  const nav = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const initialPin = searchParams.get('pin') || '110001';
-  const [pinInput, setPinInput] = useState(initialPin);
-  const [currentPin, setCurrentPin] = useState(initialPin);
-  const [reports, setReports] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [desc, setDesc] = useState('');
-  const [moduleSel, setModuleSel] = useState('school');
-
-  const loc = useMemo(() => resolvePincode(currentPin), [currentPin]);
-
-  const loadReports = () => {
-    setLoading(true);
-    api.getReports(currentPin).then(r => { setReports(Array.isArray(r) ? r : []); }).catch(() => setReports([])).finally(() => setLoading(false));
-  };
-
-  useEffect(() => { loadReports(); }, [currentPin]);
-
-  const handleSubmit = async () => {
-    if (!desc.trim()) return;
-    setSubmitting(true);
-    try {
-      await api.submitReport({ pinCode: currentPin, module: moduleSel, category: 'Citizen Issue', description: desc.trim() });
-      setDesc('');
-      loadReports();
-    } catch { /* queued locally */ setDesc(''); } finally { setSubmitting(false); }
-  };
-
-  return (
-    <div style={pageStyle}>
-      <div style={{ borderLeft: '4px solid #ef4444', paddingLeft: '1rem', marginBottom: '1.5rem' }}>
-        <h1 style={{ fontSize: '1.6rem', color: '#0f2d59', margin: 0 }}>Report an Issue</h1>
-        <p style={{ color: '#475569' }}>Anonymous ground truth — photo, PIN, category, description.</p>
-      </div>
-
-      <div style={cardStyle}>
-        <h3 style={{ color: '#0f2d59', marginTop: 0 }}>Search reports by PIN</h3>
-        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginTop: '0.4rem' }}>
-          <input
-            type="text"
-            className="form-input"
-            maxLength={6}
-            value={pinInput}
-            onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ''))}
-            placeholder="PIN code"
-            style={{ maxWidth: 160 }}
-          />
-          <button
-            onClick={() => { setCurrentPin(pinInput); setSearchParams({ pin: pinInput }); }}
-            className="btn btn-primary"
-          >खोजें</button>
-        </div>
-        {loc.isValid && (
-          <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '0.5rem' }}>
-            📍 {loc.district} ({loc.state}){loc.stateCode ? ` · ${loc.stateCode}` : ''}
+    <div style={{ padding: '3rem 0 5rem' }}>
+      <div className="container" style={{ maxWidth: 840 }}>
+        <div style={{ marginBottom: '2.5rem' }}>
+          <h1 style={{ fontSize: '2.4rem', fontWeight: 900, color: 'var(--navy-950)', marginBottom: '0.6rem' }}>
+            Privacy & Non-Surveillance Guarantee
+          </h1>
+          <p style={{ fontSize: '1.05rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+            JantaX is built with a zero-knowledge architecture. We do not track, profile, or sell citizen data.
           </p>
-        )}
-      </div>
+        </div>
 
-      <div style={cardStyle}>
-        <h3 style={{ color: '#0f2d59', marginTop: 0 }}>Submit a citizen report</h3>
-        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '0.6rem' }}>
-          <select value={moduleSel} onChange={(e) => setModuleSel(e.target.value)} className="form-input" style={{ maxWidth: 200 }}>
-            <option value="school">School</option>
-            <option value="hospital">Hospital</option>
-            <option value="infra">Infra</option>
-            <option value="rera">RERA</option>
-            <option value="ration">Ration</option>
-            <option value="contractor">Contractor</option>
-          </select>
-          <input readOnly value={currentPin} className="form-input" style={{ maxWidth: 120, opacity: 0.7 }} />
-        </div>
-        <textarea
-          value={desc}
-          onChange={(e) => setDesc(e.target.value)}
-          placeholder="Describe the ground-truth issue (anonymous)…"
-          className="form-input"
-          rows={3}
-          style={{ width: '100%', resize: 'vertical' }}
-        />
-        <div style={{ marginTop: '0.6rem' }}>
-          <button onClick={handleSubmit} disabled={submitting || !desc.trim()} className="btn btn-primary">
-            {submitting ? 'Submitting…' : 'Submit Report'}
-          </button>
-        </div>
-        <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '0.6rem' }}>
-          Goes to <code>POST /api/reports</code> as <code>PENDING</code>, media capped at 10 items. Moderation SLA 72h · <a href="mailto:moderation@jantax.in" style={{ color: '#0f2d59' }}>moderation@jantax.in</a>.
-        </div>
-      </div>
-
-      <div style={cardStyle}>
-        <h3 style={{ color: '#0f2d59', marginTop: 0 }}>Reports for this PIN</h3>
-        {loading ? (
-          <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Loading…</p>
-        ) : reports.length === 0 ? (
-          <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>No citizen reports on file for {currentPin} yet. Be the first to drop ground truth.</p>
-        ) : (
-          <div style={{ display: 'grid', gap: '0.6rem' }}>
-            {reports.map((r) => (
-              <div key={r.id} style={{ border: '1px solid #eef2f7', borderRadius: 10, padding: '0.75rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
-                  <strong style={{ fontSize: '0.85rem', color: '#0f2d59' }}>{r.category || r.title || 'Citizen Report'}</strong>
-                  <SourceBadge sourceType="E" sourceName={`${r.status || 'PENDING'} · ${r.module || 'citizen'}`} />
-                </div>
-                <p style={{ fontSize: '0.82rem', color: '#475569', margin: '0.4rem 0 0' }}>{r.description}</p>
-              </div>
-            ))}
+        <div style={{ background: '#ffffff', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-xl)', padding: '2rem', boxShadow: 'var(--shadow-card)', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div>
+            <h3 style={{ fontSize: '1.15rem', color: 'var(--navy-950)', marginBottom: '0.4rem' }}>1. Zero-EXIF Photo Verification</h3>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              When you upload field photos of school classrooms or uncompleted roads, our backend automatically strips all device metadata, camera serial numbers, and embedded GPS coordinates before publishing.
+            </p>
           </div>
-        )}
-      </div>
 
-      <div style={cardStyle}>
-        <h3 style={{ color: '#0f2d59', marginTop: 0 }}>Government Response (कार्रवाई) — दावा vs हकीकत → कार्रवाई</h3>
-        <p style={{ fontSize: '0.82rem', color: '#64748b', margin: '0 0 0.8rem' }}>
-          Read-only accountability loop: <strong>Submitted → Acknowledged → Action → Verified</strong>. Original citizen report is never deleted; delay tracked as Filed→Resolved.
-        </p>
-        <GovtResponseTracker reports={reports} />
-      </div>
+          <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '1.25rem' }}>
+            <h3 style={{ fontSize: '1.15rem', color: 'var(--navy-950)', marginBottom: '0.4rem' }}>2. No Login Required to Inspect</h3>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              Public government data belongs to the public. You can search, compare, and inspect every school, contractor, and PMGSY road without providing an email address or mobile number.
+            </p>
+          </div>
 
-      <div style={cardStyle}>
-        <p style={{ fontSize: '0.9rem', color: '#475569', margin: 0 }}>Prefer a module-specific drop? Use any module’s <strong>Report / Photo Drop</strong>:</p>
-        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginTop: '0.8rem' }}>
-          <button onClick={()=>nav(`/module/school?pin=${currentPin}`)} className="btn btn-primary">School Report</button>
-          <button onClick={()=>nav(`/module/hospital?pin=${currentPin}`)} className="btn btn-secondary">Hospital Photo Drop</button>
-          <button onClick={()=>nav(`/module/andhbhakt?pin=${currentPin}`)} style={{ padding: '0.5rem 1rem', background: '#ef4444', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 700, cursor: 'pointer' }}>Andhbhakt Photo Drop</button>
+          <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '1.25rem' }}>
+            <h3 style={{ fontSize: '1.15rem', color: 'var(--navy-950)', marginBottom: '0.4rem' }}>3. Cryptographic SHA-256 Hashing</h3>
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              Audit reports and citizen feedback submissions are cryptographically hashed using SHA-256 to ensure tamper-proof authenticity without storing personally identifiable information.
+            </p>
+          </div>
         </div>
       </div>
     </div>

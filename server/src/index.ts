@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { config } from './config';
-import { requireAuth } from './middleware/auth';
+import { attachUser } from './middleware/auth';
 import pincodeRoutes from './routes/pincode';
 import recordsRoutes from './routes/records';
 import reportsRoutes from './routes/reports';
@@ -20,9 +20,11 @@ import methodologyRoutes from './routes/methodology';
 import staffingRoutes from './routes/staffing';
 import moderationRoutes from './routes/moderation';
 import v1Routes from './routes/v1';
+import modulesRoutes from './routes/modules';
 import authRoutes from './routes/auth';
 
 const app = express();
+app.set('trust proxy', Number(process.env.TRUST_PROXY) || 0);
 
 // Security headers (helmet-lite)
 app.use((_req, res, next) => {
@@ -45,7 +47,8 @@ app.use((req, _res, next) => {
 // Simple in-memory rate limit: 120 req / 15m per IP (anon), 1000 auth
 const _rateMap = new Map();
 app.use((req, res, next) => {
-  const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip || 'local';
+  // req.ip honours 'trust proxy' (TRUST_PROXY hops); raw X-Forwarded-For is spoofable.
+  const ip = req.ip || 'local';
   const key = 'rl:' + ip;
   const now = Date.now();
   const windowMs = 15 * 60 * 1000;
@@ -70,7 +73,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cors());
+app.disable('x-powered-by');
+app.use(cors(config.corsOrigins.length ? { origin: config.corsOrigins } : undefined));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -82,27 +86,30 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 
-app.use(requireAuth);
+// Optional auth: attaches req.user when a token is present. Public reads stay
+// public; individual routes gate themselves with requireRole().
+app.use(attachUser);
 app.use('/api/auth', authRoutes);
 
 app.use('/api', pincodeRoutes);
 app.use('/api', recordsRoutes);
 app.use('/api', reportsRoutes);
 app.use('/api', correctionsRoutes);
-app.use('/api', sourcesRoutes);
+app.use('/api/sources', sourcesRoutes);
 app.use('/api', adminSyncRoutes);
-app.use('/api', searchRoutes);
-app.use('/api', locationsRoutes);
-app.use('/api', schoolsRoutes);
-app.use('/api', infrastructureRoutes);
-app.use('/api', contractorsRoutes);
-app.use('/api', reraRoutes);
-app.use('/api', evidenceRoutes);
-app.use('/api', issuesRoutes);
-app.use('/api', methodologyRoutes);
-app.use('/api', staffingRoutes);
-app.use('/api', moderationRoutes);
+app.use('/api/search', searchRoutes);
+app.use('/api/locations', locationsRoutes);
+app.use('/api/schools', schoolsRoutes);
+app.use('/api/infrastructure', infrastructureRoutes);
+app.use('/api/contractors', contractorsRoutes);
+app.use('/api/rera', reraRoutes);
+app.use('/api/evidence', evidenceRoutes);
+app.use('/api/issues', issuesRoutes);
+app.use('/api/methodology', methodologyRoutes);
+app.use('/api/staffing', staffingRoutes);
+app.use('/api/moderation', moderationRoutes);
 app.use('/api/v1', v1Routes);
+app.use('/api/modules', modulesRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ error: 'Not found' });

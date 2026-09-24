@@ -72,7 +72,7 @@ export const MOCK_INTERNAL_ALERTS: InternalAlert[] = [
     categoryLabel: 'New CAG Audit Report Tabled',
     sourceId: 'src-cag',
     sourceName: 'CAG Audit Reports Register',
-    summary: 'CAG Audit Report No. 4 of 2024 parsed via Tabula OCR.',
+    summary: 'CAG local bodies audit (example reference) parsed via Tabula OCR.',
     validation: {
       sourceId: 'src-cag',
       sourceName: 'CAG Audit Reports Register',

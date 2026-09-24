@@ -113,7 +113,10 @@ export function HospitalDashboard() {
 
             <ProvenanceBar observedAt={new Date().toISOString().slice(0,10)} sourceAt="2024-08-15" recalcAt={new Date().toISOString().slice(0,10)} sourceUrl="https://hmis.mohfw.gov.in" sourceLabel="HMIS ↗" sampleSize={8} reportingDays={4} agreementRate={0.68} />
             <div style={{ display:'flex', gap:'0.5rem', marginTop:'0.5rem', flexWrap:'wrap' }}>
-              <span style={{ fontSize:'0.68rem', background:'#f1f5f9', border:'1px solid #e2e8f0', padding:'2px 7px', borderRadius:999 }}><a href="https://hmis.mohfw.gov.in" target="_blank" rel="noreferrer" style={{ color:'#0f2d59' }}>CAG Report 2024 Para 3.7 ↗</a></span>
+              <span style={{ fontSize:'0.68rem', background:'#f1f5f9', border:'1px solid #e2e8f0', padding:'2px 7px', borderRadius:999 }}>{/* Previously labelled as a specific audit paragraph while linking to HMIS —
+    a citation that did not resolve to the document it named. Label the real
+    source instead. Never invent a report or paragraph reference. */}
+<a href="https://hmis.mohfw.gov.in" target="_blank" rel="noreferrer" style={{ color:'#0f2d59' }}>HMIS facility data ↗</a></span>
               <StaleBadge lastUpdated={new Date().toISOString()} />
               <a href="/data-sources" style={{ fontSize:'0.68rem', color:'#2563eb', fontWeight:700 }}>Methodology →</a>
               <button onClick={async()=>{

@@ -40,7 +40,7 @@ describe('Integration Tests: Search, Monitoring & Transparency Services', () => 
       submitterName: 'Shri Legal Counsel',
       organization: 'M/s L&T Infra',
       email: 'legal@example.com',
-      entityId: 'cont-lt-infra',
+      entityId: 'cont-meridian-infra',
       claimDetails: 'Challenging penalty order date with High Court stay order.',
       supportingGazetteUrl: 'https://cag.gov.in/stay.pdf'
     });

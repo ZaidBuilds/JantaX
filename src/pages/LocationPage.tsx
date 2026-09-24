@@ -212,7 +212,7 @@ export function LocationPage() {
               <MapPin size={24} />
             </div>
             <div>
-              <h1 style={{ fontSize: '2rem', margin: 0, fontWeight: 800 }}>
+              <h1 style={{ fontSize: '2rem', margin: 0, fontWeight: 800, color: '#ffffff' }}>
                 PIN {data.pincode}
               </h1>
               <p style={{ margin: 0, opacity: 0.85, fontSize: '0.9rem' }}>

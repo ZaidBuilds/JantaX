@@ -1,16 +1,30 @@
 import type { ContractorProfile } from '../types/contractorIntelligence';
 
+/**
+ * DEMONSTRATION FIXTURES — every company, director and identifier below is
+ * FICTIONAL and must stay that way.
+ *
+ * This module attaches performance indicators such as `documentedPenaltiesCount`
+ * and `activeDebarmentsCount` to each entry. Those are invented figures. Putting
+ * them against a real firm or a real named executive would be publishing an
+ * unevidenced adverse claim about an identifiable party — see Rule 22
+ * (no labelling contractors without authoritative evidence) and Rule 9.5
+ * (evidence before accusation) in docs/MODULE_EXPANSION_PROTOCOL.md.
+ *
+ * Identifiers use the reserved 'XX'/'000000' patterns so they cannot collide
+ * with a real CIN or GSTIN. Do not replace them with real-looking values.
+ */
 export const MOCK_CONTRACTORS: ContractorProfile[] = [
   {
-    id: 'cont-lt-infra',
-    companyName: 'Larsen & Toubro Construction Limited',
-    registrationNumber: 'DL-PWD-CAT1-2018-092',
+    id: 'cont-meridian-infra',
+    companyName: 'Meridian Infra Constructions Pvt Ltd',
+    registrationNumber: 'DEMO-PWD-CAT1-0001',
     category: 'Class 1 Heavy Infrastructure',
-    incorporationYear: 1946,
-    headquarters: 'Mumbai, Maharashtra',
-    directors: ['Shri S.N. Subrahmanyan (CMD)', 'Shri R. Shankar Raman'],
-    gstin: '27AAACL0123P1Z2',
-    cin: 'L99999MH1946PLC004768',
+    incorporationYear: 1998,
+    headquarters: 'Demo City, Sample State',
+    directors: ['Director A (Managing Director)', 'Director B (Finance)'],
+    gstin: '00XXXXX0000X0X0',
+    cin: 'X00000XX0000XXX000000',
     performanceIndicators: {
       overallScore: 91,
       completionRatePct: 92,
@@ -58,14 +72,16 @@ export const MOCK_CONTRACTORS: ContractorProfile[] = [
     ],
     penalties: [
       {
-        id: 'pen-lt-01',
-        orderNumber: 'NHAI/RO-DEL/2023/PEN-44',
+        id: 'pen-demo-01',
+        // Demo order reference. Never mint a real-looking order number against
+        // a real authority — it reads as a verifiable citation and is not one.
+        orderNumber: 'DEMO/PEN-0001',
         date: '2023-11-14',
-        issuingAuthority: 'National Highways Authority of India (NHAI) Regional Office Delhi',
+        issuingAuthority: 'Highways Authority (demonstration record)',
         penaltyAmountLakhs: 15.0,
         reasonNeutral: 'Procedural penalty for delay in submission of lane closure safety signage audit report.',
-        sourceUrl: 'https://nhai.gov.in/orders/penalties-2023-Q4.pdf',
-        sourceTitle: 'NHAI Official Quarterly Penalty Register Q4 2023'
+        sourceUrl: '',
+        sourceTitle: 'Example penalty register entry — not a real document'
       }
     ],
     debarmentRecords: [],
@@ -76,15 +92,15 @@ export const MOCK_CONTRACTORS: ContractorProfile[] = [
     }
   },
   {
-    id: 'cont-ncc-afcons',
-    companyName: 'NCC Ltd - Afcons Infrastructure JV',
-    registrationNumber: 'KA-BMRCL-JV-2020-009',
+    id: 'cont-deccan-metro',
+    companyName: 'Deccan Metro Builders JV (Demo)',
+    registrationNumber: 'DEMO-METRO-JV-0002',
     category: 'Urban Transit & Metro',
     incorporationYear: 1990,
     headquarters: 'Hyderabad & Mumbai',
-    directors: ['Shri A.A.V. Ranga Raju', 'Shri K. Subramanian'],
-    gstin: '36AAACN1029F1Z1',
-    cin: 'L74210TG1990PLC011146',
+    directors: ['Director C (Chairman)', 'Director D (Operations)'],
+    gstin: '00XXXXX0000X0X1',
+    cin: 'X00000XX0000XXX000001',
     performanceIndicators: {
       overallScore: 84,
       completionRatePct: 86,
@@ -116,14 +132,14 @@ export const MOCK_CONTRACTORS: ContractorProfile[] = [
     ],
     penalties: [
       {
-        id: 'pen-ncc-01',
-        orderNumber: 'BMRCL/2023/PEN-88',
+        id: 'pen-demo-02',
+        orderNumber: 'DEMO/PEN-0002',
         date: '2023-04-10',
-        issuingAuthority: 'Bangalore Metro Rail Corporation Limited (BMRCL)',
+        issuingAuthority: 'Metro Rail Corporation (demonstration record)',
         penaltyAmountLakhs: 10.0,
-        reasonNeutral: 'Penalty levied under Clause 28.1 for delayed traffic safety barricading setup during ORR nocturnal work.',
-        sourceUrl: 'https://bmrcl.co.in/orders/penalties-2023.pdf',
-        sourceTitle: 'BMRCL Public Safety Audit & Penalty Release 2023'
+        reasonNeutral: 'Penalty levied for delayed traffic safety barricading setup during night works.',
+        sourceUrl: '',
+        sourceTitle: 'Example penalty register entry — not a real document'
       }
     ],
     debarmentRecords: [],
@@ -134,14 +150,14 @@ export const MOCK_CONTRACTORS: ContractorProfile[] = [
     }
   },
   {
-    id: 'cont-chaudhary-builders',
-    companyName: 'M/s Chaudhary Road Builders & Sons',
-    registrationNumber: 'UP-PWD-REG-2019-441',
+    id: 'cont-sample-roads',
+    companyName: 'M/s Sample Road Builders (Demo)',
+    registrationNumber: 'DEMO-PWD-REG-0003',
     category: 'Rural Roads & PMGSY',
     incorporationYear: 2008,
     headquarters: 'Meerut, Uttar Pradesh',
-    directors: ['Shri Satish Chaudhary', 'Shri Pravin Chaudhary'],
-    gstin: '09AABFC8890Q1Z8',
+    directors: ['Director E (Proprietor)', 'Director F (Partner)'],
+    gstin: '00XXXXX0000X0X2',
     performanceIndicators: {
       overallScore: 88,
       completionRatePct: 94,
@@ -180,15 +196,15 @@ export const MOCK_CONTRACTORS: ContractorProfile[] = [
     }
   },
   {
-    id: 'cont-wabag',
-    companyName: 'VA Tech Wabag Limited',
-    registrationNumber: 'TN-WABAG-NMCG-2019-108',
+    id: 'cont-clearflow',
+    companyName: 'Clearflow Water Systems Ltd (Demo)',
+    registrationNumber: 'DEMO-WATER-NMCG-0004',
     category: 'Water & Sewage Specialist',
     incorporationYear: 1996,
     headquarters: 'Chennai, Tamil Nadu',
-    directors: ['Shri Rajiv Mittal (MD)', 'Shri S. Varadarajan'],
-    gstin: '33AAACV2098M1Z4',
-    cin: 'L45205TN1996PLC035968',
+    directors: ['Director G (Managing Director)', 'Director H (Technical)'],
+    gstin: '00XXXXX0000X0X3',
+    cin: 'X00000XX0000XXX000002',
     performanceIndicators: {
       overallScore: 86,
       completionRatePct: 88,

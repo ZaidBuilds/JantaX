@@ -22,4 +22,4 @@ COPY --from=base /app/dist ./dist
 COPY --from=base /app/prisma ./prisma
 COPY --from=base /app/server ./server
 EXPOSE 4000 4173
-CMD ["sh","-c","npx prisma migrate deploy && npm run preview -- --host 0.0.0.0 --port 4173 & node --loader tsx server/src/index.ts"]
+CMD ["sh","-c","npx prisma migrate deploy && npm run preview -- --host 0.0.0.0 --port 4173 & npm run server:start"]

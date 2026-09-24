@@ -107,6 +107,7 @@ export function ReraDirectoryPage() {
           fontSize: '2.1rem',
           fontWeight: 800,
           fontFamily: 'var(--font-heading)',
+          color: '#ffffff',
           lineHeight: 1.25,
           marginBottom: '0.6rem'
         }}>

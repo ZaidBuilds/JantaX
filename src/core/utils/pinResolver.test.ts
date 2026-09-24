@@ -46,4 +46,18 @@ describe('pinResolver — stateCode resolution', () => {
       expect(idx).toBeLessThan(8);
     }
   });
+
+  it('resolves authentic Pan-India PIN via resolvePincodeAccurate synchronously or via fallback', async () => {
+    const { resolvePincodeAccurate } = await import('../../core/utils/pinResolver');
+    const res = await resolvePincodeAccurate('560001');
+    expect(res.isValid).toBe(true);
+    expect(res.state).toBeTruthy();
+    expect(res.district).toBeTruthy();
+    expect(res.stateCode).toBe('KA');
+    expect(res.postOffice).toBeTruthy();
+    // Verify no generic "Zone X" appears anywhere
+    expect(res.district).not.toMatch(/Zone \d/);
+    expect(res.block).not.toMatch(/Zone \d/);
+  });
 });
+

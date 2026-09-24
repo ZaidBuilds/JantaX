@@ -5,7 +5,8 @@ import type { Source } from './Source';
 
 /**
  * ModuleRecord — Base type that every module's record extends.
- * Implements the Andhbhakt Pattern: Claim vs Reality on the same screen.
+ * Implements the Claim vs Reality pattern: the official record and the
+ * corroborated ground observation shown side-by-side on the same screen.
  * 
  * Every module (school, infra, hospital, RERA, etc.) extends this
  * to add domain-specific fields while inheriting the universal
@@ -15,13 +16,15 @@ export interface ModuleRecord {
   id: string;
   moduleId: ModuleId;         // Which module this belongs to
   location: Location;
+  /** Rule 40: true when this row is a fixture, not source data. */
+  isSample?: boolean;
 
   // ── Multilingual Identity ──
   titleEnglish: string;
   titleHindi: string;
   titleRegional: string;      // Marathi or state-specific language
 
-  // ── The Andhbhakt Pattern: Claim vs Reality ──
+  // ── Claim vs Reality ──
   claim: {
     label: string;            // e.g., "72% Complete"
     labelHindi: string;       // e.g., "72% पूर्ण"
@@ -65,8 +68,7 @@ export type ModuleId =
   | 'nagar'        // 3. नगर स्कोरबोर्ड
   | 'budget'       // 4. पिन हिसाब
   | 'contractor'   // 5. ठेकेदार लेजर
-  | 'andhbhakt'     // 6. अंधभक्त स्टेट (State CM Accountability)
-  | 'hospital'     // 7. अस्पताल जांच
+  | 'hospital'     // 6. अस्पताल जांच
   | 'rera'         // 8. RERA सच
   | 'ration'       // 9. राशन रिपोर्ट
   | 'utility'      // 10. पानी-बिजली मीटर
@@ -91,6 +93,13 @@ export interface ModuleMeta {
   description: string;
   descriptionHindi: string;
   dataSource: string;         // Where data comes from
-  isLive: boolean;            // false = stub/coming soon
+  /**
+   * How this module is currently backed. Must reflect reality — a module
+   * reading local/seed fixtures is 'demo', never 'live'.
+   *  - 'live' : served from the database via the API
+   *  - 'demo' : local fixture data, shown for demonstration only
+   */
+  dataStatus: 'live' | 'demo';
+  isLive: boolean;            // convenience mirror of dataStatus === 'live'
   recordCount: number;        // How many records loaded
 }

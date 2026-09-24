@@ -10,8 +10,8 @@ export function SchoolsSearchPage() {
   const [searchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get('q') || '');
   const [pin, setPin] = useState(searchParams.get('pin') || '');
-  const [level, setLevel] = useState(searchParams.get('level') || 'all');
-  const [management, setManagement] = useState(searchParams.get('management') || 'all');
+  const [level, setLevel] = useState(searchParams.get('level') || '');
+  const [management, setManagement] = useState(searchParams.get('management') || '');
   const [schools, setSchools] = useState<SchoolRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
@@ -49,8 +49,8 @@ export function SchoolsSearchPage() {
         s.udiseCode.toLowerCase().includes(q)
       );
     }
-    if (level !== 'all') list = list.filter(s => s.schoolLevel === level);
-    if (management !== 'all') list = list.filter(s => s.managementType === management);
+    if (level) list = list.filter(s => s.schoolLevel === level);
+    if (management) list = list.filter(s => s.managementType === management);
     return list;
   }, [schools, query, level, management]);
 
@@ -97,7 +97,7 @@ export function SchoolsSearchPage() {
             <div>
               <label style={{ fontSize: '0.75rem', fontWeight: 700, display: 'block', marginBottom: '0.35rem' }}>School Level</label>
               <select value={level} onChange={e => setLevel(e.target.value)} className="form-input" style={{ fontSize: '0.82rem' }}>
-                <option value="all">All Levels</option>
+                <option value="">Any Level</option>
                 <option value="Primary">Primary</option>
                 <option value="Upper Primary">Upper Primary</option>
                 <option value="Secondary">Secondary</option>
@@ -107,14 +107,14 @@ export function SchoolsSearchPage() {
             <div>
               <label style={{ fontSize: '0.75rem', fontWeight: 700, display: 'block', marginBottom: '0.35rem' }}>Management</label>
               <select value={management} onChange={e => setManagement(e.target.value)} className="form-input" style={{ fontSize: '0.82rem' }}>
-                <option value="all">All</option>
+                <option value="">Any Management</option>
                 <option value="Government">Government</option>
                 <option value="Aided">Aided</option>
                 <option value="Private">Private</option>
               </select>
             </div>
-            {(level !== 'all' || management !== 'all') && (
-              <button onClick={() => { setLevel('all'); setManagement('all'); }} style={{ alignSelf: 'flex-end', padding: '0.45rem 0.75rem', border: '1px solid #e2e8f0', borderRadius: 8, background: '#fff', cursor: 'pointer', fontSize: '0.78rem', color: '#ef4444', fontWeight: 600 }}>
+            {(level || management) && (
+              <button onClick={() => { setLevel(''); setManagement(''); }} style={{ alignSelf: 'flex-end', padding: '0.45rem 0.75rem', border: '1px solid #e2e8f0', borderRadius: 8, background: '#fff', cursor: 'pointer', fontSize: '0.78rem', color: '#ef4444', fontWeight: 600 }}>
                 Clear Filters
               </button>
             )}

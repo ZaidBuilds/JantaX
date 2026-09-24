@@ -1,226 +1,436 @@
-import { PrismaClient } from '@prisma/client';
-import { states, claims } from '../src/modules/andhbhakt/data/rawSeedData';
+import { PrismaClient, ProjectStatus, Region, ModerationStatus, EvidenceType } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-async function main() {
-  console.log('🌱 JantaX seed start — 15 modules');
+/**
+ * Seeds two kinds of data:
+ *  - Reference data (always): PIN spine + official source registry.
+ *  - Sample data (opt-out): fictional domain rows so the UI is not empty.
+ *    Every sample row has `isSample: true` (Rule 40 — no fabricated data
+ *    presented as real). Names are deliberately fictional; no real company,
+ *    officer or project is attached to invented figures.
+ * Sample data is skipped when NODE_ENV=production unless SEED_SAMPLE_DATA=true,
+ * and always skipped when SEED_SAMPLE_DATA=false.
+ */
+const SEED_SAMPLE =
+  process.env.SEED_SAMPLE_DATA === 'true' ||
+  (process.env.SEED_SAMPLE_DATA !== 'false' && process.env.NODE_ENV !== 'production');
 
-  // 1. Pincode spine — demo PINs
+async function main() {
+  console.log('🌱 JantaX seed start');
+
+  // 1. Pincode spine (head-post-office PINs; coordinates are city centroids).
+  // Population is left null — no sourced figure per PIN yet.
   const demoPins = [
-    { code: '110001', state: 'Delhi', district: 'New Delhi', region: 'North' as const, lat: 28.61, lng: 77.20, population: 200000 },
-    { code: '250001', state: 'Uttar Pradesh', district: 'Meerut', region: 'North' as const, lat: 28.98, lng: 77.70, population: 150000 },
-    { code: '560001', state: 'Karnataka', district: 'Bengaluru', region: 'South' as const, lat: 12.97, lng: 77.59, population: 300000 },
-    { code: '226001', state: 'Uttar Pradesh', district: 'Lucknow', region: 'North' as const, lat: 26.84, lng: 80.94, population: 250000 },
-    { code: '400001', state: 'Maharashtra', district: 'Mumbai', region: 'West' as const, lat: 19.07, lng: 72.87, population: 500000 },
-    { code: '600001', state: 'Tamil Nadu', district: 'Chennai', region: 'South' as const, lat: 13.08, lng: 80.27, population: 400000 },
-    { code: '700001', state: 'West Bengal', district: 'Kolkata', region: 'East' as const, lat: 22.57, lng: 88.36, population: 350000 },
+    { code: '110001', state: 'Delhi', district: 'New Delhi', region: Region.NORTH, lat: 28.6139, lng: 77.2090 },
+    { code: '250001', state: 'Uttar Pradesh', district: 'Meerut', region: Region.NORTH, lat: 28.9845, lng: 77.7064 },
+    { code: '560001', state: 'Karnataka', district: 'Bengaluru', region: Region.SOUTH, lat: 12.9716, lng: 77.5946 },
+    { code: '226001', state: 'Uttar Pradesh', district: 'Lucknow', region: Region.NORTH, lat: 26.8467, lng: 80.9462 },
+    { code: '400001', state: 'Maharashtra', district: 'Mumbai', region: Region.WEST, lat: 18.9388, lng: 72.8354 },
+    { code: '600001', state: 'Tamil Nadu', district: 'Chennai', region: Region.SOUTH, lat: 13.0827, lng: 80.2707 },
+    { code: '700001', state: 'West Bengal', district: 'Kolkata', region: Region.EAST, lat: 22.5726, lng: 88.3639 },
+    { code: '800001', state: 'Bihar', district: 'Patna', region: Region.EAST, lat: 25.5941, lng: 85.1376 },
+    { code: '500001', state: 'Telangana', district: 'Hyderabad', region: Region.SOUTH, lat: 17.3850, lng: 78.4867 },
   ];
+
   for (const p of demoPins) {
     await prisma.pincode.upsert({
       where: { code: p.code },
-      update: {},
-      create: { code: p.code, state: p.state, district: p.district, region: p.region, lat: p.lat, lng: p.lng, population: p.population, areaType: 'Urban' },
+      update: { state: p.state, district: p.district, region: p.region, lat: p.lat, lng: p.lng },
+      create: { ...p, population: null, areaType: 'Urban' },
     });
   }
-  console.log(`✓ Pincode ${demoPins.length}`);
+  console.log(`✓ Pincodes seeded: ${demoPins.length}`);
 
-  // 2. Schools — 2 per demo PIN
-  for (const pin of demoPins.slice(0,3)) {
-    for (let i=0;i<2;i++) {
-      const udise = `0701${pin.code.slice(2)}${i}0${i}`;
+  await seedSources();
+
+  if (!SEED_SAMPLE) {
+    console.log('↷ Sample data skipped (production or SEED_SAMPLE_DATA=false)');
+    console.log('✅ JantaX seed complete (reference data only)');
+    return;
+  }
+  console.log('… Seeding SAMPLE rows (isSample=true, fictional)');
+
+  // 2. Schools (UDISE+)
+  for (const pin of demoPins) {
+    const schoolsData = [
+      {
+        udiseCode: `0701${pin.code}01`,
+        nameEnglish: `Govt. Primary Model School ${pin.district} Central`,
+        nameHindi: `राजकीय प्राथमिक आदर्श विद्यालय ${pin.district} केंद्रीय`,
+        level: 'Primary',
+        managementType: 'Government',
+        studentsEnrolled: 142,
+        teachersWorking: 6,
+        teachersSanctioned: 7,
+        groundTruthScore: 78,
+        hasToilet: true,
+        hasElectricity: true,
+        hasDrinkingWater: true,
+      },
+      {
+        udiseCode: `0701${pin.code}02`,
+        nameEnglish: `Govt. Girls Senior Secondary School ${pin.district}`,
+        nameHindi: `राजकीय कन्या उच्चतर माध्यमिक विद्यालय ${pin.district}`,
+        level: 'Secondary',
+        managementType: 'Government',
+        studentsEnrolled: 310,
+        teachersWorking: 12,
+        teachersSanctioned: 15,
+        groundTruthScore: 64,
+        hasToilet: true,
+        hasElectricity: true,
+        hasDrinkingWater: false,
+      },
+      {
+        udiseCode: `0701${pin.code}03`,
+        nameEnglish: `Sarvodaya Vidyalaya Sector 4 ${pin.district}`,
+        nameHindi: `सर्वोदय विद्यालय सेक्टर 4 ${pin.district}`,
+        level: 'Upper Primary',
+        managementType: 'Govt-Aided',
+        studentsEnrolled: 220,
+        teachersWorking: 9,
+        teachersSanctioned: 10,
+        groundTruthScore: 82,
+        hasToilet: true,
+        hasElectricity: true,
+        hasDrinkingWater: true,
+      },
+    ];
+
+    for (const s of schoolsData) {
       await prisma.school.upsert({
-        where: { udiseCode: udise },
-        update: {},
-        create: {
-          pincodeCode: pin.code,
-          udiseCode: udise,
-          nameEnglish: i===0 ? `Govt. Primary School ${pin.district} Sector A9` : `Govt. School ${pin.code}-${i}`,
-          nameHindi: i===0 ? `राजकीय प्राथमिक विद्यालय ${pin.district}` : `सरकारी स्कूल ${pin.code}`,
-          level: 'Primary',
-          managementType: 'Government',
-          studentsEnrolled: 80 + i*20,
-          teachersWorking: 4 + i,
-          teachersSanctioned: 5 + i,
-          groundTruthScore: 65 + i*10,
-          hasToilet: true,
-          hasElectricity: i!==1,
-          hasDrinkingWater: true,
-        },
+        where: { udiseCode: s.udiseCode },
+        update: { ...s, pincodeCode: pin.code, isSample: true },
+        create: { ...s, pincodeCode: pin.code, isSample: true },
       });
     }
   }
-  console.log('✓ Schools');
+  console.log('✓ Schools (UDISE+) populated across all PINs');
 
-  // 3. Infra — 2 per PIN
-  for (const pin of demoPins.slice(0,2)) {
-    for (let i=0;i<2;i++) {
-      await prisma.infraProject.create({
-        data: {
-          pincodeCode: pin.code,
-          titleEnglish: i===0 ? `Elevated Corridor Phase-${i+2} ${pin.district}` : `PMGSY Road ${pin.code}-${i}`,
-          titleHindi: `सड़क परियोजना ${pin.code}`,
-          department: 'PWD',
-          budget: 20 + i*15,
-          startDate: new Date('2022-03-15'),
-          expectedCompletion: new Date('2024-12-31'),
-          status: i===0 ? 'ONGOING' : 'DELAYED',
-          claimCompletionPct: 60 + i*10,
-          groundTruthScore: 70,
-          responsibleOfficer: 'EE, PWD',
-          implementingAgency: 'NHAI',
-          evidenceCount: i,
-        },
+  // 3. Infrastructure Projects (PMGSY / PWD / NHAI)
+  for (const pin of demoPins) {
+    const infraData = [
+      {
+        titleEnglish: `4-Lane Arterial Road Overbridge & Drainage (${pin.district})`,
+        titleHindi: `4-लेन रेलवे ओवरब्रिज एवं जल निकासी निर्माण (${pin.district})`,
+        department: 'Public Works Department (PWD)',
+        budget: 48.5,
+        startDate: new Date('2023-02-15'),
+        expectedCompletion: new Date('2025-06-30'),
+        status: ProjectStatus.ONGOING,
+        claimCompletionPct: 70,
+        groundTruthScore: 58,
+        responsibleOfficer: 'Executive Engineer, PWD Division II',
+        implementingAgency: 'State PWD Infra Corporation',
+        evidenceCount: 14,
+        sourceUrl: null, // sample row — no source document
+      },
+      {
+        titleEnglish: `Urban Stormwater Drain & Pavement Widening (${pin.district})`,
+        titleHindi: `शहरी वर्षा जल नाला एवं फुटपाथ चौड़ीकरण (${pin.district})`,
+        department: 'Municipal Corporation Engineering Division',
+        budget: 18.2,
+        startDate: new Date('2022-09-10'),
+        expectedCompletion: new Date('2024-03-31'),
+        status: ProjectStatus.DELAYED,
+        claimCompletionPct: 85,
+        groundTruthScore: 42,
+        responsibleOfficer: 'Superintending Engineer, Urban Infra',
+        implementingAgency: 'Smart Cities Mission SPV',
+        evidenceCount: 22,
+        sourceUrl: null, // sample row — no source document
+      },
+    ];
+
+    for (const inf of infraData) {
+      const existing = await prisma.infraProject.findFirst({
+        where: { pincodeCode: pin.code, titleEnglish: inf.titleEnglish },
+      });
+      if (existing) {
+        await prisma.infraProject.update({
+          where: { id: existing.id },
+          data: { ...inf, isSample: true },
+        });
+      } else {
+        await prisma.infraProject.create({
+          data: { ...inf, pincodeCode: pin.code, isSample: true },
+        });
+      }
+    }
+  }
+  console.log('✓ Infrastructure Projects populated across all PINs');
+
+  // 4. RERA Registered Real Estate Projects
+  for (const pin of demoPins) {
+    const reraList = [
+      {
+        reraNumber: `SAMPLE-RERA-${pin.code}-2022-001`,
+        name: `${pin.district} Imperial Towers Phase 1`,
+        promoter: 'Sample Promoter A (fictional)',
+        configuration: '2 BHK, 3 BHK Residential Units (480 Units)',
+        plannedPossession: new Date('2023-12-31'),
+        actualPossession: null,
+        status: ProjectStatus.DELAYED,
+        delayMonths: 18,
+        complaints: 42,
+        refundsPending: 12,
+      },
+      {
+        reraNumber: `SAMPLE-RERA-${pin.code}-2023-002`,
+        name: `Greenview Residency & Commercial Arcade`,
+        promoter: 'Sample Promoter B (fictional)',
+        configuration: '3 BHK High-rise Luxury & Retail Plaza',
+        plannedPossession: new Date('2025-11-30'),
+        actualPossession: null,
+        status: ProjectStatus.ONGOING,
+        delayMonths: 3,
+        complaints: 8,
+        refundsPending: 0,
+      },
+      {
+        reraNumber: `SAMPLE-RERA-${pin.code}-2021-003`,
+        name: `Sunrise Heritage Enclave`,
+        promoter: 'Sample Promoter C (fictional)',
+        configuration: 'Residential Villas & Plotted Development',
+        plannedPossession: new Date('2024-04-15'),
+        actualPossession: new Date('2024-05-10'),
+        status: ProjectStatus.COMPLETED,
+        delayMonths: 1,
+        complaints: 3,
+        refundsPending: 0,
+      },
+    ];
+
+    for (const r of reraList) {
+      await prisma.reraProject.upsert({
+        where: { reraNumber: r.reraNumber },
+        update: { ...r, pincodeCode: pin.code, isSample: true },
+        create: { ...r, pincodeCode: pin.code, isSample: true },
       });
     }
   }
-  console.log('✓ Infra');
+  console.log('✓ RERA Real Estate Projects seeded');
 
-  // 4. StateCmClaim — from rawSeedData (18 claims)
-  for (const c of claims) {
-    await prisma.stateCmClaim.upsert({
-      where: { id: `seed-${c.pincode}-${c.category}` },
-      update: {},
-      create: {
-        id: `seed-${c.pincode}-${c.category}`,
-        stateCode: c.stateCode,
-        category: c.category,
-        claimTitleHindi: c.claimTextHi.slice(0,120),
-        claimTitleEn: c.claimTextEn.slice(0,120),
-        claimSource: c.sourceUrl,
-        claimDetails: c.claimTextHi,
-        realityTitleHindi: c.realityTextHi.slice(0,120),
-        realityTitleEn: c.realityTextEn.slice(0,120),
-        realityDetails: c.realityTextHi,
-        cagReportRef: c.verificationSource,
-        realitySeverity: c.verified ? 'critical' : 'warning',
+  // 5. Healthcare / PHC / CHC Facility Registry (HMIS)
+  for (const pin of demoPins) {
+    const hospitals = [
+      {
+        name: `${pin.district} Primary Health Center (PHC Central)`,
+        type: 'PHC',
+        isOpen: true,
+        doctorPresent: true,
+        bedsTotal: 12,
+        bedsOccupied: 8,
+        medicinesAvailable: true,
       },
-    });
+      {
+        name: `Community Health Center (CHC) Sub-District Hospital`,
+        type: 'CHC',
+        isOpen: true,
+        doctorPresent: false,
+        bedsTotal: 30,
+        bedsOccupied: 24,
+        medicinesAvailable: false,
+      },
+    ];
+
+    for (const h of hospitals) {
+      const existing = await prisma.hospital.findFirst({
+        where: { pincodeCode: pin.code, name: h.name },
+      });
+      if (existing) {
+        await prisma.hospital.update({ where: { id: existing.id }, data: { ...h, isSample: true } });
+      } else {
+        await prisma.hospital.create({ data: { ...h, pincodeCode: pin.code, isSample: true } });
+      }
+    }
   }
-  console.log(`✓ StateCmClaim ${claims.length}`);
+  console.log('✓ Healthcare & PHC/CHC Facilities seeded');
 
-  // 5. MunicipalWard demo
-  await prisma.municipalWard.upsert({
-    where: { id: 'ward-demo-110001' },
-    update: {},
-    create: {
-      id: 'ward-demo-110001',
-      pincode: '110001',
-      wardNo: '12',
-      garbageClaimedSla: '100%',
-      waterClaimedSla: '6 Hours',
-      drainageClaimedSla: '100%',
-    },
-  });
-  console.log('✓ MunicipalWard');
-
-  // 6. PincodeBudget demo
-  await prisma.pincodeBudget.upsert({
-    where: { pincode: '110001' },
-    update: {},
-    create: {
-      pincode: '110001',
-      financialYear: '2024-25',
-      totalRevenueCr: 120,
-      totalAllocatedCr: 85,
-      allocations: {
-        create: [
-          { sectorNameEn: 'Infrastructure', sectorNameHi: 'अवसंरचना', allocatedCr: 35, utilizedCr: 28, stalledProjects: 1 },
-          { sectorNameEn: 'Education', sectorNameHi: 'शिक्षा', allocatedCr: 20, utilizedCr: 18, stalledProjects: 0 },
-        ],
+  // 6. PDS / Fair Price Ration Shops (NFSA)
+  for (const pin of demoPins) {
+    const shops = [
+      {
+        shopName: `Fair Price Shop No. ${pin.code.slice(2)}-A`,
+        dealerName: 'Sample Dealer A (fictional)',
+        isOpen: true,
+        quotaDistributedPct: 88,
+        qualityOk: true,
+        beneficiaries: 1420,
       },
-    },
-  });
-  console.log('✓ PincodeBudget');
+      {
+        shopName: `Govt. PDS Distribution Outlet ${pin.code.slice(2)}-B`,
+        dealerName: 'Sample Dealer B (fictional)',
+        isOpen: true,
+        quotaDistributedPct: 62,
+        qualityOk: false,
+        beneficiaries: 980,
+      },
+    ];
 
-  // 7. AQI + Land + Feeder + Candidate + Cpgrams stubs
-  const aqi = await prisma.regionalAqiStation.create({
-    data: { pincode: '110001', stationName: 'ITO Delhi', aqiValue: 312, dominantPollutant: 'PM2.5' },
-  });
-  await prisma.spcbNotice.create({ data: { stationId: aqi.id, industryName: 'M/S Balaji Chemical', noticeType: 'closure-order', violationReason: 'Air pollution beyond limits', issueDate: '2024-12-01' } });
+    for (const sh of shops) {
+      const existing = await prisma.pdsShop.findFirst({
+        where: { pincodeCode: pin.code, shopName: sh.shopName },
+      });
+      if (existing) {
+        await prisma.pdsShop.update({ where: { id: existing.id }, data: { ...sh, isSample: true } });
+      } else {
+        await prisma.pdsShop.create({ data: { ...sh, pincodeCode: pin.code, isSample: true } });
+      }
+    }
+  }
+  console.log('✓ Fair Price Ration Shops (PDS) seeded');
 
-  const tehsil = await prisma.tehsilOffice.create({ data: { pincode: '110001', tehsilName: 'New Delhi Tehsil', district: 'New Delhi', promisedSlaDays: 45 } });
-  await prisma.landMutationRecord.create({ data: { tehsilId: tehsil.id, surveyNumber: '124/**', daysTaken: 145, status: 'pending', appliedDate: '2024-01-15' } });
+  // 7. CPGRAMS Public Grievances
+  for (const pin of demoPins) {
+    const grievances = [
+      {
+        ministry: 'Ministry of Housing and Urban Affairs',
+        state: pin.state,
+        category: 'Broken drainage & persistent sewage waterlogging on public highway',
+        status: 'Pending',
+        filedDate: new Date('2024-04-10'),
+        resolvedDate: null,
+        delayDays: 145,
+      },
+      {
+        ministry: 'Ministry of Road Transport and Highways',
+        state: pin.state,
+        category: 'Dangerous deep potholes left unrepaired post monsoon season',
+        status: 'Escalated',
+        filedDate: new Date('2024-05-18'),
+        resolvedDate: null,
+        delayDays: 108,
+      },
+      {
+        ministry: 'Department of School Education and Literacy',
+        state: pin.state,
+        category: 'Non-functional student toilets and missing drinking water filter in primary school',
+        status: 'Closed',
+        filedDate: new Date('2024-01-12'),
+        resolvedDate: new Date('2024-03-20'),
+        delayDays: 68,
+      },
+    ];
 
-  const feeder = await prisma.discomFeeder.create({ data: { pincode: '110001', feederName: 'Feeder 12A', substationName: 'ITO Substation', promisedSupplyHours: 24 } });
-  await prisma.feederOutageLog.create({ data: { feederId: feeder.id, outageMinutes: 420, faultType: 'load-shedding', faultTypeHi: 'लोड शेडिंग', logDate: '2024-08-20' } });
+    for (const g of grievances) {
+      const existing = await prisma.cpgramGrievance.findFirst({
+        where: { pincodeCode: pin.code, category: g.category },
+      });
+      if (existing) {
+        await prisma.cpgramGrievance.update({ where: { id: existing.id }, data: { ...g, isSample: true } });
+      } else {
+        await prisma.cpgramGrievance.create({ data: { ...g, pincodeCode: pin.code, isSample: true } });
+      }
+    }
+  }
+  console.log('✓ CPGRAMS Grievances seeded');
 
-  await prisma.candidateSpendRecord.create({ data: { pincode: '110001', candidateName: 'Ram Nivas Singh', party: 'BJP', constituency: 'New Delhi', declaredSpend: 32.5, estimatedSpend: 185, sourceAffidavit: 'https://eci.gov.in' } });
-
-  await prisma.cpgramsMonthlyRecord.create({
-    data: {
-      recordType: 'ministry', rank: 1, name: 'Ministry of Urban Development', nameHi: 'शहरी विकास मंत्रालय',
-      totalGrievances: 12500, resolvedCount: 8200, pendingCount: 4300, avgDisposalDays: 45, backlogOver30Days: 2100,
-      worstCategoryEn: 'Potholes', worstCategoryHi: 'गड्ढे', reportMonth: '2024-08',
-    },
-  });
-
-  console.log('✓ AQI, Land, Feeder, Candidate, Cpgrams');
-
-  // 8. Contractor + project
-  const contractor = await prisma.contractor.upsert({
-    where: { id: 'cont-seed-1' },
-    update: {},
-    create: { id: 'cont-seed-1', name: 'Vanguard Infra Projects Pvt Ltd', registeredState: 'Karnataka', verified: true, totalContracts: 25, completed: 18, ongoing: 5, delayed: 2, score: 68 },
-  });
-  await prisma.contractorProject.upsert({
-    where: { workOrderNo: 'BBMP/2024-25/RD-W151/089' },
-    update: {},
-    create: { contractorId: contractor.id, workOrderNo: 'BBMP/2024-25/RD-W151/089', workName: 'Asphalting 80ft Road Koramangala', workNameHi: '80 फीट रोड डामरीकरण', sanctionedLakhs: 240, paymentReleased: 180, status: 'delayed', delayMonths: 4, defectReports: 11 },
-  });
-
-  console.log('✓ Contractor');
-
-  // 9. Sources — Tier A-E (canonical governance)
-  const sources = [
-    // Tier A — GODL datasets
-    { sourceId: 'src_udise_2324', organization: 'Ministry of Education', department: 'UDISE+', governmentLevel: 'union', sourceName: 'UDISE+ 2023-24', sourceUrl: 'https://udiseplus.gov.in', datasetUrl: 'https://udiseplus.gov.in/p/dataset', sourceType: 'A-dataset', license: 'GODL-India', termsUrl: 'https://data.gov.in/sites/default/files/GODL.pdf', attributionRequirement: 'Source: UDISE+ 2023-24 | GODL', reusePermission: 'store/transform/display/redistribute: yes (attribution)', dataSensitivity: 'public', updateFrequency: 'annual', expectedRefreshInterval: '365d', lastPublishedDate: '2024-08-15', parserVersion: 'udise_csv_v1.2', status: 'active', owner: 'data-ops' },
-    { sourceId: 'src_hmis_2024', organization: 'MoHFW', department: 'HMIS', governmentLevel: 'union', sourceName: 'HMIS Facility Registry 2024', sourceUrl: 'https://hmis.mohfw.gov.in', datasetUrl: 'https://hmis.mohfw.gov.in/api', sourceType: 'A-dataset', license: 'GODL-India', termsUrl: 'https://data.gov.in/sites/default/files/GODL.pdf', attributionRequirement: 'Source: HMIS 2024 | GODL', reusePermission: 'store/transform/display/redistribute: yes', dataSensitivity: 'public', updateFrequency: 'monthly', expectedRefreshInterval: '30d', lastPublishedDate: '2024-08-01', parserVersion: 'hmis_api_v1.0', status: 'active', owner: 'data-ops' },
-    { sourceId: 'src_darpg_202408', organization: 'DARPG', department: 'CPGRAMS', governmentLevel: 'union', sourceName: 'CPGRAMS Monthly Report 2024-08', sourceUrl: 'https://darpg.gov.in', datasetUrl: 'https://darpg.gov.in/en/cpgrams-reports', sourceType: 'A-dataset', license: 'GODL-India', termsUrl: 'https://data.gov.in/sites/default/files/GODL.pdf', attributionRequirement: 'Source: DARPG CPGRAMS Monthly Report 2024-08 | GODL', reusePermission: 'store/transform/display/redistribute: yes', dataSensitivity: 'public', updateFrequency: 'monthly', expectedRefreshInterval: '30d', lastPublishedDate: '2024-08-31', parserVersion: 'darpg_pdf_v1.0', status: 'active', owner: 'data-ops' },
-    // Tier B — Official API
-    { sourceId: 'src_cpcb_aqi', organization: 'CPCB', department: 'AQI', governmentLevel: 'union', sourceName: 'CPCB AQI API', sourceUrl: 'https://cpcb.nic.in', apiUrl: 'https://api.cpcb.nic.in/aqi', sourceType: 'B-api', license: 'GODL-India', termsUrl: 'https://cpcb.nic.in/terms', attributionRequirement: 'Source: CPCB | GODL', reusePermission: 'store: cache 1h, display: yes', dataSensitivity: 'public', updateFrequency: 'realtime', expectedRefreshInterval: '1h', lastPublishedDate: '2024-08-25', parserVersion: 'cpcb_api_v1.0', status: 'active', owner: 'data-ops' },
-    // Tier C — Official webpage/document (quote only)
-    { sourceId: 'src_cag_mh_2024', organization: 'CAG', department: 'PAG Maharashtra', governmentLevel: 'state', sourceName: 'CAG Audit Report No.4 2023-24', sourceUrl: 'https://cag.gov.in/uploads/en/.../Report-4-MH.pdf', sourceType: 'C-document', license: 'Fair-use-quotation', termsUrl: 'https://cag.gov.in/terms', attributionRequirement: 'Source: CAG Report No.4 of 2024, Para 3.7', reusePermission: 'store: excerpt ≤200 chars, display: quote + link, redistribute: no', dataSensitivity: 'public', updateFrequency: 'annual', expectedRefreshInterval: '365d', lastPublishedDate: '2024-03-14', parserVersion: 'cag_pdf_tabula_v0.8', status: 'active', owner: 'data-ops' },
-    { sourceId: 'src_maharera', organization: 'MahaRERA', department: 'Housing', governmentLevel: 'state', sourceName: 'MahaRERA Project Page', sourceUrl: 'https://maharera.mahaonline.gov.in', sourceType: 'C-webpage', license: 'Fair-use', termsUrl: 'https://maharera.mahaonline.gov.in/terms', attributionRequirement: 'Source: MahaRERA', reusePermission: 'store: excerpt, display: quote + link', dataSensitivity: 'public', updateFrequency: 'daily', expectedRefreshInterval: '1d', lastPublishedDate: '2024-08-20', parserVersion: 'rera_scrape_v0.5', status: 'degraded', owner: 'data-ops', notes: 'CAPTCHA proxy required' },
-    // Tier D — Independent
-    { sourceId: 'src_adr_2024', organization: 'ADR', department: 'MyNeta', governmentLevel: 'independent', sourceName: 'ADR Estimated Spend 2024', sourceUrl: 'https://adrindia.org', sourceType: 'D-independent', license: 'CC-BY-4.0', termsUrl: 'https://adrindia.org/terms', attributionRequirement: 'Source: ADR | ECI + CC-BY', reusePermission: 'store/transform/display/redistribute: yes (CC-BY)', dataSensitivity: 'public', updateFrequency: 'per_election', expectedRefreshInterval: 'session', lastPublishedDate: '2024-05-01', parserVersion: 'adr_scrape_v1.0', status: 'active', owner: 'data-ops' },
-    // Tier E — Community
-    { sourceId: 'src_community_school', organization: 'JantaX', department: 'Community', governmentLevel: 'community', sourceName: 'Parent Check-in', sourceUrl: 'https://jantax.in/report', sourceType: 'E-community', license: 'Community-CC0', termsUrl: 'https://jantax.in/privacy', attributionRequirement: 'Anon • SHA-256+salt', reusePermission: 'store: anon, transform: aggregate, display: aggregate', dataSensitivity: 'community_anon', updateFrequency: 'realtime', expectedRefreshInterval: '1d', lastPublishedDate: '2024-08-25', parserVersion: 'community_v1.0', status: 'active', owner: 'moderation@jantax.in' },
+  // 8. Contractors & works (fictional; never marked verified)
+  const contractors = [
+    { id: 'cont-seed-1', name: 'Sample Contractor A (fictional)', registeredState: 'Karnataka', totalContracts: 28, completed: 21, ongoing: 5, delayed: 2, score: 78 },
+    { id: 'cont-seed-2', name: 'Sample Contractor B (fictional)', registeredState: 'Delhi', totalContracts: 45, completed: 34, ongoing: 8, delayed: 3, score: 84 },
+    { id: 'cont-seed-3', name: 'Sample Contractor C (fictional)', registeredState: 'Uttar Pradesh', totalContracts: 19, completed: 11, ongoing: 5, delayed: 3, score: 62 },
+    { id: 'cont-seed-4', name: 'Sample Contractor D (fictional)', registeredState: 'Maharashtra', totalContracts: 32, completed: 25, ongoing: 4, delayed: 3, score: 74 },
   ];
-  for (const s of sources) {
-    await prisma.source.upsert({
-      where: { sourceId: s.sourceId },
-      update: { lastChecked: new Date(), lastSuccessfulSync: new Date(), status: s.status as any },
-      create: {
-        sourceId: s.sourceId,
-        organization: s.organization,
-        department: s.department,
-        governmentLevel: s.governmentLevel,
-        sourceName: s.sourceName,
-        sourceUrl: s.sourceUrl,
-        apiUrl: (s as any).apiUrl || null,
-        datasetUrl: (s as any).datasetUrl || null,
-        sourceType: s.sourceType,
-        license: s.license,
-        termsUrl: s.termsUrl || null,
-        attributionRequirement: s.attributionRequirement,
-        reusePermission: s.reusePermission,
-        dataSensitivity: s.dataSensitivity,
-        updateFrequency: s.updateFrequency,
-        expectedRefreshInterval: s.expectedRefreshInterval,
-        lastChecked: new Date(),
-        lastSuccessfulSync: new Date(),
-        lastPublishedDate: s.lastPublishedDate,
-        parserVersion: s.parserVersion,
-        status: s.status,
-        owner: s.owner,
-        notes: (s as any).notes || null,
+
+  for (const c of contractors) {
+    const data = { ...c, verified: false, isSample: true };
+    await prisma.contractor.upsert({ where: { id: c.id }, update: data, create: data });
+  }
+
+  const contractorProjects = [
+    { workOrderNo: 'SAMPLE/2024-25/RD/001', contractorId: 'cont-seed-1', workName: 'Sample arterial road asphalting', workNameHi: 'नमूना मुख्य सड़क डामरीकरण', sanctionedLakhs: 240, paymentReleased: 180, status: 'delayed', delayMonths: 4, defectReports: 11 },
+    { workOrderNo: 'SAMPLE/2023-24/FL/002', contractorId: 'cont-seed-2', workName: 'Sample flyover extension', workNameHi: 'नमूना फ्लाईओवर विस्तार', sanctionedLakhs: 1850, paymentReleased: 1420, status: 'ongoing', delayMonths: 2, defectReports: 5 },
+    { workOrderNo: 'SAMPLE/2024/LR/003', contractorId: 'cont-seed-3', workName: 'Sample link road resurfacing', workNameHi: 'नमूना लिंक मार्ग नवीनीकरण', sanctionedLakhs: 420, paymentReleased: 290, status: 'delayed', delayMonths: 6, defectReports: 18 },
+  ];
+
+  for (const cp of contractorProjects) {
+    const data = { ...cp, isSample: true };
+    await prisma.contractorProject.upsert({ where: { workOrderNo: cp.workOrderNo }, update: data, create: data });
+  }
+  console.log('✓ Sample contractors & works seeded');
+
+  // 9. Citizen reports (idempotent: one sample report per PIN)
+  const reportTitle = 'Sample report: school drinking-water point not working';
+  for (const pin of demoPins.slice(0, 4)) {
+    const exists = await prisma.citizenReport.findFirst({
+      where: { pincodeCode: pin.code, title: reportTitle, isSample: true },
+    });
+    if (exists) continue;
+    await prisma.citizenReport.create({
+      data: {
+        pincodeCode: pin.code,
+        moduleId: 'school',
+        title: reportTitle,
+        description: `Sample citizen report for ${pin.district}. Illustrates the evidence flow; not a real submission.`,
+        status: ModerationStatus.APPROVED,
+        submittedBy: 'sample-seed',
+        isSample: true,
+        media: {
+          create: [
+            {
+              type: EvidenceType.PHOTO,
+              url: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=800',
+              caption: 'Stock photo (sample)',
+              verificationStatus: ModerationStatus.APPROVED,
+            },
+          ],
+        },
       },
     });
   }
-  console.log(`✓ Sources ${sources.length} (A-E)`);
-
-  console.log('🌱 Seed done — 15 modules + governance populated');
+  console.log('✓ Sample citizen reports seeded');
+  console.log('✅ JantaX seed complete (reference + sample data)');
 }
 
-main().then(()=>prisma.$disconnect()).catch(e=>{ console.error(e); prisma.$disconnect(); process.exit(1); });
+async function seedSources() {
+  // Official source registry. status 'registered' until a connector syncs it;
+  // lastSuccessfulSync stays null — the seed never fetched anything.
+  const sources = [
+    { sourceId: 'src_udise_2324', organization: 'Ministry of Education', department: 'UDISE+', governmentLevel: 'union', sourceName: 'UDISE+ 2023-24', sourceUrl: 'https://udiseplus.gov.in', datasetUrl: 'https://udiseplus.gov.in/p/dataset', sourceType: 'A-dataset', license: 'GODL-India', termsUrl: 'https://data.gov.in/sites/default/files/GODL.pdf', attributionRequirement: 'Source: UDISE+ 2023-24 | GODL', reusePermission: 'store/transform/display/redistribute: yes (attribution)', dataSensitivity: 'public', updateFrequency: 'annual', expectedRefreshInterval: '365d', lastPublishedDate: '2024-08-15', parserVersion: 'udise_csv_v1.2', status: 'registered', owner: 'data-ops' },
+    { sourceId: 'src_hmis_2024', organization: 'MoHFW', department: 'HMIS', governmentLevel: 'union', sourceName: 'HMIS Facility Registry 2024', sourceUrl: 'https://hmis.mohfw.gov.in', datasetUrl: 'https://hmis.mohfw.gov.in/api', sourceType: 'A-dataset', license: 'GODL-India', termsUrl: 'https://data.gov.in/sites/default/files/GODL.pdf', attributionRequirement: 'Source: HMIS 2024 | GODL', reusePermission: 'store/transform/display/redistribute: yes', dataSensitivity: 'public', updateFrequency: 'monthly', expectedRefreshInterval: '30d', lastPublishedDate: '2024-08-01', parserVersion: 'hmis_api_v1.0', status: 'registered', owner: 'data-ops' },
+    { sourceId: 'src_darpg_202408', organization: 'DARPG', department: 'CPGRAMS', governmentLevel: 'union', sourceName: 'CPGRAMS Monthly Report 2024-08', sourceUrl: 'https://darpg.gov.in', datasetUrl: 'https://darpg.gov.in/en/cpgrams-reports', sourceType: 'A-dataset', license: 'GODL-India', termsUrl: 'https://data.gov.in/sites/default/files/GODL.pdf', attributionRequirement: 'Source: DARPG CPGRAMS Monthly Report 2024-08 | GODL', reusePermission: 'store/transform/display/redistribute: yes', dataSensitivity: 'public', updateFrequency: 'monthly', expectedRefreshInterval: '30d', lastPublishedDate: '2024-08-31', parserVersion: 'darpg_pdf_v1.0', status: 'registered', owner: 'data-ops' },
+    { sourceId: 'src_cpcb_aqi', organization: 'CPCB', department: 'AQI', governmentLevel: 'union', sourceName: 'CPCB AQI API', sourceUrl: 'https://cpcb.nic.in', apiUrl: 'https://api.cpcb.nic.in/aqi', sourceType: 'B-api', license: 'GODL-India', termsUrl: 'https://cpcb.nic.in/terms', attributionRequirement: 'Source: CPCB | GODL', reusePermission: 'store: cache 1h, display: yes', dataSensitivity: 'public', updateFrequency: 'realtime', expectedRefreshInterval: '1h', lastPublishedDate: '2024-08-25', parserVersion: 'cpcb_api_v1.0', status: 'registered', owner: 'data-ops' },
+    { sourceId: 'src_maharera', organization: 'MahaRERA', department: 'Housing', governmentLevel: 'state', sourceName: 'MahaRERA Project Registry', sourceUrl: 'https://maharera.mahaonline.gov.in', sourceType: 'C-webpage', license: 'Fair-use', termsUrl: 'https://maharera.mahaonline.gov.in/terms', attributionRequirement: 'Source: State RERA Authorities', reusePermission: 'store: excerpt, display: quote + link', dataSensitivity: 'public', updateFrequency: 'daily', expectedRefreshInterval: '1d', lastPublishedDate: '2024-08-20', parserVersion: 'rera_scrape_v0.5', status: 'registered', owner: 'data-ops' },
+  ];
+
+  for (const s of sources) {
+    const meta = {
+      organization: s.organization,
+      department: s.department,
+      governmentLevel: s.governmentLevel,
+      sourceName: s.sourceName,
+      sourceUrl: s.sourceUrl,
+      apiUrl: (s as any).apiUrl || null,
+      datasetUrl: (s as any).datasetUrl || null,
+      sourceType: s.sourceType,
+      license: s.license,
+      termsUrl: s.termsUrl || null,
+      attributionRequirement: s.attributionRequirement,
+      reusePermission: s.reusePermission,
+      dataSensitivity: s.dataSensitivity,
+      updateFrequency: s.updateFrequency,
+      expectedRefreshInterval: s.expectedRefreshInterval,
+      lastPublishedDate: s.lastPublishedDate,
+      parserVersion: s.parserVersion,
+      owner: s.owner,
+    };
+    await prisma.source.upsert({
+      where: { sourceId: s.sourceId },
+      // Never touch sync state on re-seed; connectors own it.
+      update: meta,
+      create: { sourceId: s.sourceId, ...meta, status: s.status, lastChecked: new Date(), lastSuccessfulSync: null },
+    });
+  }
+  console.log(`✓ Sources registered: ${sources.length}`);
+}
+
+main()
+  .then(() => prisma.$disconnect())
+  .catch(async (e) => {
+    console.error('Seed Error:', e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });

@@ -18,7 +18,7 @@ export function SchoolsDirectory() {
   const [searchParams] = useSearchParams();
   const pinFromUrl = searchParams.get('pin') || '';
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSchoolType, setSelectedSchoolType] = useState<string>('all');
+  const [selectedSchoolType, setSelectedSchoolType] = useState<string>('');
   const [schools, setSchools] = useState<SchoolRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -62,7 +62,7 @@ export function SchoolsDirectory() {
         s.location.district.toLowerCase().includes(q)
       );
     }
-    if (selectedSchoolType !== 'all') {
+    if (selectedSchoolType) {
       list = list.filter(s => s.schoolLevel === selectedSchoolType);
     }
     return list;
@@ -90,14 +90,29 @@ export function SchoolsDirectory() {
           {/* Location Filters */}
           <div style={{ marginBottom: '1.25rem', display: 'grid', gap: '0.75rem' }}>
             <div>
-              <label style={{ fontSize: '0.75rem', opacity: 0.6, display: 'block', marginBottom: '0.25rem' }}>Location</label>
-              <select className="form-input" style={{ fontSize: '0.8rem' }}><option>All States</option></select>
+              <label style={{ fontSize: '0.75rem', opacity: 0.6, display: 'block', marginBottom: '0.25rem' }}>Location Filter</label>
+              <select className="form-input" style={{ fontSize: '0.8rem' }}>
+                <option value="">Select State</option>
+                <option value="UP">Uttar Pradesh</option>
+                <option value="DL">Delhi</option>
+                <option value="KA">Karnataka</option>
+                <option value="MH">Maharashtra</option>
+              </select>
             </div>
             <div>
-              <select className="form-input" style={{ fontSize: '0.8rem' }}><option>All Districts</option></select>
+              <select className="form-input" style={{ fontSize: '0.8rem' }}>
+                <option value="">Select District</option>
+                <option value="meerut">Meerut</option>
+                <option value="new_delhi">New Delhi</option>
+                <option value="bengaluru">Bengaluru Urban</option>
+              </select>
             </div>
             <div>
-              <select className="form-input" style={{ fontSize: '0.8rem' }}><option>All Blocks</option></select>
+              <select className="form-input" style={{ fontSize: '0.8rem' }}>
+                <option value="">Select Block / Taluk</option>
+                <option value="meerut_cantt">Meerut Cantt</option>
+                <option value="chanakyapuri">Chanakyapuri</option>
+              </select>
             </div>
             <div>
               <input type="text" placeholder="Search city or village" className="form-input" style={{ fontSize: '0.8rem' }} />
@@ -109,34 +124,34 @@ export function SchoolsDirectory() {
 
           {/* School Type Checkboxes */}
           <div style={{ marginBottom: '1.25rem', borderTop: '1px solid #e2e8f0', paddingTop: '1rem' }}>
-            <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.5rem' }}>School Type</label>
+            <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.5rem' }}>School Level / Category</label>
             <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.8rem' }}>
               <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span><input type="checkbox" checked={selectedSchoolType === 'all'} onChange={() => setSelectedSchoolType('all')} /> All Types</span>
-                <span style={{ opacity: 0.5 }}>78,231</span>
-              </label>
-              <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span><input type="checkbox" checked={selectedSchoolType === 'Primary'} onChange={() => setSelectedSchoolType('Primary')} /> Primary (1 to 5)</span>
+                <span><input type="checkbox" checked={selectedSchoolType === 'Primary'} onChange={() => setSelectedSchoolType(selectedSchoolType === 'Primary' ? '' : 'Primary')} /> Primary (1 to 5)</span>
                 <span style={{ opacity: 0.5 }}>45,765</span>
               </label>
               <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span><input type="checkbox" checked={selectedSchoolType === 'Upper Primary'} onChange={() => setSelectedSchoolType('Upper Primary')} /> Upper Primary (6 to 8)</span>
+                <span><input type="checkbox" checked={selectedSchoolType === 'Upper Primary'} onChange={() => setSelectedSchoolType(selectedSchoolType === 'Upper Primary' ? '' : 'Upper Primary')} /> Upper Primary (6 to 8)</span>
                 <span style={{ opacity: 0.5 }}>16,842</span>
+              </label>
+              <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span><input type="checkbox" checked={selectedSchoolType === 'Secondary'} onChange={() => setSelectedSchoolType(selectedSchoolType === 'Secondary' ? '' : 'Secondary')} /> Secondary (9 to 10)</span>
+                <span style={{ opacity: 0.5 }}>15,624</span>
               </label>
             </div>
           </div>
 
           {/* Management Checkboxes */}
           <div style={{ marginBottom: '1.5rem', borderTop: '1px solid #e2e8f0', paddingTop: '1rem' }}>
-            <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.5rem' }}>Management</label>
+            <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.5rem' }}>Management Registry</label>
             <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.8rem' }}>
               <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span><input type="checkbox" defaultChecked /> All</span>
-                <span style={{ opacity: 0.5 }}>1,25,873</span>
+                <span><input type="checkbox" defaultChecked /> Government (KVS / State Dept)</span>
+                <span style={{ opacity: 0.5 }}>15,327</span>
               </label>
               <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span><input type="checkbox" /> Government</span>
-                <span style={{ opacity: 0.5 }}>15,327</span>
+                <span><input type="checkbox" /> Government-Aided Schools</span>
+                <span style={{ opacity: 0.5 }}>8,419</span>
               </label>
             </div>
           </div>

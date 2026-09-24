@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { prisma } from '../prisma';
-import { requireRole } from '../middleware/auth';
+import { ModerationStatus, EvidenceType } from '@prisma/client';
 
 // Evidence response types
 export interface EvidenceInfo {
@@ -11,7 +11,7 @@ export interface EvidenceInfo {
   entityType: string;
   entityId: string;
   description: string;
-  evidenceType: string; // From EvidenceTypeEnum
+  evidenceType: string;
   location: {
     pincode: string;
     state: string;
@@ -19,21 +19,21 @@ export interface EvidenceInfo {
   } | null;
   media: Array<{
     id: string;
-    type: string; // From MediaType
+    type: string;
     url: string;
     caption: string | null;
-    privacyStatus: string; // From PrivacyStatus
+    privacyStatus: string;
   }>;
-  verificationStatus: string; // From VerificationStatus
-  confidence: number; // 0-100
-  moderationStatus: string; // From ModerationStatus
-  privacyStatus: string; // From PrivacyStatus
-  createdAt: string; // ISO date
-  updatedAt: string; // ISO date
+  verificationStatus: string;
+  confidence: number;
+  moderationStatus: string;
+  privacyStatus: string;
+  createdAt: string;
+  updatedAt: string;
   metadata: Record<string, any>;
   sourceInfo: {
     name: string;
-    freshness: string; // ISO timestamp
+    freshness: string;
     reliability: 'high' | 'medium' | 'low';
   };
 }
@@ -54,31 +54,13 @@ const router = Router();
 
 /**
  * GET /api/evidence
- * Get evidence with filtering, pagination, and sorting
- * Query parameters:
- *   entityType: filter by entity type (optional)
- *   entityId: filter by entity ID (optional)
- *   evidenceType: filter by evidence type (optional)
- *   verificationStatus: filter by verification status (optional)
- *   moderationStatus: filter by moderation status (optional)
- *   minConfidence: minimum confidence score (optional)
- *   maxConfidence: maximum confidence score (optional)
- *   pincode: filter by PIN code (optional)
- *   page: page number (default: 1)
- *   limit: results per page (default: 10)
- *   sortBy: field to sort by (default: createdAt)
- *   sortOrder: asc or desc (default: desc)
+ * Get citizen evidence reports backed by CitizenReport & EvidenceMedia
  */
 router.get('/', async (req: Request, res: Response) => {
   try {
     const {
       entityType,
-      entityId,
-      evidenceType,
-      verificationStatus,
       moderationStatus,
-      minConfidence,
-      maxConfidence,
       pincode,
       page = 1,
       limit = 10,
@@ -99,52 +81,14 @@ router.get('/', async (req: Request, res: Response) => {
       sortOrder?: string;
     };
     
-    // Validate pagination
     const pageNum = Math.max(1, parseInt(String(page)));
     const limitNum = Math.min(50, Math.max(1, parseInt(String(limit))));
+    const validSortOrder = ['asc', 'desc'].includes(sortOrder ?? '') ? (sortOrder as 'asc' | 'desc') : 'desc';
     
-    // Validate sort order
-    const validSortOrder = ['asc', 'desc'].includes(sortOrder ?? '') ? sortOrder : 'desc';
-    
-    // Build WHERE clause
     const where: any = {};
-    
-    if (entityType) {
-      where.entityType = entityType;
-    }
-    
-    if (entityId) {
-      where.entityId = entityId;
-    }
-    
-    if (evidenceType) {
-      where.evidenceType = evidenceType;
-    }
-    
-    if (verificationStatus) {
-      where.verificationStatus = verificationStatus;
-    }
-    
-    if (moderationStatus) {
-      where.moderationStatus = moderationStatus;
-    }
-    
-    if (minConfidence !== undefined && maxConfidence !== undefined) {
-      const min = parseFloat(String(minConfidence));
-      const max = parseFloat(String(maxConfidence));
-      if (!isNaN(min) && !isNaN(max)) {
-        where.confidence = { gte: min, lte: max };
-      }
-    } else if (minConfidence !== undefined) {
-      const min = parseFloat(String(minConfidence));
-      if (!isNaN(min)) {
-        where.confidence = { gte: min };
-      }
-    } else if (maxConfidence !== undefined) {
-      const max = parseFloat(String(maxConfidence));
-      if (!isNaN(max)) {
-        where.confidence = { lte: max };
-      }
+    if (entityType) where.moduleId = entityType;
+    if (moderationStatus && Object.values(ModerationStatus).includes(moderationStatus as any)) {
+      where.status = moderationStatus as ModerationStatus;
     }
     
     if (pincode) {
@@ -154,19 +98,10 @@ router.get('/', async (req: Request, res: Response) => {
       }
     }
     
-    // Get evidence with count for pagination
-    const [evidence, total] = await Promise.all([
-      prisma.evidence.findMany({
+    const [reports, total] = await Promise.all([
+      prisma.citizenReport.findMany({
         where,
-        select: {
-          id: true,
-          evidenceId: true,
-          source: true,
-          entityType: true,
-          entityId: true,
-          description: true,
-          evidenceType: true,
-          pincodeCode: true,
+        include: {
           pincode: {
             select: {
               code: true,
@@ -174,67 +109,52 @@ router.get('/', async (req: Request, res: Response) => {
               district: true
             }
           },
-          media: {
-            select: {
-              id: true,
-              type: true,
-              url: true,
-              caption: true,
-              privacyStatus: true
-            }
-          },
-          verificationStatus: true,
-          confidence: true,
-          moderationStatus: true,
-          privacyStatus: true,
-          createdAt: true,
-          updatedAt: true
+          media: true
         },
         orderBy: {
-          [sortBy]: validSortOrder
+          createdAt: validSortOrder
         },
         skip: (pageNum - 1) * limitNum,
         take: limitNum
       }),
-      prisma.evidence.count({ where })
+      prisma.citizenReport.count({ where })
     ]);
     
-    // Format response
-    const formattedEvidence = evidence.map(ev => ({
-      id: ev.id,
-      evidenceId: ev.evidenceId,
-      source: ev.source,
-      entityType: ev.entityType,
-      entityId: ev.entityId,
-      description: ev.description,
-      evidenceType: ev.evidenceType,
-      location: ev.pincodeCode ? {
-        pincode: ev.pincodeCode,
-        state: ev.pincode?.state ?? '',
-        district: ev.pincode?.district ?? ''
+    const formattedEvidence: EvidenceInfo[] = reports.map((r: any) => ({
+      id: r.id,
+      evidenceId: r.id,
+      source: 'Citizen Ground Report',
+      entityType: r.moduleId,
+      entityId: r.id,
+      description: r.description,
+      evidenceType: r.media?.[0]?.type ?? 'PHOTO',
+      location: r.pincode ? {
+        pincode: r.pincode.code,
+        state: r.pincode.state,
+        district: r.pincode.district
       } : null,
-      media: ev.media?.map(m => ({
+      media: (r.media || []).map((m: any) => ({
         id: m.id,
         type: m.type,
         url: m.url,
         caption: m.caption ?? null,
-        privacyStatus: m.privacyStatus
-      })) ?? [],
-      verificationStatus: ev.verificationStatus,
-      confidence: ev.confidence,
-      moderationStatus: ev.moderationStatus,
-      privacyStatus: ev.privacyStatus,
-      createdAt: ev.createdAt.toISOString(),
-      updatedAt: ev.updatedAt.toISOString(),
+        privacyStatus: 'PUBLIC'
+      })),
+      verificationStatus: r.status,
+      confidence: r.status === ModerationStatus.APPROVED ? 90 : 50,
+      moderationStatus: r.status,
+      privacyStatus: 'ANONYMIZED',
+      createdAt: r.createdAt.toISOString(),
+      updatedAt: r.updatedAt.toISOString(),
       metadata: {
-        entityInfo: ev.entityType + ':',
-        hasMedia: ev.media?.length > 0,
-        mediaCount: ev.media?.length ?? 0
+        title: r.title,
+        hasMedia: (r.media?.length ?? 0) > 0,
+        mediaCount: r.media?.length ?? 0
       },
       sourceInfo: {
-        name: ev.source,
-        freshness: ev.updatedAt.toISOString(),
-        reliability: 'high' // Evidence source reliability would need to be determined
+        name: 'Citizen Report',
+        freshness: r.updatedAt.toISOString(),
+        reliability: r.status === ModerationStatus.APPROVED ? 'high' : 'medium'
       }
     }));
     
@@ -248,13 +168,7 @@ router.get('/', async (req: Request, res: Response) => {
       },
       filters: {
         entityType,
-        entityId,
-        evidenceType,
-        evidenceType,
-        verificationStatus,
         moderationStatus,
-        minConfidence,
-        maxConfidence,
         pincode
       }
     });
@@ -266,23 +180,15 @@ router.get('/', async (req: Request, res: Response) => {
 
 /**
  * GET /api/evidence/:id
- * Get a specific evidence by ID
+ * Get specific evidence report by ID
  */
 router.get('/:id', async (req: Request, res: Response) => {
   try {
     const evidenceId = String(req.params.id);
     
-    const evidence = await prisma.evidence.findUnique({
+    const r: any = await prisma.citizenReport.findUnique({
       where: { id: evidenceId },
-      select: {
-        id: true,
-        evidenceId: true,
-        source: true,
-        entityType: true,
-        entityId: true,
-        description: true,
-        evidenceType: true,
-        pincodeCode: true,
+      include: {
         pincode: {
           select: {
             code: true,
@@ -290,66 +196,53 @@ router.get('/:id', async (req: Request, res: Response) => {
             district: true
           }
         },
-        media: {
-            select: {
-              id: true,
-              type: true,
-              url: true,
-              caption: true,
-              privacyStatus: true
-            }
-          },
-          verificationStatus: true,
-          confidence: true,
-          moderationStatus: true,
-          privacyStatus: true,
-          createdAt: true,
-          updatedAt: true
-        }
+        media: true
       }
     });
     
-    if (!evidence) {
+    if (!r) {
       return res.status(404).json({ error: 'Evidence not found' });
     }
     
-    res.json({
-      id: evidence.id,
-      evidenceId: evidence.evidenceId,
-      source: evidence.source,
-      entityType: evidence.entityType,
-      entityId: evidence.entityId,
-      description: evidence.description,
-      evidenceType: evidence.evidenceType,
-      location: evidence.pincodeCode ? {
-        pincode: evidence.pincodeCode,
-        state: evidence.pincode?.state ?? '',
-        district: evidence.pincode?.district ?? ''
+    const formatted: EvidenceInfo = {
+      id: r.id,
+      evidenceId: r.id,
+      source: 'Citizen Ground Report',
+      entityType: r.moduleId,
+      entityId: r.id,
+      description: r.description,
+      evidenceType: r.media?.[0]?.type ?? 'PHOTO',
+      location: r.pincode ? {
+        pincode: r.pincode.code,
+        state: r.pincode.state,
+        district: r.pincode.district
       } : null,
-      media: evidence.media?.map(m => ({
+      media: (r.media || []).map((m: any) => ({
         id: m.id,
         type: m.type,
         url: m.url,
         caption: m.caption ?? null,
-        privacyStatus: m.privacyStatus
-      })) ?? [],
-      verificationStatus: evidence.verificationStatus,
-      confidence: evidence.confidence,
-      moderationStatus: evidence.moderationStatus,
-      privacyStatus: evidence.privacyStatus,
-      createdAt: evidence.createdAt.toISOString(),
-      updatedAt: evidence.updatedAt.toISOString(),
+        privacyStatus: 'PUBLIC'
+      })),
+      verificationStatus: r.status,
+      confidence: r.status === ModerationStatus.APPROVED ? 90 : 50,
+      moderationStatus: r.status,
+      privacyStatus: 'ANONYMIZED',
+      createdAt: r.createdAt.toISOString(),
+      updatedAt: r.updatedAt.toISOString(),
       metadata: {
-        entityInfo: \:\,
-        hasMedia: evidence.media?.length > 0,
-        mediaCount: evidence.media?.length ?? 0
+        title: r.title,
+        hasMedia: (r.media?.length ?? 0) > 0,
+        mediaCount: r.media?.length ?? 0
       },
       sourceInfo: {
-        name: evidence.source,
-        freshness: evidence.updatedAt.toISOString(),
-        reliability: 'high'
+        name: 'Citizen Report',
+        freshness: r.updatedAt.toISOString(),
+        reliability: r.status === ModerationStatus.APPROVED ? 'high' : 'medium'
       }
-    });
+    };
+    
+    res.json(formatted);
   } catch (error) {
     console.error('[evidence/:id] Error:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -358,105 +251,73 @@ router.get('/:id', async (req: Request, res: Response) => {
 
 /**
  * POST /api/evidence
- * Create new evidence (typically called after media upload)
+ * Create new citizen report with evidence media
  */
 router.post('/', async (req: Request, res: Response) => {
   try {
     const {
-      evidenceId,
-      source,
-      entityType,
-      entityId,
+      entityType = 'general',
       description,
-      evidenceType,
       pincodeCode,
-      media,
-      verificationStatus,
-      confidence,
-      moderationStatus,
-      privacyStatus
+      title,
+      media
     } = req.body as {
-      evidenceId?: string;
-      source?: string;
       entityType?: string;
-      entityId?: string;
       description?: string;
-      evidenceType?: string;
       pincodeCode?: string;
+      title?: string;
       media?: Array<{
-        type: string; // From MediaType
+        type: string;
         url: string;
         caption?: string;
-        privacyStatus?: string; // From PrivacyStatus
       }>;
-      verificationStatus?: string; // From VerificationStatus
-      confidence?: string; // 0-100
-      moderationStatus?: string; // From ModerationStatus
-      privacyStatus?: string; // From PrivacyStatus
     };
     
-    // Validate required fields
-    if (!evidenceId || !source || !entityType || !entityId || !description || !evidenceType) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    if (!description || !pincodeCode) {
+      return res.status(400).json({ error: 'description and pincodeCode are required' });
     }
     
-    // Validate evidenceId uniqueness
-    const existing = await prisma.evidence.findUnique({ where: { evidenceId } });
-    if (existing) {
-      return res.status(409).json({ error: 'Evidence ID already exists' });
+    const cleanPincode = String(pincodeCode).replace(/\D/g, '');
+    if (!/^\d{6}$/.test(cleanPincode)) {
+      return res.status(400).json({ error: 'Invalid PIN code format' });
     }
     
-    // Validate pincode if provided
-    if (pincodeCode) {
-      const cleanPincode = String(pincodeCode).replace(/\D/g, '');
-      if (!/^\d{6}$/.test(cleanPincode)) {
-        return res.status(400).json({ error: 'Invalid PIN code format' });
-      }
-      
-      const pincodeExists = await prisma.pincode.findUnique({ where: { code: cleanPincode } });
-      if (!pincodeExists) {
-        // Auto-create PIN code if it doesn't exist (with unknown state/district)
-        await prisma.pincode.create({
-          data: {
-            code: cleanPincode,
-            state: 'Unknown',
-            district: 'Unknown',
-            region: 'CENTRAL' as const
-          }
-        });
-      }
+    let pin = await prisma.pincode.findUnique({ where: { code: cleanPincode } });
+    if (!pin) {
+      pin = await prisma.pincode.create({
+        data: {
+          code: cleanPincode,
+          state: 'Unknown',
+          district: 'Unknown',
+          region: 'CENTRAL'
+        }
+      });
     }
     
-    // Create evidence
-    const newEvidence = await prisma.evidence.create({
+    const newReport = await prisma.citizenReport.create({
       data: {
-        evidenceId,
-        source,
-        entityType,
-        entityId,
+        pincodeCode: cleanPincode,
+        moduleId: entityType,
+        title: title || description.slice(0, 60),
         description,
-        evidenceType: evidenceType as any, // Assuming it's a valid EvidenceTypeEnum value
-        pincodeCode: pincodeCode ?? undefined,
-        media: {
-          create: media?.map(m => ({
-            type: m.type as any, // Assuming it's a valid MediaType value
+        status: ModerationStatus.PENDING,
+        media: media && media.length > 0 ? {
+          create: media.map((m: any) => ({
+            type: (Object.values(EvidenceType).includes(m.type as any) ? m.type : EvidenceType.PHOTO) as EvidenceType,
             url: m.url,
-            caption: m.caption ?? undefined,
-            privacyStatus: m.privacyStatus as any // Assuming it's a valid PrivacyStatus value
-          })) ?? undefined
-        },
-        verificationStatus: verificationStatus as any, // Assuming it's a valid VerificationStatus value
-        confidence: confidence ? parseFloat(String(confidence)) : 0,
-        moderationStatus: moderationStatus as any, // Assuming it's a valid ModerationStatus value
-        privacyStatus: privacyStatus as any // Assuming it's a valid PrivacyStatus value
+            caption: m.caption || null,
+            verificationStatus: ModerationStatus.PENDING
+          }))
+        } : undefined
+      },
+      include: {
+        media: true,
+        pincode: true
       }
     });
     
-    // Update evidence count on related entities if applicable
-    // This would be done via triggers or application logic in a real implementation
-    
     res.status(201).json({
-      evidence: newEvidence,
+      evidence: newReport,
       message: 'Evidence created successfully'
     });
   } catch (error) {
@@ -466,4 +327,3 @@ router.post('/', async (req: Request, res: Response) => {
 });
 
 export default router;
-

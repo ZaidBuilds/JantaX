@@ -75,7 +75,7 @@ export interface ClaimVsRealityData {
   sanctionedSpecs: string;
   officialClaim: string; // e.g. "₹2.4 Cr Bitumen VG-30 complete with 3-year warranty and IRC quality certificate"
   officialSourceDoc: string; // e.g. "BBMP/2023-24/EE/RD/WO-9941 (Vol II, Pg 44)"
-  cagAuditReference?: string; // e.g. "CAG Report No. 4 of 2024 (Local Bodies Karnataka), Para 3.2.1"
+  cagAuditReference?: string; // e.g. "CAG local bodies audit (example reference) (Local Bodies Karnataka), Para 3.2.1"
   cagFindingSnippet?: string; // e.g. "Measurement books inflated by 35%; core cut tests showed bitumen content 3.8% against mandated 5.4%"
   realityGroundTruth: string; // e.g. "14 massive craters after first monsoon rain, 4 months after handover. Core thickness: 22mm vs 50mm sanctioned."
   discrepancyPercentage: number; // e.g. 56%

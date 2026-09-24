@@ -1,11 +1,45 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { monthlyMinistries, monthlyStates } from '../data/cpgramsData';
 import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
 import { getUpdatedGrievances } from '../../../core/utils/autoUpdater';
+import { api } from '../../../core/services/api';
+import { usePin } from '../../../core/context/PinContext';
 
 export function CpgramsDashboard() {
   const { share } = useWhatsAppShare();
   const [activeTab, setActiveTab] = useState<'ministry' | 'state'>('ministry');
+  const { selectedPin } = usePin();
+
+  /**
+   * Real grievance records for the active PIN, from the database.
+   *
+   * The ministry/state tables further down are national aggregates that have no
+   * table behind them, so they stay clearly labelled as demonstration data.
+   * This section is the part that is genuinely live.
+   */
+  const [localGrievances, setLocalGrievances] = useState<any[]>([]);
+  const [grievancesLoaded, setGrievancesLoaded] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const pin = selectedPin || '110001';
+    setGrievancesLoaded(false);
+
+    api
+      .getRecords(pin, 'grievance')
+      .then((res: any) => {
+        if (cancelled) return;
+        setLocalGrievances(res?.records?.grievance ?? []);
+        setGrievancesLoaded(true);
+      })
+      .catch(() => {
+        if (!cancelled) setGrievancesLoaded(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedPin]);
 
   // Compute daily auto-updated caseload statistics
   const updatedMinistries = useMemo(() => getUpdatedGrievances(monthlyMinistries), []);
@@ -29,7 +63,7 @@ export function CpgramsDashboard() {
       responsiblePerson: type === 'ministry' ? 'Ministry Secretary' : 'State Nodal Officer',
       responsibleOrg: item.name,
       sourceUrl: 'https://pgportal.gov.in',
-      moduleNameHindi: 'M15 - CPGRAMS Shame Index (शिकायत विलंब सूचकांक)',
+      moduleNameHindi: 'M15 - CPGRAMS Response Tracker (शिकायत विलंब सूचकांक)',
     });
   };
 
@@ -39,12 +73,92 @@ export function CpgramsDashboard() {
       {/* Module Title */}
       <div className="glass-card" style={{ padding: '1.5rem', marginBottom: '2rem', borderLeft: '4px solid #ef4444' }}>
         <h2 style={{ fontSize: '1.6rem', marginBottom: '0.5rem' }}>
-          📉 CPGRAMS Shame Index (शिकायत विलंब सूचकांक)
+          📉 CPGRAMS Response Tracker (शिकायत विलंब सूचकांक)
         </h2>
         <p style={{ opacity: 0.8, fontSize: '0.9rem', lineHeight: 1.5 }}>
           <strong>M15 - स्व-मूल्यांकन रिपोर्ट:</strong> भारत सरकार के प्रशासनिक सुधार विभाग (DARPG) द्वारा जारी मासिक डेटा। सरकारी मंत्रालयों और राज्यों के शिकायत निपटान प्रदर्शन की पोल खोलता सूचकांक।
         </p>
       </div>
+
+      {/* Real grievance records for the active PIN, straight from the database. */}
+      <div
+        style={{
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 'var(--radius-lg)',
+          padding: 'var(--space-4)',
+          marginBottom: 'var(--space-6)',
+        }}
+      >
+        <h3 style={{ fontSize: 'var(--text-h3)', fontWeight: 700, marginBottom: 'var(--space-1)' }}>
+          Grievances filed in PIN {selectedPin || '110001'}
+        </h3>
+        <p style={{ fontSize: 'var(--text-caption)', color: 'var(--text-muted)', marginBottom: 'var(--space-3)' }}>
+          Live records — source: DARPG CPGRAMS
+        </p>
+
+        {!grievancesLoaded ? (
+          <p style={{ fontSize: 'var(--text-small)', color: 'var(--text-muted)' }}>Loading…</p>
+        ) : localGrievances.length === 0 ? (
+          <p style={{ fontSize: 'var(--text-small)', color: 'var(--text-muted)' }}>
+            No grievance records published for this PIN code.
+          </p>
+        ) : (
+          <div className="data-table-wrap">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Ministry / Department</th>
+                  <th>Status</th>
+                  <th>Days pending</th>
+                </tr>
+              </thead>
+              <tbody>
+                {localGrievances.map((g: any) => (
+                  <tr key={g.id}>
+                    <td>{g.category}</td>
+                    <td>{g.ministry}</td>
+                    <td>
+                      <span
+                        className={`badge-status ${
+                          g.status === 'Resolved' ? 'verified' : 'warning'
+                        }`}
+                      >
+                        {g.status}
+                      </span>
+                    </td>
+                    {/* Statutory context, not an accusation: CPGRAMS targets 30 days. */}
+                    <td>{typeof g.delayDays === 'number' ? `${g.delayDays}` : '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* The national ministry/state tables below are NOT backed by a database
+          table — they are monthly aggregates kept as local fixtures. Labelled so
+          they are never mistaken for live DARPG figures. */}
+      <p
+        role="note"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 'var(--space-2)',
+          margin: '0 0 var(--space-3)',
+          padding: 'var(--space-1) var(--space-3)',
+          borderRadius: 'var(--radius-pill)',
+          background: 'var(--status-warn-bg)',
+          border: '1px solid var(--status-warn-border)',
+          color: 'var(--status-warn-text)',
+          fontSize: 'var(--text-caption)',
+          fontWeight: 700,
+        }}
+      >
+        National rankings below are demonstration data — not live DARPG figures
+      </p>
 
       {/* Switch Tabs */}
       <div className="dash-tab-group">
@@ -52,7 +166,7 @@ export function CpgramsDashboard() {
           onClick={() => setActiveTab('ministry')}
           className={`dash-tab-btn ${activeTab === 'ministry' ? 'active' : ''}`}
         >
-          Worst Performing Ministries (केंद्रीय मंत्रालय)
+          Ministries by response time (केंद्रीय मंत्रालय)
         </button>
         <button
           onClick={() => setActiveTab('state')}
@@ -116,7 +230,7 @@ export function CpgramsDashboard() {
               {/* Share block */}
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <button onClick={() => handleShareWhatsApp(item, 'ministry')} className="btn-whatsapp">
-                  📤 Send Shame Card on WhatsApp
+                  📤 Share Response Record
                 </button>
               </div>
             </div>
@@ -173,7 +287,7 @@ export function CpgramsDashboard() {
               {/* Share block */}
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <button onClick={() => handleShareWhatsApp(item, 'state')} className="btn-whatsapp">
-                  📤 Send Shame Card on WhatsApp
+                  📤 Share Response Record
                 </button>
               </div>
             </div>

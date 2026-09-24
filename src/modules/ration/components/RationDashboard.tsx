@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
 import { resolvePincode } from '../../../core/utils/pinResolver';
+import { api } from '../../../core/services/api';
 
 export function RationDashboard() {
   const { share } = useWhatsAppShare();
@@ -18,19 +19,68 @@ export function RationDashboard() {
 
   const loc = useMemo(() => resolvePincode(currentPin), [currentPin]);
 
-  const pdsStores = useMemo(() => {
+  // Demonstration fallback, used only when the API has no record for this PIN.
+  // Never names an individual licensee: these cards can carry a stock
+  // discrepancy, and `handleShare` puts the responsible party into a WhatsApp
+  // message. Naming a person beside an unproven allegation is what Rule 22 and
+  // Rule 9.5 prohibit.
+  const demoStores = useMemo(() => {
     const suffix = parseInt(currentPin.substring(3, 6)) || 1;
     return [
       {
-        shopNo: `FPS-UP-${suffix}892`,
-        dealerName: loc.region === 'North' ? 'श्री संजय शर्मा' : 'श्री एम. रविचंद्रन',
+        shopNo: `FPS-DEMO-${suffix}`,
+        dealerName: 'एफपीएस लाइसेंसधारी (नाम प्रकाशित नहीं)',
         claimedQuota: 'गेहूं: 5kg/व्यक्ति, चावल: 3kg/व्यक्ति (मुफ्त)',
-        realityStatus: 'दुकान महीने में केवल १२ दिन खुलती है। चावल का स्टॉक अक्सर गायब रहता है।',
+        realityStatus: 'उदाहरण: दुकान महीने में केवल १२ दिन खुलती है। चावल का स्टॉक अक्सर अनुपलब्ध रहता है।',
         lastAuditDate: '2025-08-10',
-        auditFinding: '12% राशन स्टॉक में विसंगति पाई गई (CAG ऑडिट संदर्भ)',
-      }
+        auditFinding: 'उदाहरण निष्कर्ष: राशन स्टॉक में विसंगति (कोई वास्तविक ऑडिट संदर्भित नहीं)',
+      },
     ];
-  }, [currentPin, loc]);
+  }, [currentPin]);
+
+  const [pdsStores, setPdsStores] = useState<any[]>(demoStores);
+  const [isLiveData, setIsLiveData] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    setPdsStores(demoStores);
+    setIsLiveData(false);
+
+    api
+      .getRecords(currentPin, 'pds')
+      .then((res: any) => {
+        if (cancelled) return;
+        const rows: any[] = res?.records?.pds ?? [];
+        if (rows.length === 0) return; // no published record — keep demo cards
+
+        setPdsStores(
+          rows.map((r) => ({
+            shopNo: r.shopName || r.id,
+            // The registry stores the licensee as an organisation. If a value
+            // ever looks like a personal name it must not be rendered here.
+            dealerName: r.dealerName || 'एफपीएस लाइसेंसधारी',
+            claimedQuota: 'गेहूं: 5kg/व्यक्ति, चावल: 3kg/व्यक्ति (NFSA)',
+            realityStatus:
+              `${r.isOpen ? 'दुकान खुली दर्ज' : 'दुकान बंद दर्ज'} · ` +
+              `कोटा वितरण ${r.quotaDistributedPct ?? '—'}% · ` +
+              `लाभार्थी ${r.beneficiaries ?? '—'}`,
+            lastAuditDate: (r.updatedAt || '').slice(0, 10),
+            auditFinding:
+              r.qualityOk === false
+                ? 'गुणवत्ता जांच में समस्या दर्ज (आधिकारिक रिकॉर्ड)'
+                : 'गुणवत्ता जांच में कोई समस्या दर्ज नहीं',
+          }))
+        );
+        setIsLiveData(true);
+      })
+      .catch(() => {
+        /* API unreachable — demonstration cards remain, already labelled. */
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentPin, demoStores]);
 
   const handleShare = (shop: any) => {
     share({
@@ -41,7 +91,8 @@ export function RationDashboard() {
       claimLabelHindi: `सरकारी राशन कोटा: ${shop.claimedQuota}`,
       realityLabel: `Reality check: ${shop.realityStatus}`,
       realityLabelHindi: `ज़मीनी हकीकत: ${shop.realityStatus}`,
-      responsiblePerson: shop.dealerName,
+      // Share the accountable OFFICE, never an individual.
+      responsiblePerson: 'Fair Price Shop Licensee',
       responsibleOrg: 'Food & Civil Supplies Department',
       sourceUrl: 'https://nfsa.gov.in',
       moduleNameHindi: 'M5 - राशन रिपोर्ट (PDS/Ration Audit)',
@@ -78,6 +129,29 @@ export function RationDashboard() {
           </p>
         )}
       </div>
+
+      {/* Always say which dataset is on screen — live and demo cards look
+          identical otherwise. */}
+      <p
+        role="status"
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 'var(--space-2)',
+          margin: '0 0 var(--space-4)',
+          padding: 'var(--space-1) var(--space-3)',
+          borderRadius: 'var(--radius-pill)',
+          background: isLiveData ? 'var(--bg-subtle)' : 'var(--status-warn-bg)',
+          border: `1px solid ${isLiveData ? 'var(--border-color)' : 'var(--status-warn-border)'}`,
+          color: isLiveData ? 'var(--text-secondary)' : 'var(--status-warn-text)',
+          fontSize: 'var(--text-caption)',
+          fontWeight: 700,
+        }}
+      >
+        {isLiveData
+          ? `Live NFSA records for PIN ${currentPin} — served from the JantaX database`
+          : 'Demonstration data — no published ration shop record for this PIN'}
+      </p>
 
       <div style={{ display: 'grid', gap: '1.5rem' }}>
         {pdsStores.map((shop, idx) => (

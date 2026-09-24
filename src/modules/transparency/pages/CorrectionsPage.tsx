@@ -121,7 +121,7 @@ export function CorrectionsPage() {
 
             <div>
               <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.3rem' }}>Target Entity / Record ID *</label>
-              <input type="text" value={entityId} onChange={(e) => setEntityId(e.target.value)} placeholder="e.g. Project ID (proj-delhi-elevated-01) or Contractor ID (cont-lt-infra)" style={{ width: '100%', padding: '0.6rem 0.85rem', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: '0.88rem' }} required />
+              <input type="text" value={entityId} onChange={(e) => setEntityId(e.target.value)} placeholder="e.g. Project ID (proj-delhi-elevated-01) or Contractor ID (cont-meridian-infra)" style={{ width: '100%', padding: '0.6rem 0.85rem', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: '0.88rem' }} required />
             </div>
 
             <div>

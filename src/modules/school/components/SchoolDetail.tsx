@@ -52,7 +52,7 @@ export function SchoolDetail({ schoolId, school: prop, onBack }: Props) {
   const [loading, setLoading] = useState(!prop);
   const [error, setError] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string>('teachers');
-  const [teacherTab, setTeacherTab] = useState<'all' | 'regular' | 'para' | 'subject'>('all');
+  const [teacherTab, setTeacherTab] = useState<'regular' | 'para' | 'subject'>('regular');
   const [compareId, setCompareId] = useState('');
   const [pincodeSchools, setPincodeSchools] = useState<SchoolRecord[]>([]);
   const [following, setFollowing] = useState(false);
@@ -221,7 +221,6 @@ export function SchoolDetail({ schoolId, school: prop, onBack }: Props) {
               <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0f172a' }}>Teacher Details</div>
               <div style={{ display: 'flex', gap: '1.2rem', marginTop: '0.6rem', borderBottom: '1px solid #f1f5f9', fontSize: '0.74rem' }}>
                 {[
-                  { id: 'all', label: 'All Teachers' },
                   { id: 'regular', label: 'Regular Teachers' },
                   { id: 'para', label: 'Para Teachers' },
                   { id: 'subject', label: 'Subject Allocation' },

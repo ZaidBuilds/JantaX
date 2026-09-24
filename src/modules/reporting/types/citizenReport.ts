@@ -23,6 +23,9 @@ export interface EvidenceItem {
   fileSize: string;
   uploadedAt: string;
   moderationStatus: 'Approved' | 'Pending Moderation' | 'Flagged';
+  exifIntegrity?: 'VERIFIED_GEOFENCE' | 'PROXIMITY_WARNING' | 'LOCATION_MISMATCH' | 'NO_EXIF_DATA';
+  gpsCoordinates?: { lat: number; lng: number };
+  distanceMeters?: number;
 }
 
 export interface CitizenReport {

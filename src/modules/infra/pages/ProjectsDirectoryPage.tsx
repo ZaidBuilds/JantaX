@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   Construction, 
@@ -17,12 +17,37 @@ import {
   Layers,
   ArrowRight
 } from 'lucide-react';
-import { getStoredProjects } from '../services/projectService';
+import { getStoredProjects, fetchProjectsForPin } from '../services/projectService';
 import type { InfraProject, NeutralStatus } from '../types/projectInfra';
+import { usePin } from '../../../core/context/PinContext';
 
 export function ProjectsDirectoryPage() {
   const navigate = useNavigate();
-  const [projects] = useState<InfraProject[]>(() => getStoredProjects());
+  const { selectedPin } = usePin();
+
+  // Start from the local fixtures so the page renders immediately, then replace
+  // them with real API records for the active PIN. `isLiveData` drives the
+  // banner so a reader always knows which of the two they are looking at.
+  const [projects, setProjects] = useState<InfraProject[]>(() => getStoredProjects());
+  const [isLiveData, setIsLiveData] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const pin = selectedPin || '110001';
+
+    fetchProjectsForPin(pin).then((rows) => {
+      if (cancelled || rows === null) return; // API unreachable — keep fixtures
+      if (rows.length > 0) {
+        setProjects(rows);
+        setIsLiveData(true);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedPin]);
+
   const [selectedSector, setSelectedSector] = useState<string>('All');
   const [selectedStatus, setSelectedStatus] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -122,6 +147,7 @@ export function ProjectsDirectoryPage() {
             fontSize: '2.1rem',
             fontWeight: 800,
             fontFamily: 'var(--font-heading)',
+            color: '#ffffff',
             lineHeight: 1.25,
             marginBottom: '0.6rem',
             letterSpacing: '-0.02em'
@@ -135,7 +161,30 @@ export function ProjectsDirectoryPage() {
             lineHeight: 1.55,
             marginBottom: '1.5rem'
           }}>
-            Track high-value central & state sector infrastructure projects across India. Neutral, source-linked history linking official tenders, work orders, budgets, extensions, and ground-truth verification.
+            Track high-value central &amp; state sector infrastructure projects across India. Neutral, source-linked history linking official tenders, work orders, budgets, extensions, and ground-truth verification.
+          </p>
+
+          {/* Tell the reader which dataset is on screen. Fixtures and live
+              records look identical otherwise. */}
+          <p
+            role="status"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              margin: '0 0 var(--space-4)',
+              padding: 'var(--space-1) var(--space-3)',
+              borderRadius: 'var(--radius-pill)',
+              background: isLiveData ? 'rgba(255,255,255,0.12)' : 'var(--status-warn-bg)',
+              border: `1px solid ${isLiveData ? 'rgba(255,255,255,0.25)' : 'var(--status-warn-border)'}`,
+              color: isLiveData ? '#e2e8f0' : 'var(--status-warn-text)',
+              fontSize: 'var(--text-caption)',
+              fontWeight: 700,
+            }}
+          >
+            {isLiveData
+              ? `Live records for PIN ${selectedPin || '110001'} — served from the JantaX database`
+              : 'Demonstration data — live records unavailable for this PIN'}
           </p>
 
           {/* Quick Search Input */}

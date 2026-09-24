@@ -243,7 +243,7 @@ export const MOCK_CORRECTIONS_LOG: CorrectionRequest[] = [
     submitterName: 'Shri R.K. Mehta (Legal Counsel)',
     organization: 'Larsen & Toubro Heavy Infrastructure Wing',
     email: 'legal.infra@example.com',
-    entityId: 'cont-lt-infra',
+    entityId: 'cont-meridian-infra',
     claimDetails: 'Challenging penalty order #PEN-44 listing date. Enclosing High Court stay order copy.',
     supportingGazetteUrl: 'https://nhai.gov.in/orders/stay-order-2024.pdf',
     status: 'Accepted & Updated',

@@ -288,3 +288,27 @@ export function verifyResolution(reportId: string, isResolved: boolean, feedback
 
   return updatedTracking;
 }
+
+export function updateReportModeration(
+  reportId: string,
+  state: ModerationState,
+  note?: string
+): CitizenReport | undefined {
+  const reports = getStoredReports();
+  let updatedReport: CitizenReport | undefined;
+
+  const updated = reports.map((r) => {
+    if (r.id === reportId) {
+      updatedReport = {
+        ...r,
+        moderationState: state,
+        description: note ? `${r.description}\n\n[Moderator Note: ${note}]` : r.description
+      };
+      return updatedReport;
+    }
+    return r;
+  });
+
+  saveStoredReports(updated);
+  return updatedReport;
+}

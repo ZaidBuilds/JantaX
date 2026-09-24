@@ -1,60 +1,66 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { api } from '../core/services/api';
 import {
   Search,
   MapPin,
   GraduationCap,
   Construction,
+  Building2,
   HardHat,
   Hospital,
-  Building2,
   Wheat,
   Scale,
   FileText,
-  ChevronRight,
-  RefreshCw,
-  ExternalLink,
-  CheckCircle2,
-  AlertTriangle,
-  Clock,
+  Wind,
+  Landmark,
+  PiggyBank,
+  Share2,
   ArrowRight,
   ShieldCheck,
-  Flame,
-  Droplets,
-  Users,
-  Compass,
+  AlertTriangle,
+  Camera,
+  ChevronRight,
+  Clock,
+  Sparkles,
+  CheckCircle2,
 } from 'lucide-react';
 import { usePinSearch } from '../core/hooks/usePinSearch';
-import { useCatalog } from '../core/hooks/useCatalog';
 import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver';
 import { usePin } from '../core/context/PinContext';
+import { useLanguage } from '../core/context/LanguageContext';
+import { useWhatsAppShare } from '../core/hooks/useWhatsAppShare';
 import { MOCK_CITIZEN_REPORTS } from '../modules/reporting/data/mockReports';
+import HeroBackground from '../components/Antigravity/HeroBackground';
+
+const QUICK_CITIES = [
+  { label: 'Delhi (110001)', pin: '110001' },
+  { label: 'Meerut (250001)', pin: '250001' },
+  { label: 'Bengaluru (560001)', pin: '560001' },
+  { label: 'Mumbai (400001)', pin: '400001' },
+  { label: 'Lucknow (226001)', pin: '226001' },
+  { label: 'Kolkata (700001)', pin: '700001' },
+  { label: 'Chennai (600001)', pin: '600001' },
+  { label: 'Patna (800001)', pin: '800001' },
+  { label: 'Hyderabad (500001)', pin: '500001' },
+];
 
 export function Home() {
   const navigate = useNavigate();
   const { query, search } = usePinSearch();
   const [searchText, setSearchText] = useState('');
-  const { selectedPin, setSelectedPin, detectLocation, isDetecting } = usePin();
+  const { selectedPin, setSelectedPin } = usePin();
+  const { tr } = useLanguage();
+  const { share } = useWhatsAppShare();
 
   const activePin = selectedPin || '110001';
   const resolvedLoc = resolvePincode(activePin);
-  const { records: catalogRecords } = useCatalog();
-
-  const [pinCounts, setPinCounts] = useState({
-    schools: 14,
-    infraProjects: 8,
-    reraProjects: 12,
-    hospitals: 4,
-    pdsShops: 6,
-    grievances: 5,
-    citizenReports: 3,
-  });
-  const [countsLoading, setCountsLoading] = useState(false);
-  const [countsLastUpdated, setCountsLastUpdated] = useState<Date | null>(new Date());
 
   const [reports, setReports] = useState<any[]>(MOCK_CITIZEN_REPORTS.slice(0, 4));
-  const [reportsLoading, setReportsLoading] = useState(false);
+  // True while `reports` holds local demonstration fixtures rather than
+  // moderated records from the API. Must be surfaced in the UI — sample
+  // records are never presented as verified citizen evidence.
+  const [reportsAreSample, setReportsAreSample] = useState(true);
 
   const submitSearch = (value: string) => {
     const trimmed = value.trim();
@@ -67,507 +73,719 @@ export function Home() {
     }
   };
 
-  const loadPinData = useCallback(async () => {
-    if (!activePin) return;
-    let alive = true;
-    setCountsLoading(true);
-    try {
-      const info = await api.getPincode(activePin);
-      if (alive && info?.counts) {
-        setPinCounts({
-          schools: info.counts.schools || 14,
-          infraProjects: info.counts.infraProjects || 8,
-          reraProjects: info.counts.reraProjects || 12,
-          hospitals: info.counts.hospitals || 4,
-          pdsShops: info.counts.pdsShops || 6,
-          grievances: info.counts.grievances || 5,
-          citizenReports: info.counts.citizenReports || 3,
-        });
-        setCountsLastUpdated(new Date());
-      }
-    } catch {
-      // Retain fallback numbers
-    } finally {
-      if (alive) setCountsLoading(false);
-    }
-  }, [activePin]);
-
   const loadReports = useCallback(async () => {
     if (!activePin) return;
-    let alive = true;
-    setReportsLoading(true);
     try {
       const data = await api.getReports(activePin);
-      if (alive && Array.isArray(data) && data.length > 0) {
+      if (Array.isArray(data) && data.length > 0) {
         setReports(data.slice(0, 4));
-      } else {
-        setReports(MOCK_CITIZEN_REPORTS.slice(0, 4));
+        setReportsAreSample(false);
       }
     } catch {
-      setReports(MOCK_CITIZEN_REPORTS.slice(0, 4));
-    } finally {
-      if (alive) setReportsLoading(false);
+      // Source unavailable — keep the demonstration fixtures, but they stay
+      // flagged as sample so they are never shown as verified evidence.
     }
   }, [activePin]);
 
   useEffect(() => {
-    loadPinData();
     loadReports();
-  }, [loadPinData, loadReports]);
-
-  const pinSchools = catalogRecords.filter(
-    (record) => record.moduleId === 'school' && record.location.pinCode === activePin
-  );
-  const pinProjects = catalogRecords.filter(
-    (project) => project.moduleId === 'infra' && project.location.pinCode === activePin
-  );
+  }, [loadReports]);
 
   const sectors = [
     {
       id: 'school',
-      title: 'Schools & Education',
-      count: `${pinCounts.schools} schools`,
-      desc: 'Classroom infrastructure, functional toilets, electricity, and pupil-teacher ratios.',
-      source: 'UDISE+ / Ministry of Education',
+      className: 'sector-school',
+      title: tr('Schools & Education', 'स्कूल एवं शिक्षा'),
+      category: tr('Primary & Secondary Education', 'प्राथमिक एवं माध्यमिक शिक्षा'),
+      tag: tr('UDISE+ Registry Verified', 'UDISE+ सत्यापित'),
+      desc: tr('Classroom infrastructure, functional toilets, pupil-teacher ratios and UDISE+ scores.', 'कक्षा संरचना, शौचालय, छात्र-शिक्षक अनुपात एवं UDISE+ स्कोर।'),
+      source: tr('Ministry of Education / UDISE+', 'शिक्षा मंत्रालय / UDISE+'),
       route: `/schools?pin=${activePin}`,
+      icon: GraduationCap,
+      color: 'var(--sector-school)',
+      bg: 'var(--sector-school-bg)',
     },
     {
       id: 'infra',
-      title: 'Roads & Public Works',
-      count: `${pinCounts.infraProjects} projects`,
-      desc: 'Highway expansions, rural road maintenance, contractor tenders, and completion delays.',
-      source: 'PMGSY / State PWD',
-      route: `/module/infra?pin=${activePin}`,
-    },
-    {
-      id: 'hospital',
-      title: 'Healthcare Centers (PHC/CHC)',
-      count: `${pinCounts.hospitals} centers`,
-      desc: 'Primary health centers, doctor availability, bed counts, and medicine distribution.',
-      source: 'HMIS / MoHFW',
-      route: `/module/hospital?pin=${activePin}`,
+      className: 'sector-infra',
+      title: tr('Roads & Public Works', 'सड़कें और निर्माण कार्य'),
+      category: tr('Physical Infrastructure & PWD', 'सार्वजनिक निर्माण एवं सड़कें'),
+      tag: tr('PMGSY & Highway Tenders', 'PMGSY एवं सड़क निविदाएं'),
+      desc: tr('Rural connectivity, state highways, physical completion percentages vs sanctioned budget.', 'ग्रामीण कनेक्टिविटी, राज्य मार्ग, स्वीकृत बजट बनाम कार्य प्रगति।'),
+      source: tr('PMGSY / State Public Works', 'PMGSY / राज्य लोक निर्माण विभाग'),
+      route: `/projects?pin=${activePin}`,
+      icon: Construction,
+      color: 'var(--sector-infra)',
+      bg: 'var(--sector-infra-bg)',
     },
     {
       id: 'rera',
-      title: 'RERA Housing Projects',
-      count: `${pinCounts.reraProjects} projects`,
-      desc: 'Builder delivery timelines, occupancy certificates, and buyer complaints.',
-      source: 'State RERA Authorities',
-      route: `/module/rera?pin=${activePin}`,
-    },
-    {
-      id: 'ration',
-      title: 'Fair Price Shops (PDS)',
-      count: `${pinCounts.pdsShops} outlets`,
-      desc: 'Food grain allocations, active ration cards, and stock delivery latency.',
-      source: 'NFSA / State Food Dept',
-      route: `/module/ration?pin=${activePin}`,
+      className: 'sector-rera',
+      title: tr('RERA Real Estate', 'रेरा हाउसिंग प्रोजेक्ट्स'),
+      category: tr('Housing & Urban Development', 'आवास एवं शहरी विकास'),
+      tag: tr('Possession Deadlines & Delays', 'पजेशन समय सीमा एवं देरी'),
+      desc: tr('Builder delivery commitments, construction delay tracker, and homebuyer complaints.', 'बिल्डर डिलीवरी वादे, निर्माण देरी ट्रैकर एवं खरीदार शिकायतें।'),
+      source: tr('State RERA Authorities', 'राज्य रेरा प्राधिकरण'),
+      route: `/rera?pin=${activePin}`,
+      icon: Building2,
+      color: 'var(--sector-rera)',
+      bg: 'var(--sector-rera-bg)',
     },
     {
       id: 'contractor',
-      title: 'Contractor Transparency',
-      count: 'Active Ledger',
-      desc: 'Public procurement records, contract values, performance history, and blacklists.',
-      source: 'Central / State Portals',
-      route: `/module/contractor?pin=${activePin}`,
+      className: 'sector-contractor',
+      title: tr('Contractors Accountability', 'ठेकेदार जवाबदेही लेज़र'),
+      category: tr('Public Procurement & Tenders', 'सार्वजनिक खरीद एवं निविदाएं'),
+      tag: tr('Performance & Debarment', 'प्रदर्शन एवं डिबारमेंट रिकॉर्ड'),
+      desc: tr('Contractor tender awards, blacklist records, win rates, and ground completion ratings.', 'ठेकेदार निविदा रिकॉर्ड, ब्लैकलिस्ट स्थिति एवं कार्य निष्पादन रेटिंग।'),
+      source: tr('Central & State Procurement Gazettes', 'केंद्रीय एवं राज्य खरीद रिकॉर्ड'),
+      route: '/contractors',
+      icon: HardHat,
+      color: 'var(--sector-contractor)',
+      bg: 'var(--sector-contractor-bg)',
+    },
+    {
+      id: 'hospital',
+      className: 'sector-hospital',
+      title: tr('Healthcare Facilities', 'अस्पताल व स्वास्थ्य केंद्र'),
+      category: tr('Primary Healthcare & PHC/CHC', 'प्राथमिक स्वास्थ्य एवं अस्पताल'),
+      tag: tr('Doctor Attendance & Beds', 'डॉक्टर उपस्थिति एवं बेड क्षमता'),
+      desc: tr('District hospital capacity, primary health center doctor rosters, and essential medicines.', 'जिला अस्पताल क्षमता, प्राथमिक स्वास्थ्य केंद्र डॉक्टर रोस्टर एवं दवाएं।'),
+      source: tr('HMIS / National Health Mission', 'HMIS / राष्ट्रीय स्वास्थ्य मिशन'),
+      route: `/module/hospital?pin=${activePin}`,
+      icon: Hospital,
+      color: 'var(--sector-hospital)',
+      bg: 'var(--sector-hospital-bg)',
+    },
+    {
+      id: 'ration',
+      className: 'sector-ration',
+      title: tr('Fair Price Shops (PDS)', 'उचित दर राशन दुकान (PDS)'),
+      category: tr('Food Security & NFSA', 'खाद्य सुरक्षा एवं राशन वितरण'),
+      tag: tr('Grain Quotas & Distribution', 'अनाज कोटा एवं वितरण स्थिति'),
+      desc: tr('NFSA grain quotas, active family beneficiaries, monthly distribution compliance rates.', 'राशन कोटा, सक्रिय लाभार्थी परिवार, मासिक वितरण स्थिति।'),
+      source: tr('National Food Security Portal', 'राष्ट्रीय खाद्य सुरक्षा पोर्टल'),
+      route: `/module/ration?pin=${activePin}`,
+      icon: Wheat,
+      color: 'var(--sector-ration)',
+      bg: 'var(--sector-ration-bg)',
     },
     {
       id: 'courts',
-      title: 'Courts & Case Filings (CNR)',
-      count: 'District Courts',
-      desc: 'Case pendency, daily cause lists, disposal rates, and judicial tracking.',
-      source: 'eCourts Services / NJDG',
+      className: 'sector-courts',
+      title: tr('eCourts & Case Filings', 'न्यायालय एवं केस स्टेटस'),
+      category: tr('Judicial Administration', 'न्यायिक प्रशासन एवं वाद'),
+      tag: tr('CNR Case Pendency', 'CNR केस स्थिति एवं सुनवाई'),
+      desc: tr('District court case pendency, hearing schedules, cause lists, and disposal rates.', 'जिला अदालत केस पेंडेंसी, सुनवाई की तारीखें एवं निस्तारण दर।'),
+      source: tr('eCourts Services / NJDG', 'eCourts सेवाएं / NJDG'),
       route: `/module/courts?pin=${activePin}`,
+      icon: Scale,
+      color: 'var(--sector-courts)',
+      bg: 'var(--sector-courts-bg)',
     },
     {
       id: 'rti',
-      title: 'RTI & Public Filings',
-      count: 'CPIO Clock',
-      desc: 'Right to Information appeal response times, draft templates, and disclosures.',
-      source: 'Central Information Commission',
-      route: `/module/rti?pin=${activePin}`,
+      className: 'sector-rti',
+      title: tr('RTI Application Generator', 'सूचना का अधिकार (RTI)'),
+      category: tr('Statutory Rights & CPIO', 'नागरिक अधिकार एवं सीपीएम'),
+      tag: tr('30-Day Response Clock', '30-दिवसीय वैधानिक समय सीमा'),
+      desc: tr('Instant Section 6(1) RTI draft generator, public authority directory, and reply tracker.', 'तुरंत आरटीआई आवेदन ड्राफ्ट, लोक सूचना अधिकारी निर्देशिका एवं ट्रैकर।'),
+      source: tr('Central Information Commission', 'केंद्रीय सूचना आयोग'),
+      route: '/rti',
+      icon: FileText,
+      color: 'var(--sector-rti)',
+      bg: 'var(--sector-rti-bg)',
     },
     {
       id: 'grievance',
-      title: 'Public Grievances (CPGRAMS)',
-      count: `${pinCounts.grievances} tickets`,
-      desc: 'Departmental resolution speed, pending citizen complaints, and disposal latency.',
-      source: 'DARPG / CPGRAMS',
+      className: 'sector-grievance',
+      title: tr('Public Grievances (CPGRAMS)', 'सार्वजनिक शिकायत निवारण'),
+      category: tr('Administrative Resolution', 'प्रशासनिक शिकायत निवारण'),
+      tag: tr('SLA Resolution Tracker', 'विभागीय समाधान समय सीमा'),
+      desc: tr('Central and state departmental resolution timelines, pending days, and escalation ladders.', 'केंद्रीय एवं राज्य विभागीय समाधान समय, पेंडिंग दिन एवं एस्केलेशन।'),
+      source: tr('DARPG / CPGRAMS Portal', 'DARPG / CPGRAMS पोर्टल'),
       route: `/module/grievance?pin=${activePin}`,
+      icon: AlertTriangle,
+      color: 'var(--sector-grievance)',
+      bg: 'var(--sector-grievance-bg)',
     },
     {
       id: 'pollution',
-      title: 'Air Quality & Pollution (AQI)',
-      count: 'Live Stations',
-      desc: 'Real-time particulate matter (PM2.5 / PM10), station sensors, and GRAP stages.',
-      source: 'CPCB / State PCBs',
-      route: `/module/pollution?pin=${activePin}`,
+      className: 'sector-pollution',
+      title: tr('Air Quality & GRAP (AQI)', 'वायु गुणवत्ता एवं प्रदूषण'),
+      category: tr('Environmental Monitoring', 'पर्यावरण एवं वायु निगरानी'),
+      tag: tr('Live PM2.5 / PM10 Sensors', 'लाइव सेंसर निगरानी'),
+      desc: tr('Real-time continuous ambient monitoring, GRAP alert stages, and public health advisories.', 'वास्तविक समय वायु निगरानी, ग्रैप प्रतिबंध चरण एवं स्वास्थ्य परामर्श।'),
+      source: tr('Central Pollution Control Board', 'केंद्रीय प्रदूषण नियंत्रण बोर्ड'),
+      route: '/pollution',
+      icon: Wind,
+      color: 'var(--sector-pollution)',
+      bg: 'var(--sector-pollution-bg)',
     },
     {
       id: 'nagar',
-      title: 'Ward & Municipal Services',
-      count: 'Local Body',
-      desc: 'Sanitation, streetlights, property tax rates, and councillor contact ledger.',
-      source: 'State Urban Dev Depts',
-      route: `/module/nagar?pin=${activePin}`,
+      className: 'sector-nagar',
+      title: tr('Ward & Municipal Services', 'वार्ड एवं नगर निगम सेवाएं'),
+      category: tr('Urban Local Body (ULB)', 'स्थानीय शहरी निकाय'),
+      tag: tr('Sanitation & Complaints', 'सफाई एवं स्थानीय सुविधाएं'),
+      desc: tr('Waste management routes, streetlights, local councillor contacts, and civic complaints.', 'कचरा प्रबंधन मार्ग, स्ट्रीट लाइट, पार्षद संपर्क एवं नागरिक शिकायतें।'),
+      source: tr('State Urban Development Departments', 'राज्य नगर विकास विभाग'),
+      route: '/nagar',
+      icon: Landmark,
+      color: 'var(--sector-nagar)',
+      bg: 'var(--sector-nagar-bg)',
     },
     {
       id: 'mplads',
-      title: 'MPLADS Fund Tracker',
-      count: 'Constituency',
-      desc: 'Parliamentarian fund allocation, recommended works, and unspent balances.',
-      source: 'MoSPI / MPLADS Portal',
-      route: `/module/mplads?pin=${activePin}`,
+      className: 'sector-mplads',
+      title: tr('MPLADS Fund Tracker', 'सांसद निधि (MPLADS)'),
+      category: tr('Parliamentary Fund Audits', 'संसदीय विकास निधि लेखा'),
+      tag: tr('₹5 Crore / Year Allotment', '₹5 करोड़ वार्षिक आवंटन'),
+      desc: tr('Parliamentarian recommended projects, fund releases, completed civil works, and unspent balances.', 'सांसद द्वारा अनुशंसित कार्य, फंड रिलीज, पूर्ण कार्य एवं अप्रयुक्त शेष।'),
+      source: tr('Ministry of Statistics (MoSPI)', 'सांख्यिकी मंत्रालय (MoSPI)'),
+      route: '/mplads',
+      icon: PiggyBank,
+      color: 'var(--sector-mplads)',
+      bg: 'var(--sector-mplads-bg)',
     },
   ];
 
-  return (
-    <div className="home-root">
-      {/* 1. PUBLIC UTILITY SEARCH HERO */}
-      <section className="search-hero">
-        <div className="container">
-          <h1 className="hero-headline">
-            Search Public Records & Civic Data Across India
-          </h1>
-          <p className="hero-subhead">
-            Open government data on schools, healthcare, roads, RERA housing, and public works by PIN code, district, or project name.
-          </p>
+  const handleShareSample = () => {
+    share({
+      pinCode: activePin,
+      titleHindi: `जनताएक्स जमीनी रिपोर्ट: पिन कोड ${activePin}`,
+      titleEnglish: `JantaX Ground Reality Report: PIN ${activePin}`,
+      claimLabel: 'Official Claim',
+      claimLabelHindi: 'सरकारी दावा: 100% कार्य पूर्ण',
+      realityLabel: 'Ground Reality',
+      realityLabelHindi: 'जमीनी हकीकत: 18 महीने से विलंबित',
+      responsiblePerson: 'District Administration',
+      responsibleOrg: 'Public Works Department',
+      sourceUrl: `https://jantax.in/pin/${activePin}`,
+      moduleNameHindi: 'दावा बनाम हकीकत (JantaX Reality Check)',
+    });
+  };
 
-          {/* Clean Search Form */}
-          <form
-            className="main-search-form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              submitSearch(searchText || query);
-            }}
-          >
-            <div className="search-input-wrapper">
-              <Search size={18} className="search-icon-inside" />
-              <input
-                type="text"
-                aria-label="Search by PIN Code, school, hospital, contractor or project"
-                placeholder="Enter 6-digit PIN Code (e.g. 110001), school, hospital, or contractor name..."
-                value={searchText || query}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setSearchText(val);
-                  if (/^\d{0,6}$/.test(val)) search(val);
-                }}
-                className="search-input-main"
-              />
+  return (
+    <div style={{ paddingBottom: '3rem' }}>
+      {/* 1. PUBLIC CIVIC SEARCH HERO */}
+      <section className="search-hero">
+        <HeroBackground />
+        <div className="container">
+          <div className="hero-content">
+            {/* Live Status Pill */}
+            <div className="hero-pill-badge">
+              <span className="hero-pill-dot"></span>
+              {/* Claim must stay checkable: we publish open government data and
+                  show the source for every record. We do not claim to be
+                  government-verified — JantaX is not an official portal. */}
+              <span>{tr('Open government data · Source shown for every record', 'सरकारी ओपन डेटा · हर रिकॉर्ड का स्रोत दिखाया गया')}</span>
             </div>
 
-            <button type="submit" className="search-submit-btn">
-              Search Records
-            </button>
-          </form>
+            <h1 className="hero-headline">
+              {tr('India, Explained by', 'भारत, आपके स्थान से')}{' '}
+              <br />
+              <span style={{ color: 'var(--navy-600)' }}>{tr('Where You Live.', 'सच्चाई समझें।')}</span>
+            </h1>
 
-          {/* Example lookups */}
-          <div className="search-examples">
-            <span>Examples:</span>
-            {[
-              { label: 'Delhi (110001)', pin: '110001' },
-              { label: 'Bengaluru (560001)', pin: '560001' },
-              { label: 'Mumbai (400001)', pin: '400001' },
-              { label: 'Lucknow (226001)', pin: '226001' },
-              { label: 'Patna (800001)', pin: '800001' },
-              { label: 'Hyderabad (500001)', pin: '500001' },
-            ].map((ex) => (
-              <button
-                key={ex.pin}
-                type="button"
-                className="search-example-link"
-                onClick={() => {
-                  setSearchText(ex.pin);
-                  submitSearch(ex.pin);
-                }}
-              >
-                {ex.label}
+            <p className="hero-subhead">
+              {tr(
+                'Search public records on schools, healthcare, roads, RERA housing, and government tenders across any Indian PIN code or district.',
+                'किसी भी भारतीय पिन कोड या जिले के स्कूलों, स्वास्थ्य केंद्रों, सड़कों और हाउसिंग प्रोजेक्ट्स के सरकारी रिकॉर्ड देखें।'
+              )}
+            </p>
+
+            {/* Elevated Command Search Bar */}
+            <form
+              className="main-search-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                submitSearch(searchText || query);
+              }}
+            >
+              <div className="search-input-wrapper">
+                <Search size={22} className="search-icon-inside" />
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="postal-code"
+                  aria-label="Enter 6-digit Indian PIN Code or search topic"
+                  placeholder={tr('Enter any 6-digit PIN (e.g. 110001, 682001, 302001)...', 'कोई भी 6 अंकों का पिन कोड दर्ज करें (उदा. 110001, 682001)...')}
+                  value={searchText || query}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSearchText(val);
+                    if (/^\d{0,6}$/.test(val)) search(val);
+                  }}
+                  className="search-input-main"
+                />
+              </div>
+
+              <button type="submit" className="search-submit-btn">
+                <span>{tr('Search Records', 'रिकॉर्ड खोजें')}</span>
+                <ArrowRight size={18} />
               </button>
-            ))}
+            </form>
+
+            {/* Quick Cities Pill Carousel */}
+            <div className="search-examples">
+              <span className="search-examples-label">{tr('Quick Cities:', 'प्रमुख शहर:')}</span>
+              {QUICK_CITIES.map((c) => (
+                <button
+                  key={c.pin}
+                  type="button"
+                  className="search-example-link"
+                  onClick={() => {
+                    setSearchText(c.pin);
+                    setSelectedPin(c.pin);
+                    navigate(`/pin/${c.pin}`);
+                  }}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Live Ticker Strip */}
+            <div className="live-stream-ticker">
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--emerald-500)', display: 'inline-block' }}></span>
+              {/* Name the sources we draw on, without claiming every one is
+                  live nationwide. Per-module status is shown on each module. */}
+              <span>{tr('Sources include UDISE+ · PMGSY · RERA · NHM · NFSA · CPGRAMS', 'स्रोतों में शामिल हैं: UDISE+ · PMGSY · RERA · NHM · NFSA · CPGRAMS')}</span>
+            </div>
           </div>
         </div>
       </section>
 
-      <main className="container" id="main">
-        {/* 2. LOCAL AREA INTELLIGENCE SUMMARY TABLE */}
-        <section className="data-summary-box">
-          <div className="data-summary-header">
-            <div className="data-summary-title">
-              <span>Official Records for PIN</span>
-              <span className="pin-code-badge">{activePin}</span>
-              {resolvedLoc.isValid && (
-                <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
-                  ({resolvedLoc.district}, {resolvedLoc.state})
-                </span>
-              )}
-            </div>
-
-            <div className="data-summary-actions">
-              {countsLastUpdated && (
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  Data refreshed: {countsLastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </span>
-              )}
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={loadPinData}
-                disabled={countsLoading}
-                title="Refresh latest data"
-              >
-                <RefreshCw size={13} className={countsLoading ? 'animate-spin' : ''} />
-                <span>Refresh</span>
-              </button>
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={() => {
-                  const p = prompt('Enter 6-digit Indian PIN Code:', activePin);
-                  if (p && isValidIndianPincode(p)) setSelectedPin(p);
+      {/* Main Content Area */}
+      <main className="container" id="main" style={{ marginTop: '2.5rem' }}>
+        {/* 2. ACTIVE LOCALITY FACILITY SPOTLIGHT (REPLACES BARE NUMBERS) */}
+        <section
+          style={{
+            background: '#ffffff',
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--radius-xl)',
+            padding: '1.75rem',
+            boxShadow: 'var(--shadow-card)',
+            marginBottom: '2.75rem',
+          }}
+        >
+          {/* Header of Active Locality */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--navy-50)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--navy-600)',
                 }}
               >
-                Change PIN
-              </button>
+                <MapPin size={24} />
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+                    {tr('Active Locality', 'सक्रिय क्षेत्र')}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontWeight: 800,
+                      fontSize: '0.88rem',
+                      background: 'var(--navy-900)',
+                      color: '#ffffff',
+                      padding: '0.1rem 0.55rem',
+                      borderRadius: 'var(--radius-sm)',
+                    }}
+                  >
+                    {activePin}
+                  </span>
+                </div>
+                <h2 style={{ fontSize: '1.35rem', color: 'var(--navy-950)', margin: '0.15rem 0 0' }}>
+                  {resolvedLoc.district}, {resolvedLoc.state}
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 500, marginLeft: '0.5rem' }}>
+                    ({resolvedLoc.region} India)
+                  </span>
+                </h2>
+              </div>
             </div>
+
+            <Link to={`/pin/${activePin}`} className="btn btn-primary" style={{ padding: '0.55rem 1.15rem' }}>
+              <span>{tr('View Complete Locality Scorecard', 'संपूर्ण क्षेत्र रिपोर्ट कार्ड देखें')}</span>
+              <ArrowRight size={15} />
+            </Link>
           </div>
 
-          <div className="data-table-wrap" style={{ border: 'none', borderRadius: 0 }}>
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th style={{ width: '28%' }}>Sector / Category</th>
-                  <th style={{ width: '18%' }}>Recorded Count</th>
-                  <th style={{ width: '32%' }}>Official Source</th>
-                  <th style={{ width: '22%' }}>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <strong>Government Schools</strong>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Classrooms, toilets & PTR</div>
-                  </td>
-                  <td>
-                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.schools}</span>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> schools</span>
-                  </td>
-                  <td>
-                    <span className="source-tag">
-                      <strong>UDISE+</strong> • Ministry of Education
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      className="source-link"
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                      onClick={() => navigate(`/schools?pin=${activePin}`)}
-                    >
-                      View schools →
-                    </button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <strong>Roads & Public Works</strong>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Maintenance & highway tenders</div>
-                  </td>
-                  <td>
-                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.infraProjects}</span>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> projects</span>
-                  </td>
-                  <td>
-                    <span className="source-tag">
-                      <strong>PMGSY / PWD</strong> • MoRD
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      className="source-link"
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                      onClick={() => navigate(`/module/infra?pin=${activePin}`)}
-                    >
-                      View works →
-                    </button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <strong>Healthcare Centers (PHC)</strong>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Primary health clinic status</div>
-                  </td>
-                  <td>
-                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.hospitals}</span>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> facilities</span>
-                  </td>
-                  <td>
-                    <span className="source-tag">
-                      <strong>HMIS</strong> • MoHFW
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      className="source-link"
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                      onClick={() => navigate(`/module/hospital?pin=${activePin}`)}
-                    >
-                      View centers →
-                    </button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <strong>RERA Registered Housing</strong>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Builder delivery & delays</div>
-                  </td>
-                  <td>
-                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.reraProjects}</span>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> projects</span>
-                  </td>
-                  <td>
-                    <span className="source-tag">
-                      <strong>State RERA</strong> • Housing Ministry
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      className="source-link"
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                      onClick={() => navigate(`/module/rera?pin=${activePin}`)}
-                    >
-                      View housing →
-                    </button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <strong>Fair Price Shops (PDS)</strong>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Ration distribution outlets</div>
-                  </td>
-                  <td>
-                    <span style={{ fontWeight: 700 }}>{countsLoading ? '...' : pinCounts.pdsShops}</span>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}> outlets</span>
-                  </td>
-                  <td>
-                    <span className="source-tag">
-                      <strong>NFSA</strong> • Dept of Food & Public Distribution
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      className="source-link"
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                      onClick={() => navigate(`/module/ration?pin=${activePin}`)}
-                    >
-                      View PDS →
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        {/* 3. EXPLORE ALL SECTORS DIRECTORY */}
-        <section className="section-block">
-          <h2 className="section-title">Explore Public Data by Sector</h2>
-          <p className="section-description">
-            Search and verify official databases across national and state public utilities.
+          {/*
+            Illustrative spotlight cards. The figures below are fixed example
+            content used to show the layout — they are NOT read from the API
+            and do not describe the active PIN. They must stay clearly
+            labelled until they are wired to /api/pincode/:code.
+          */}
+          <p
+            role="note"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              margin: '0 0 var(--space-3)',
+              padding: 'var(--space-1) var(--space-3)',
+              borderRadius: 'var(--radius-pill)',
+              background: 'var(--status-warn-bg)',
+              border: '1px solid var(--status-warn-border)',
+              color: 'var(--status-warn-text)',
+              fontSize: 'var(--text-caption)',
+              fontWeight: 700,
+            }}
+          >
+            <AlertTriangle size={13} aria-hidden="true" />
+            {tr(
+              'Illustrative example — not live data for this PIN',
+              'उदाहरण मात्र — इस पिन का वास्तविक डेटा नहीं'
+            )}
           </p>
 
-          <div className="sector-list-grid">
-            {sectors.map((sec) => (
-              <div
-                key={sec.id}
-                className="sector-item-card"
-                onClick={() => navigate(sec.route)}
-                role="button"
-                tabIndex={0}
-              >
-                <div className="sector-item-top">
-                  <span className="sector-item-title">{sec.title}</span>
-                  <span className="sector-item-count">{sec.count}</span>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+            {/* School Spotlight */}
+            <div style={{ background: 'var(--bg-subtle)', borderRadius: 'var(--radius-lg)', padding: '1rem', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--sector-school)', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                  <GraduationCap size={15} />
+                  <span>{tr('Education Benchmark', 'शिक्षा मानक')}</span>
                 </div>
-                <p className="sector-item-desc">{sec.desc}</p>
-                <div className="sector-item-source">
-                  <span>Source: {sec.source}</span>
-                  <span style={{ color: 'var(--color-accent)', fontWeight: 600 }}>Explore →</span>
+                <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--navy-950)', marginBottom: '0.2rem' }}>
+                  Kendriya Vidyalaya & Govt Schools
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                  100% functional sanitation · 24:1 pupil-teacher ratio · UDISE+ audited
                 </div>
               </div>
-            ))}
+              <div style={{ marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem' }}>
+                <span style={{ color: 'var(--text-muted)', fontWeight: 700 }}>{tr('Example', 'उदाहरण')}</span>
+                <Link to={`/schools?pin=${activePin}`} style={{ color: 'var(--navy-600)', fontWeight: 700 }}>Inspect ↗</Link>
+              </div>
+            </div>
+
+            {/* Public Works Spotlight */}
+            <div style={{ background: 'var(--bg-subtle)', borderRadius: 'var(--radius-lg)', padding: '1rem', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--sector-infra)', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                  <Construction size={15} />
+                  <span>{tr('Public Infrastructure', 'सार्वजनिक निर्माण')}</span>
+                </div>
+                <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--navy-950)', marginBottom: '0.2rem' }}>
+                  PMGSY Road & Drainage Network
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                  ₹14.8 Cr sanctioned budget · 68% progress · 14 mo. average delay
+                </div>
+              </div>
+              <div style={{ marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem' }}>
+                <span style={{ color: 'var(--text-muted)', fontWeight: 700 }}>{tr('Example', 'उदाहरण')}</span>
+                <Link to={`/projects?pin=${activePin}`} style={{ color: 'var(--navy-600)', fontWeight: 700 }}>Inspect ↗</Link>
+              </div>
+            </div>
+
+            {/* Healthcare Spotlight */}
+            <div style={{ background: 'var(--bg-subtle)', borderRadius: 'var(--radius-lg)', padding: '1rem', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--sector-hospital)', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                  <Hospital size={15} />
+                  <span>{tr('Healthcare Access', 'स्वास्थ्य सुविधाएं')}</span>
+                </div>
+                <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--navy-950)', marginBottom: '0.2rem' }}>
+                  District Hospital & CHC Health Unit
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                  24x7 emergency duty verified · 200 sanctioned beds · HMIS registered
+                </div>
+              </div>
+              <div style={{ marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem' }}>
+                <span style={{ color: 'var(--text-muted)', fontWeight: 700 }}>{tr('Example', 'उदाहरण')}</span>
+                <Link to={`/module/hospital?pin=${activePin}`} style={{ color: 'var(--navy-600)', fontWeight: 700 }}>Inspect ↗</Link>
+              </div>
+            </div>
+
+            {/* RERA Spotlight */}
+            <div style={{ background: 'var(--bg-subtle)', borderRadius: 'var(--radius-lg)', padding: '1rem', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--sector-rera)', fontWeight: 700, fontSize: '0.75rem', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+                  <Building2 size={15} />
+                  <span>{tr('Housing Accountability', 'हाउसिंग जवाबदेही')}</span>
+                </div>
+                <div style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--navy-950)', marginBottom: '0.2rem' }}>
+                  RERA Registered Residential Projects
+                </div>
+                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                  2,730 housing units tracked · Delivery timelines & buyer complaints
+                </div>
+              </div>
+              <div style={{ marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(0,0,0,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem' }}>
+                <span style={{ color: 'var(--text-muted)', fontWeight: 700 }}>{tr('Example', 'उदाहरण')}</span>
+                <Link to={`/rera?pin=${activePin}`} style={{ color: 'var(--navy-600)', fontWeight: 700 }}>Inspect ↗</Link>
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* 4. RECENT CITIZEN GROUND-TRUTH REPORTS */}
-        <section className="section-block">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+        {/* 3. BENTO GRID SECTOR OBSERVATORIES */}
+        <section style={{ marginBottom: '3.5rem' }}>
+          <div className="section-header-block">
             <div>
-              <h2 className="section-title">Recent Ground-Truth Entries</h2>
-              <p className="section-description" style={{ marginBottom: 0 }}>
-                Citizen-submitted photo verifications and infrastructure audit records.
+              <h2 className="section-title">{tr('Public Observatories', 'नागरिक वेधशाला')}</h2>
+              <p className="section-desc">
+                {tr(
+                  'Select any sector below to inspect official government claims side-by-side with ground realities.',
+                  'किसी भी विभाग के आधिकारिक दावों और वास्तविक स्थिति की तुलना देखने के लिए नीचे चुनें।'
+                )}
+              </p>
+            </div>
+            <Link to={`/pin/${activePin}`} style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--navy-600)', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+              <span>{tr('View Complete Locality Map', 'संपूर्ण क्षेत्र मानचित्र देखें')}</span>
+              <ChevronRight size={16} />
+            </Link>
+          </div>
+
+          <div className="bento-grid">
+            {sectors.map((s) => {
+              const Icon = s.icon;
+              return (
+                <Link key={s.id} to={s.route} className={`bento-card ${s.className}`}>
+                  <div>
+                    <div className="bento-card-top">
+                      <div className="bento-icon-halo" style={{ background: s.bg, color: s.color }}>
+                        <Icon size={24} />
+                      </div>
+                      <span className="bento-count-badge">{s.tag}</span>
+                    </div>
+
+                    <h3 className="bento-title">
+                      <span>{s.title}</span>
+                    </h3>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '0.65rem' }}>
+                      {s.category}
+                    </div>
+
+                    <p className="bento-desc">{s.desc}</p>
+                  </div>
+
+                  <div className="bento-footer">
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>{s.source}</span>
+                    <span className="bento-explore-arrow">
+                      <span>{tr('Inspect', 'जांचें')}</span>
+                      <ChevronRight size={14} />
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* 4. CLAIM VS REALITY SHOWCASE */}
+        <section className="claim-reality-container">
+          <div className="claim-reality-header">
+            <div>
+              <h2>
+                <Sparkles size={22} style={{ color: 'var(--saffron-400)' }} />
+                <span>{tr('Claim vs Ground Reality', 'दावा बनाम हकीकत')}</span>
+              </h2>
+              <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: '0.2rem 0 0' }}>
+                {tr(
+                  'How JantaX presents an official record next to corroborated ground observations. Worked example — the figures below are illustrative, not a real case.',
+                  'JantaX आधिकारिक रिकॉर्ड और जमीनी टिप्पणियों को साथ-साथ कैसे दिखाता है। यह एक उदाहरण है, वास्तविक मामला नहीं।'
+                )}
               </p>
             </div>
             <button
               type="button"
-              className="btn btn-secondary btn-sm"
-              onClick={() => navigate('/reports')}
+              onClick={handleShareSample}
+              className="btn btn-whatsapp"
+              style={{ fontSize: '0.85rem', padding: '0.5rem 1rem' }}
             >
-              View all reports →
+              <Share2 size={16} />
+              <span>{tr('Share on WhatsApp', 'व्हाट्सएप पर साझा करें')}</span>
             </button>
           </div>
 
-          <div className="evidence-list">
-            {reports.map((rep) => (
-              <div
-                key={rep.id}
-                className="evidence-row"
-                onClick={() => navigate(`/reports/${rep.id}`)}
-                style={{ cursor: 'pointer' }}
-              >
-                <div className="evidence-main">
-                  <div className="evidence-title">
-                    {rep.title || rep.description.slice(0, 80)}
-                  </div>
-                  <div className="evidence-meta">
-                    <span>Category: {rep.category || rep.module}</span>
-                    <span>•</span>
-                    <span>PIN {rep.location?.pinCode || rep.pincode || activePin}</span>
-                    <span>•</span>
-                    <span>{new Date(rep.createdAt).toLocaleDateString()}</span>
-                  </div>
-                </div>
-                <span className="badge-status official">
-                  {rep.moderationState || rep.status || 'Verified'}
-                </span>
+          <div className="claim-reality-grid">
+            {/* Left: Official Claim */}
+            <div className="claim-panel">
+              <div className="panel-kicker">{tr('Official Claim', 'सरकारी दावा')}</div>
+              <h3 className="panel-headline">{tr('PMGSY Rural Road & Drain Package', 'प्रधानमंत्री ग्राम सड़क योजना कार्य')}</h3>
+              <div className="panel-metric-huge">{tr('100% Completed', '100% पूर्ण घोषित')}</div>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                {tr(
+                  'Official State PWD dashboard records the 4.8 km connecting road and stormwater drainage work as 100% physically complete with full fund disbursement.',
+                  'राज्य लोक निर्माण विभाग के अनुसार 4.8 किमी सड़क और जल निकासी कार्य 100% पूरा व भुगतान स्वीकृत है।'
+                )}
+              </p>
+              {/* Illustrative only. Never print a specific tender reference or
+                  claim portal verification unless it resolves to a real record. */}
+              <div className="panel-citation">
+                <strong>{tr('Source type:', 'स्रोत प्रकार:')}</strong>{' '}
+                {tr(
+                  'State public works portal — example, no real tender referenced',
+                  'राज्य लोक निर्माण पोर्टल — उदाहरण, कोई वास्तविक निविदा संदर्भित नहीं'
+                )}
               </div>
-            ))}
+            </div>
+
+            {/* Right: Ground Reality */}
+            <div className="reality-panel">
+              <div className="panel-kicker">{tr('Ground Reality', 'जमीनी हकीकत')}</div>
+              <h3 className="panel-headline">{tr('Audit Finding & Citizen Observations', 'ऑडिट निष्कर्ष एवं नागरिक टिप्पणियाँ')}</h3>
+              <div className="panel-metric-huge">{tr('18 Months Delayed', '18 महीने से विलंबित')}</div>
+              {/* Illustrative. Do NOT cite a specific CAG paragraph number —
+                  a fabricated citation of a real audit body is indefensible. */}
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                {tr(
+                  'In this example, a state audit report records 40% physical completion with missing culverts, while several corroborating citizen photo reports show open waterlogged ditches.',
+                  'इस उदाहरण में, राज्य ऑडिट रिपोर्ट 40% वास्तविक कार्य दर्ज करती है, जबकि कई नागरिक फोटो रिपोर्टों में खुला जलभराव दिखता है।'
+                )}
+              </p>
+              <div className="panel-citation">
+                <strong>{tr('Evidence type:', 'साक्ष्य प्रकार:')}</strong>{' '}
+                {tr(
+                  'State performance audit + geotagged citizen reports — example, no real audit cited',
+                  'राज्य ऑडिट एवं जियोटैग नागरिक रिपोर्ट — उदाहरण, कोई वास्तविक ऑडिट संदर्भित नहीं'
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="claim-reality-footer">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+              <ShieldCheck size={16} style={{ color: 'var(--emerald-600)' }} />
+              <span>{tr('Non-partisan presentation · Cites public documents & verified EXIF-stripped citizen submissions', 'गैर-पक्षपाती प्रस्तुति · केवल सार्वजनिक दस्तावेज एवं सत्यापित नागरिक साक्ष्य')}</span>
+            </div>
+
+            <Link to="/report-issue" className="btn btn-secondary" style={{ fontSize: '0.85rem' }}>
+              <Camera size={16} />
+              <span>{tr('Submit Local Evidence', 'स्थानीय साक्ष्य दर्ज करें')}</span>
+            </Link>
           </div>
         </section>
 
-        {/* 5. NOTICE & CORRECTIONS CALLOUT */}
-        <section className="notice-box">
-          <div className="notice-text">
-            <strong>Found a discrepancy in official government records?</strong>
-            <p style={{ marginTop: '0.2rem', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
-              Citizens can submit timestamped photo evidence to corroborate or dispute local school facilities, road quality, or clinic operations.
-            </p>
+        {/* 5. RECENT CITIZEN EVIDENCE STREAM */}
+        <section>
+          <div className="section-header-block">
+            <div>
+              <h2 className="section-title">
+                {reportsAreSample
+                  ? tr('Citizen Evidence Stream', 'नागरिक साक्ष्य स्ट्रीम')
+                  : tr('Live Citizen Evidence Stream', 'लाइव नागरिक साक्ष्य स्ट्रीम')}
+              </h2>
+              <p className="section-desc">
+                {reportsAreSample
+                  ? tr(
+                      'Sample records shown for demonstration — the live moderation feed is unavailable right now.',
+                      'प्रदर्शन हेतु नमूना रिकॉर्ड — लाइव मॉडरेशन फ़ीड अभी उपलब्ध नहीं है।'
+                    )
+                  : tr(
+                      'Latest ground verification photos submitted by citizens across India, reviewed by moderation.',
+                      'भारत भर के नागरिकों द्वारा भेजे गए जमीनी सत्यापन चित्र, मॉडरेशन द्वारा सत्यापित।'
+                    )}
+              </p>
+              {reportsAreSample && (
+                <p
+                  role="status"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    marginTop: '0.5rem',
+                    padding: '0.25rem 0.6rem',
+                    borderRadius: 'var(--radius-pill)',
+                    background: 'var(--saffron-50)',
+                    border: '1px solid var(--saffron-100)',
+                    color: 'var(--saffron-600)',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                  }}
+                >
+                  <AlertTriangle size={13} aria-hidden="true" />
+                  {tr('Sample data — not citizen-verified', 'नमूना डेटा — नागरिक-सत्यापित नहीं')}
+                </p>
+              )}
+            </div>
+            <Link to="/reports" style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--navy-600)', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+              <span>{tr('View All Citizen Reports', 'सभी नागरिक रिपोर्टें देखें')}</span>
+              <ChevronRight size={16} />
+            </Link>
           </div>
-          <button
-            type="button"
-            className="btn btn-primary btn-sm"
-            onClick={() => navigate('/report-issue')}
-          >
-            Submit Ground Evidence
-          </button>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.25rem' }}>
+            {reports.map((rep, idx) => (
+              <div
+                key={rep.id || idx}
+                style={{
+                  background: '#ffffff',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '1.25rem',
+                  boxShadow: 'var(--shadow-card)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '0.75rem',
+                        fontWeight: 700,
+                        background: 'var(--bg-subtle)',
+                        padding: '0.2rem 0.5rem',
+                        borderRadius: 'var(--radius-sm)',
+                        color: 'var(--navy-700)',
+                      }}
+                    >
+                      PIN {rep.pinCode || activePin}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: '0.72rem',
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        color: !reportsAreSample && rep.status === 'VERIFIED' ? 'var(--emerald-700)' : 'var(--saffron-600)',
+                        background: !reportsAreSample && rep.status === 'VERIFIED' ? 'var(--emerald-50)' : 'var(--saffron-50)',
+                        padding: '0.2rem 0.5rem',
+                        borderRadius: 'var(--radius-pill)',
+                      }}
+                    >
+                      {reportsAreSample ? tr('SAMPLE', 'नमूना') : rep.status || 'UNVERIFIED'}
+                    </span>
+                  </div>
+
+                  <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--navy-950)', marginBottom: '0.4rem' }}>
+                    {rep.title || 'Ground Inspection Report'}
+                  </h4>
+
+                  <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '0.85rem' }}>
+                    {rep.description?.substring(0, 110)}...
+                  </p>
+                </div>
+
+                <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '0.6rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <Clock size={13} />
+                    <span>{new Date(rep.createdAt || Date.now()).toLocaleDateString()}</span>
+                  </span>
+                  <Link to={`/reports/${rep.id}`} style={{ fontWeight: 700, color: 'var(--navy-600)' }}>
+                    {tr('Details', 'विवरण')} ↗
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
       </main>
     </div>

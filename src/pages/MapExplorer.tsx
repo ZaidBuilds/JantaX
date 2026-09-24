@@ -33,6 +33,7 @@ import { resolvePincode } from '../core/utils/pinResolver';
 import { getAllWorks } from '../modules/mplads/services/mpladsService';
 import { getAllBooths } from '../modules/booth/services/boothService';
 import { getAllCourts } from '../modules/courts/services/courtsService';
+import { MOCK_CITIZEN_REPORTS } from '../modules/reporting/data/mockReports';
 import { TransparencyDisclaimer } from '../modules/transparency/components/TransparencyDisclaimer';
 import { SkeletonCard } from '../components/data-states';
 
@@ -135,9 +136,9 @@ export function MapExplorer() {
 
       const mod = r.moduleId as 'school' | 'infra' | 'rera' | 'hospital';
       const routeMap: Record<string, string> = {
-        school: `/schools?pin=${pin}&id=${r.id}`,
-        infra: `/module/infra?pin=${pin}&id=${r.id}`,
-        rera: `/rera/projects/${r.id}`,
+        school: `/schools/profile/${r.id}`,
+        infra: `/projects/${r.id}`,
+        rera: `/rera/project/${r.id}`,
         hospital: `/module/hospital?pin=${pin}&id=${r.id}`,
       };
 
@@ -176,7 +177,7 @@ export function MapExplorer() {
         pinCode: w.pinCode,
         lat: baseCoords.lat + offsetLat,
         lng: baseCoords.lng + offsetLng,
-        routeUrl: `/mplads/projects/${w.id}`,
+        routeUrl: `/mplads/project/${w.id}`,
         keyMetricLabel: 'Sanctioned Cost',
         keyMetricValue: `₹${w.sanctionCostLakhs} Lakhs`,
         badgeColor: LAYER_COLORS.mplads,
@@ -199,7 +200,7 @@ export function MapExplorer() {
         pinCode: b.pinCode,
         lat: baseCoords.lat + offsetLat,
         lng: baseCoords.lng + offsetLng,
-        routeUrl: `/booth/${b.id}`,
+        routeUrl: `/nagar/ward/${b.id}`,
         keyMetricLabel: 'Electors',
         keyMetricValue: `${b.totalElectors} Voters`,
         badgeColor: LAYER_COLORS.booth,
@@ -222,10 +223,35 @@ export function MapExplorer() {
         pinCode: c.pinCode,
         lat: baseCoords.lat + offsetLat,
         lng: baseCoords.lng + offsetLng,
-        routeUrl: `/courts/${c.id}`,
+        routeUrl: `/entity/organization/${c.id}`,
         keyMetricLabel: 'Case Pendency',
         keyMetricValue: `${c.totalPendingCases.toLocaleString('en-IN')} Cases`,
         badgeColor: LAYER_COLORS.court,
+      });
+    });
+
+    // 5. Citizen Reported Issues & Ground Truth Observations
+    MOCK_CITIZEN_REPORTS.forEach((rep, idx) => {
+      const isLocal = rep.location.pinCode === activePin;
+      const offsetLat = (idx % 3 - 1) * 0.0055;
+      const offsetLng = ((idx + 1) % 3 - 1) * 0.0055;
+      const repLat = isLocal && rep.location.lat ? rep.location.lat : baseCoords.lat + offsetLat;
+      const repLng = isLocal && rep.location.lng ? rep.location.lng : baseCoords.lng + offsetLng;
+
+      list.push({
+        id: rep.id,
+        moduleId: 'issue',
+        layerName: 'CITIZEN REPORT',
+        title: rep.title,
+        subtitle: `${rep.category} · ${rep.location.landmark || rep.location.district}`,
+        status: rep.moderationState,
+        pinCode: rep.location.pinCode,
+        lat: repLat,
+        lng: repLng,
+        routeUrl: `/reports/${rep.id}`,
+        keyMetricLabel: 'Community Corroboration',
+        keyMetricValue: `${rep.upvotes || 12} Verified Signals`,
+        badgeColor: LAYER_COLORS.issue,
       });
     });
 

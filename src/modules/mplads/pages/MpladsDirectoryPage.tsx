@@ -63,7 +63,7 @@ export function MpladsDirectoryPage() {
           </span>
         </div>
 
-        <h1 style={{ fontSize: '2.1rem', fontWeight: 800, fontFamily: 'var(--font-heading)', margin: '0 0 0.6rem' }}>
+        <h1 style={{ fontSize: '2.1rem', fontWeight: 800, fontFamily: 'var(--font-heading)', color: '#ffffff', margin: '0 0 0.6rem' }}>
           MP & MLA Local Development Fund Scorecard
         </h1>
         <p style={{ fontSize: '0.96rem', color: '#e2e8f0', maxWidth: 840, lineHeight: 1.55, marginBottom: '1.5rem' }}>

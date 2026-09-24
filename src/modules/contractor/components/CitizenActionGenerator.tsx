@@ -64,12 +64,27 @@ export const CitizenActionGenerator: React.FC<CitizenActionGeneratorProps> = ({
         }),
       });
 
+      // `/api/ai/generate-action` is not implemented on this server (it came
+      // from the reference project this module was ported from). Say so plainly
+      // rather than leaving the button silently doing nothing — and never emit
+      // a half-written legal document the citizen might file.
+      if (!res.ok) {
+        setDocumentContent(
+          'Document generation is not available yet — this service is not connected.\n\n' +
+            'You can still file directly with the authority through the official channel: https://pgportal.gov.in'
+        );
+        return;
+      }
+
       const data = await res.json();
       if (data.documentText) {
         setDocumentContent(data.documentText);
       }
-    } catch (err) {
-      console.error('Error generating document:', err);
+    } catch {
+      setDocumentContent(
+        'Document generation is not available yet — this service is not connected.\n\n' +
+          'You can still file directly with the authority through the official channel: https://pgportal.gov.in'
+      );
     } finally {
       setIsLoading(false);
     }
