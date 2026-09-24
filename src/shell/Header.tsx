@@ -79,8 +79,8 @@ export function Header() {
       title: tr('Around you', 'आपके आसपास'),
       items: [
         { name: tr('Schools & Education', 'स्कूल एवं शिक्षा'), path: `/schools?pin=${selectedPin}`, icon: GraduationCap },
-        { name: tr('Healthcare & Hospitals', 'अस्पताल व स्वास्थ्य केंद्र'), path: `/module/hospital?pin=${selectedPin}`, icon: Hospital },
-        { name: tr('Ration Shops (PDS)', 'राशन दुकानें'), path: `/module/pds?pin=${selectedPin}`, icon: Wheat },
+        { name: tr('Healthcare & Hospitals', 'अस्पताल व स्वास्थ्य केंद्र'), path: `/hospitals?pin=${selectedPin}`, icon: Hospital },
+        { name: tr('Ration Shops (PDS)', 'राशन दुकानें'), path: `/ration?pin=${selectedPin}`, icon: Wheat },
         { name: tr('Air Quality (AQI)', 'वायु गुणवत्ता'), path: '/pollution', icon: Wind },
       ],
     },
@@ -90,6 +90,7 @@ export function Header() {
         { name: tr('Public Works & Roads', 'सड़कें और निर्माण कार्य'), path: `/projects?pin=${selectedPin}`, icon: Construction },
         { name: tr('Contractors', 'ठेकेदार'), path: '/contractors', icon: HardHat },
         { name: tr('MP / MLA Funds', 'सांसद/विधायक निधि'), path: '/mplads', icon: Landmark },
+        { name: tr('District Budget & Treasury', 'जिला बजट व कोषागार'), path: `/budget?pin=${selectedPin}`, icon: Landmark },
         { name: tr('RERA Housing', 'रेरा आवास परियोजनाएं'), path: `/rera?pin=${selectedPin}`, icon: Building2 },
       ],
     },
@@ -97,9 +98,11 @@ export function Header() {
       title: tr('Rights & institutions', 'अधिकार एवं संस्थाएं'),
       items: [
         { name: tr('Representatives', 'जनप्रतिनिधि'), path: `/pin/${selectedPin}/people`, icon: Users },
-        { name: tr('Courts & Case Pendency', 'न्यायालय एवं केस स्टेटस'), path: `/module/courts?pin=${selectedPin}`, icon: Scale },
+        { name: tr('Land Records (Bhulekh)', 'भूलेख व ज़मीन रजिस्ट्री'), path: `/land?pin=${selectedPin}`, icon: Landmark },
+        { name: tr('Courts & Case Pendency', 'न्यायालय एवं केस स्टेटस'), path: `/courts`, icon: Scale },
         { name: tr('RTI Applications', 'सूचना का अधिकार (RTI)'), path: '/rti', icon: FileText },
-        { name: tr('Grievance Response', 'शिकायत निपटान'), path: '/module/grievance', icon: ShieldCheck },
+        { name: tr('CPGRAMS Grievances', 'शिकायत निवारण (CPGRAMS)'), path: '/grievance', icon: ShieldCheck },
+        { name: tr('Locality Compare (PIN vs PIN)', 'क्षेत्रीय तुलना'), path: '/pin/compare', icon: Scale },
       ],
     },
   ];

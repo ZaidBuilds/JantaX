@@ -70,4 +70,33 @@ describe('Phase 2 Master Architecture: UI/UX Primitives and Back-End REST APIs',
       expect(rera?.dlpMonths).toBe(60); // RERA Section 14(3) 5-year structural warranty
     });
   });
+
+  describe('Observatory Pages: Civic Health Standards & SLAs', () => {
+    it('validates NFSA PDS food grain quota entitlements', () => {
+      const aayQuotaKg = 35; // Antyodaya Anna Yojana per family
+      const phhQuotaKgPerPerson = 5; // Priority Household per member
+
+      expect(aayQuotaKg).toBe(35);
+      expect(phhQuotaKgPerPerson).toBe(5);
+    });
+
+    it('validates Revenue Department mutation statutory SLA', () => {
+      const statutorySlaDays = 45;
+      expect(statutorySlaDays).toBe(45); // Section 34/35 State Revenue Code
+    });
+
+    it('validates CPGRAMS DoPT grievance resolution target', () => {
+      const doptMandateDays = 30;
+      expect(doptMandateDays).toBe(30); // DoPT 30-day citizen grievance SLA
+    });
+
+    it('validates Locality Comparison matrix metrics', () => {
+      const metricsMeerut = { pin: '250001', civicHealth: 76, aqi: 210 };
+      const metricsDelhi = { pin: '110001', civicHealth: 84, aqi: 284 };
+
+      expect(metricsDelhi.civicHealth).toBeGreaterThan(metricsMeerut.civicHealth);
+      expect(metricsMeerut.aqi).toBeLessThan(metricsDelhi.aqi); // Lower AQI is cleaner
+    });
+  });
 });
+

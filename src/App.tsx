@@ -101,6 +101,14 @@ const MpladsComparePage = lazy(() => import('./modules/mplads/pages/MpladsCompar
 const WardComparePage = lazy(() => import('./modules/nagar/pages/WardComparePage').then((m) => ({ default: m.WardComparePage })));
 const PollutionComparePage = lazy(() => import('./modules/pollution/pages/PollutionComparePage').then((m) => ({ default: m.PollutionComparePage })));
 
+// Healthcare, Ration, Land, Grievance, Budget & Locality Compare
+const HospitalsDirectoryPage = lazy(() => import('./modules/hospital/pages/HospitalsDirectoryPage').then((m) => ({ default: m.HospitalsDirectoryPage })));
+const RationDirectoryPage = lazy(() => import('./modules/ration/pages/RationDirectoryPage').then((m) => ({ default: m.RationDirectoryPage })));
+const LandDirectoryPage = lazy(() => import('./modules/land/pages/LandDirectoryPage').then((m) => ({ default: m.LandDirectoryPage })));
+const GrievanceObservatoryPage = lazy(() => import('./modules/grievance/pages/GrievanceObservatoryPage').then((m) => ({ default: m.GrievanceObservatoryPage })));
+const BudgetLedgerPage = lazy(() => import('./modules/budget/pages/BudgetLedgerPage').then((m) => ({ default: m.BudgetLedgerPage })));
+const LocalityComparePage = lazy(() => import('./pages/LocalityComparePage').then((m) => ({ default: m.LocalityComparePage })));
+
 function LoadingFallback() {
   return (
     <div
@@ -165,10 +173,35 @@ function AppContent() {
               <Route path="/pin/:pinCode/people" element={<PeopleProfilePage />} />
               <Route path="/pin/:pinCode/representatives" element={<PeopleProfilePage />} />
               <Route path="/pin/:pinCode/schools" element={<SchoolsDirectory />} />
-              <Route path="/pin/:pinCode/health" element={<PinDashboard />} />
+              <Route path="/pin/:pinCode/health" element={<HospitalsDirectoryPage />} />
+              <Route path="/pin/:pinCode/hospitals" element={<HospitalsDirectoryPage />} />
+              <Route path="/pin/:pinCode/ration" element={<RationDirectoryPage />} />
+              <Route path="/pin/:pinCode/pds" element={<RationDirectoryPage />} />
+              <Route path="/pin/:pinCode/land" element={<LandDirectoryPage />} />
               <Route path="/pin/:pinCode/works" element={<ProjectsDirectoryPage />} />
               <Route path="/pin/:pinCode/schemes" element={<SchemesPage />} />
+              <Route path="/pin/:pinCode/budget" element={<BudgetLedgerPage />} />
+              <Route path="/pin/compare" element={<LocalityComparePage />} />
               <Route path="/schemes" element={<SchemesPage />} />
+
+              {/* Healthcare & Hospitals */}
+              <Route path="/hospitals" element={<HospitalsDirectoryPage />} />
+              <Route path="/health" element={<HospitalsDirectoryPage />} />
+
+              {/* Ration & Food Security */}
+              <Route path="/ration" element={<RationDirectoryPage />} />
+              <Route path="/pds" element={<RationDirectoryPage />} />
+
+              {/* Land Records & Bhulekh */}
+              <Route path="/land" element={<LandDirectoryPage />} />
+              <Route path="/bhulekh" element={<LandDirectoryPage />} />
+
+              {/* Grievance & CPGRAMS */}
+              <Route path="/grievance" element={<GrievanceObservatoryPage />} />
+              <Route path="/cpgrams" element={<GrievanceObservatoryPage />} />
+
+              {/* Public Budget & Treasury */}
+              <Route path="/budget" element={<BudgetLedgerPage />} />
 
               {/* Canonical Unified Entity Routes */}
               <Route path="/entity/:type/:id" element={<CanonicalEntityPage />} />

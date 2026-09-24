@@ -92,10 +92,12 @@ export function Footer() {
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.65rem', fontSize: '0.88rem' }}>
               <li><Link to={`/schools?pin=${activePin}`} style={{ color: 'var(--text-secondary)', transition: 'color 0.15s' }}>🏫 {tr('Schools & UDISE+ Registry', 'स्कूल एवं UDISE+ रिकॉर्ड')}</Link></li>
               <li><Link to={`/projects?pin=${activePin}`} style={{ color: 'var(--text-secondary)', transition: 'color 0.15s' }}>🏗️ {tr('PMGSY Roads & Public Works', 'PMGSY सड़कें व निर्माण कार्य')}</Link></li>
-              <li><Link to={`/rera?pin=${activePin}`} style={{ color: 'var(--text-secondary)', transition: 'color 0.15s' }}>🏠 {tr('RERA Real Estate & Delays', 'रेरा हाउसिंग एवं पजेशन देरी')}</Link></li>
+              <li><Link to={`/hospitals?pin=${activePin}`} style={{ color: 'var(--text-secondary)', transition: 'color 0.15s' }}>🏥 {tr('HMIS Hospitals & PHC Centers', 'अस्पताल व प्राथमिक स्वास्थ्य केंद्र')}</Link></li>
+              <li><Link to={`/ration?pin=${activePin}`} style={{ color: 'var(--text-secondary)', transition: 'color 0.15s' }}>🌾 {tr('PDS Fair Price Ration Shops', 'उचित दर राशन दुकान (PDS)')}</Link></li>
+              <li><Link to={`/land?pin=${activePin}`} style={{ color: 'var(--text-secondary)', transition: 'color 0.15s' }}>🗺️ {tr('Land Records & Mutation (Bhulekh)', 'भूलेख व ज़मीन रजिस्ट्री')}</Link></li>
+              <li><Link to={`/budget?pin=${activePin}`} style={{ color: 'var(--text-secondary)', transition: 'color 0.15s' }}>💰 {tr('District Budget & Capex Ledger', 'जिला सार्वजनिक बजट लेज़र')}</Link></li>
               <li><Link to="/contractors" style={{ color: 'var(--text-secondary)', transition: 'color 0.15s' }}>👷 {tr('Contractor Accountability Ledger', 'ठेकेदार जवाबदेही लेज़र')}</Link></li>
-              <li><Link to={`/module/hospital?pin=${activePin}`} style={{ color: 'var(--text-secondary)', transition: 'color 0.15s' }}>🏥 {tr('HMIS Hospitals & PHC Centers', 'अस्पताल व प्राथमिक स्वास्थ्य केंद्र')}</Link></li>
-              <li><Link to={`/module/ration?pin=${activePin}`} style={{ color: 'var(--text-secondary)', transition: 'color 0.15s' }}>🌾 {tr('PDS Fair Price Ration Shops', 'उचित दर राशन दुकान (PDS)')}</Link></li>
+              <li><Link to={`/rera?pin=${activePin}`} style={{ color: 'var(--text-secondary)', transition: 'color 0.15s' }}>🏠 {tr('RERA Real Estate & Delays', 'रेरा हाउसिंग एवं पजेशन देरी')}</Link></li>
             </ul>
           </div>
 
