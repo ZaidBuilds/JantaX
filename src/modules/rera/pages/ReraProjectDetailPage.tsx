@@ -12,8 +12,12 @@ import {
   FileText, 
   CheckCircle2, 
   Clock,
-  Share2
+  Share2,
+  FileCheck2
 } from 'lucide-react';
+import { JuxtapositionSlider } from '../../../components/UI/JuxtapositionSlider';
+import { MilestoneTimeline } from '../../../components/UI/MilestoneTimeline';
+import { CitizenDossierModal } from '../../accountability/components/CitizenDossierModal';
 
 interface ReraProjectDetailPageProps {
   initialTab?: 'overview' | 'orders';
@@ -26,6 +30,7 @@ export function ReraProjectDetailPage({ initialTab }: ReraProjectDetailPageProps
 
   const [project, setProject] = useState<ReraProject | undefined>(() => id ? getReraProjectById(id) : undefined);
   const [copied, setCopied] = useState(false);
+  const [dossierOpen, setDossierOpen] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -139,14 +144,104 @@ export function ReraProjectDetailPage({ initialTab }: ReraProjectDetailPageProps
 
       {/* Tab Content: Overview */}
       {activeTab === 'overview' && (
-        <div style={{ background: '#ffffff', borderRadius: 16, border: '1px solid #e2e8f0', padding: '1.5rem' }}>
-          <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginTop: 0, marginBottom: '1rem' }}>
-            RERA Registration Attributes
-          </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
-            <div><div style={{ fontSize: '0.78rem', color: '#64748b' }}>Project Type</div><div style={{ fontSize: '0.95rem', fontWeight: 700 }}>{project.projectType}</div></div>
-            <div><div style={{ fontSize: '0.78rem', color: '#64748b' }}>Extensions Granted</div><div style={{ fontSize: '0.95rem', fontWeight: 700 }}>{project.extensionsGranted} Extension(s)</div></div>
-            <div><div style={{ fontSize: '0.78rem', color: '#64748b' }}>Units Sold</div><div style={{ fontSize: '0.95rem', fontWeight: 700 }}>{project.soldUnits} / {project.totalUnits} Units</div></div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {/* Construction & Handover Milestone Stepper */}
+          <div style={{ background: '#ffffff', borderRadius: 16, border: '1px solid #e2e8f0', padding: '1.5rem' }}>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginTop: 0, marginBottom: '0.5rem' }}>
+              Project Execution & Delivery Timeline
+            </h3>
+            <p style={{ fontSize: '0.84rem', color: '#64748b', marginBottom: '1.25rem' }}>
+              Statutory comparison between original registered possession date and real-world construction delivery.
+            </p>
+            <MilestoneTimeline
+              currentProgressPct={project.soldUnits > 0 ? Math.round((project.soldUnits / project.totalUnits) * 100) : 65}
+              steps={[
+                {
+                  id: 'rera-step-1',
+                  label: 'RERA Registration & Sanction',
+                  status: 'completed',
+                  date: 'Reg Awarded',
+                  description: `Approved by ${project.statePortal}`,
+                },
+                {
+                  id: 'rera-step-2',
+                  label: 'Promised Delivery SLA',
+                  status: project.documentedDelayMonths > 0 ? 'completed' : 'in_progress',
+                  date: project.promisedCompletionDate,
+                  description: 'Original statutory deadline',
+                },
+                {
+                  id: 'rera-step-3',
+                  label: `Statutory Extension (${project.extensionsGranted}x)`,
+                  status: project.documentedDelayMonths > 0 ? 'delayed' : 'pending',
+                  date: project.revisedCompletionDate,
+                  description: `Overrun: +${project.documentedDelayMonths} Months`,
+                },
+                {
+                  id: 'rera-step-4',
+                  label: 'Occupancy Certificate & Handover',
+                  status: 'pending',
+                  date: 'Awaiting Inspection',
+                  description: 'Mandatory joint audit',
+                },
+              ]}
+            />
+          </div>
+
+          {/* Dual-View Juxtaposition Slider */}
+          <div style={{ background: '#ffffff', borderRadius: 16, border: '1px solid #e2e8f0', padding: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <div>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                  Claim vs. Reality Visual Audit
+                </h3>
+                <p style={{ fontSize: '0.82rem', color: '#64748b', margin: '2px 0 0' }}>
+                  Interactive slider comparing builder brochure render against physical site progress.
+                </p>
+              </div>
+              <button
+                onClick={() => setDossierOpen(true)}
+                style={{
+                  background: 'var(--navy-900, #0f2d59)',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '0.5rem 1rem',
+                  fontSize: '0.84rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                }}
+              >
+                <FileCheck2 size={16} /> Draft Section 6(1) Escrow RTI
+              </button>
+            </div>
+
+            <JuxtapositionSlider
+              claimTitle="Official RERA Brochure Render"
+              claimDate={project.promisedCompletionDate}
+              claimDetails="Builder gazetted marketing showcase: Fully completed façade and luxury clubhouse delivery."
+              claimImageUrl="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&auto=format&fit=crop&q=80"
+              realityTitle="Ground Truth Inspection Photo"
+              realityDate="August 2024"
+              realityDetails={`Citizen & homebuyer verification: Bare concrete structural framing with active +${project.documentedDelayMonths} months possession overrun.`}
+              realityImageUrl="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&auto=format&fit=crop&q=80"
+              aspectRatio="16/9"
+            />
+          </div>
+
+          {/* Registration Attributes */}
+          <div style={{ background: '#ffffff', borderRadius: 16, border: '1px solid #e2e8f0', padding: '1.5rem' }}>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginTop: 0, marginBottom: '1rem' }}>
+              RERA Registration Attributes
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+              <div><div style={{ fontSize: '0.78rem', color: '#64748b' }}>Project Type</div><div style={{ fontSize: '0.95rem', fontWeight: 700 }}>{project.projectType}</div></div>
+              <div><div style={{ fontSize: '0.78rem', color: '#64748b' }}>Extensions Granted</div><div style={{ fontSize: '0.95rem', fontWeight: 700 }}>{project.extensionsGranted} Extension(s)</div></div>
+              <div><div style={{ fontSize: '0.78rem', color: '#64748b' }}>Units Sold</div><div style={{ fontSize: '0.95rem', fontWeight: 700 }}>{project.soldUnits} / {project.totalUnits} Units</div></div>
+            </div>
           </div>
         </div>
       )}
@@ -190,6 +285,32 @@ export function ReraProjectDetailPage({ initialTab }: ReraProjectDetailPageProps
           )}
         </div>
       )}
+
+      {/* Citizen Legal Dossier Modal */}
+      <CitizenDossierModal
+        isOpen={dossierOpen}
+        onClose={() => setDossierOpen(false)}
+        defaultTab="rti"
+        rtiOptions={{
+          publicAuthority: `Real Estate Regulatory Authority (${project.statePortal})`,
+          department: 'Housing & Urban Planning',
+          workTitle: `${project.projectName} (Reg #${project.reraRegistrationNumber})`,
+          workOrderNo: project.reraRegistrationNumber,
+          sanctionedBudgetLakhs: project.totalUnits * 45,
+          contractorName: project.builderName,
+          dlpEndDate: project.revisedCompletionDate,
+          localityPin: project.pinCode,
+          specificIssue: `Homebuyer inspection into 70% Escrow Account deposits under RERA Section 4(2)(l)(D) and active ${project.documentedDelayMonths} months possession delay.`,
+        }}
+        lokayuktaOptions={{
+          complaintTitle: `Failure of Authority to enforce Escrow compliance on ${project.projectName}`,
+          authorityOrOfficer: `State RERA Secretary & Registrar, ${project.statePortal}`,
+          department: 'Housing Department',
+          contractorName: project.builderName,
+          localityPin: project.pinCode,
+          allegationSummary: `Promoter granted multiple extensions despite unfulfilled structural commitments and diverted funds from statutory Escrow Account.`,
+        }}
+      />
     </div>
   );
 }

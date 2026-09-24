@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
 import { resolvePincode } from '../../../core/utils/pinResolver';
+import { CitizenDossierModal } from '../../accountability/components/CitizenDossierModal';
+import { Scale, FileText } from 'lucide-react';
 
 export function UtilityDashboard() {
   const { share } = useWhatsAppShare();
@@ -9,6 +11,7 @@ export function UtilityDashboard() {
   const initialPin = searchParams.get('pin') || '250001';
   const [pinInput, setPinInput] = useState(initialPin);
   const [currentPin, setCurrentPin] = useState(initialPin);
+  const [dossierOpen, setDossierOpen] = useState(false);
 
   React.useEffect(() => {
     const p = searchParams.get('pin') || '250001';
@@ -95,13 +98,73 @@ export function UtilityDashboard() {
           <div>⚠️ <strong>वोल्टेज में उतार-चढ़ाव (Fluctuations):</strong> {powerStats.voltageFluctuations}</div>
         </div>
 
-        <div className="card-footer-meta">
+        {/* 24-Hour Visual Delivery Bar */}
+        <div style={{ margin: '1.25rem 0', background: '#f8fafc', padding: '1rem', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 700, marginBottom: '0.4rem' }}>
+            <span>Feeder Daily Supply Reliability</span>
+            <span style={{ color: powerStats.actualSupplyHours >= 20 ? '#047857' : '#b45309' }}>
+              {powerStats.actualSupplyHours} / 24 Hours ({Math.round((powerStats.actualSupplyHours / 24) * 100)}%)
+            </span>
+          </div>
+          <div style={{ width: '100%', height: '10px', background: '#e2e8f0', borderRadius: '9999px', overflow: 'hidden' }}>
+            <div
+              style={{
+                width: `${Math.round((powerStats.actualSupplyHours / 24) * 100)}%`,
+                height: '100%',
+                background: powerStats.actualSupplyHours >= 20 ? '#10b981' : '#f59e0b',
+                borderRadius: '9999px',
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="card-footer-meta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
           <span>Source: {powerStats.source}</span>
-          <button onClick={handleShare} className="btn-whatsapp">
-            📤 Share Feeder Report
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setDossierOpen(true)}
+              style={{
+                background: '#ffffff',
+                border: '1px solid #cbd5e1',
+                borderRadius: '8px',
+                padding: '0.45rem 0.85rem',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                color: '#1e293b',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+              }}
+            >
+              <Scale size={14} style={{ color: '#0284c7' }} /> Draft SERC Penalty Petition
+            </button>
+            <button onClick={handleShare} className="btn-whatsapp">
+              📤 Share Feeder Report
+            </button>
+          </div>
         </div>
       </div>
+
+      <CitizenDossierModal
+        isOpen={dossierOpen}
+        onClose={() => setDossierOpen(false)}
+        defaultTab="lokayukta"
+        rtiOptions={{
+          publicAuthority: `Superintending Engineer, ${loc.district} Electricity Distribution Circle (DISCOM)`,
+          department: 'Power & Energy Department',
+          workTitle: `Feeder Supply & Unscheduled Load Shedding Audit: ${powerStats.feederName}`,
+          localityPin: currentPin,
+          specificIssue: `Demand hourly outage logs, transformer trip records, and compensation under Electricity (Rights of Consumers) Rules 2020 for ${powerStats.loadSheddingMinutes} mins daily load shedding.`,
+        }}
+        lokayuktaOptions={{
+          complaintTitle: `Chronic Unscheduled Power Outages & Violation of 24x7 Supply Mandate`,
+          authorityOrOfficer: `Executive Engineer (Distribution) & Substation In-Charge`,
+          department: 'State Power Corporation / DISCOM',
+          localityPin: currentPin,
+          allegationSummary: `Substation recorded ${powerStats.loadSheddingMinutes} minutes of unannounced daily power cuts against 24x7 statutory supply mandate without notifying consumers or paying statutory outage compensation.`,
+        }}
+      />
     </div>
   );
 }

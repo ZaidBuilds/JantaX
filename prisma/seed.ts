@@ -381,8 +381,318 @@ async function main() {
       },
     });
   }
+  // 10. State CM Claims vs CAG (Andhbhakt / State Claims)
+  const stateClaims = [
+    {
+      stateCode: 'UP',
+      category: 'Infrastructure',
+      claimTitleEn: '100% Pothole-Free Roads Across All State Districts by Diwali',
+      claimTitleHindi: 'दीपावली तक प्रदेश के सभी जिलों में 100% गड्ढामुक्त सड़कें',
+      claimSource: 'State Government Press Release / Official Spokesperson (Oct 2023)',
+      claimDetails: 'State announced completion of special campaign achieving 100% pothole removal across 1.15 lakh km road network.',
+      realityTitleEn: 'CAG Report & Citizen Audit: 38% Bitumen Roads Degraded Within 11 Months',
+      realityTitleHindi: 'कैग रिपोर्ट एवं नागरिक ऑडिट: 11 माह के भीतर 38% सड़कें पुनः क्षतिग्रस्त',
+      realityDetails: 'CAG State Finances Audit noted premature renewal without mandatory bitumen compaction tests and active DLP violations.',
+      cagReportRef: 'CAG Report No. 4 of 2024 (Govt of Uttar Pradesh), Para 3.2',
+      realitySeverity: 'HIGH',
+    },
+    {
+      stateCode: 'DL',
+      category: 'Education',
+      claimTitleEn: 'World-Class Model Classrooms Constructed in 100% Government Schools',
+      claimTitleHindi: 'सभी सरकारी विद्यालयों में विश्वस्तरीय मॉडल कक्षाओं का निर्माण',
+      claimSource: 'Delhi Budget Speech & Directorate of Education Notice',
+      claimDetails: 'Sanctioned over 12,000 new semi-permanent and permanent classrooms with smart boards.',
+      realityTitleEn: 'CPWD Vigilance & Lokayukta Audit: 42% Cost Overrun & Missing Fire NOCs',
+      realityTitleHindi: 'सीपीडब्ल्यूडी सतर्कता व लोकायुक्त रिपोर्ट: 42% लागत वृद्धि व अग्निशमन अनापत्ति अनुपस्थित',
+      realityDetails: 'Vigilance enquiry established inflated tender rates of Rs 2,800/sq.ft vs standard DSR benchmark of Rs 1,450/sq.ft.',
+      cagReportRef: 'Lokayukta Enquiry Report C-184/2023 & CPWD Chief Technical Examiner Inspection',
+      realitySeverity: 'MEDIUM',
+    },
+    {
+      stateCode: 'KA',
+      category: 'Urban Works',
+      claimTitleEn: 'Stormwater Drain Desilting and Rajakaluve Encroachment Clearance 100% Complete',
+      claimTitleHindi: 'बारिश से पूर्व राजाकालुवे नालों की 100% गाद सफाई व अतिक्रमण मुक्ति',
+      claimSource: 'BBMP Municipal Press Conference',
+      claimDetails: 'Claimed full desilting of 842 km stormwater network before monsoon onset.',
+      realityTitleEn: 'CAG Performance Audit: 1,840 Encroachments Unresolved, Chronic Flooding',
+      realityTitleHindi: 'कैग परफॉर्मेंस ऑडिट: 1,840 अतिक्रमण जस के तस, व्यापक जलभराव',
+      realityDetails: 'CAG documented Rs 340 Cr expenditure without GIS elevation mapping or buffer-zone enforcement.',
+      cagReportRef: 'CAG Report No. 2 of 2023 (Govt of Karnataka), Performance Audit on Urban Flooding',
+      realitySeverity: 'CRITICAL',
+    },
+  ];
+
+  for (const sc of stateClaims) {
+    const existing = await prisma.stateCmClaim.findFirst({
+      where: { stateCode: sc.stateCode, claimTitleEn: sc.claimTitleEn },
+    });
+    if (!existing) {
+      await prisma.stateCmClaim.create({ data: sc });
+    }
+  }
+  console.log('✓ State CM Claims vs CAG seeded');
+
+  // 11. Municipal Wards (Nagar)
+  for (const pin of demoPins) {
+    const wardNo = pin.code.slice(4, 6);
+    const existingWard = await prisma.municipalWard.findFirst({
+      where: { pincode: pin.code, wardNo: `Ward ${wardNo}` },
+    });
+    if (!existingWard) {
+      await prisma.municipalWard.create({
+        data: {
+          pincode: pin.code,
+          wardNo: `Ward ${wardNo}`,
+          garbageClaimedSla: '24 Hours Door-to-Door Collection',
+          waterClaimedSla: '135 Litres/Capita/Day @ 1.5 Bar Pressure',
+          drainageClaimedSla: 'Weekly Mechanical Desilting',
+          citizenReviews: {
+            create: [
+              {
+                serviceCategory: 'Garbage Collection',
+                actualRating: 3,
+                feedbackText: 'Vehicle visits only 3 days a week, erratic morning timings.',
+              },
+              {
+                serviceCategory: 'Water Supply',
+                actualRating: 2,
+                feedbackText: 'Low pressure in morning hours, high turbidity post rain.',
+              },
+            ],
+          },
+        },
+      });
+    }
+  }
+  console.log('✓ Municipal Wards & Citizen Reviews seeded');
+
+  // 12. Pincode Budgets & Sector Allocations
+  for (const pin of demoPins) {
+    const existingBudget = await prisma.pincodeBudget.findUnique({
+      where: { pincode: pin.code },
+    });
+    if (!existingBudget) {
+      await prisma.pincodeBudget.create({
+        data: {
+          pincode: pin.code,
+          financialYear: '2024-25',
+          totalRevenueCr: 142.5,
+          totalAllocatedCr: 128.8,
+          allocations: {
+            create: [
+              {
+                sectorNameEn: 'Roads & Bridges (PWD)',
+                sectorNameHi: 'सड़क एवं सेतु निर्माण',
+                allocatedCr: 48.5,
+                utilizedCr: 36.2,
+                stalledProjects: 2,
+              },
+              {
+                sectorNameEn: 'Drinking Water & Sanitation (JJM/AMRUT)',
+                sectorNameHi: 'पेयजल एवं स्वच्छता',
+                allocatedCr: 34.0,
+                utilizedCr: 21.8,
+                stalledProjects: 1,
+              },
+              {
+                sectorNameEn: 'Primary Education & Anganwadi Infrastructure',
+                sectorNameHi: 'प्राथमिक शिक्षा एवं आंगनवाड़ी भवन',
+                allocatedCr: 26.3,
+                utilizedCr: 22.1,
+                stalledProjects: 0,
+              },
+              {
+                sectorNameEn: 'Public Health Centers & Diagnostics',
+                sectorNameHi: 'सामुदायिक स्वास्थ्य केंद्र एवं नैदानिक केंद्र',
+                allocatedCr: 20.0,
+                utilizedCr: 14.5,
+                stalledProjects: 1,
+              },
+            ],
+          },
+        },
+      });
+    }
+  }
+  console.log('✓ Pincode Budgets & Sector Allocations seeded');
+
+  // 13. Regional AQI Stations & PCB Notices (Pollution)
+  for (const pin of demoPins) {
+    const existingStation = await prisma.regionalAqiStation.findFirst({
+      where: { pincode: pin.code },
+    });
+    if (!existingStation) {
+      await prisma.regionalAqiStation.create({
+        data: {
+          pincode: pin.code,
+          stationName: `${pin.district} Continuous Ambient Air Quality Monitoring Station (CAAQMS)`,
+          aqiValue: pin.state === 'Delhi' ? 245 : pin.state === 'Uttar Pradesh' ? 186 : 94,
+          dominantPollutant: 'PM2.5',
+          pcbNotices: {
+            create: [
+              {
+                industryName: `${pin.district} Industrial Fabricators Unit 4`,
+                noticeType: 'Show Cause Notice under Section 31A of Air Act 1981',
+                violationReason: 'Operation of diesel generator sets without acoustic enclosures or valid Consent to Operate (CTO).',
+                issueDate: '2024-07-14',
+              },
+            ],
+          },
+        },
+      });
+    }
+  }
+  console.log('✓ Regional AQI Stations & SPCB Notices seeded');
+
+  // 14. Tehsil Offices & Land Mutation Backlogs (Land / Bhulekh)
+  for (const pin of demoPins) {
+    const existingTehsil = await prisma.tehsilOffice.findFirst({
+      where: { pincode: pin.code },
+    });
+    if (!existingTehsil) {
+      await prisma.tehsilOffice.create({
+        data: {
+          pincode: pin.code,
+          tehsilName: `${pin.district} Sadar Tehsil`,
+          district: pin.district,
+          promisedSlaDays: 45,
+          mutationRecords: {
+            create: [
+              {
+                surveyNumber: `Khasra ${pin.code.slice(3)}/42`,
+                daysTaken: 118,
+                status: 'Delayed Overrun',
+                appliedDate: '2024-03-10',
+              },
+              {
+                surveyNumber: `Khasra ${pin.code.slice(3)}/89`,
+                daysTaken: 38,
+                status: 'Completed',
+                appliedDate: '2024-06-01',
+              },
+            ],
+          },
+        },
+      });
+    }
+  }
+  console.log('✓ Tehsil Offices & Land Mutation Records seeded');
+
+  // 15. DISCOM Feeders & Outage Logs (Utility)
+  for (const pin of demoPins) {
+    const existingFeeder = await prisma.discomFeeder.findFirst({
+      where: { pincode: pin.code },
+    });
+    if (!existingFeeder) {
+      await prisma.discomFeeder.create({
+        data: {
+          pincode: pin.code,
+          feederName: `11kV ${pin.district} Town Feeder Line 2`,
+          substationName: `33/11kV ${pin.district} Main Grid Substation`,
+          promisedSupplyHours: 24,
+          outageLogs: {
+            create: [
+              {
+                outageMinutes: 145,
+                faultType: 'Transformer Overload & Phase Failure',
+                faultTypeHi: 'ट्रांसफॉर्मर ओवरलोड एवं फेज विफलता',
+                logDate: '2024-08-12',
+              },
+              {
+                outageMinutes: 45,
+                faultType: 'Scheduled Line Maintenance',
+                faultTypeHi: 'नियत विद्युत लाइन रखरखाव',
+                logDate: '2024-08-19',
+              },
+            ],
+          },
+        },
+      });
+    }
+  }
+  console.log('✓ DISCOM Feeders & Outage Logs seeded');
+
+  // 16. Candidate Spend Records (Election)
+  for (const pin of demoPins) {
+    const existingCandidate = await prisma.candidateSpendRecord.findFirst({
+      where: { pincode: pin.code },
+    });
+    if (!existingCandidate) {
+      await prisma.candidateSpendRecord.create({
+        data: {
+          pincode: pin.code,
+          candidateName: `Elected Representative (${pin.district})`,
+          party: 'Sample Political Alliance',
+          constituency: `${pin.district} Parliamentary Constituency`,
+          declaredSpend: 38.5,
+          estimatedSpend: 142.0,
+          sourceAffidavit: 'ECI Form 20 Affidavit & ADR Campaign Finance Monitoring Report',
+        },
+      });
+    }
+  }
+  console.log('✓ Candidate Spend Records seeded');
+
+  // 17. CPGRAMS Monthly Department Records
+  const cpgramsMonthly = [
+    {
+      recordType: 'CentralMinistry',
+      rank: 1,
+      name: 'Department of Financial Services (Banking Division)',
+      nameHi: 'वित्तीय सेवाएं विभाग (बैंकिंग प्रभाग)',
+      totalGrievances: 18450,
+      resolvedCount: 16200,
+      pendingCount: 2250,
+      avgDisposalDays: 19,
+      backlogOver30Days: 240,
+      worstCategoryEn: 'Unauthorized digital debit & pension delay',
+      worstCategoryHi: 'अनधिकृत डिजिटल कटौती एवं पेंशन विलंब',
+      reportMonth: '2024-08',
+    },
+    {
+      recordType: 'CentralMinistry',
+      rank: 2,
+      name: 'Ministry of Railways (Railway Board)',
+      nameHi: 'रेल मंत्रालय (रेलवे बोर्ड)',
+      totalGrievances: 14200,
+      resolvedCount: 12800,
+      pendingCount: 1400,
+      avgDisposalDays: 14,
+      backlogOver30Days: 110,
+      worstCategoryEn: 'Coach cleanliness & unreserved coach crowding',
+      worstCategoryHi: 'कोच स्वच्छता एवं सामान्य डिब्बों में अत्यधिक भीड़',
+      reportMonth: '2024-08',
+    },
+    {
+      recordType: 'CentralMinistry',
+      rank: 3,
+      name: 'Ministry of Road Transport and Highways (NHAI)',
+      nameHi: 'सड़क परिवहन एवं राजमार्ग मंत्रालय (एनएचएआई)',
+      totalGrievances: 8900,
+      resolvedCount: 6100,
+      pendingCount: 2800,
+      avgDisposalDays: 42,
+      backlogOver30Days: 1150,
+      worstCategoryEn: 'Toll plaza FASTag double deduction & highway surface crater',
+      worstCategoryHi: 'टोल प्लाजा फास्टैग दोहरी कटौती एवं हाईवे सतह गड्ढे',
+      reportMonth: '2024-08',
+    },
+  ];
+
+  for (const cpm of cpgramsMonthly) {
+    const existing = await prisma.cpgramsMonthlyRecord.findFirst({
+      where: { name: cpm.name, reportMonth: cpm.reportMonth },
+    });
+    if (!existing) {
+      await prisma.cpgramsMonthlyRecord.create({ data: cpm });
+    }
+  }
+  console.log('✓ CPGRAMS Monthly Records seeded');
+
   console.log('✓ Sample citizen reports seeded');
-  console.log('✅ JantaX seed complete (reference + sample data)');
+  console.log('✅ JantaX seed complete (all 15/15 canonical modules populated)');
 }
 
 async function seedSources() {

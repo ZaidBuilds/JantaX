@@ -209,10 +209,78 @@ function mockRecords(code: string, module?: string, locAccurate?: any): RecordsR
     ];
   }
   if (wantGrievance) {
-    records.grievance = [{ id: `mock-griev-${code}`, ministry: 'Urban Development & Civic Amenities' } as any];
+    records.grievance = [{ id: `mock-griev-${code}`, ministry: 'Urban Development & Civic Amenities', category: 'Drainage and road maintenance delay', delayDays: 45 } as any];
   }
   if (wantContractor) {
-    records.contractor = [{ id: `mock-cont-${code}`, name: `${loc.district} Civil Infratech Pvt Ltd`, rating: 4.2 } as any];
+    records.contractor = [{ id: `mock-cont-${code}`, name: `${loc.district} Civil Infratech Pvt Ltd`, rating: 4.2, score: 78 } as any];
+  }
+  if (!module || module === 'andhbhakt') {
+    records.andhbhakt = [{
+      id: `mock-claim-${code}`,
+      stateCode: loc.stateCode || 'UP',
+      claimTitleEn: '100% Pothole-Free Roads Across State Districts',
+      claimTitleHindi: 'प्रदेश के सभी जिलों में 100% गड्ढामुक्त सड़कें',
+      cagReportRef: 'CAG State Finances Audit',
+      realitySeverity: 'HIGH',
+      realityTitleEn: 'CAG Audit: 38% Premature Bitumen Degradation Within 11 Months'
+    } as any];
+  }
+  if (!module || module === 'nagar') {
+    records.nagar = [{
+      id: `mock-ward-${code}`,
+      wardNo: `Ward ${code.slice(4, 6)}`,
+      pincode: code,
+      garbageClaimedSla: '24 Hours Door-to-Door Collection',
+      waterClaimedSla: '135 Litres/Capita/Day',
+      drainageClaimedSla: 'Weekly Mechanical Desilting'
+    } as any];
+  }
+  if (!module || module === 'budget') {
+    records.budget = [{
+      id: `mock-budget-${code}`,
+      pincode: code,
+      financialYear: '2024-25',
+      totalRevenueCr: 142.5,
+      totalAllocatedCr: 128.8,
+      allocations: [
+        { sectorNameEn: 'Roads & Bridges', allocatedCr: 48.5, utilizedCr: 36.2 },
+        { sectorNameEn: 'Drinking Water & Sanitation', allocatedCr: 34.0, utilizedCr: 21.8 }
+      ]
+    } as any];
+  }
+  if (!module || module === 'pollution') {
+    records.pollution = [{
+      id: `mock-station-${code}`,
+      stationName: `${loc.district} Continuous Ambient Air Quality Station`,
+      pincode: code,
+      aqiValue: 145 + (h % 100),
+      dominantPollutant: 'PM2.5'
+    } as any];
+  }
+  if (!module || module === 'land') {
+    records.land = [{
+      id: `mock-tehsil-${code}`,
+      tehsilName: `${loc.district} Sadar Tehsil`,
+      district: loc.district,
+      promisedSlaDays: 45,
+      mutationRecords: [{ surveyNumber: `Khasra ${code.slice(3)}/42`, daysTaken: 118, status: 'Delayed Overrun' }]
+    } as any];
+  }
+  if (!module || module === 'utility') {
+    records.utility = [{
+      id: `mock-feeder-${code}`,
+      feederName: `11kV ${loc.district} Town Feeder Line 2`,
+      promisedSupplyHours: 24,
+      outageLogs: [{ outageMinutes: 145, faultType: 'Transformer Overload' }]
+    } as any];
+  }
+  if (!module || module === 'election') {
+    records.election = [{
+      id: `mock-cand-${code}`,
+      candidateName: `Elected Representative (${loc.district})`,
+      declaredSpend: 38.5,
+      estimatedSpend: 142.0
+    } as any];
   }
 
   return { pincode: code, records };
@@ -319,6 +387,14 @@ export interface RecordsResponse {
     pds?: unknown[];
     grievance?: unknown[];
     contractor?: unknown[];
+    andhbhakt?: unknown[];
+    nagar?: unknown[];
+    budget?: unknown[];
+    pollution?: unknown[];
+    land?: unknown[];
+    utility?: unknown[];
+    election?: unknown[];
+    booth?: unknown[];
   };
 }
 

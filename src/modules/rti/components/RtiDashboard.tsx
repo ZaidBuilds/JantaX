@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
 import { resolvePincode } from '../../../core/utils/pinResolver';
+import { CitizenDossierModal } from '../../accountability/components/CitizenDossierModal';
+import { FileText, Download } from 'lucide-react';
 
 export function RtiDashboard() {
   const { share } = useWhatsAppShare();
@@ -9,6 +11,7 @@ export function RtiDashboard() {
   const initialPin = searchParams.get('pin') || '250001';
   const [pinInput, setPinInput] = useState(initialPin);
   const [currentPin, setCurrentPin] = useState(initialPin);
+  const [dossierOpen, setDossierOpen] = useState(false);
 
   React.useEffect(() => {
     const p = searchParams.get('pin') || '250001';
@@ -95,13 +98,53 @@ export function RtiDashboard() {
           <div>📁 <strong>कुल दायर फाइलें (Total Filed):</strong> {rtiStats.totalRtiFiled} filings in last quarter</div>
         </div>
 
-        <div className="card-footer-meta">
+        <div className="card-footer-meta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
           <span>Source: {rtiStats.source}</span>
-          <button onClick={handleShare} className="btn-whatsapp">
-            📤 Share RTI Report
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setDossierOpen(true)}
+              style={{
+                background: '#ffffff',
+                border: '1px solid #cbd5e1',
+                borderRadius: '8px',
+                padding: '0.45rem 0.85rem',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                color: '#1e293b',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+              }}
+            >
+              <FileText size={14} style={{ color: '#0891b2' }} /> 1-Click Section 6(1) Draft
+            </button>
+            <button onClick={handleShare} className="btn-whatsapp">
+              📤 Share RTI Report
+            </button>
+          </div>
         </div>
       </div>
+
+      <CitizenDossierModal
+        isOpen={dossierOpen}
+        onClose={() => setDossierOpen(false)}
+        defaultTab="rti"
+        rtiOptions={{
+          publicAuthority: rtiStats.departmentName,
+          department: 'Public Authority & District Administration',
+          workTitle: `Administrative Expenditure & Citizen Charter SLA Compliance (${loc.district})`,
+          localityPin: currentPin,
+          specificIssue: `Statutory enquiry regarding non-adherence to 30-day response timeline under Section 7(1) of RTI Act 2005 (average response delay: ${rtiStats.actualAverageDays} days).`,
+        }}
+        lokayuktaOptions={{
+          complaintTitle: `Systematic Information Concealment & Deliberate Delay by Public Information Officer`,
+          authorityOrOfficer: `First Appellate Authority & Public Information Officer, ${loc.district}`,
+          department: 'District Collectorate / Information Commission',
+          localityPin: currentPin,
+          allegationSummary: `The office recorded an average disposal delay of ${rtiStats.actualAverageDays} days (+${rtiStats.actualAverageDays - 30} days overrun) with a ${rtiStats.rejectedPercentage}% rejection rate in violation of Section 20 penal provisions.`,
+        }}
+      />
     </div>
   );
 }

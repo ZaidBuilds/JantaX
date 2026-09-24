@@ -170,7 +170,33 @@ router.get('/pincode/:code/records', async (req: Request, res: Response) => {
         result.grievance = await prisma.cpgramGrievance.findMany({ where, orderBy: { delayDays: 'desc' } });
         break;
       case 'contractor':
-        result.contractor = await prisma.contractor.findMany({ where: { verified: true }, orderBy: { score: 'desc' } });
+        result.contractor = await prisma.contractor.findMany({ orderBy: { score: 'desc' } });
+        break;
+      case 'andhbhakt':
+        result.andhbhakt = await prisma.stateCmClaim.findMany({ take: 20 });
+        break;
+      case 'nagar':
+        result.nagar = await prisma.municipalWard.findMany({ where: { pincode: code }, include: { citizenReviews: true } });
+        break;
+      case 'budget': {
+        const b = await prisma.pincodeBudget.findUnique({ where: { pincode: code }, include: { allocations: true } });
+        result.budget = b ? [b] : [];
+        break;
+      }
+      case 'pollution':
+        result.pollution = await prisma.regionalAqiStation.findMany({ where: { pincode: code }, include: { pcbNotices: true } });
+        break;
+      case 'land':
+        result.land = await prisma.tehsilOffice.findMany({ where: { pincode: code }, include: { mutationRecords: true } });
+        break;
+      case 'utility':
+        result.utility = await prisma.discomFeeder.findMany({ where: { pincode: code }, include: { outageLogs: true } });
+        break;
+      case 'election':
+        result.election = await prisma.candidateSpendRecord.findMany({ where: { pincode: code } });
+        break;
+      case 'booth':
+        result.booth = [];
         break;
     }
   }
@@ -298,6 +324,27 @@ router.get('/records/:module/:id', async (req: Request, res: Response) => {
       break;
     case 'contractor':
       record = await prisma.contractor.findUnique({ where: { id } });
+      break;
+    case 'andhbhakt':
+      record = await prisma.stateCmClaim.findUnique({ where: { id } });
+      break;
+    case 'nagar':
+      record = await prisma.municipalWard.findUnique({ where: { id }, include: { citizenReviews: true } });
+      break;
+    case 'budget':
+      record = await prisma.pincodeBudget.findUnique({ where: { id }, include: { allocations: true } });
+      break;
+    case 'pollution':
+      record = await prisma.regionalAqiStation.findUnique({ where: { id }, include: { pcbNotices: true } });
+      break;
+    case 'land':
+      record = await prisma.tehsilOffice.findUnique({ where: { id }, include: { mutationRecords: true } });
+      break;
+    case 'utility':
+      record = await prisma.discomFeeder.findUnique({ where: { id }, include: { outageLogs: true } });
+      break;
+    case 'election':
+      record = await prisma.candidateSpendRecord.findUnique({ where: { id } });
       break;
   }
 

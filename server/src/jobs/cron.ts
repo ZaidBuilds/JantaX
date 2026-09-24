@@ -6,6 +6,8 @@
  */
 import { scheduler } from './scheduler';
 import { createUdiseMockConnector } from './connectors/udiseMockConnector';
+import { createCpcbLiveConnector } from './connectors/cpcbLiveConnector';
+import { createCpgramsFeedConnector } from './connectors/cpgramsFeedConnector';
 
 export function startIngestionCron() {
   const mocksEnabled =
@@ -14,9 +16,12 @@ export function startIngestionCron() {
   if (mocksEnabled) {
     scheduler.register(createUdiseMockConnector());
     console.log('[cron] Mock UDISE connector registered (writes isSample rows).');
-  } else {
-    console.log('[cron] No connectors registered. Set ENABLE_MOCK_CONNECTORS=true to run the UDISE mock pipeline.');
   }
+
+  // Register real and scheduled connectors
+  scheduler.register(createCpcbLiveConnector());
+  scheduler.register(createCpgramsFeedConnector());
+  console.log('[cron] CPCB Live AQI and DARPG CPGRAMS connectors registered.');
 
   return { scheduler };
 }
