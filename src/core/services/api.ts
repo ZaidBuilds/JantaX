@@ -21,45 +21,30 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json();
 }
 
-// --- Resilient mock fallback when backend is down (so PIN never shows red error) ---
+import { getAuthenticPincode } from '../data/authenticData';
+
+// --- Resilient fallback when backend server is offline ---
 function markOffline() { try { if (typeof window !== 'undefined') localStorage.setItem('jantax_offline','1'); } catch {} }
 function clearOffline() { try { if (typeof window !== 'undefined' && navigator.onLine) localStorage.removeItem('jantax_offline'); } catch {} }
-function hashSeed(s: string): number {
-  let h = 0; for (let i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i)) >>>0; return h;
-}
 
 function mockPincodeInfo(code: string, locAccurate?: any): PincodeInfo {
   markOffline();
-  let loc: any = locAccurate || { state: 'India', district: 'Local District', region: 'Central' };
-  if (!locAccurate) {
-    try { loc = _resolvePincode(code); } catch {}
-  }
-  const h = hashSeed(code);
-  const coords = getCoordinateForPin(code);
-  const areaLabel = loc.postOffice ? `${loc.postOffice} (${loc.block && loc.block !== 'NA' ? loc.block : 'Taluk'})` : (h % 2 === 0 ? 'Urban Sector' : 'Rural Block');
+  const auth = getAuthenticPincode(code, locAccurate);
   return {
-    code,
-    state: loc.state || coords.state || 'India',
-    district: loc.district || coords.district || 'Local District',
-    region: loc.region || 'North',
-    areaType: areaLabel,
-    lat: coords.lat,
-    lng: coords.lng,
-    counts: {
-      schools: 3 + (h % 3),
-      infraProjects: 2 + (h % 3),
-      reraProjects: 1 + (h % 3),
-      hospitals: 2 + (h % 2),
-      pdsShops: 2 + (h % 2),
-      grievances: 3 + (h % 5),
-      citizenReports: 1 + (h % 4),
-    }
+    code: auth.code,
+    state: auth.state,
+    district: auth.district,
+    region: auth.region,
+    areaType: auth.areaType,
+    lat: auth.lat,
+    lng: auth.lng,
+    counts: auth.counts,
   };
 }
 
 function mockRecords(code: string, module?: string, locAccurate?: any): RecordsResponse {
   markOffline();
-  const h = hashSeed(code);
+  const h = (parseInt(code.slice(0, 4), 10) || 1100) % 20;
   let loc: any = locAccurate || { state: 'India', district: 'Local District', region: 'Central', stateCode: 'IN' };
   if (!locAccurate) {
     try { loc = _resolvePincode(code); } catch {}
