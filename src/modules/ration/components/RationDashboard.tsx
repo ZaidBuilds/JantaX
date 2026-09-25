@@ -3,6 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
 import { resolvePincode } from '../../../core/utils/pinResolver';
 import { api } from '../../../core/services/api';
+import { PdsAuditCard } from './PdsAuditCard';
+import { DgroPetitionModal } from './DgroPetitionModal';
 
 export function RationDashboard() {
   const { share } = useWhatsAppShare();
@@ -10,6 +12,9 @@ export function RationDashboard() {
   const initialPin = searchParams.get('pin') || '250001';
   const [pinInput, setPinInput] = useState(initialPin);
   const [currentPin, setCurrentPin] = useState(initialPin);
+  const [activeTab, setActiveTab] = useState<'shops' | 'audit'>('shops');
+  const [showPetitionModal, setShowPetitionModal] = useState(false);
+  const [selectedFps, setSelectedFps] = useState('');
 
   React.useEffect(() => {
     const p = searchParams.get("pin") || "250001";
@@ -99,6 +104,11 @@ export function RationDashboard() {
     });
   };
 
+  const handleFilePetition = (fpsLicenseNo: string) => {
+    setSelectedFps(fpsLicenseNo);
+    setShowPetitionModal(true);
+  };
+
   return (
     <div className="module-dashboard">
       <div className="glass-card dash-header-card" style={{ borderLeftColor: '#d97706' }}>
@@ -106,6 +116,22 @@ export function RationDashboard() {
         <p>
           राष्ट्रीय खाद्य सुरक्षा अधिनियम (NFSA) के तहत आवंटित अनाज कोटा बनाम राशन दुकान की कार्यप्रणाली की वास्तविक जांच।
         </p>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="dash-tab-group">
+        <button
+          onClick={() => setActiveTab('shops')}
+          className={`dash-tab-btn ${activeTab === 'shops' ? 'active' : ''}`}
+        >
+          FPS Shop Cards (दुकान कार्ड)
+        </button>
+        <button
+          onClick={() => setActiveTab('audit')}
+          className={`dash-tab-btn ${activeTab === 'audit' ? 'active' : ''}`}
+        >
+          PDS Quota Audit (कोटा ऑडिट)
+        </button>
       </div>
 
       <div className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
@@ -130,60 +156,74 @@ export function RationDashboard() {
         )}
       </div>
 
-      {/* Always say which dataset is on screen — live and demo cards look
-          identical otherwise. */}
-      <p
-        role="status"
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 'var(--space-2)',
-          margin: '0 0 var(--space-4)',
-          padding: 'var(--space-1) var(--space-3)',
-          borderRadius: 'var(--radius-pill)',
-          background: isLiveData ? 'var(--bg-subtle)' : 'var(--status-warn-bg)',
-          border: `1px solid ${isLiveData ? 'var(--border-color)' : 'var(--status-warn-border)'}`,
-          color: isLiveData ? 'var(--text-secondary)' : 'var(--status-warn-text)',
-          fontSize: 'var(--text-caption)',
-          fontWeight: 700,
-        }}
-      >
-        {isLiveData
-          ? `Live NFSA records for PIN ${currentPin} — served from the JantaX database`
-          : 'Demonstration data — no published ration shop record for this PIN'}
-      </p>
+      {activeTab === 'shops' ? (
+        <>
+          {/* Always say which dataset is on screen — live and demo cards look
+              identical otherwise. */}
+          <p
+            role="status"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
+              margin: '0 0 var(--space-4)',
+              padding: 'var(--space-1) var(--space-3)',
+              borderRadius: 'var(--radius-pill)',
+              background: isLiveData ? 'var(--bg-subtle)' : 'var(--status-warn-bg)',
+              border: `1px solid ${isLiveData ? 'var(--border-color)' : 'var(--status-warn-border)'}`,
+              color: isLiveData ? 'var(--text-secondary)' : 'var(--status-warn-text)',
+              fontSize: 'var(--text-caption)',
+              fontWeight: 700,
+            }}
+          >
+            {isLiveData
+              ? `Live NFSA records for PIN ${currentPin} — served from the JantaX database`
+              : 'Demonstration data — no published ration shop record for this PIN'}
+          </p>
 
-      <div style={{ display: 'grid', gap: '1.5rem' }}>
-        {pdsStores.map((shop, idx) => (
-          <div key={idx} className="glass-card" style={{ padding: '1.25rem' }}>
-            <div className="card-ribbon" style={{ margin: '-1.25rem -1.25rem 1rem', borderRadius: '10px 10px 0 0' }}>
-              <span>FPS LICENSE NO: <strong>{shop.shopNo}</strong></span>
-              <span>Dealer: <strong>{shop.dealerName}</strong></span>
-            </div>
+          <div style={{ display: 'grid', gap: '1.5rem' }}>
+            {pdsStores.map((shop, idx) => (
+              <div key={idx} className="glass-card" style={{ padding: '1.25rem' }}>
+                <div className="card-ribbon" style={{ margin: '-1.25rem -1.25rem 1rem', borderRadius: '10px 10px 0 0' }}>
+                  <span>FPS LICENSE NO: <strong>{shop.shopNo}</strong></span>
+                  <span>Dealer: <strong>{shop.dealerName}</strong></span>
+                </div>
 
-            <div className="dash-panel-grid" style={{ marginBottom: '1rem' }}>
-              <div className="dash-panel claim">
-                <span className="dash-panel-label">📢 ALLOCATED QUOTA (आधिकारिक आवंटन)</span>
-                <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>{shop.claimedQuota}</p>
+                <div className="dash-panel-grid" style={{ marginBottom: '1rem' }}>
+                  <div className="dash-panel claim">
+                    <span className="dash-panel-label">📢 ALLOCATED QUOTA (आधिकारिक आवंटन)</span>
+                    <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>{shop.claimedQuota}</p>
+                  </div>
+                  <div className="dash-panel reality">
+                    <span className="dash-panel-label">👁️ GROUND REALITY (जमीनी हकीकत)</span>
+                    <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>{shop.realityStatus}</p>
+                  </div>
+                </div>
+
+                <div style={{ fontSize: '0.75rem', padding: '0.5rem 0.75rem', borderRadius: '6px', background: 'var(--status-critical-bg)', borderLeft: '3px solid var(--status-critical)', marginBottom: '1rem', color: 'var(--text-primary)' }}>
+                  📋 <strong>Audit Finding:</strong> {shop.auditFinding} (Report Date: {shop.lastAuditDate})
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <button onClick={() => handleShare(shop)} className="btn-whatsapp">
+                    📤 Share Ration Audit
+                  </button>
+                </div>
               </div>
-              <div className="dash-panel reality">
-                <span className="dash-panel-label">👁️ GROUND REALITY (जमीनी हकीकत)</span>
-                <p style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>{shop.realityStatus}</p>
-              </div>
-            </div>
-
-            <div style={{ fontSize: '0.75rem', padding: '0.5rem 0.75rem', borderRadius: '6px', background: 'var(--status-critical-bg)', borderLeft: '3px solid var(--status-critical)', marginBottom: '1rem', color: 'var(--text-primary)' }}>
-              📋 <strong>Audit Finding:</strong> {shop.auditFinding} (Report Date: {shop.lastAuditDate})
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <button onClick={() => handleShare(shop)} className="btn-whatsapp">
-                📤 Share Ration Audit
-              </button>
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </>
+      ) : (
+        <PdsAuditCard pinCode={currentPin} onFilePetition={handleFilePetition} />
+      )}
+
+      {showPetitionModal && (
+        <DgroPetitionModal
+          pinCode={currentPin}
+          fpsLicenseNo={selectedFps}
+          onClose={() => setShowPetitionModal(false)}
+        />
+      )}
     </div>
   );
 }

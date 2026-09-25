@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
 import { resolvePincode } from '../../../core/utils/pinResolver';
+import { ShadowExpenditureCard } from './ShadowExpenditureCard';
 
 export function ElectionDashboard() {
   const { share } = useWhatsAppShare();
@@ -15,7 +16,7 @@ export function ElectionDashboard() {
     setPinInput(p);
     setCurrentPin(p);
   }, [searchParams]);
-  const [activeTab, setActiveTab] = useState<'election' | 'exams'>('election');
+  const [activeTab, setActiveTab] = useState<'election' | 'exams' | 'shadow'>('election');
 
   const loc = useMemo(() => resolvePincode(currentPin), [currentPin]);
 
@@ -94,6 +95,12 @@ export function ElectionDashboard() {
         >
           Exam Delay Tracker (परीक्षा विलंब)
         </button>
+        <button
+          onClick={() => setActiveTab('shadow')}
+          className={`dash-tab-btn ${activeTab === 'shadow' ? 'active' : ''}`}
+        >
+          Shadow Expenditure (छाया व्यय)
+        </button>
       </div>
 
       <div className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
@@ -138,7 +145,7 @@ export function ElectionDashboard() {
             </button>
           </div>
         </div>
-      ) : (
+      ) : activeTab === 'exams' ? (
         <div className="glass-card" style={{ padding: '1.25rem' }}>
           <h3 style={{ fontSize: '1.15rem', marginBottom: '1rem', color: 'var(--status-delayed)' }}>Exam Delay Timeline / भर्ती परीक्षा चक्र</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.85rem' }}>
@@ -155,6 +162,8 @@ export function ElectionDashboard() {
             </button>
           </div>
         </div>
+      ) : (
+        <ShadowExpenditureCard pinCode={currentPin} />
       )}
 
     </div>

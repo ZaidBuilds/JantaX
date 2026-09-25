@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
 import { resolvePincode } from '../../../core/utils/pinResolver';
 import { ProvenanceBar, DisclaimerBar } from '../../../components/UI/Provenance';
+import { FundUtilizationAuditCard } from './FundUtilizationAuditCard';
 
 export function BudgetDashboard() {
   const { share } = useWhatsAppShare();
@@ -10,6 +11,7 @@ export function BudgetDashboard() {
   const initialPin = searchParams.get('pin') || '250001';
   const [pinInput, setPinInput] = useState(initialPin);
   const [currentPin, setCurrentPin] = useState(initialPin);
+  const [activeTab, setActiveTab] = useState<'distribution' | 'utilization'>('distribution');
 
   React.useEffect(() => {
     const p = searchParams.get("pin") || "250001";
@@ -57,6 +59,22 @@ export function BudgetDashboard() {
         </p>
       </div>
 
+      {/* Tab Navigation */}
+      <div className="dash-tab-group">
+        <button
+          onClick={() => setActiveTab('distribution')}
+          className={`dash-tab-btn ${activeTab === 'distribution' ? 'active' : ''}`}
+        >
+          Tax Distribution (कर आवंटन)
+        </button>
+        <button
+          onClick={() => setActiveTab('utilization')}
+          className={`dash-tab-btn ${activeTab === 'utilization' ? 'active' : ''}`}
+        >
+          Fund Utilization Audit (निधि उपयोग ऑडिट)
+        </button>
+      </div>
+
       <div className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
         <h3 style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>Search Local Budget</h3>
         <div className="dash-search-row">
@@ -79,31 +97,35 @@ export function BudgetDashboard() {
         )}
       </div>
 
-      <div className="glass-card" style={{ padding: '1.25rem' }}>
-        <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>Tax Rupee Distribution / टैक्स रुपए का आवंटन</h3>
-        <div style={{ display: 'grid', gap: '1rem' }}>
-          {budgetAllocation.sectors.map((s, idx) => (
-            <div key={idx} className="stat-box">
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.4rem' }}>
-                <span>{s.name}</span>
-                <span>{s.share}% (₹{s.spentCr} Cr)</span>
+      {activeTab === 'distribution' ? (
+        <div className="glass-card" style={{ padding: '1.25rem' }}>
+          <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>Tax Rupee Distribution / टैक्स रुपए का आवंटन</h3>
+          <div style={{ display: 'grid', gap: '1rem' }}>
+            {budgetAllocation.sectors.map((s, idx) => (
+              <div key={idx} className="stat-box">
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: 700, marginBottom: '0.4rem' }}>
+                  <span>{s.name}</span>
+                  <span>{s.share}% (₹{s.spentCr} Cr)</span>
+                </div>
+                <div className="progress-track">
+                  <div className="progress-fill" style={{ width: `${s.share}%`, background: s.color }}></div>
+                </div>
               </div>
-              <div className="progress-track">
-                <div className="progress-fill" style={{ width: `${s.share}%`, background: s.color }}></div>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        <ProvenanceBar observedAt={new Date().toISOString().slice(0,10)} sourceAt="Union Budget 2024-25" recalcAt={new Date().toISOString().slice(0,10)} sourceUrl="https://openbudgetsindia.org" sourceLabel="Open Budgets ↗" sampleSize={5} reportingDays={1} agreementRate={1} />
-        <DisclaimerBar />
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.9rem', gap:'0.5rem' }}>
-          <button onClick={async()=>{ const r=prompt('Correction reason?'); const d=prompt('Details?'); if(!r||!d) return; await fetch('/api/corrections',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({pinCode:currentPin, moduleId:'budget', reason:r, details:d})}); alert('Correction queued — 72h SLA'); }} style={{ fontSize:'0.72rem', color:'#ef4444', background:'transparent', border:'1px solid #fecaca', padding:'6px 10px', borderRadius:8, cursor:'pointer', fontWeight:700 }}>Report Data Issue →</button>
-          <button onClick={handleShare} className="btn-whatsapp">
-            📤 Share Budget Card
-          </button>
+          <ProvenanceBar observedAt={new Date().toISOString().slice(0,10)} sourceAt="Union Budget 2024-25" recalcAt={new Date().toISOString().slice(0,10)} sourceUrl="https://openbudgetsindia.org" sourceLabel="Open Budgets ↗" sampleSize={5} reportingDays={1} agreementRate={1} />
+          <DisclaimerBar />
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.9rem', gap:'0.5rem' }}>
+            <button onClick={async()=>{ const r=prompt('Correction reason?'); const d=prompt('Details?'); if(!r||!d) return; await fetch('/api/corrections',{method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({pinCode:currentPin, moduleId:'budget', reason:r, details:d})}); alert('Correction queued — 72h SLA'); }} style={{ fontSize:'0.72rem', color:'#ef4444', background:'transparent', border:'1px solid #fecaca', padding:'6px 10px', borderRadius:8, cursor:'pointer', fontWeight:700 }}>Report Data Issue →</button>
+            <button onClick={handleShare} className="btn-whatsapp">
+              📤 Share Budget Card
+            </button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <FundUtilizationAuditCard pinCode={currentPin} />
+      )}
     </div>
   );
 }

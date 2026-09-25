@@ -3,20 +3,10 @@ import { useSearchParams, Link } from 'react-router-dom';
 import {
   MapPin,
   ArrowRightLeft,
-  GraduationCap,
-  Hospital,
-  Construction,
-  Users,
-  Wind,
-  Building2,
   Share2,
-  CheckCircle2,
-  AlertTriangle,
   ChevronRight,
-  ShieldCheck,
-  TrendingUp,
-  TrendingDown,
 } from 'lucide-react';
+import { DualPinBenchmark } from './components/DualPinBenchmark';
 import { resolvePincode, resolvePincodeAccurate, ResolvedLocation } from '../core/utils/pinResolver';
 import { useLanguage } from '../core/context/LanguageContext';
 import { useWhatsAppShare } from '../core/hooks/useWhatsAppShare';
@@ -131,71 +121,7 @@ export function LocalityComparePage() {
     });
   };
 
-  const comparisonRows = [
-    {
-      category: 'Civic Health Index',
-      icon: ShieldCheck,
-      color: '#2563eb',
-      valA: `${metricsA.civicHealthScore}%`,
-      valB: `${metricsB.civicHealthScore}%`,
-      winner: metricsA.civicHealthScore >= metricsB.civicHealthScore ? 'A' : 'B',
-      detail: 'Composite score across education, healthcare, roads & governance',
-    },
-    {
-      category: 'School Quality (UDISE+)',
-      icon: GraduationCap,
-      color: '#059669',
-      valA: `${metricsA.schoolHealthPct}% (${metricsA.schoolsCount} schools)`,
-      valB: `${metricsB.schoolHealthPct}% (${metricsB.schoolsCount} schools)`,
-      winner: metricsA.schoolHealthPct >= metricsB.schoolHealthPct ? 'A' : 'B',
-      detail: `Student-Teacher Ratio: ${metricsA.studentTeacherRatio} vs ${metricsB.studentTeacherRatio}`,
-    },
-    {
-      category: 'Healthcare Capacity',
-      icon: Hospital,
-      color: '#db2777',
-      valA: `${metricsA.hospitalBedsUsable} beds (-${metricsA.hospitalDoctorVacancyPct}% drs)`,
-      valB: `${metricsB.hospitalBedsUsable} beds (-${metricsB.hospitalDoctorVacancyPct}% drs)`,
-      winner: metricsA.hospitalBedsUsable >= metricsB.hospitalBedsUsable ? 'A' : 'B',
-      detail: 'Operational functional beds and doctor vacancy rate in public hospitals',
-    },
-    {
-      category: 'Roads & Infrastructure (PWD)',
-      icon: Construction,
-      color: '#d97706',
-      valA: `${metricsA.infraCompletionPct}% (${metricsA.activeDlpRoadsCount} DLP)`,
-      valB: `${metricsB.infraCompletionPct}% (${metricsB.activeDlpRoadsCount} DLP)`,
-      winner: metricsA.infraCompletionPct >= metricsB.infraCompletionPct ? 'A' : 'B',
-      detail: 'Physical completion rate vs statutory IRC SP:98 warranty roads',
-    },
-    {
-      category: 'MP & MLA Fund Utilization',
-      icon: Users,
-      color: '#7c3aed',
-      valA: `${metricsA.repFundUtilizationPct}% (+${metricsA.repAverageCostHikePct}% hike)`,
-      valB: `${metricsB.repFundUtilizationPct}% (+${metricsB.repAverageCostHikePct}% hike)`,
-      winner: metricsA.repFundUtilizationPct >= metricsB.repFundUtilizationPct ? 'A' : 'B',
-      detail: 'MPLADS/MLALADS disbursed spending vs average project cost escalation',
-    },
-    {
-      category: 'Air Quality (Live AQI)',
-      icon: Wind,
-      color: '#0284c7',
-      valA: `${metricsA.aqiValue} (${metricsA.aqiCategory})`,
-      valB: `${metricsB.aqiValue} (${metricsB.aqiCategory})`,
-      winner: metricsA.aqiValue <= metricsB.aqiValue ? 'A' : 'B', // Lower AQI is better
-      detail: 'CPCB continuous ambient monitoring station readings',
-    },
-    {
-      category: 'Grievance Resolution Speed',
-      icon: Building2,
-      color: '#ea580c',
-      valA: `${metricsA.grievanceDisposalDays} Days`,
-      valB: `${metricsB.grievanceDisposalDays} Days`,
-      winner: metricsA.grievanceDisposalDays <= metricsB.grievanceDisposalDays ? 'A' : 'B', // Fewer days is better
-      detail: 'Average days to dispose CPGRAMS & CM Helpline complaints',
-    },
-  ];
+  // comparisonRows logic moved to DualPinBenchmark component
 
   return (
     <div style={{ padding: '2rem 0 4rem', minHeight: '80vh' }}>
@@ -326,59 +252,8 @@ export function LocalityComparePage() {
           </div>
         </div>
 
-        {/* Comparison Matrix Table */}
-        <div
-          style={{
-            background: '#ffffff',
-            borderRadius: 16,
-            border: '1px solid #e2e8f0',
-            overflow: 'hidden',
-            boxShadow: 'var(--shadow-card)',
-            marginBottom: '1.75rem',
-          }}
-        >
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 2fr 2fr', background: '#f8fafc', padding: '1rem 1.5rem', borderBottom: '1.5px solid #e2e8f0', fontWeight: 800, fontSize: '0.82rem', color: '#475569', textTransform: 'uppercase' }}>
-            <div>Public Domain / Indicator</div>
-            <div>{locA.district} ({pinA})</div>
-            <div>{locB.district} ({pinB})</div>
-          </div>
-
-          {comparisonRows.map((r, idx) => (
-            <div
-              key={idx}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '2fr 2fr 2fr',
-                padding: '1.25rem 1.5rem',
-                borderBottom: idx < comparisonRows.length - 1 ? '1px solid #f1f5f9' : 'none',
-                alignItems: 'center',
-                background: idx % 2 === 0 ? '#ffffff' : '#fcfcfd',
-              }}
-            >
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 800, fontSize: '0.95rem', color: '#0f172a' }}>
-                  <r.icon size={16} style={{ color: r.color }} />
-                  <span>{r.category}</span>
-                </div>
-                <div style={{ fontSize: '0.74rem', color: '#64748b', marginTop: '0.15rem' }}>
-                  {r.detail}
-                </div>
-              </div>
-
-              <div>
-                <div style={{ fontSize: '1rem', fontWeight: 800, color: r.winner === 'A' ? '#047857' : '#0f172a' }}>
-                  {r.valA} {r.winner === 'A' && <span style={{ fontSize: '0.72rem', background: '#ecfdf5', color: '#047857', padding: '0.15rem 0.4rem', borderRadius: 4, marginLeft: '0.35rem' }}>Leader</span>}
-                </div>
-              </div>
-
-              <div>
-                <div style={{ fontSize: '1rem', fontWeight: 800, color: r.winner === 'B' ? '#047857' : '#0f172a' }}>
-                  {r.valB} {r.winner === 'B' && <span style={{ fontSize: '0.72rem', background: '#ecfdf5', color: '#047857', padding: '0.15rem 0.4rem', borderRadius: 4, marginLeft: '0.35rem' }}>Leader</span>}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* 6-Pillar Weighted Comparison Matrix (Phase 6) */}
+        <DualPinBenchmark metricsA={metricsA} metricsB={metricsB} locA={locA} locB={locB} />
 
         {/* Bottom Actions */}
         <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '0.75rem' }}>
