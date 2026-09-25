@@ -1,20 +1,18 @@
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { ensurePincodeExists } from './pinHelpers';
+import { localStore } from '../db/localStore';
 
 const router = Router();
 
-function hashSeed(s: string): number {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) {
-    h = ((h * 31 + s.charCodeAt(i)) >>> 0);
-  }
-  return h;
-}
-
 export function generateServerRepresentatives(pinCode: string, district: string, state: string) {
-  const h = hashSeed(pinCode);
-  const isUrban = h % 2 === 0;
+  const pin = localStore.getPincode(pinCode);
+  const isUrban = !pin?.areaType?.toLowerCase().includes('rural');
+  const reps = localStore.getRepresentatives(pinCode);
+
+  const realMp = reps.find((r) => r.tier === 'MP_LOK_SABHA');
+  const realMla = reps.find((r) => r.tier === 'MLA');
+  const realGp = reps.find((r) => r.tier === 'GRAM_PANCHAYAT' || r.tier === 'BLOCK_PRAMUKH');
 
   // 1. Local Tier: Gram Panchayat (Rural) or Ward Councillor (Urban)
   const localRep = isUrban
@@ -23,23 +21,23 @@ export function generateServerRepresentatives(pinCode: string, district: string,
         tier: 'WARD_COUNCILLOR',
         tierLabel: 'Municipal Ward Councillor',
         tierLabelHi: 'वार्ड पार्षद / नगर निगम',
-        designation: `Councillor, Ward ${(h % 45) + 1}`,
-        designationHi: `पार्षद, वार्ड नं. ${(h % 45) + 1}`,
+        designation: `Councillor, Ward 08`,
+        designationHi: `पार्षद, वार्ड नं. 08`,
         name: `Sunil Kumar Verma`,
         nameHi: `सुनील कुमार वर्मा`,
         photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
         bodyName: `${district} Municipal Corporation (Nagar Nigam)`,
         bodyNameHi: `${district} नगर निगम`,
-        constituencyOrArea: `Ward ${(h % 45) + 1} (${district} Central)`,
-        constituencyOrAreaHi: `वार्ड नं. ${(h % 45) + 1} (${district} मध्य)`,
+        constituencyOrArea: `Ward 08 (${district} Central)`,
+        constituencyOrAreaHi: `वार्ड नं. 08 (${district} मध्य)`,
         district,
         state,
-        party: 'Independent',
+        party: 'Independent (ULB)',
         partyColor: '#64748b',
         termStart: '2022',
         termEnd: '2027',
-        officeAddress: `Nagar Nigam Zonal Office, Ward ${(h % 45) + 1}, ${district}`,
-        officeAddressHi: `नगर निगम जोनल कार्यालय, वार्ड ${(h % 45) + 1}, ${district}`,
+        officeAddress: `Nagar Nigam Zonal Office, Ward 08, ${district}`,
+        officeAddressHi: `नगर निगम जोनल कार्यालय, वार्ड 08, ${district}`,
         helplinePhone: `+91 941${pinCode.slice(0, 3)}00`,
         pincodesCovered: [pinCode],
         coOfficialName: 'Zonal Health & Sanitary Inspector',
@@ -58,6 +56,7 @@ export function generateServerRepresentatives(pinCode: string, district: string,
         totalWorksCompleted: 2,
         totalWorksDelayed: 1,
         avgHikePercentage: 8.5,
+
         works: [
           {
             id: `WRK-WARD-${pinCode}-01`,
@@ -173,37 +172,37 @@ export function generateServerRepresentatives(pinCode: string, district: string,
     tierLabelHi: 'विधायक (विधान सभा)',
     designation: 'MLA, State Legislative Assembly',
     designationHi: `विधायक, ${district} विधानसभा क्षेत्र`,
-    name: `Rajesh Singh Rathore`,
-    nameHi: `राजेश सिंह राठौड़`,
+    name: realMla ? realMla.nameEn : `Shri Rajesh Singh Rathore`,
+    nameHi: realMla ? realMla.nameHi : `श्री राजेश सिंह राठौड़`,
     photoUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80',
     bodyName: `${state} Legislative Assembly (Vidhan Sabha)`,
     bodyNameHi: `${state} विधान सभा`,
-    constituencyOrArea: `${district} Vidhan Sabha AC-${(h % 70) + 1}`,
-    constituencyOrAreaHi: `${district} विधानसभा क्षेत्र क्रमांक ${(h % 70) + 1}`,
+    constituencyOrArea: realMla?.constituencyOrArea || pin?.assemblyConstituency || `${district} Vidhan Sabha AC`,
+    constituencyOrAreaHi: realMla?.constituencyOrArea || pin?.assemblyConstituency || `${district} विधानसभा क्षेत्र`,
     district,
     state,
-    party: 'Elected Legislative Member',
+    party: realMla ? realMla.party : 'Elected Legislative Member',
     partyColor: '#ea580c',
     termStart: '2022',
     termEnd: '2027',
     officeAddress: `MLA Constituency Secretariat, Civil Lines, ${district}`,
     officeAddressHi: `विधायक जनसेवा सचिवालय, सिविल लाइंस, ${district}`,
-    helplinePhone: `+91 982${pinCode.slice(0, 3)}10`,
+    helplinePhone: realMla ? realMla.contactHelpline : `+91 982${pinCode.slice(0, 3)}10`,
     pincodesCovered: [pinCode],
     coOfficialName: 'Chief Development Officer (CDO)',
     coOfficialRole: 'District Rural Development Executive',
     fundSummary: {
-      entitledAmountCr: 5.00,
-      releasedByGovtCr: 4.50,
-      sanctionedWorksCr: 4.10,
-      expenditureReportedCr: 3.45,
-      unspentBalanceCr: 1.05,
-      utilizationPercentage: 76.7,
+      entitledAmountCr: realMla?.allocatedBudgetCr || 5.00,
+      releasedByGovtCr: realMla?.allocatedBudgetCr || 4.50,
+      sanctionedWorksCr: (realMla?.allocatedBudgetCr || 5.0) * 0.9,
+      expenditureReportedCr: realMla?.spentBudgetCr || 3.45,
+      unspentBalanceCr: realMla?.unspentBalanceCr || 1.05,
+      utilizationPercentage: realMla?.utilizationPct || 76.7,
       fundSchemeName: `${state} Vidhayak Nidhi (MLALADS)`,
-      lastAuditedDate: '10 Feb 2026',
+      lastAuditedDate: realMla?.lastUpdated || '10 Feb 2026',
     },
-    totalWorksCount: 4,
-    totalWorksCompleted: 2,
+    totalWorksCount: realMla?.sanctionedWorksCount || 4,
+    totalWorksCompleted: Math.max(1, Math.floor((realMla?.sanctionedWorksCount || 4) / 2)),
     totalWorksDelayed: 1,
     avgHikePercentage: 14.8,
     works: [
@@ -234,7 +233,7 @@ export function generateServerRepresentatives(pinCode: string, district: string,
         dlpStatus: 'Active DLP',
         schemeName: 'Vidhayak Nidhi (MLALADS)',
         groundTruthScore: 85,
-        sourceUrl: 'https://vidhansabha.nic.in',
+        sourceUrl: realMla?.sourceUrl || 'https://vidhansabha.nic.in',
         lastUpdatedDate: '2026-02-18',
       }
     ]
@@ -248,37 +247,37 @@ export function generateServerRepresentatives(pinCode: string, district: string,
     tierLabelHi: 'सांसद (लोक सभा)',
     designation: 'MP, 18th Lok Sabha',
     designationHi: `सांसद, 18वीं लोक सभा`,
-    name: `Dr. Anand Prakash Sharma`,
-    nameHi: `डॉ. आनंद प्रकाश शर्मा`,
+    name: realMp ? realMp.nameEn : `Dr. Anand Prakash Sharma`,
+    nameHi: realMp ? realMp.nameHi : `डॉ. आनंद प्रकाश शर्मा`,
     photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80',
     bodyName: `Lok Sabha, Parliament of India`,
     bodyNameHi: `लोक सभा, भारतीय संसद`,
-    constituencyOrArea: `${district} Parliamentary Constituency PC-${(h % 25) + 1}`,
-    constituencyOrAreaHi: `${district} संसदीय क्षेत्र`,
+    constituencyOrArea: realMp?.constituencyOrArea || pin?.parliamentaryConstituency || `${district} Parliamentary Constituency`,
+    constituencyOrAreaHi: realMp?.constituencyOrArea || pin?.parliamentaryConstituency || `${district} संसदीय क्षेत्र`,
     district,
     state,
-    party: 'Parliamentary Representative',
+    party: realMp ? realMp.party : 'Parliamentary Representative',
     partyColor: '#2563eb',
     termStart: '2024',
     termEnd: '2029',
     officeAddress: `MP Constituency Office, Collectorate Road, ${district}`,
     officeAddressHi: `सांसद कार्यालय, कलेक्ट्रेट रोड, ${district}`,
-    helplinePhone: `+91 981${pinCode.slice(0, 3)}20`,
+    helplinePhone: realMp ? realMp.contactHelpline : `+91 981${pinCode.slice(0, 3)}20`,
     pincodesCovered: [pinCode],
     coOfficialName: 'District Planning Officer (DPO)',
     coOfficialRole: 'MPLADS Nodal Officer',
     fundSummary: {
-      entitledAmountCr: 10.00,
-      releasedByGovtCr: 7.50,
-      sanctionedWorksCr: 6.80,
-      expenditureReportedCr: 5.20,
-      unspentBalanceCr: 2.30,
-      utilizationPercentage: 69.3,
+      entitledAmountCr: realMp?.allocatedBudgetCr || 5.00,
+      releasedByGovtCr: realMp?.allocatedBudgetCr || 5.00,
+      sanctionedWorksCr: (realMp?.allocatedBudgetCr || 5.0) * 0.85,
+      expenditureReportedCr: realMp?.spentBudgetCr || 3.80,
+      unspentBalanceCr: realMp?.unspentBalanceCr || 1.20,
+      utilizationPercentage: realMp?.utilizationPct || 76.0,
       fundSchemeName: 'MPLADS (Member of Parliament Local Area Development Scheme)',
-      lastAuditedDate: '01 Mar 2026',
+      lastAuditedDate: realMp?.lastUpdated || '01 Mar 2026',
     },
-    totalWorksCount: 5,
-    totalWorksCompleted: 2,
+    totalWorksCount: realMp?.sanctionedWorksCount || 5,
+    totalWorksCompleted: Math.max(1, Math.floor((realMp?.sanctionedWorksCount || 5) / 2)),
     totalWorksDelayed: 2,
     avgHikePercentage: 18.2,
     works: [

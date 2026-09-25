@@ -21,7 +21,7 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json();
 }
 
-import { getAuthenticPincode } from '../data/authenticData';
+import { getAuthenticPincode, getAuthenticRecordsForPin } from '../data/authenticData';
 
 // --- Resilient fallback when backend server is offline ---
 function markOffline() { try { if (typeof window !== 'undefined') localStorage.setItem('jantax_offline','1'); } catch {} }
@@ -44,232 +44,9 @@ function mockPincodeInfo(code: string, locAccurate?: any): PincodeInfo {
 
 function mockRecords(code: string, module?: string, locAccurate?: any): RecordsResponse {
   markOffline();
-  const h = (parseInt(code.slice(0, 4), 10) || 1100) % 20;
-  let loc: any = locAccurate || { state: 'India', district: 'Local District', region: 'Central', stateCode: 'IN' };
-  if (!locAccurate) {
-    try { loc = _resolvePincode(code); } catch {}
-  }
-  const coords = getCoordinateForPin(code);
-  const subArea = loc.postOffice ? `${loc.postOffice}, ` : '';
-  const localPlace = loc.postOffice || loc.block || loc.district;
-
-  const mkSchool = (i: number): ApiRecord => ({
-    id: `mock-school-${code}-${i}`,
-    moduleId: 'school',
-    location: { pinCode: code, state: loc.state, district: loc.district },
-    titleEnglish: i === 0 ? `Govt. Composite Model School (${subArea}${loc.district})` : `PM SHRI Govt. Primary School (${subArea}${loc.district})`,
-    titleHindi: i === 0 ? `राजकीय कम्पोजिट मॉडल विद्यालय (${subArea}${loc.district})` : `पीएम श्री सरकारी प्राथमिक विद्यालय (${subArea}${loc.district})`,
-    status: i % 2 === 0 ? 'Looking Steady' : 'Needs Attention',
-    groundTruthScore: 68 + (h + i * 7) % 30,
-    reality: { evidenceCount: i + 1 },
-    claim: { value: 100 },
-    updatedAt: new Date().toISOString(),
-    udiseCode: `09${code.slice(0, 4)}${i + 1}01`,
-    schoolLevel: i === 0 ? 'Upper Primary' : 'Primary',
-    managementType: 'Department of School Education',
-    officialStudentCount: 140 + i * 45,
-    officialTeacherCount: 5 + i * 2,
-    teachersSanctioned: 6 + i * 2,
-    hasToilet: true,
-    hasElectricity: true,
-    hasDrinkingWater: true,
-    lastCheckIn: new Date().toISOString(),
-  });
-
-  const mkInfra = (i: number): ApiRecord => {
-    return {
-      id: `mock-infra-${code}-${i}`,
-      moduleId: 'infra',
-      location: { pinCode: code, state: loc.state, district: loc.district },
-      titleEnglish: i === 0 ? `PMGSY Road & Drainage Network (${subArea}${loc.district})` : `PWD Connecting Highway Corridor ${code}-${i + 1}`,
-      titleHindi: i === 0 ? `पीएमजीएसवाई ग्रामीण सड़क एवं नाली निर्माण (${subArea}${loc.district})` : `लोक निर्माण मुख्य मार्ग संपर्क पैकेज ${code}-${i + 1}`,
-      status: ['Construction', 'Delayed', 'Completed'][i % 3],
-      groundTruthScore: 65 + (h + i * 5) % 32,
-      reality: { evidenceCount: i + 1 },
-      claim: { value: 60 + i * 15 },
-      updatedAt: new Date().toISOString(),
-      department: i === 0 ? 'PMGSY / Rural Works' : 'Public Works Department (PWD)',
-      ministry: i === 0 ? 'Ministry of Rural Development' : 'Ministry of Road Transport & Highways',
-      budget: `₹${14 + (h % 20) + i * 8} Cr`,
-      startDate: '2023-04-15',
-      expectedCompletion: '2025-06-30',
-      claimCompletionPct: 60 + i * 15,
-      responsibleOfficer: `Executive Engineer (${loc.district})`,
-      evidenceCount: i + 1,
-      sourceUrl: 'https://omms.nic.in',
-    };
-  };
-
-  const records: RecordsResponse['records'] = {};
-  const wantSchool = !module || module === 'school';
-  const wantInfra = !module || module === 'infra';
-  const wantRera = !module || module === 'rera';
-  const wantHospital = !module || module === 'hospital';
-  const wantPds = !module || module === 'pds';
-  const wantGrievance = !module || module === 'grievance';
-  const wantContractor = !module || module === 'contractor';
-
-  if (wantSchool) records.school = [mkSchool(0), mkSchool(1)];
-  if (wantInfra) records.infra = [mkInfra(0), mkInfra(1)];
-  if (wantRera) {
-    records.rera = [
-      {
-        id: `mock-rera-${code}-1`,
-        reraNumber: `RERA-${loc.stateCode || 'IN'}-${code}-01`,
-        name: `${localPlace} Green Heights Residency`,
-        promoter: `${loc.district} Infra Developers`,
-        status: 'Ongoing',
-        district: loc.district,
-        state: loc.state,
-        delayMonths: 8,
-        complaints: 4,
-        possessionDate: '2025-12-31'
-      } as any,
-      {
-        id: `mock-rera-${code}-2`,
-        reraNumber: `RERA-${loc.stateCode || 'IN'}-${code}-02`,
-        name: `${localPlace} Eco Smart Township`,
-        promoter: `Balaji Realcon Developers`,
-        status: 'Delayed',
-        district: loc.district,
-        state: loc.state,
-        delayMonths: 14,
-        complaints: 11,
-        possessionDate: '2024-06-30'
-      } as any,
-    ];
-  }
-  if (wantHospital) {
-    records.hospital = [
-      {
-        id: `mock-hosp-${code}-1`,
-        name: `District Civil Hospital, ${loc.district}`,
-        type: 'DISTRICT_HOSPITAL',
-        beds: 200,
-        bedsTotal: 200,
-        bedsOccupied: 164,
-        doctorsPresent: 18,
-        doctorPresent: true,
-        medicinesAvailable: true,
-        district: loc.district,
-        state: loc.state,
-      } as any,
-      {
-        id: `mock-hosp-${code}-2`,
-        name: `Community Health Centre (CHC) ${localPlace}`,
-        type: 'CHC',
-        beds: 30,
-        bedsTotal: 30,
-        bedsOccupied: 22,
-        doctorsPresent: 4,
-        doctorPresent: true,
-        medicinesAvailable: true,
-        district: loc.district,
-        state: loc.state,
-      } as any,
-    ];
-  }
-  if (wantPds) {
-    records.pds = [
-      {
-        id: `mock-pds-${code}-1`,
-        shopName: `Fair Price Ration Shop #108 (${localPlace})`,
-        dealerName: 'Shri Ram PDS Seva Kendra',
-        district: loc.district,
-        state: loc.state,
-        beneficiaries: 1420,
-        quotaDistributedPct: 94,
-        activeRationCards: 1420,
-      } as any,
-      {
-        id: `mock-pds-${code}-2`,
-        shopName: `Fair Price Ration Outlet #42 (${loc.district})`,
-        dealerName: 'Kisan Sahkari PDS Outlet',
-        district: loc.district,
-        state: loc.state,
-        beneficiaries: 980,
-        quotaDistributedPct: 91,
-        activeRationCards: 980,
-      } as any,
-    ];
-  }
-  if (wantGrievance) {
-    records.grievance = [{ id: `mock-griev-${code}`, ministry: 'Urban Development & Civic Amenities', category: 'Drainage and road maintenance delay', delayDays: 45 } as any];
-  }
-  if (wantContractor) {
-    records.contractor = [{ id: `mock-cont-${code}`, name: `${loc.district} Civil Infratech Pvt Ltd`, rating: 4.2, score: 78 } as any];
-  }
-  if (!module || module === 'andhbhakt') {
-    records.andhbhakt = [{
-      id: `mock-claim-${code}`,
-      stateCode: loc.stateCode || 'UP',
-      claimTitleEn: '100% Pothole-Free Roads Across State Districts',
-      claimTitleHindi: 'प्रदेश के सभी जिलों में 100% गड्ढामुक्त सड़कें',
-      cagReportRef: 'CAG State Finances Audit',
-      realitySeverity: 'HIGH',
-      realityTitleEn: 'CAG Audit: 38% Premature Bitumen Degradation Within 11 Months'
-    } as any];
-  }
-  if (!module || module === 'nagar') {
-    records.nagar = [{
-      id: `mock-ward-${code}`,
-      wardNo: `Ward ${code.slice(4, 6)}`,
-      pincode: code,
-      garbageClaimedSla: '24 Hours Door-to-Door Collection',
-      waterClaimedSla: '135 Litres/Capita/Day',
-      drainageClaimedSla: 'Weekly Mechanical Desilting'
-    } as any];
-  }
-  if (!module || module === 'budget') {
-    records.budget = [{
-      id: `mock-budget-${code}`,
-      pincode: code,
-      financialYear: '2024-25',
-      totalRevenueCr: 142.5,
-      totalAllocatedCr: 128.8,
-      allocations: [
-        { sectorNameEn: 'Roads & Bridges', allocatedCr: 48.5, utilizedCr: 36.2 },
-        { sectorNameEn: 'Drinking Water & Sanitation', allocatedCr: 34.0, utilizedCr: 21.8 }
-      ]
-    } as any];
-  }
-  if (!module || module === 'pollution') {
-    records.pollution = [{
-      id: `mock-station-${code}`,
-      stationName: `${loc.district} Continuous Ambient Air Quality Station`,
-      pincode: code,
-      aqiValue: 145 + (h % 100),
-      dominantPollutant: 'PM2.5'
-    } as any];
-  }
-  if (!module || module === 'land') {
-    records.land = [{
-      id: `mock-tehsil-${code}`,
-      tehsilName: `${loc.district} Sadar Tehsil`,
-      district: loc.district,
-      promisedSlaDays: 45,
-      mutationRecords: [{ surveyNumber: `Khasra ${code.slice(3)}/42`, daysTaken: 118, status: 'Delayed Overrun' }]
-    } as any];
-  }
-  if (!module || module === 'utility') {
-    records.utility = [{
-      id: `mock-feeder-${code}`,
-      feederName: `11kV ${loc.district} Town Feeder Line 2`,
-      promisedSupplyHours: 24,
-      outageLogs: [{ outageMinutes: 145, faultType: 'Transformer Overload' }]
-    } as any];
-  }
-  if (!module || module === 'election') {
-    records.election = [{
-      id: `mock-cand-${code}`,
-      candidateName: `Elected Representative (${loc.district})`,
-      declaredSpend: 38.5,
-      estimatedSpend: 142.0
-    } as any];
-  }
-
-  return { pincode: code, records };
+  return getAuthenticRecordsForPin(code, module, locAccurate) as RecordsResponse;
 }
+
 
 export interface PincodeInfo {
   code: string;
@@ -422,15 +199,16 @@ export const api = {
   getRecord: async (module: string, id: string) => {
     try { return await apiFetch<{ module: string; record: unknown }>(`/api/records/${module}/${id}`); }
     catch {
-      // Fallback: try to synthesize from mockRecords if id is mock-*
-      if (id.startsWith('mock-')) {
-        const codeMatch = id.match(/mock-\w+-(\d{6})/);
+      // Fallback: try to synthesize from mockRecords if id is mock-* or auth-*
+      if (id.startsWith('mock-') || id.startsWith('auth-')) {
+        const codeMatch = id.match(/(?:mock|auth)-\w+-(\d{6})/);
         const code = codeMatch ? codeMatch[1] : '110001';
         const recs = mockRecords(code);
         const all: ApiRecord[] = [...(recs.records.school||[]), ...(recs.records.infra||[])];
         const found = all.find(r=>r.id===id);
         if (found) return { module, record: found as unknown };
       }
+
       throw new Error('Record not found (offline fallback)');
     }
   },

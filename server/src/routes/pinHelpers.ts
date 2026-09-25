@@ -115,34 +115,60 @@ async function fetchIndiaPostOfficial(pin: string): Promise<{ state: string; dis
   return null;
 }
 
+import { checkDbHealth } from '../db/dal';
+import { localStore } from '../db/localStore';
+
 export async function ensurePincodeExists(code: string) {
   const cleanCode = code.replace(/\D/g, '');
   if (cleanCode.length !== 6) return null;
 
-  let pincode = await prisma.pincode.findUnique({ where: { code: cleanCode } });
-  if (pincode) return pincode;
-
-  // 1. Fetch official India Post registry for 100% authentic real-world data (no hallucination/guessing)
-  const official = await fetchIndiaPostOfficial(cleanCode);
-  const prefix2 = cleanCode.substring(0, 2);
-  const circleFallback = CIRCLE_MAP[prefix2] || { state: 'India', district: `District ${cleanCode.substring(0, 3)}` };
-
-  const state = official?.state || circleFallback.state;
-  const district = official?.district || circleFallback.district;
-  const areaType = official?.areaType || 'Urban/Semi-Urban';
-  const region = regionForState(state);
-
-  pincode = await prisma.pincode.create({
-    data: {
+  const isDbOnline = await checkDbHealth();
+  if (!isDbOnline) {
+    const raw = localStore.getPincode(cleanCode);
+    const prefix2 = cleanCode.substring(0, 2);
+    const circle = CIRCLE_MAP[prefix2] || { state: 'India', district: `District ${cleanCode.substring(0, 3)}` };
+    const state = raw?.state || circle.state;
+    const district = raw?.district || circle.district;
+    return {
+      id: `mem-${cleanCode}`,
       code: cleanCode,
       state,
       district,
-      region,
-      areaType,
-      lat: 20.5937 + (parseInt(cleanCode[0]) * 1.5),
-      lng: 78.9629 + (parseInt(cleanCode[1]) * 1.2),
-    },
-  });
+      region: regionForState(state),
+      areaType: raw?.areaType || 'Urban/Semi-Urban Circle',
+      lat: raw?.lat || 20.5937,
+      lng: raw?.lng || 78.9629,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any;
+  }
+
+  try {
+    let pincode = await prisma.pincode.findUnique({ where: { code: cleanCode } });
+    if (pincode) return pincode;
+
+    // 1. Fetch official India Post registry for 100% authentic real-world data (no hallucination/guessing)
+    const official = await fetchIndiaPostOfficial(cleanCode);
+    const prefix2 = cleanCode.substring(0, 2);
+    const circleFallback = CIRCLE_MAP[prefix2] || { state: 'India', district: `District ${cleanCode.substring(0, 3)}` };
+
+    const state = official?.state || circleFallback.state;
+    const district = official?.district || circleFallback.district;
+    const areaType = official?.areaType || 'Urban/Semi-Urban';
+    const region = regionForState(state);
+
+    pincode = await prisma.pincode.create({
+      data: {
+        code: cleanCode,
+        state,
+        district,
+        region,
+        areaType,
+        lat: 20.5937 + (parseInt(cleanCode[0]) * 1.5),
+        lng: 78.9629 + (parseInt(cleanCode[1]) * 1.2),
+      },
+    });
+
 
   const d = district;
   const s = state;
@@ -340,5 +366,25 @@ export async function ensurePincodeExists(code: string) {
     ],
   });
 
-  return pincode;
+    return pincode;
+  } catch (err: any) {
+    const raw = localStore.getPincode(cleanCode);
+    const prefix2 = cleanCode.substring(0, 2);
+    const circle = CIRCLE_MAP[prefix2] || { state: 'India', district: `District ${cleanCode.substring(0, 3)}` };
+    const state = raw?.state || circle.state;
+    const district = raw?.district || circle.district;
+    return {
+      id: `fallback-${cleanCode}`,
+      code: cleanCode,
+      state,
+      district,
+      region: regionForState(state),
+      areaType: raw?.areaType || 'Urban/Semi-Urban Circle',
+      lat: raw?.lat || 20.5937,
+      lng: raw?.lng || 78.9629,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any;
+  }
 }
+

@@ -267,14 +267,32 @@ export function resolvePincode(pin: string): ResolvedLocation {
   const match3 = PIN_3DIGIT_MAP[prefix3];
 
   if (match3) {
-    return { pinCode: cleaned, state: match3.state, stateCode: match3.stateCode, district: match3.district, region: match3.region, isValid: true };
+    return {
+      pinCode: cleaned,
+      state: match3.state,
+      stateCode: match3.stateCode,
+      district: match3.district,
+      region: match3.region,
+      postOffice: `${match3.district} Head Post Office`,
+      block: `${match3.district} Sub-Division`,
+      isValid: true,
+    };
   }
 
   const prefix2 = cleaned.substring(0, 2);
   const match2 = PIN_2DIGIT_MAP[prefix2];
 
   if (match2) {
-    return { pinCode: cleaned, state: match2.state, stateCode: match2.stateCode, district: match2.district, region: match2.region, isValid: true };
+    return {
+      pinCode: cleaned,
+      state: match2.state,
+      stateCode: match2.stateCode,
+      district: match2.district,
+      region: match2.region,
+      postOffice: `${match2.district} Head Post Office`,
+      block: `${match2.district} Sub-Division`,
+      isValid: true,
+    };
   }
 
   const firstDigit = cleaned[0];
@@ -291,8 +309,18 @@ export function resolvePincode(pin: string): ResolvedLocation {
     '9': { state: 'Army Postal Service', stateCode: 'APS', district: 'Central Base Post Office' },
   };
   const fallback = ZONAL_DISTRICTS[firstDigit] || { state: 'India', stateCode: 'IN', district: `Postal Region ${firstDigit}` };
-  return { pinCode: cleaned, state: fallback.state, stateCode: fallback.stateCode, district: fallback.district, region, isValid: true };
+  return {
+    pinCode: cleaned,
+    state: fallback.state,
+    stateCode: fallback.stateCode,
+    district: fallback.district,
+    region,
+    postOffice: `${fallback.district} Post Office`,
+    block: `${fallback.district} Division`,
+    isValid: true,
+  };
 }
+
 
 // In-memory and persistent client-side cache for verified India Post Lookups
 const VERIFIED_PIN_CACHE = new Map<string, ResolvedLocation>();

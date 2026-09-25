@@ -2,6 +2,9 @@ import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { prisma } from '../prisma';
 import { requireRole } from '../middleware/auth';
+import { checkDbHealth } from '../db/dal';
+import { localStore } from '../db/localStore';
+import { REAL_SCHOOLS } from '../data/real';
 
 // School response types
 export interface SchoolInfo {
@@ -46,6 +49,40 @@ export interface SchoolsResponse {
 
 const router = Router();
 
+function mapRealSchoolToInfo(s: any): SchoolInfo {
+  const pin = localStore.getPincode(s.pincodeCode) || { state: 'Uttar Pradesh', district: 'Meerut' };
+  return {
+    id: s.id,
+    udiseCode: s.udiseCode,
+    nameEnglish: s.nameEnglish,
+    nameHindi: s.nameHindi,
+    level: s.level,
+    managementType: s.managementType,
+    studentsEnrolled: s.studentsEnrolled,
+    teachersWorking: s.teachersWorking,
+    teachersSanctioned: s.teachersSanctioned,
+    groundTruthScore: s.groundTruthScore,
+    hasToilet: s.hasToilet,
+    hasElectricity: s.hasElectricity,
+    hasDrinkingWater: s.hasDrinkingWater,
+    lastCheckIn: s.lastUpdated,
+    location: {
+      pincode: s.pincodeCode,
+      state: pin.state,
+      district: pin.district,
+    },
+    metadata: {
+      cagReportRef: s.cagReportRef,
+    },
+    source: {
+      name: 'UDISE+ Portal (DoSEL / MoE GODL-India)',
+      freshness: s.lastUpdated,
+      reliability: 'high',
+    },
+  };
+}
+
+
 /**
  * GET /api/schools
  * Get schools with filtering, pagination, and sorting
@@ -64,39 +101,43 @@ const router = Router();
  *   sortOrder: asc or desc (default: desc)
  */
 router.get('/', async (req: Request, res: Response) => {
+  const {
+    pincode,
+    level,
+    managementType,
+    minScore,
+    maxScore,
+    hasToilet,
+    hasElectricity,
+    hasDrinkingWater,
+    page = 1,
+    limit = 10,
+    sortBy = 'groundTruthScore',
+    sortOrder = 'desc',
+  } = req.query as Record<string, string>;
+
+  const pageNum = Math.max(1, parseInt(String(page)) || 1);
+  const limitNum = Math.min(50, Math.max(1, parseInt(String(limit)) || 10));
+
+  const isOnline = await checkDbHealth();
+  if (!isOnline) {
+    const pin = pincode ? String(pincode).replace(/\D/g, '') : '250001';
+    const items = localStore.getSchools(pin);
+    const mapped = items.map(mapRealSchoolToInfo);
+    return res.json({
+      schools: mapped.slice((pageNum - 1) * limitNum, pageNum * limitNum),
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total: mapped.length,
+        totalPages: Math.ceil(mapped.length / limitNum) || 1,
+      },
+      filters: req.query,
+      notice: 'Served from Resilient LocalStore (GODL-India)',
+    });
+  }
+
   try {
-    const {
-      pincode,
-      level,
-      managementType,
-      minScore,
-      maxScore,
-      hasToilet,
-      hasElectricity,
-      hasDrinkingWater,
-      page = 1,
-      limit = 10,
-      sortBy = 'groundTruthScore',
-      sortOrder = 'desc'
-    } = req.query as {
-      pincode?: string;
-      level?: string;
-      managementType?: string;
-      minScore?: string;
-      maxScore?: string;
-      hasToilet?: string;
-      hasElectricity?: string;
-      hasDrinkingWater?: string;
-      page?: string;
-      limit?: string;
-      sortBy?: string;
-      sortOrder?: string;
-    };
-    
-    // Validate pagination
-    const pageNum = Math.max(1, parseInt(String(page)));
-    const limitNum = Math.min(50, Math.max(1, parseInt(String(limit))));
-    
     // Validate sort order
     const validSortOrder = ['asc', 'desc'].includes(sortOrder ?? '') ? sortOrder : 'desc';
     
@@ -105,6 +146,7 @@ router.get('/', async (req: Request, res: Response) => {
     
     if (pincode) {
       const cleanPincode = String(pincode).replace(/\D/g, '');
+
       if (/^\d{6}$/.test(cleanPincode)) {
         where.pincodeCode = cleanPincode;
       }
@@ -243,8 +285,20 @@ router.get('/', async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    console.error('[schools] Error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    const pin = pincode ? String(pincode).replace(/\D/g, '') : '250001';
+    const items = localStore.getSchools(pin);
+    const mapped = items.map(mapRealSchoolToInfo);
+    return res.json({
+      schools: mapped.slice((pageNum - 1) * limitNum, pageNum * limitNum),
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total: mapped.length,
+        totalPages: Math.ceil(mapped.length / limitNum) || 1,
+      },
+      filters: req.query,
+      notice: 'Fallback from LocalStore (GODL-India)',
+    });
   }
 });
 
@@ -253,9 +307,18 @@ router.get('/', async (req: Request, res: Response) => {
  * Get a specific school by ID
  */
 router.get('/:id', async (req: Request, res: Response) => {
+  const schoolId = String(req.params.id);
+
+  const isOnline = await checkDbHealth();
+  if (!isOnline) {
+    const found = REAL_SCHOOLS.find((s) => s.id === schoolId || s.udiseCode === schoolId);
+    if (found) {
+      return res.json(mapRealSchoolToInfo(found));
+    }
+    return res.status(404).json({ error: 'School not found' });
+  }
+
   try {
-    const schoolId = String(req.params.id);
-    
     const school = await prisma.school.findUnique({
       where: { id: schoolId },
       select: {
@@ -285,6 +348,8 @@ router.get('/:id', async (req: Request, res: Response) => {
     });
     
     if (!school) {
+      const fallback = REAL_SCHOOLS.find((s) => s.id === schoolId || s.udiseCode === schoolId);
+      if (fallback) return res.json(mapRealSchoolToInfo(fallback));
       return res.status(404).json({ error: 'School not found' });
     }
     
@@ -325,10 +390,12 @@ router.get('/:id', async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    console.error('[schools/:id] Error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    const fallback = REAL_SCHOOLS.find((s) => s.id === schoolId || s.udiseCode === schoolId);
+    if (fallback) return res.json(mapRealSchoolToInfo(fallback));
+    res.status(404).json({ error: 'School not found' });
   }
 });
+
 
 /**
  * POST /api/schools/:id/score

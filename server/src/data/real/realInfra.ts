@@ -25,7 +25,7 @@ export interface RealInfraProject {
 }
 
 export const REAL_INFRA: RealInfraProject[] = [
-  // 110001 - New Delhi
+  // --- 110001: New Delhi ---
   {
     id: 'inf-110001-01',
     pincodeCode: '110001',
@@ -49,7 +49,7 @@ export const REAL_INFRA: RealInfraProject[] = [
     lastUpdated: '2026-02-15',
   },
 
-  // 250001 - Meerut Cantt
+  // --- 250001: Meerut Cantt ---
   {
     id: 'inf-250001-01',
     pincodeCode: '250001',
@@ -96,7 +96,7 @@ export const REAL_INFRA: RealInfraProject[] = [
     lastUpdated: '2026-02-18',
   },
 
-  // 250342 - Meerut Mawana (Rural PMGSY)
+  // --- 250342: Meerut Mawana (Rural PMGSY) ---
   {
     id: 'inf-250342-01',
     pincodeCode: '250342',
@@ -121,7 +121,7 @@ export const REAL_INFRA: RealInfraProject[] = [
     lastUpdated: '2026-01-25',
   },
 
-  // 221001 - Varanasi Cantt
+  // --- 221001: Varanasi Cantt ---
   {
     id: 'inf-221001-01',
     pincodeCode: '221001',
@@ -145,7 +145,7 @@ export const REAL_INFRA: RealInfraProject[] = [
     lastUpdated: '2026-02-12',
   },
 
-  // 560001 - Bengaluru Urban
+  // --- 560001: Bengaluru Urban ---
   {
     id: 'inf-560001-01',
     pincodeCode: '560001',
@@ -167,5 +167,77 @@ export const REAL_INFRA: RealInfraProject[] = [
     isDlpActive: true,
     sourceUrl: 'https://bbmp.gov.in',
     lastUpdated: '2026-02-08',
+  },
+
+  // --- 400001: Mumbai Fort ---
+  {
+    id: 'inf-400001-01',
+    pincodeCode: '400001',
+    packageNo: 'MCGM-RDS-2024-A01',
+    titleEnglish: 'South Mumbai Heritage Precinct Heritage Pavement & Storm Culvert Retrofit',
+    titleHindi: 'दक्षिण मुंबई हेरिटेज क्षेत्र पेवमेंट एवं स्टॉर्म ड्रेन पुनर्निर्माण',
+    department: 'Municipal Corporation of Greater Mumbai (MCGM)',
+    ministry: 'Urban Development Department, Maharashtra',
+    budgetCr: 45.8,
+    startDate: '2023-10-01',
+    expectedCompletion: '2025-03-31',
+    status: 'ONGOING',
+    claimCompletionPct: 85,
+    groundTruthScore: 82,
+    contractorName: 'MEP Infrastructure Developers Ltd.',
+    responsibleOfficer: 'Deputy Municipal Commissioner (Infrastructure)',
+    implementingAgency: 'MCGM Roads & Traffic Division',
+    dlpExpiryDate: '2029-03-31',
+    isDlpActive: true,
+    sourceUrl: 'https://portal.mcgm.gov.in',
+    lastUpdated: '2026-02-14',
+  },
+
+  // --- 600001: Chennai George Town ---
+  {
+    id: 'inf-600001-01',
+    pincodeCode: '600001',
+    packageNo: 'GCC-BR-2024-04',
+    titleEnglish: 'George Town Coastal Drainage & North Fort Arterial Pavement Renewal',
+    titleHindi: 'जॉर्ज टाउन तटीय जल निकासी एवं नॉर्थ फोर्ट मुख्य सड़क नवीनीकरण',
+    department: 'Greater Chennai Corporation (GCC)',
+    ministry: 'Municipal Administration and Water Supply, Tamil Nadu',
+    budgetCr: 28.6,
+    startDate: '2024-02-15',
+    expectedCompletion: '2025-05-30',
+    status: 'ONGOING',
+    claimCompletionPct: 70,
+    groundTruthScore: 74,
+    contractorName: 'BGR Infra Engineering Ltd.',
+    responsibleOfficer: 'Superintending Engineer (GCC Bus Routes)',
+    implementingAgency: 'Greater Chennai Corporation Works Dept',
+    dlpExpiryDate: '2029-05-30',
+    isDlpActive: true,
+    sourceUrl: 'https://chennaicorporation.gov.in',
+    lastUpdated: '2026-02-10',
+  },
+
+  // --- 700001: Kolkata BBD Bagh ---
+  {
+    id: 'inf-700001-01',
+    pincodeCode: '700001',
+    packageNo: 'KMC-CIVIL-2024-18',
+    titleEnglish: 'Dalhousie Central Heritage Corridor Flyover Overhaul & Underground Power Grid',
+    titleHindi: 'डलहौजी सेंट्रल हेरिटेज कॉरिडोर ओवरब्रिज मरम्मत एवं भूमिगत विद्युत ग्रिड',
+    department: 'Kolkata Municipal Corporation (KMC)',
+    ministry: 'Urban Development & Municipal Affairs, West Bengal',
+    budgetCr: 36.2,
+    startDate: '2023-09-01',
+    expectedCompletion: '2024-11-30',
+    status: 'DELAYED',
+    claimCompletionPct: 78,
+    groundTruthScore: 60,
+    contractorName: 'Simplex Infrastructures Ltd.',
+    responsibleOfficer: 'Director General (Civil Infrastructure KMC)',
+    implementingAgency: 'Kolkata Municipal Corporation',
+    dlpExpiryDate: '2028-11-30',
+    isDlpActive: true,
+    sourceUrl: 'https://kmcgov.in',
+    lastUpdated: '2026-02-07',
   },
 ];

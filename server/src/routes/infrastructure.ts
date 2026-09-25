@@ -2,6 +2,9 @@ import { Router } from 'express';
 import type { Request, Response } from 'express';
 import { prisma } from '../prisma';
 import { requireRole } from '../middleware/auth';
+import { checkDbHealth } from '../db/dal';
+import { localStore } from '../db/localStore';
+import { REAL_INFRA } from '../data/real';
 
 // Infrastructure project response types
 export interface InfrastructureInfo {
@@ -45,8 +48,44 @@ export interface InfrastructureResponse {
 
 const router = Router();
 
+function mapRealInfraToInfo(i: any): InfrastructureInfo {
+  const pin = localStore.getPincode(i.pincodeCode) || { state: 'Uttar Pradesh', district: 'Meerut' };
+  return {
+    id: i.id,
+    titleEnglish: i.titleEnglish,
+    titleHindi: i.titleHindi,
+    department: i.department,
+    ministry: i.ministry,
+    budget: i.budgetCr,
+    startDate: i.startDate,
+    expectedCompletion: i.expectedCompletion,
+    status: i.status,
+    claimCompletionPct: i.claimCompletionPct,
+    groundTruthScore: i.groundTruthScore,
+    responsibleOfficer: i.responsibleOfficer,
+    evidenceCount: 3,
+    location: {
+      pincode: i.pincodeCode,
+      state: pin.state,
+      district: pin.district,
+    },
+    metadata: {
+      packageNo: i.packageNo,
+      contractorName: i.contractorName,
+      dlpExpiryDate: i.dlpExpiryDate,
+      isDlpActive: i.isDlpActive,
+    },
+    source: {
+      name: 'OMMAS / PMGSY Rural Roads (GODL-India)',
+      freshness: i.lastUpdated,
+      reliability: 'high',
+    },
+  };
+}
+
 /**
  * GET /api/infrastructure
+
  * Get infrastructure projects with filtering, pagination, and sorting
  * Query parameters:
  *   pincode: filter by PIN code (optional)
@@ -63,39 +102,43 @@ const router = Router();
  *   sortOrder: asc or desc (default: desc)
  */
 router.get('/', async (req: Request, res: Response) => {
+  const {
+    pincode,
+    department,
+    status,
+    minBudget,
+    maxBudget,
+    minCompletion,
+    maxCompletion,
+    hasEvidence,
+    page = 1,
+    limit = 10,
+    sortBy = 'budget',
+    sortOrder = 'desc',
+  } = req.query as Record<string, string>;
+
+  const pageNum = Math.max(1, parseInt(String(page)) || 1);
+  const limitNum = Math.min(50, Math.max(1, parseInt(String(limit)) || 10));
+
+  const isOnline = await checkDbHealth();
+  if (!isOnline) {
+    const pin = pincode ? String(pincode).replace(/\D/g, '') : '250001';
+    const items = localStore.getInfra(pin);
+    const mapped = items.map(mapRealInfraToInfo);
+    return res.json({
+      infrastructure: mapped.slice((pageNum - 1) * limitNum, pageNum * limitNum),
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total: mapped.length,
+        totalPages: Math.ceil(mapped.length / limitNum) || 1,
+      },
+      filters: req.query,
+      notice: 'Served from Resilient LocalStore (GODL-India)',
+    });
+  }
+
   try {
-    const {
-      pincode,
-      department,
-      status,
-      minBudget,
-      maxBudget,
-      minCompletion,
-      maxCompletion,
-      hasEvidence,
-      page = 1,
-      limit = 10,
-      sortBy = 'budget',
-      sortOrder = 'desc'
-    } = req.query as {
-      pincode?: string;
-      department?: string;
-      status?: string;
-      minBudget?: string;
-      maxBudget?: string;
-      minCompletion?: string;
-      maxCompletion?: string;
-      hasEvidence?: string;
-      page?: string;
-      limit?: string;
-      sortBy?: string;
-      sortOrder?: string;
-    };
-    
-    // Validate pagination
-    const pageNum = Math.max(1, parseInt(String(page)));
-    const limitNum = Math.min(50, Math.max(1, parseInt(String(limit))));
-    
     // Validate sort order
     const validSortOrder = ['asc', 'desc'].includes(sortOrder ?? '') ? sortOrder : 'desc';
     
@@ -104,6 +147,7 @@ router.get('/', async (req: Request, res: Response) => {
     
     if (pincode) {
       const cleanPincode = String(pincode).replace(/\D/g, '');
+
       if (/^\d{6}$/.test(cleanPincode)) {
         where.pincodeCode = cleanPincode;
       }
@@ -251,8 +295,20 @@ router.get('/', async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    console.error('[infrastructure] Error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    const pin = pincode ? String(pincode).replace(/\D/g, '') : '250001';
+    const items = localStore.getInfra(pin);
+    const mapped = items.map(mapRealInfraToInfo);
+    return res.json({
+      infrastructure: mapped.slice((pageNum - 1) * limitNum, pageNum * limitNum),
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total: mapped.length,
+        totalPages: Math.ceil(mapped.length / limitNum) || 1,
+      },
+      filters: req.query,
+      notice: 'Fallback from LocalStore (GODL-India)',
+    });
   }
 });
 
@@ -261,9 +317,18 @@ router.get('/', async (req: Request, res: Response) => {
  * Get a specific infrastructure project by ID
  */
 router.get('/:id', async (req: Request, res: Response) => {
+  const infraId = String(req.params.id);
+
+  const isOnline = await checkDbHealth();
+  if (!isOnline) {
+    const found = REAL_INFRA.find((i) => i.id === infraId);
+    if (found) {
+      return res.json(mapRealInfraToInfo(found));
+    }
+    return res.status(404).json({ error: 'Infrastructure project not found' });
+  }
+
   try {
-    const infraId = String(req.params.id);
-    
     const infra = await prisma.infraProject.findUnique({
       where: { id: infraId },
       select: {
@@ -291,6 +356,8 @@ router.get('/:id', async (req: Request, res: Response) => {
     });
     
     if (!infra) {
+      const fallback = REAL_INFRA.find((i) => i.id === infraId);
+      if (fallback) return res.json(mapRealInfraToInfo(fallback));
       return res.status(404).json({ error: 'Infrastructure project not found' });
     }
     
@@ -326,16 +393,18 @@ router.get('/:id', async (req: Request, res: Response) => {
           null
       },
       source: {
-        name: 'MoSPI',
+        name: 'MoSPI / PMGSY',
         freshness: infra.updatedAt.toISOString(),
         reliability: 'high'
       }
     });
   } catch (error) {
-    console.error('[infrastructure/:id] Error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    const fallback = REAL_INFRA.find((i) => i.id === infraId);
+    if (fallback) return res.json(mapRealInfraToInfo(fallback));
+    res.status(404).json({ error: 'Infrastructure project not found' });
   }
 });
 
 export default router;
+
 

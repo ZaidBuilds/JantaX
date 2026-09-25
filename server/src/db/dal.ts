@@ -56,8 +56,9 @@ export const dal = {
     }
 
     return {
-      code: raw.code,
+      code,
       state: raw.state,
+
       stateCode: raw.stateCode,
       district: raw.district,
       region: raw.region,

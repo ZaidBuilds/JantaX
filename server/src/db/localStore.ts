@@ -120,57 +120,156 @@ class LocalStore {
     }
   }
 
-  // --- Lookups ---
+  // --- Lookups with Pan-India 9-Zone Coverage ---
 
   getPincode(code: string): RealPincode | null {
     if (this.pincodes.has(code)) return this.pincodes.get(code)!;
-    // Fallback: Check if prefix matches any known region
+
+    // 2-digit prefix matching
     const prefix2 = code.substring(0, 2);
-    if (prefix2 === '25') return this.pincodes.get('250001') || null;
+    const prefix1 = code.substring(0, 1);
+
+    // Zone 1: Delhi, Haryana, Punjab, HP, J&K, Chandigarh
     if (prefix2 === '11') return this.pincodes.get('110001') || null;
+    if (prefix2 === '16') return this.pincodes.get('160001') || null;
+    if (prefix2 === '19') return this.pincodes.get('190001') || null;
+    if (prefix1 === '1') return this.pincodes.get('110001') || null;
+
+    // Zone 2: Uttar Pradesh, Uttarakhand
+    if (prefix2 === '25') return this.pincodes.get('250001') || null;
     if (prefix2 === '22') return this.pincodes.get('221001') || null;
+    if (prefix1 === '2') return this.pincodes.get('250001') || null;
+
+    // Zone 3: Rajasthan, Gujarat
+    if (prefix2 === '30') return this.pincodes.get('302001') || null;
+    if (prefix2 === '38') return this.pincodes.get('380001') || null;
+    if (prefix1 === '3') return this.pincodes.get('302001') || null;
+
+    // Zone 4: Maharashtra, MP, Goa, Chhattisgarh
+    if (prefix2 === '40') return this.pincodes.get('400001') || null;
+    if (prefix2 === '46') return this.pincodes.get('462001') || null;
+    if (prefix1 === '4') return this.pincodes.get('400001') || null;
+
+    // Zone 5: Andhra, Telangana, Karnataka
     if (prefix2 === '56') return this.pincodes.get('560001') || null;
+    if (prefix2 === '50') return this.pincodes.get('500001') || null;
+    if (prefix1 === '5') return this.pincodes.get('560001') || null;
+
+    // Zone 6: Tamil Nadu, Kerala
+    if (prefix2 === '60') return this.pincodes.get('600001') || null;
+    if (prefix2 === '68') return this.pincodes.get('682001') || null;
+    if (prefix1 === '6') return this.pincodes.get('600001') || null;
+
+    // Zone 7: West Bengal, Odisha, North East
+    if (prefix2 === '70') return this.pincodes.get('700001') || null;
+    if (prefix1 === '7') return this.pincodes.get('700001') || null;
+
+    // Zone 8: Bihar, Jharkhand
+    if (prefix2 === '80') return this.pincodes.get('800001') || null;
+    if (prefix1 === '8') return this.pincodes.get('800001') || null;
+
+    // Zone 9: Central / Army Postal
     return this.pincodes.get('110001') || null;
   }
 
   getSchools(pinCode: string): RealSchool[] {
-    return this.schoolsByPin.get(pinCode) || this.schoolsByPin.get('250001') || [];
+    const direct = this.schoolsByPin.get(pinCode);
+    if (direct && direct.length > 0) return direct;
+    const pin = this.getPincode(pinCode);
+    if (pin && this.schoolsByPin.has(pin.code)) {
+      return this.schoolsByPin.get(pin.code)!;
+    }
+    return this.schoolsByPin.get('250001') || [];
   }
 
   getInfra(pinCode: string): RealInfraProject[] {
-    return this.infraByPin.get(pinCode) || this.infraByPin.get('250001') || [];
+    const direct = this.infraByPin.get(pinCode);
+    if (direct && direct.length > 0) return direct;
+    const pin = this.getPincode(pinCode);
+    if (pin && this.infraByPin.has(pin.code)) {
+      return this.infraByPin.get(pin.code)!;
+    }
+    return this.infraByPin.get('250001') || [];
   }
 
   getRera(pinCode: string): RealReraProject[] {
-    return this.reraByPin.get(pinCode) || this.reraByPin.get('250001') || [];
+    const direct = this.reraByPin.get(pinCode);
+    if (direct && direct.length > 0) return direct;
+    const pin = this.getPincode(pinCode);
+    if (pin && this.reraByPin.has(pin.code)) {
+      return this.reraByPin.get(pin.code)!;
+    }
+    return this.reraByPin.get('250001') || [];
   }
 
   getHospitals(pinCode: string): RealHospital[] {
-    return this.hospitalsByPin.get(pinCode) || this.hospitalsByPin.get('250001') || [];
+    const direct = this.hospitalsByPin.get(pinCode);
+    if (direct && direct.length > 0) return direct;
+    const pin = this.getPincode(pinCode);
+    if (pin && this.hospitalsByPin.has(pin.code)) {
+      return this.hospitalsByPin.get(pin.code)!;
+    }
+    return this.hospitalsByPin.get('250001') || [];
   }
 
   getPds(pinCode: string): RealPdsShop[] {
-    return this.pdsByPin.get(pinCode) || this.pdsByPin.get('250001') || [];
+    const direct = this.pdsByPin.get(pinCode);
+    if (direct && direct.length > 0) return direct;
+    const pin = this.getPincode(pinCode);
+    if (pin && this.pdsByPin.has(pin.code)) {
+      return this.pdsByPin.get(pin.code)!;
+    }
+    return this.pdsByPin.get('250001') || [];
   }
 
   getGrievances(pinCode: string): RealCpgramsRecord[] {
-    return this.grievancesByPin.get(pinCode) || this.grievancesByPin.get('110001') || [];
+    const direct = this.grievancesByPin.get(pinCode);
+    if (direct && direct.length > 0) return direct;
+    const pin = this.getPincode(pinCode);
+    if (pin && this.grievancesByPin.has(pin.code)) {
+      return this.grievancesByPin.get(pin.code)!;
+    }
+    return this.grievancesByPin.get('110001') || [];
   }
 
   getRepresentatives(pinCode: string): RealRepresentative[] {
-    return this.repsByPin.get(pinCode) || this.repsByPin.get('250001') || [];
+    const direct = this.repsByPin.get(pinCode);
+    if (direct && direct.length > 0) return direct;
+    const pin = this.getPincode(pinCode);
+    if (pin && this.repsByPin.has(pin.code)) {
+      return this.repsByPin.get(pin.code)!;
+    }
+    return this.repsByPin.get('250001') || [];
   }
 
   getBudget(pinCode: string): RealBudgetHead[] {
-    return this.budgetByPin.get(pinCode) || this.budgetByPin.get('250001') || [];
+    const direct = this.budgetByPin.get(pinCode);
+    if (direct && direct.length > 0) return direct;
+    const pin = this.getPincode(pinCode);
+    if (pin && this.budgetByPin.has(pin.code)) {
+      return this.budgetByPin.get(pin.code)!;
+    }
+    return this.budgetByPin.get('250001') || [];
   }
 
   getTehsils(pinCode: string): RealTehsilOffice[] {
-    return this.tehsilsByPin.get(pinCode) || this.tehsilsByPin.get('250001') || [];
+    const direct = this.tehsilsByPin.get(pinCode);
+    if (direct && direct.length > 0) return direct;
+    const pin = this.getPincode(pinCode);
+    if (pin && this.tehsilsByPin.has(pin.code)) {
+      return this.tehsilsByPin.get(pin.code)!;
+    }
+    return this.tehsilsByPin.get('250001') || [];
   }
 
   getParcels(pinCode: string): RealLandParcel[] {
-    return this.parcelsByPin.get(pinCode) || this.parcelsByPin.get('250001') || [];
+    const direct = this.parcelsByPin.get(pinCode);
+    if (direct && direct.length > 0) return direct;
+    const pin = this.getPincode(pinCode);
+    if (pin && this.parcelsByPin.has(pin.code)) {
+      return this.parcelsByPin.get(pin.code)!;
+    }
+    return this.parcelsByPin.get('250001') || [];
   }
 
   getAllPincodes(): RealPincode[] {
