@@ -3,6 +3,7 @@ import { lazy, Suspense, type ComponentType } from 'react';
 import { ModuleFrame } from './ModuleFrame';
 import { NotFoundPage } from './NotFoundPage';
 import { Breadcrumbs, canonicalModuleId } from '../ui';
+import { OfficialRecords } from '../ui/OfficialRecords';
 
 function screen<T extends Record<string, unknown>>(loader: () => Promise<T>, name: keyof T) {
   return lazy(() => loader().then((m) => ({ default: m[name] as unknown as ComponentType })));
@@ -62,6 +63,7 @@ export function ModulePage() {
 
   return (
     <ModuleFrame moduleId={id}>
+      <OfficialRecords moduleId={id} />
       <Suspense fallback={<ScreenLoading />}>
         <Screen />
       </Suspense>

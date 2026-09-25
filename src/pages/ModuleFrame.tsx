@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Link, NavLink, useSearchParams } from 'react-router-dom';
 import { Database, FlaskConical, Megaphone, Radio, Scale } from 'lucide-react';
 import { Breadcrumbs, LIVE_FEEDS, ModuleIcon, getModule } from '../ui';
+import { isConnected, useCatalog } from '../core/services/officialData';
 
 interface View {
   label: string;
@@ -67,6 +68,40 @@ interface ModuleFrameProps {
   children: ReactNode;
 }
 
+/** What this module's figures are: live official data, partly live, or samples. Read from the data service, not assumed. */
+function DataStatus({ moduleId }: { moduleId: string }) {
+  const catalog = useCatalog();
+  const live = LIVE_FEEDS[moduleId];
+  const datasets = catalog.status === 'ok' ? catalog.data.datasets.filter((d) => d.module === moduleId) : [];
+  const connected = datasets.filter((d) => isConnected(d.state));
+  const feedLive = live && catalog.status === 'ok' && catalog.data.feeds.some((f) => f.id === live.sourceId && isConnected(f.state));
+
+  if (connected.length || feedLive) {
+    const names = [...(feedLive ? [live.label] : []), ...connected.map((d) => d.title)];
+    return (
+      <div className="data-status data-status-live">
+        <Radio size={14} aria-hidden="true" />
+        <span>
+          <strong>Official data connected:</strong> {names.join('; ')}. Figures under “Official records” come from these sources; other figures on this screen are samples.
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div className="data-status data-status-sample">
+      <FlaskConical size={14} aria-hidden="true" />
+      <span>
+        <strong>Sample data.</strong>{' '}
+        {catalog.status !== 'ok'
+          ? 'Official records for this module appear when the JantaX data service is running. The figures here are illustrative. Do not quote them.'
+          : datasets.length || live
+            ? `Official ${datasets.length + (live ? 1 : 0) === 1 ? 'feed' : 'feeds'} for this module ${datasets.length + (live ? 1 : 0) === 1 ? 'is' : 'are'} set up but not connected yet, so these figures are illustrative. Do not quote them.`
+            : 'No official feed is connected to this module yet, so its figures are illustrative. Do not quote them.'}
+      </span>
+    </div>
+  );
+}
+
 export function ModuleFrame({ moduleId, children }: ModuleFrameProps) {
   const m = getModule(moduleId);
   const [params] = useSearchParams();
@@ -85,21 +120,7 @@ export function ModuleFrame({ moduleId, children }: ModuleFrameProps) {
           <h1 className="page-title">{m.shortName}</h1>
           <p className="module-hindi" lang="hi">{m.hindi}</p>
           <p className="page-lede">{m.summary}</p>
-          {LIVE_FEEDS[moduleId] ? (
-            <div className="data-status data-status-live">
-              <Radio size={14} aria-hidden="true" />
-              <span>
-                <strong>Live feed:</strong> {LIVE_FEEDS[moduleId].label}, shown when the JantaX data service is running. Other figures here are samples.
-              </span>
-            </div>
-          ) : (
-            <div className="data-status data-status-sample">
-              <FlaskConical size={14} aria-hidden="true" />
-              <span>
-                <strong>Sample data.</strong> No official feed is connected to this module yet, so its figures are illustrative. Do not quote them.
-              </span>
-            </div>
-          )}
+          <DataStatus moduleId={moduleId} />
           <div className="source-row" style={{ marginTop: 'var(--s-2)' }}>
             <Database size={13} aria-hidden="true" />
             <span>Official sources for this module: {m.dataSource}</span>

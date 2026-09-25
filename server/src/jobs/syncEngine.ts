@@ -147,8 +147,11 @@ export async function runSyncJob(connector: SourceConnector, options: SyncOption
     });
     obs.validationFailures = validation.errors.length;
     obs.recordsRejected = validation.errors.length;
-    if (!validation.isValid && validation.errors.length > rows.length * 0.5) {
-      throw new Error(`Validation failed: ${validation.errors.length} errors across ${rows.length} rows`);
+    // Errors on row 0 are about the whole file (no rows, a required column missing): never publish those.
+    const fileError = validation.errors.find((e) => e.row === 0);
+    if (!validation.isValid && (fileError || validation.errors.length > rows.length * 0.5)) {
+      const first = fileError ?? validation.errors[0];
+      throw new Error(`Validation failed: ${validation.errors.length} errors across ${rows.length} rows. First: ${first.message}${first.row ? ` (row ${first.row})` : ''}`);
     }
     if (validation.warnings.length) log(`VALIDATE ${validation.warnings.length} warnings, first: ${validation.warnings[0].message}`);
 

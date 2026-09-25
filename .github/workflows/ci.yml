@@ -41,6 +41,8 @@ jobs:
         run: npx prisma migrate deploy
       - name: Migrations match the schema
         run: npx prisma migrate diff --from-url "$DATABASE_URL" --to-schema-datamodel prisma/schema.prisma --exit-code
+      - name: Import templates and docs/DATASETS.md match the catalog
+        run: npm run data -- templates --check
       - run: npm test
       - run: npm run build
       - run: npx playwright install --with-deps chromium

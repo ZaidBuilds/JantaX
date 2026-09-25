@@ -1,8 +1,8 @@
 /**
  * RFC 4180 CSV parser: quoted fields, doubled quotes, commas and newlines inside quotes,
- * CRLF or LF line endings and a UTF-8 BOM. Returns one object per row keyed by header.
+ * CRLF or LF line endings and a UTF-8 BOM. Returns the non-blank rows as arrays of cells.
  */
-export function parseCsv(text: string): Record<string, string>[] {
+export function parseCsvRows(text: string): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];
   let field = '';
@@ -37,7 +37,12 @@ export function parseCsv(text: string): Record<string, string>[] {
     rows.push(row);
   }
 
-  const [header, ...body] = rows.filter((r) => r.some((v) => v.trim() !== ''));
+  return rows.filter((r) => r.some((v) => v.trim() !== ''));
+}
+
+/** CSV text → one object per row keyed by the first row. */
+export function parseCsv(text: string): Record<string, string>[] {
+  const [header, ...body] = parseCsvRows(text);
   if (!header) return [];
   const keys = header.map((h) => h.trim());
   return body.map((r) => Object.fromEntries(keys.map((k, i) => [k, (r[i] ?? '').trim()])));

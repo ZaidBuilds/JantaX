@@ -23,6 +23,7 @@ import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver'
 import { getCoordinateForPin } from '../core/utils/pinCoordinates';
 import { usePinRecord } from '../core/services/pinDirectory';
 import { PostOfficesCard } from '../ui/PostOffices';
+import { AreaSummary } from '../ui/OfficialRecords';
 import { getBottleneckLensesForPin, type BottleneckLens } from '../core/services/bottleneckService';
 import { MOCK_CITIZEN_REPORTS } from '../modules/reporting/data/mockReports';
 import {
@@ -194,6 +195,15 @@ export function PinDashboard({ choose = false }: { choose?: boolean }) {
 
       <div className="split" style={{ marginTop: 'var(--s-8)' }}>
         <div className="stack" style={{ gap: 'var(--s-8)' }}>
+          <section aria-labelledby="official-h">
+            <div className="section-head">
+              <div>
+                <h2 id="official-h" className="section-title">Official figures for this area</h2>
+                <p className="small muted">Straight from government datasets, at the closest level each one publishes.</p>
+              </div>
+            </div>
+            <AreaSummary pin={pin} />
+          </section>
           <section aria-labelledby="claims-h">
             <div className="section-head">
               <div>

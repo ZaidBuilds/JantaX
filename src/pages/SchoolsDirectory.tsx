@@ -5,6 +5,7 @@ import { api, type ApiRecord } from '../core/services/api';
 import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver';
 import { Badge, EmptyState, Stat, toneForScore, toneForStatus, useToast } from '../ui';
 import { ModuleFrame } from './ModuleFrame';
+import { OfficialRecords } from '../ui/OfficialRecords';
 
 const SAMPLE_PINS = ['110001', '250001', '560001', '400001', '226001', '800001'];
 const LEVELS = ['All', 'Primary', 'Upper Primary', 'Secondary', 'Higher Secondary'];
@@ -122,6 +123,7 @@ export function SchoolsDirectory() {
 
   return (
     <ModuleFrame moduleId="school">
+      <OfficialRecords moduleId="school" pin={pin || undefined} />
       <div className="card card-pad schools-toolbar">
         <form
           className="field"

@@ -9,6 +9,7 @@ import { isInIndia, medianPoint } from '../lib/geo';
 import { mode, num, picker, slug, text, titleCase } from '../lib/normalize';
 import { regionForState } from '../../routes/pinHelpers';
 import { RESOURCE_IDS, SOURCES } from '../sources';
+import { buildDistrictsFromPins } from '../../data/districts';
 
 /**
  * India Post "All India Pincode Directory" → PostOffice rows, plus one Pincode row per PIN
@@ -228,6 +229,8 @@ export function createPincodeDirectoryConnector(opts: { file?: string; maxRecord
       for (let i = 0; i < gone.length; i += 5000) {
         await prisma.postOffice.deleteMany({ where: { id: { in: gone.slice(i, i + 5000) } } });
       }
+      // Every other dataset resolves its places against the district spine built from this directory.
+      await buildDistrictsFromPins();
       return { inserted: changes.newRecords.length, updated: changes.updatedRecords.length, deleted: gone.length };
     },
   };

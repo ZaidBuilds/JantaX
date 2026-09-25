@@ -5,11 +5,64 @@ import { TransparencyLayout } from '../components/TransparencyLayout';
 import { Badge, EmptyState } from '../../../ui';
 import type { Tone } from '../../../ui/Badge';
 import type { SourceStatus } from '../types/transparency';
+import { formatWhen, STATE_LABEL, useCatalog, type Catalog, type DatasetState } from '../../../core/services/officialData';
 
 export const STATUS_TONE: Record<SourceStatus, Tone> = { Connected: 'good', 'Connector ready': 'info', 'Not connected': 'neutral' };
+export const STATE_TONE: Record<DatasetState, Tone> = { live: 'good', stale: 'warn', failing: 'bad', 'needs-setting': 'neutral', 'needs-file': 'neutral', ready: 'info' };
+
+const ACCESS: Record<string, string> = { ogd: 'data.gov.in API', ckan: 'CKAN API', url: 'Direct download', file: 'File import' };
+
+/** Every catalogued dataset, as the data service reports it. */
+function LiveCatalog({ catalog }: { catalog: Catalog }) {
+  return (
+    <section style={{ marginBottom: 'var(--s-8)' }} aria-labelledby="catalog-h">
+      <div className="section-head" style={{ marginBottom: 'var(--s-3)' }}>
+        <h2 id="catalog-h" className="section-title">Dataset catalog</h2>
+        <span className="small muted">{catalog.datasets.length} datasets, status from the data service</span>
+      </div>
+      <div className="table-wrap">
+        <table className="table">
+          <thead>
+            <tr>
+              <th scope="col">Dataset</th>
+              <th scope="col">Module</th>
+              <th scope="col">How it arrives</th>
+              <th scope="col">Licence</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {catalog.datasets.map((d) => (
+              <tr key={d.id}>
+                <td>
+                  <a className="strong" href={d.sourceUrl} target="_blank" rel="noreferrer">{d.title}</a>
+                  <div className="tiny muted">{d.publisher} · {d.level} level</div>
+                  {d.missing && (
+                    <details className="tiny" style={{ marginTop: 4 }}>
+                      <summary className="muted" style={{ cursor: 'pointer' }}>What's needed to connect it</summary>
+                      <p style={{ marginTop: 4, maxWidth: '70ch' }}>{d.missing}</p>
+                    </details>
+                  )}
+                </td>
+                <td className="small">{d.module}</td>
+                <td className="small">{ACCESS[d.access]}</td>
+                <td className="tiny">{d.licenseUrl ? <a href={d.licenseUrl} target="_blank" rel="noreferrer">{d.license}</a> : d.license}</td>
+                <td>
+                  <Badge tone={STATE_TONE[d.state]}>{STATE_LABEL[d.state]}</Badge>
+                  {d.rows > 0 && <div className="tiny muted num">{d.rows.toLocaleString('en-IN')} rows · {formatWhen(d.lastSync)}</div>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}
 
 export function SourcesPage() {
   const sources = getStoredGovtSources();
+  const catalog = useCatalog();
   const [q, setQ] = useState('');
   const list = useMemo(() => {
     const n = q.trim().toLowerCase();
@@ -23,6 +76,8 @@ export function SourcesPage() {
       title="Data sources"
       lede="Every official database, register and audit report we use, with how often it updates, what it misses and the licence it is published under."
     >
+      {catalog.status === 'ok' && <LiveCatalog catalog={catalog.data} />}
+      {catalog.status === 'ok' && <h2 className="section-title" style={{ marginBottom: 'var(--s-3)' }}>Source notes</h2>}
       <div className="input-group" style={{ maxWidth: 440, marginBottom: 'var(--s-5)' }}>
         <Search size={16} aria-hidden="true" />
         <input className="input" type="search" placeholder="Search by source, ministry or field" aria-label="Search sources" value={q} onChange={(e) => setQ(e.target.value)} />

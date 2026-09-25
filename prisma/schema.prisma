@@ -69,6 +69,8 @@ model Pincode {
   follows        Follow[]
   issues         Issue[]
   postOffices    PostOffice[]
+  /// Canonical district this PIN belongs to (set by the PIN directory sync).
+  districtId     String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -792,4 +794,51 @@ model AirReading {
 
   @@unique([stationId, pollutant, observedAt])
   @@index([stationId, observedAt])
+}
+
+/// Canonical district list. Built from the India Post directory, enriched with LGD codes; every
+/// dataset row is resolved to one of these (or to its state) before it is stored.
+model District {
+  id       String          @id // "<state slug>:<district slug>"
+  name     String
+  state    String
+  lgdCode  Int?            @unique
+  lat      Float?
+  lng      Float?
+  pinCount Int             @default(0)
+  aliases  DistrictAlias[]
+
+  @@index([state])
+}
+
+/// Extra spellings that resolve to a district, e.g. from the LGD list or manual review.
+model DistrictAlias {
+  key        String   @id // "<state key>:<district key>"
+  districtId String
+  district   District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  source     String
+
+  @@index([districtId])
+}
+
+/// One row of a catalogued government dataset (server/src/data/catalog). `data` keeps the mapped
+/// fields; geography is resolved to the spine so modules can query by PIN, district or state.
+model DatasetRecord {
+  id            String    @id // "<datasetId>:<entity key>"
+  datasetId     String
+  entityKey     String
+  state         String?
+  districtId    String?
+  pincode       String?   @db.VarChar(6)
+  lat           Float?
+  lng           Float?
+  period        String?
+  observedAt    DateTime?
+  data          Json
+  rawDocumentId String?
+  updatedAt     DateTime  @updatedAt
+
+  @@index([datasetId, pincode])
+  @@index([datasetId, districtId])
+  @@index([datasetId, state])
 }

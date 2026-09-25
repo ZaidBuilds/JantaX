@@ -21,6 +21,7 @@ import moderationRoutes from './routes/moderation';
 import v1Routes from './routes/v1';
 import authRoutes from './routes/auth';
 import airRoutes from './routes/air';
+import dataRoutes from './routes/data';
 
 const app = express();
 
@@ -94,6 +95,7 @@ app.use('/api', sourcesRoutes);
 app.use('/api', adminSyncRoutes);
 app.use('/api', moderationRoutes);
 app.use('/api', airRoutes);
+app.use('/api', dataRoutes);
 // Resource routers declare '/' and '/:id', so each needs its own prefix.
 app.use('/api/search', searchRoutes);
 app.use('/api/locations', locationsRoutes);

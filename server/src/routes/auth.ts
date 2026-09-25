@@ -2,17 +2,16 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { prisma } from '../prisma';
 import { signToken, type AuthenticatedRequest } from '../middleware/auth';
-import type { UserRole } from '@prisma/client';
 
 const router = Router();
 const PASSWORD_MIN = 8;
 
 router.post('/register', async (req, res) => {
-  const { email, password, name, role } = req.body as {
+  // Roles are never self-assigned: every account starts as a citizen. Promote with `npm run data -- set-role`.
+  const { email, password, name } = req.body as {
     email: string;
     password: string;
     name?: string;
-    role?: UserRole;
   };
 
   if (!email || !password) {
@@ -36,7 +35,7 @@ router.post('/register', async (req, res) => {
       email,
       passwordHash,
       name,
-      role: role && ['MODERATOR', 'ADMIN'].includes(role) ? role : 'CITIZEN',
+      role: 'CITIZEN',
     },
   });
 

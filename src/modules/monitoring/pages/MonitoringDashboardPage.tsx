@@ -5,6 +5,7 @@ import type { InternalAlert, DatasetSnapshot } from '../types/dataMonitoring';
 import { ChangeDetectionCard } from '../components/ChangeDetectionCard';
 import { QuarantineQueue } from '../components/QuarantineQueue';
 import { SnapshotRollback } from '../components/SnapshotRollback';
+import { LivePipelineHealth } from '../components/LivePipelineHealth';
 import { ShieldAlert, Activity, Clock, CheckCircle2, RotateCcw, AlertTriangle, Layers, Filter } from 'lucide-react';
 
 interface MonitoringDashboardPageProps {
@@ -44,6 +45,7 @@ export function MonitoringDashboardPage({ initialTab }: MonitoringDashboardPageP
 
   return (
     <div>
+      <LivePipelineHealth />
       {/* Top Banner */}
       <div className="card card-pad module-toolbar">
 {/* Status Counter Chips */}

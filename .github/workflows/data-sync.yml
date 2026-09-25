@@ -1,0 +1,67 @@
+name: Data sync
+
+# Refreshes every configured source that is due, against the production database.
+# Needs repository secrets DATABASE_URL and DATA_GOV_IN_API_KEY, plus repository variables for
+# the dataset settings you have filled in (OGD_*, OBI_*, *_URL); see docs/GO_LIVE.md.
+# Skips quietly until DATABASE_URL is set. Use this or SYNC_SCHEDULE=on on the API server, not both.
+
+on:
+  schedule:
+    - cron: "17 * * * *" # hourly; each source runs only when its own schedule says it is due
+  workflow_dispatch:
+    inputs:
+      dataset:
+        description: "Sync one source now (id from `npm run data -- datasets`); empty = everything due"
+        required: false
+      force:
+        description: "Re-write even if the download is unchanged"
+        type: boolean
+        default: false
+
+concurrency:
+  group: data-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      HAS_DB: ${{ secrets.DATABASE_URL != '' }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DATA_GOV_IN_API_KEY: ${{ secrets.DATA_GOV_IN_API_KEY }}
+      OGD_CENSUS_DISTRICTS: ${{ vars.OGD_CENSUS_DISTRICTS }}
+      OGD_UDISE_DISTRICT_SCHOOLS: ${{ vars.OGD_UDISE_DISTRICT_SCHOOLS }}
+      OGD_NHP_HOSPITALS: ${{ vars.OGD_NHP_HOSPITALS }}
+      OGD_RHS_DISTRICT: ${{ vars.OGD_RHS_DISTRICT }}
+      OGD_NFSA_DISTRICT: ${{ vars.OGD_NFSA_DISTRICT }}
+      OGD_NFSA_OFFTAKE: ${{ vars.OGD_NFSA_OFFTAKE }}
+      OGD_JJM_DISTRICT: ${{ vars.OGD_JJM_DISTRICT }}
+      OGD_POWER_HOURS: ${{ vars.OGD_POWER_HOURS }}
+      OGD_PMGSY_DISTRICT: ${{ vars.OGD_PMGSY_DISTRICT }}
+      OGD_MPLADS_STATE: ${{ vars.OGD_MPLADS_STATE }}
+      OGD_COURT_PENDENCY: ${{ vars.OGD_COURT_PENDENCY }}
+      OGD_RTI_RETURNS: ${{ vars.OGD_RTI_RETURNS }}
+      OGD_CPGRAMS_MINISTRY: ${{ vars.OGD_CPGRAMS_MINISTRY }}
+      OGD_SWACHH_SURVEKSHAN: ${{ vars.OGD_SWACHH_SURVEKSHAN }}
+      OGD_GE2024_RESULTS: ${{ vars.OGD_GE2024_RESULTS }}
+      OGD_DILRMP_PROGRESS: ${{ vars.OGD_DILRMP_PROGRESS }}
+      OBI_STATE_BUDGET_RESOURCE: ${{ vars.OBI_STATE_BUDGET_RESOURCE }}
+      LGD_DISTRICTS_URL: ${{ vars.LGD_DISTRICTS_URL }}
+      MPLADS_WORKS_URL: ${{ vars.MPLADS_WORKS_URL }}
+    steps:
+      - if: env.HAS_DB != 'true'
+        run: echo "DATABASE_URL secret not set; nothing to sync."
+      - if: env.HAS_DB == 'true'
+        uses: actions/checkout@v4
+      - if: env.HAS_DB == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - if: env.HAS_DB == 'true'
+        run: npm ci && npx prisma generate && npx prisma migrate deploy
+      - if: env.HAS_DB == 'true' && inputs.dataset != ''
+        run: npm run data -- sync "${{ inputs.dataset }}" ${{ inputs.force && '--force' || '' }}
+      - if: env.HAS_DB == 'true' && (inputs.dataset == '' || github.event_name == 'schedule')
+        run: npm run data -- sync-all --due ${{ inputs.force && '--force' || '' }}
