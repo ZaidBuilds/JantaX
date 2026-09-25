@@ -29,8 +29,8 @@ export const MOCK_POLLING_BOOTHS: PollingBooth[] = [
       shadedWaitingArea: true,
     },
     blo: {
-      name: 'Rakesh Sharma',
-      nameHi: 'राकेश शर्मा',
+      name: 'Booth level officer (sample 1)',
+      nameHi: 'बूथ स्तर अधिकारी (नमूना 1)',
       designation: 'TGT Social Science (Directorate of Education)',
       designationHi: 'टीजीटी सामाजिक विज्ञान',
       contactPhone: '+91-98110-XXXXX (Designated BLO)',
@@ -72,8 +72,8 @@ export const MOCK_POLLING_BOOTHS: PollingBooth[] = [
       shadedWaitingArea: true,
     },
     blo: {
-      name: 'Sunita Meena',
-      nameHi: 'सुनीता मीणा',
+      name: 'Booth level officer (sample 2)',
+      nameHi: 'बूथ स्तर अधिकारी (नमूना 2)',
       designation: 'PRT Teacher (NDMC Education Dept)',
       designationHi: 'पीआरटी शिक्षिका',
       contactPhone: '+91-98712-XXXXX (Designated BLO)',
@@ -115,8 +115,8 @@ export const MOCK_POLLING_BOOTHS: PollingBooth[] = [
       shadedWaitingArea: true,
     },
     blo: {
-      name: 'Virendra Singh Rawat',
-      nameHi: 'वीरेंद्र सिंह रावत',
+      name: 'Booth level officer (sample 3)',
+      nameHi: 'बूथ स्तर अधिकारी (नमूना 3)',
       designation: 'Revenue Inspector (SDM Office Chanakyapuri)',
       designationHi: 'राजस्व निरीक्षक',
       contactPhone: '+91-99580-XXXXX (Designated BLO)',
@@ -158,8 +158,8 @@ export const MOCK_POLLING_BOOTHS: PollingBooth[] = [
       shadedWaitingArea: true,
     },
     blo: {
-      name: 'Pramod Gupta',
-      nameHi: 'प्रमोद गुप्ता',
+      name: 'Booth level officer (sample 4)',
+      nameHi: 'बूथ स्तर अधिकारी (नमूना 4)',
       designation: 'Assistant Teacher (Basic Shiksha Parishad)',
       designationHi: 'सहायक अध्यापक',
       contactPhone: '+91-94122-XXXXX (Designated BLO)',

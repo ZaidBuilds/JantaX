@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link, NavLink, useSearchParams } from 'react-router-dom';
-import { Database, Megaphone, Scale } from 'lucide-react';
-import { Breadcrumbs, ModuleIcon, getModule } from '../ui';
+import { Database, FlaskConical, Megaphone, Radio, Scale } from 'lucide-react';
+import { Breadcrumbs, LIVE_FEEDS, ModuleIcon, getModule } from '../ui';
 
 interface View {
   label: string;
@@ -85,9 +85,24 @@ export function ModuleFrame({ moduleId, children }: ModuleFrameProps) {
           <h1 className="page-title">{m.shortName}</h1>
           <p className="module-hindi" lang="hi">{m.hindi}</p>
           <p className="page-lede">{m.summary}</p>
-          <div className="source-row" style={{ marginTop: 'var(--s-3)' }}>
+          {LIVE_FEEDS[moduleId] ? (
+            <div className="data-status data-status-live">
+              <Radio size={14} aria-hidden="true" />
+              <span>
+                <strong>Live feed:</strong> {LIVE_FEEDS[moduleId].label}, shown when the JantaX data service is running. Other figures here are samples.
+              </span>
+            </div>
+          ) : (
+            <div className="data-status data-status-sample">
+              <FlaskConical size={14} aria-hidden="true" />
+              <span>
+                <strong>Sample data.</strong> No official feed is connected to this module yet, so its figures are illustrative. Do not quote them.
+              </span>
+            </div>
+          )}
+          <div className="source-row" style={{ marginTop: 'var(--s-2)' }}>
             <Database size={13} aria-hidden="true" />
-            <span>Sources: {m.dataSource}</span>
+            <span>Official sources for this module: {m.dataSource}</span>
             <Link to="/sources">All sources</Link>
           </div>
         </div>
@@ -115,7 +130,7 @@ export function ModuleFrame({ moduleId, children }: ModuleFrameProps) {
       <div className="module-body">{children}</div>
       <p className="module-disclaimer">
         <Scale size={14} aria-hidden="true" />
-        JantaX is independent and is not a government portal. Sample figures are illustrative where the live service is unavailable. Check anything consequential with the publishing authority.
+        JantaX is independent and is not a government portal. Check anything consequential with the publishing authority.
       </p>
     </div>
   );

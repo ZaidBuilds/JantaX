@@ -25,7 +25,7 @@ export function PollutionTable({ stations }: Props) {
         <thead>
           <tr style={{ background: 'var(--surface-2)', borderBottom: '2px solid var(--border)', textAlign: 'left', color: 'var(--ink-2)', fontWeight: 700 }}>
             <th style={{ padding: '0.85rem 1rem' }}>Monitoring Station & Operator</th>
-            <th style={{ padding: '0.85rem 1rem' }}>Live AQI & Category</th>
+            <th style={{ padding: '0.85rem 1rem' }}>AQI and category (sample)</th>
             <th style={{ padding: '0.85rem 1rem' }}>PM2.5 / PM10 Levels</th>
             <th style={{ padding: '0.85rem 1rem' }}>Main Pollutant</th>
             <th style={{ padding: '0.85rem 1rem' }}>Status / Update</th>

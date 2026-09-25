@@ -16,11 +16,13 @@ import {
   AlertTriangle,
   ChevronRight,
   FileSearch,
-} from 'lucide-react';
+ FlaskConical } from 'lucide-react';
 import { api, type ApiRecord, type PincodeInfo } from '../core/services/api';
 import { usePin } from '../core/context/PinContext';
 import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver';
 import { getCoordinateForPin } from '../core/utils/pinCoordinates';
+import { usePinRecord } from '../core/services/pinDirectory';
+import { PostOfficesCard } from '../ui/PostOffices';
 import { getBottleneckLensesForPin, type BottleneckLens } from '../core/services/bottleneckService';
 import { MOCK_CITIZEN_REPORTS } from '../modules/reporting/data/mockReports';
 import {
@@ -77,6 +79,7 @@ export function PinDashboard({ choose = false }: { choose?: boolean }) {
   const pin = pinCode || params.get('pin') || selectedPin;
   const valid = isValidIndianPincode(pin);
   const loc = resolvePincode(pin);
+  const directory = usePinRecord(pin);
 
   const [info, setInfo] = useState<PincodeInfo | null>(null);
   const [records, setRecords] = useState<ApiRecord[]>([]);
@@ -106,7 +109,8 @@ export function PinDashboard({ choose = false }: { choose?: boolean }) {
     const nearby = MOCK_CITIZEN_REPORTS.filter((r) => r.location.pinCode.slice(0, 3) === pin.slice(0, 3) && r.location.pinCode !== pin);
     return [...local, ...nearby].slice(0, 4).map(reportForDisplay);
   }, [pin]);
-  const coord = getCoordinateForPin(pin);
+  const dirCoord = directory.record && directory.record.lat !== null && directory.record.lng !== null ? { lat: directory.record.lat, lng: directory.record.lng } : null;
+  const coord = dirCoord ?? getCoordinateForPin(pin);
   const following = isFollowing(pin);
 
   if (choose || !valid) {
@@ -125,7 +129,8 @@ export function PinDashboard({ choose = false }: { choose?: boolean }) {
     );
   }
 
-  const place = info ? `${info.district}, ${info.state}` : `${loc.district}, ${loc.state}`;
+  // India Post's directory is the authority for where a PIN is; the records API and prefix table are fallbacks.
+  const place = directory.record ? `${directory.record.district}, ${directory.record.state}` : info ? `${info.district}, ${info.state}` : `${loc.district}, ${loc.state}`;
 
   return (
     <div className="page">
@@ -181,6 +186,11 @@ export function PinDashboard({ choose = false }: { choose?: boolean }) {
           </Link>
         ))}
       </section>
+      {info?.sample && (
+        <p className="tiny muted" style={{ marginTop: 'var(--s-2)' }}>
+          Sample counts: the records service is offline, so these numbers are generated, not counted.
+        </p>
+      )}
 
       <div className="split" style={{ marginTop: 'var(--s-8)' }}>
         <div className="stack" style={{ gap: 'var(--s-8)' }}>
@@ -188,8 +198,14 @@ export function PinDashboard({ choose = false }: { choose?: boolean }) {
             <div className="section-head">
               <div>
                 <h2 id="claims-h" className="section-title">What the records say, and what was found</h2>
-                <p className="section-sub">Official claims for {loc.district} set against audits, live feeds and citizen checks.</p>
+                <p className="section-sub">How JantaX will set official claims against audits, live feeds and citizen checks.</p>
               </div>
+            </div>
+            <div className="data-status data-status-sample" style={{ marginTop: 0, marginBottom: 'var(--s-4)', maxWidth: 'none' }}>
+              <FlaskConical size={14} aria-hidden="true" />
+              <span>
+                <strong>Sample examples.</strong> These cards are templates built from sample data, not records for PIN {pin}. Real ones appear as each module's official feed is connected.
+              </span>
             </div>
             <div className="stack">
               {lenses.map((lens) => (
@@ -319,11 +335,13 @@ export function PinDashboard({ choose = false }: { choose?: boolean }) {
                 </MapContainer>
               </div>
               <div className="card-foot" style={{ borderRadius: 0 }}>
-                <span>Approximate area centre</span>
+                <span>{dirCoord ? 'Centre of its post offices' : 'Approximate area centre'}</span>
                 <Link to={`/maps?pin=${pin}`} className="link">Open full map</Link>
               </div>
             </div>
           )}
+
+          <PostOfficesCard pin={pin} />
 
           <div className="card card-pad">
             <div className="strong" style={{ marginBottom: 'var(--s-3)' }}>Switch area</div>

@@ -25,6 +25,9 @@ services:
       JWT_SECRET: ${JWT_SECRET:-jantax-dev-secret-2026}
       PORT: 4000
       NODE_ENV: development
+      DATA_GOV_IN_API_KEY: ${DATA_GOV_IN_API_KEY:-}
+      SYNC_SCHEDULE: ${SYNC_SCHEDULE:-off}
+      RAW_DATA_DIR: /app/data/raw
     ports:
       - "4000:4000"
     command: npm run server:dev

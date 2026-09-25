@@ -6,6 +6,7 @@ import { PollutionTable } from '../components/PollutionTable';
 import { GrapStatusCard } from '../components/GrapStatusCard';
 import { PollutionReportGenerator } from '../components/PollutionReportGenerator';
 import { TransparencyDisclaimer } from '../../transparency/components/TransparencyDisclaimer';
+import { LiveAirCard } from '../components/LiveAirCard';
 import { Search, Wind, ShieldAlert, Activity, Flame, ExternalLink, Filter } from 'lucide-react';
 
 export function PollutionDirectoryPage() {
@@ -27,6 +28,7 @@ export function PollutionDirectoryPage() {
 
   return (
     <div>
+      <LiveAirCard />
 
       {/* Hero Header */}
       <div className="card card-pad module-toolbar">
@@ -91,7 +93,7 @@ export function PollutionDirectoryPage() {
             gap: '0.4rem',
           }}
         >
-          <Activity size={16} /> Live AQI Stations ({stations.length})
+          <Activity size={16} /> Sample stations ({stations.length})
         </button>
 
         <button
@@ -138,7 +140,7 @@ export function PollutionDirectoryPage() {
         <div>
           {/* Filters */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap', minWidth: 0, maxWidth: '100%' }}>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value as AqiCategory | 'All')}

@@ -9,6 +9,8 @@ export interface FetchResult {
   hash: string;
   buffer: Buffer;
   fetchedAt: Date;
+  /** When the publisher last updated the dataset, if it says so (e.g. data.gov.in updated_date). */
+  publishedAt?: string;
 }
 
 export interface ParsedRow {
@@ -53,10 +55,15 @@ export interface SyncObservability {
   log: string[];
 }
 
+export type Schedule = 'hourly' | 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'annual' | 'event';
+
 export interface SourceConnector {
   sourceId: string;
-  // Schedules: daily|weekly|monthly|quarterly|annual|event-driven
-  schedule: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'annual' | 'event';
+  schedule: Schedule;
+  /** Provenance written to the Source table before each run. */
+  source?: import('./sources').SourceDefinition;
+  /** Checked before scheduling; return a reason when the connector cannot run (e.g. a missing API key). */
+  missingConfig?(): string | null;
   fetch(): Promise<FetchResult>;
   validate(buffer: Buffer, contentType: string): Promise<ValidationResult>;
   parse(buffer: Buffer, contentType: string): Promise<ParsedRow[]>;

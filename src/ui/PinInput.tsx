@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { MapPin, ArrowRight } from 'lucide-react';
-import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver';
+import { isValidIndianPincode } from '../core/utils/pinResolver';
+import { usePinRecord } from '../core/services/pinDirectory';
 
 interface PinInputProps {
   initial?: string;
@@ -16,7 +17,7 @@ export function PinInput({ initial = '', onSubmit, label = 'PIN code', submitLab
   const [value, setValue] = useState(initial);
   const [touched, setTouched] = useState(false);
   const valid = isValidIndianPincode(value);
-  const loc = valid ? resolvePincode(value) : null;
+  const lookup = usePinRecord(valid ? value.trim() : '');
   const showError = touched && value.length > 0 && !valid;
 
   const submit = (e: FormEvent) => {
@@ -58,9 +59,13 @@ export function PinInput({ initial = '', onSubmit, label = 'PIN code', submitLab
       <div id={`${id}-hint`} className={showError ? 'error-text' : 'hint'}>
         {showError
           ? 'Enter a valid 6-digit Indian PIN code.'
-          : loc
-            ? `${loc.district}, ${loc.state}`
-            : 'Six digits, first digit 1 to 9.'}
+          : lookup.status === 'found'
+            ? `${lookup.record.district}, ${lookup.record.state}`
+            : lookup.status === 'loading'
+              ? 'Looking up…'
+              : lookup.status === 'missing'
+                ? 'Not in the India Post directory. Check the number.'
+                : 'Six digits, first digit 1 to 9.'}
       </div>
     </form>
   );

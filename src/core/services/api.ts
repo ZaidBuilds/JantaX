@@ -41,6 +41,7 @@ function mockPincodeInfo(code: string): PincodeInfo {
   const lat = 28.6 + (h % 100)/500;
   const lng = 77.2 + (h % 100)/500;
   return {
+    sample: true,
     code,
     state: (loc as any).state || 'Delhi',
     district: (loc as any).district || 'New Delhi',
@@ -192,6 +193,8 @@ export interface PincodeInfo {
     grievances: number;
     citizenReports: number;
   };
+  /** True when the records service was unreachable and these counts are generated samples. */
+  sample?: boolean;
 }
 
 export interface SchoolRecord {
@@ -287,7 +290,38 @@ export interface CitizenReport {
   createdAt: string;
 }
 
+/** /api/air/near: CPCB stations closest to a PIN, with their latest published readings. */
+export interface AirNear {
+  pin: string;
+  district: string;
+  state: string;
+  stations: {
+    id: string;
+    name: string;
+    city: string;
+    state: string;
+    km: number;
+    latest: null | {
+      observedAt: string;
+      stale: boolean;
+      aqi: number | null;
+      category: string | null;
+      dominant: string | null;
+      pollutantsReported: number;
+      reason?: string;
+      readings: { pollutant: string; minValue: number | null; maxValue: number | null; avgValue: number | null }[];
+    };
+  }[];
+  source: { name: string; organization: string; url: string; license: string; lastSync: string | null };
+}
+
 export const api = {
+  /** Live readings only: null when the data service or the feed is unavailable. Never falls back to samples. */
+  getAirNear: async (pin: string, limit = 3): Promise<AirNear | null> => {
+    try { return await apiFetch<AirNear>(`/api/air/near?pin=${pin}&limit=${limit}`); }
+    catch { return null; }
+  },
+
   getPincode: async (code: string) => {
     try { const r = await apiFetch<PincodeInfo>(`/api/pincode/${code}`); clearOffline(); return r; }
     catch { return mockPincodeInfo(code); }

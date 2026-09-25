@@ -25,6 +25,9 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
+# Raw source downloads kept by the sync engine (RAW_DATA_DIR)
+data/raw/
+
 # Local DB
 *.db
 *.sqlite

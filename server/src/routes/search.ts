@@ -68,7 +68,6 @@ router.get('/', async (req: Request, res: Response) => {
     const validType = type && validTypes.includes(type) ? type : null;
     
     // Build WHERE clauses for each entity type
-    const searchTerm = %%;
     
     // Initialize results array
     let results: SearchResult[] = [];
@@ -124,7 +123,7 @@ router.get('/', async (req: Request, res: Response) => {
           id: school.id,
           type: 'school',
           title: school.nameEnglish,
-          description: \ \ School in \, \,
+          description: `${school.level} ${school.managementType} school in ${school.pincode?.district ?? ''}, ${school.pincode?.state ?? ''}`,
           location: school.pincode ? {
             pincode: school.pincode.code,
             state: school.pincode.state,
@@ -167,9 +166,9 @@ router.get('/', async (req: Request, res: Response) => {
             department: true,
             pincode: {
               select: {
-                code: true;
-                state: true;
-                district: true;
+                code: true,
+                state: true,
+                district: true,
               }
             },
             budget: true,
@@ -198,7 +197,7 @@ router.get('/', async (req: Request, res: Response) => {
           id: infra.id,
           type: 'infra',
           title: infra.titleEnglish,
-          description: \ Project in \, \,
+          description: `${infra.department} project in ${infra.pincode?.district ?? ''}, ${infra.pincode?.state ?? ''}`,
           location: infra.pincode ? {
             pincode: infra.pincode.code,
             state: infra.pincode.state,
@@ -241,9 +240,9 @@ router.get('/', async (req: Request, res: Response) => {
             reraNumber: true,
             pincode: {
               select: {
-                code: true;
-                state: true;
-                district: true;
+                code: true,
+                state: true,
+                district: true,
               }
             },
             status: true,
@@ -271,7 +270,7 @@ router.get('/', async (req: Request, res: Response) => {
           id: rera.id,
           type: 'rera',
           title: rera.name,
-          description: RERA Project \ by \ in \, \,
+          description: `RERA project ${rera.reraNumber} by ${rera.promoter} in ${rera.pincode?.district ?? ''}, ${rera.pincode?.state ?? ''}`,
           location: rera.pincode ? {
             pincode: rera.pincode.code,
             state: rera.pincode.state,
@@ -312,9 +311,9 @@ router.get('/', async (req: Request, res: Response) => {
             type: true,
             pincode: {
               select: {
-                code: true;
-                state: true;
-                district: true;
+                code: true,
+                state: true,
+                district: true,
               }
             },
             bedsTotal: true,
@@ -342,7 +341,7 @@ router.get('/', async (req: Request, res: Response) => {
           id: hospital.id,
           type: 'hospital',
           title: hospital.name,
-          description: \ Hospital in \, \,
+          description: `${hospital.type} in ${hospital.pincode?.district ?? ''}, ${hospital.pincode?.state ?? ''}`,
           location: hospital.pincode ? {
             pincode: hospital.pincode.code,
             state: hospital.pincode.state,
@@ -383,9 +382,9 @@ router.get('/', async (req: Request, res: Response) => {
             dealerName: true,
             pincode: {
               select: {
-                code: true;
-                state: true;
-                district: true;
+                code: true,
+                state: true,
+                district: true,
               }
             },
             isOpen: true,
@@ -414,7 +413,7 @@ router.get('/', async (req: Request, res: Response) => {
           id: pds.id,
           type: 'pds',
           title: pds.shopName,
-          description: PDS Shop run by \ in \, \,
+          description: `PDS shop run by ${pds.dealerName} in ${pds.pincode?.district ?? ''}, ${pds.pincode?.state ?? ''}`,
           location: pds.pincode ? {
             pincode: pds.pincode.code,
             state: pds.pincode.state,
@@ -480,7 +479,7 @@ router.get('/', async (req: Request, res: Response) => {
           id: contractor.id,
           type: 'contractor',
           title: contractor.name,
-          description: Contractor based in \ with score \/100,
+          description: `Contractor based in ${contractor.registeredState} with score ${contractor.score}/100`,
           location: undefined, // Contractors don't have direct pincode linkage in schema
           metadata: {
             registeredState: contractor.registeredState,
@@ -543,7 +542,7 @@ router.get('/', async (req: Request, res: Response) => {
           id: source.sourceId,
           type: 'source',
           title: source.sourceName,
-          description: \ - \,
+          description: `${source.organization} - ${source.sourceType}`,
           location: undefined, // Sources don't have direct pincode linkage
           metadata: {
             organization: source.organization,
@@ -654,9 +653,9 @@ router.get('/', async (req: Request, res: Response) => {
                 pincodeCode: true,
                 pincode: {
                   select: {
-                    code: true;
-                    state: true;
-                    district: true;
+                    code: true,
+                    state: true,
+                    district: true,
                   }
                 }
               }
@@ -685,7 +684,7 @@ router.get('/', async (req: Request, res: Response) => {
         results.push({
           id: grievance.id,
           type: 'grievance',
-          title: grievance.grievanceId || Grievance \,
+          title: grievance.grievanceId || `Grievance ${grievance.id}`,
           description: grievance.draft.substring(0, 100) + (grievance.draft.length > 100 ? '...' : ''),
           location: grievance.issue?.pincode ? {
             pincode: grievance.issue.pincode.code,
@@ -741,8 +740,8 @@ router.get('/', async (req: Request, res: Response) => {
 
 // GET /api/search/autocomplete - Fast autocomplete suggestions
 router.get('/autocomplete', async (req: Request, res: Response) => {
+  const query = String(req.query.q || '').trim().slice(0, 100);
   try {
-    const query = String(req.query.q || '').trim().slice(0, 100);
     const pincode = String(req.query.pincode || '').replace(/\D/g, '');
     const validPincode = pincode && /^\d{6}$/.test(pincode) ? pincode : null;
 
@@ -804,14 +803,14 @@ router.get('/autocomplete', async (req: Request, res: Response) => {
       where: {
         name: { contains: query, mode: 'insensitive' },
       },
-      select: { id: true, name: true, registrationState: true },
+      select: { id: true, name: true, registeredState: true },
       take: 2,
       orderBy: { name: 'asc' },
     });
     contractors.forEach(c => suggestions.push({
       text: c.name,
       type: 'contractor',
-      subtitle: c.registrationState,
+      subtitle: c.registeredState,
     }));
 
     // Search infra

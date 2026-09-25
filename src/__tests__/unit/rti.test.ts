@@ -35,7 +35,7 @@ describe('RTI Clock & Statutory Accountability Module — Unit & Integration Tes
     expect(auth).toBeDefined();
     expect(auth?.authorityName).toContain('Road Transport');
     expect(auth?.avgResponseDays).toBe(22);
-    expect(auth?.cpio.name).toBe('Ajay Kumar Verma');
+    expect(auth?.cpio.name).toBe('CPIO (sample 1)');
 
     const notFound = getAuthorityById('NONEXISTENT-AUTH-999');
     expect(notFound).toBeUndefined();
@@ -53,7 +53,7 @@ describe('RTI Clock & Statutory Accountability Module — Unit & Integration Tes
     const transport = getAllAuthorities({ query: 'Transport' });
     expect(transport.length).toBeGreaterThan(0);
 
-    const cpioSearch = getAllAuthorities({ query: 'Verma' });
+    const cpioSearch = getAllAuthorities({ query: 'CPIO (sample 1)' });
     expect(cpioSearch.length).toBeGreaterThan(0);
 
     const pinAuthorities = getAllAuthorities({ pinCode: '110001' });

@@ -2,7 +2,7 @@ name: JantaX CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   pull_request:
 
 jobs:
@@ -21,6 +21,10 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/jantax?schema=public
+      # The pipeline integration test writes to this database.
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/jantax?schema=public
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -29,11 +33,15 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx prisma generate
-      - run: npx tsc --noEmit -p .
+      - name: Typecheck frontend
+        run: npx tsc --noEmit -p .
+      - name: Typecheck API server
+        run: npm run server:typecheck
+      - name: Apply migrations
+        run: npx prisma migrate deploy
+      - name: Migrations match the schema
+        run: npx prisma migrate diff --from-url "$DATABASE_URL" --to-schema-datamodel prisma/schema.prisma --exit-code
       - run: npm test
       - run: npm run build
-      - env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/jantax?schema=public
-        run: npx prisma migrate deploy || echo "no migrate"
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e

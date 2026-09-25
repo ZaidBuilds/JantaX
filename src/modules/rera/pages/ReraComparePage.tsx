@@ -31,7 +31,7 @@ export function ReraComparePage() {
       </h1>
 
       {/* Selectors Bar */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', background: 'var(--surface)', padding: '1.25rem', borderRadius: 16, border: '1px solid var(--border)', marginBottom: '1.75rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '1.5rem', background: 'var(--surface)', padding: '1.25rem', borderRadius: 16, border: '1px solid var(--border)', marginBottom: '1.75rem' }}>
         <div>
           <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.4rem' }}>Select RERA Project 1</label>
           <select value={p1Id} onChange={(e) => setP1Id(e.target.value)} style={{ width: '100%', padding: '0.6rem 0.85rem', borderRadius: 10, border: '1px solid var(--border-strong)', fontWeight: 700, fontSize: '0.9rem' }}>
@@ -48,7 +48,7 @@ export function ReraComparePage() {
 
       {/* Comparison Display */}
       {p1 && p2 && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '1.5rem' }}>
           <div style={{ background: 'var(--surface)', borderRadius: 16, border: '1px solid var(--border)', padding: '1.5rem' }}>
             <span style={{ fontSize: '0.74rem', color: 'var(--viz-6)', fontWeight: 700, background: 'var(--info-soft)', padding: '0.15rem 0.5rem', borderRadius: 4 }}>
               {p1.statePortal}

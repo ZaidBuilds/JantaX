@@ -50,7 +50,7 @@ enum EvidenceType {
 
 /// Location spine — every record hangs off a PIN code.
 model Pincode {
-  code       String   @id
+  code       String  @id
   state      String
   district   String
   region     Region
@@ -59,15 +59,16 @@ model Pincode {
   population Int?
   areaType   String?
 
-  schools         School[]
-  infraProjects   InfraProject[]
-  reraProjects    ReraProject[]
-  hospitals       Hospital[]
-  pdsShops        PdsShop[]
-  grievances      CpgramGrievance[]
-  citizenReports  CitizenReport[]
-  follows         Follow[]
-  issues          Issue[]
+  schools        School[]
+  infraProjects  InfraProject[]
+  reraProjects   ReraProject[]
+  hospitals      Hospital[]
+  pdsShops       PdsShop[]
+  grievances     CpgramGrievance[]
+  citizenReports CitizenReport[]
+  follows        Follow[]
+  issues         Issue[]
+  postOffices    PostOffice[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -77,23 +78,23 @@ model Pincode {
 
 /// UDISE+ school scorecard + parent ground-truth check-ins.
 model School {
-  id               String  @id @default(cuid())
-  pincodeCode      String
-  pincode          Pincode @relation(fields: [pincodeCode], references: [code])
-  udiseCode        String  @unique
-  nameEnglish      String
-  nameHindi        String
-  level            String // Primary / Upper Primary / Secondary
-  managementType   String // Govt / Govt-Aided / Private
-  studentsEnrolled Int
-  teachersWorking  Int
+  id                 String    @id @default(cuid())
+  pincodeCode        String
+  pincode            Pincode   @relation(fields: [pincodeCode], references: [code])
+  udiseCode          String    @unique
+  nameEnglish        String
+  nameHindi          String
+  level              String // Primary / Upper Primary / Secondary
+  managementType     String // Govt / Govt-Aided / Private
+  studentsEnrolled   Int
+  teachersWorking    Int
   teachersSanctioned Int
-  groundTruthScore Int
-  officialScore    Int?
-  hasToilet        Boolean?
-  hasElectricity   Boolean?
-  hasDrinkingWater Boolean?
-  lastCheckIn      DateTime?
+  groundTruthScore   Int
+  officialScore      Int?
+  hasToilet          Boolean?
+  hasElectricity     Boolean?
+  hasDrinkingWater   Boolean?
+  lastCheckIn        DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -151,15 +152,15 @@ model ReraProject {
 
 /// Healthcare / PHC / CHC facility registry (HMIS, NHM).
 model Hospital {
-  id              String  @id @default(cuid())
-  pincodeCode     String
-  pincode         Pincode @relation(fields: [pincodeCode], references: [code])
-  name            String
-  type            String // PHC / CHC / District Hospital
-  isOpen          Boolean @default(true)
-  doctorPresent   Boolean @default(false)
-  bedsTotal       Int     @default(0)
-  bedsOccupied    Int     @default(0)
+  id                 String  @id @default(cuid())
+  pincodeCode        String
+  pincode            Pincode @relation(fields: [pincodeCode], references: [code])
+  name               String
+  type               String // PHC / CHC / District Hospital
+  isOpen             Boolean @default(true)
+  doctorPresent      Boolean @default(false)
+  bedsTotal          Int     @default(0)
+  bedsOccupied       Int     @default(0)
   medicinesAvailable Boolean @default(false)
 
   createdAt DateTime @default(now())
@@ -170,15 +171,15 @@ model Hospital {
 
 /// PDS / ration shop audit (NFSA, state ePOS).
 model PdsShop {
-  id                String  @id @default(cuid())
-  pincodeCode       String
-  pincode           Pincode @relation(fields: [pincodeCode], references: [code])
-  shopName          String
-  dealerName        String
-  isOpen            Boolean @default(true)
-  quotaDistributedPct Int   @default(0)
-  qualityOk         Boolean @default(true)
-  beneficiaries     Int     @default(0)
+  id                  String  @id @default(cuid())
+  pincodeCode         String
+  pincode             Pincode @relation(fields: [pincodeCode], references: [code])
+  shopName            String
+  dealerName          String
+  isOpen              Boolean @default(true)
+  quotaDistributedPct Int     @default(0)
+  qualityOk           Boolean @default(true)
+  beneficiaries       Int     @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -188,16 +189,16 @@ model PdsShop {
 
 /// CPGRAMS grievance backlog (DARPG monthly reports).
 model CpgramGrievance {
-  id          String   @id @default(cuid())
-  pincodeCode String
-  pincode     Pincode  @relation(fields: [pincodeCode], references: [code])
-  ministry    String
-  state       String
-  category    String
-  status      String // Closed / Pending / Escalated
-  filedDate   DateTime
+  id           String    @id @default(cuid())
+  pincodeCode  String
+  pincode      Pincode   @relation(fields: [pincodeCode], references: [code])
+  ministry     String
+  state        String
+  category     String
+  status       String // Closed / Pending / Escalated
+  filedDate    DateTime
   resolvedDate DateTime?
-  delayDays   Int      @default(0)
+  delayDays    Int       @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -226,21 +227,21 @@ enum IssueSeverity {
 
 /// Issue tracking system for accountability
 model Issue {
-  id            String   @id @default(cuid())
-  issueId       String   @unique
-  title         String
-  description   String
-  entityType    String
-  entityId      String
-  pincodeCode   String?
-  pincode       Pincode? @relation(fields: [pincodeCode], references: [code])
-  status        IssueStatus @default(DETECTED)
-  detectedAt    DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  issueDetail   IssueDetail?
-  grievances    Grievance[]
-  resolutions   Resolution[]
-  followUps     FollowUp[]
+  id          String       @id @default(cuid())
+  issueId     String       @unique
+  title       String
+  description String
+  entityType  String
+  entityId    String
+  pincodeCode String?
+  pincode     Pincode?     @relation(fields: [pincodeCode], references: [code])
+  status      IssueStatus  @default(DETECTED)
+  detectedAt  DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  issueDetail IssueDetail?
+  grievances  Grievance[]
+  resolutions Resolution[]
+  followUps   FollowUp[]
 
   @@index([issueId])
   @@index([entityType, entityId])
@@ -249,27 +250,27 @@ model Issue {
 }
 
 model IssueDetail {
-  id            String   @id @default(cuid())
-  issue         Issue    @relation(fields: [issueId], references: [id])
-  issueId       String   @unique
-  severity      IssueSeverity?
-  impactArea    String?
-  metadata      Json?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id         String         @id @default(cuid())
+  issue      Issue          @relation(fields: [issueId], references: [id])
+  issueId    String         @unique
+  severity   IssueSeverity?
+  impactArea String?
+  metadata   Json?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
 
   @@index([issueId])
 }
 
 model AuthorityResolver {
-  id              String   @id @default(cuid())
+  id              String      @id @default(cuid())
   entityType      String
   authority       String
   officialChannel String
   submissionUrl   String?
-  isActive        Boolean @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  isActive        Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
   grievances      Grievance[]
 
   @@index([entityType])
@@ -287,27 +288,27 @@ enum GrievanceStatus {
 }
 
 model Grievance {
-  id            String   @id @default(cuid())
-  grievanceId   String   @unique
-  issue         Issue    @relation(fields: [issueId], references: [id])
-  issueId       String
-  authorityResolver AuthorityResolver? @relation(fields: [authorityResolverId], references: [id])
-  authorityResolverId String?
-  officialChannel String
-  draft         String
-  status        GrievanceStatus @default(DRAFT)
-  submittedToOfficial Boolean @default(false)
+  id                      String              @id @default(cuid())
+  grievanceId             String              @unique
+  issue                   Issue               @relation(fields: [issueId], references: [id])
+  issueId                 String
+  authorityResolver       AuthorityResolver?  @relation(fields: [authorityResolverId], references: [id])
+  authorityResolverId     String?
+  officialChannel         String
+  draft                   String
+  status                  GrievanceStatus     @default(DRAFT)
+  submittedToOfficial     Boolean             @default(false)
   officialReferenceNumber String?
-  submittedAt   DateTime?
-  officialResponse String?
-  responseDate  DateTime?
-  appealAvailable Boolean @default(false)
-  followUpAt    DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  timeline      GrievanceTimeline[]
-  resolutions   Resolution[]
-  followUps     FollowUp[]
+  submittedAt             DateTime?
+  officialResponse        String?
+  responseDate            DateTime?
+  appealAvailable         Boolean             @default(false)
+  followUpAt              DateTime?
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+  timeline                GrievanceTimeline[]
+  resolutions             Resolution[]
+  followUps               FollowUp[]
 
   @@index([grievanceId])
   @@index([issueId])
@@ -317,14 +318,14 @@ model Grievance {
 }
 
 model GrievanceTimeline {
-  id            String   @id @default(cuid())
-  grievance     Grievance @relation(fields: [grievanceId], references: [id])
-  grievanceId   String
-  eventType     String
-  description   String
-  occurredAt    DateTime @default(now())
-  actor         String?
-  metadata      Json?
+  id          String    @id @default(cuid())
+  grievance   Grievance @relation(fields: [grievanceId], references: [id])
+  grievanceId String
+  eventType   String
+  description String
+  occurredAt  DateTime  @default(now())
+  actor       String?
+  metadata    Json?
 
   @@index([grievanceId])
   @@index([occurredAt])
@@ -339,18 +340,18 @@ enum ResolutionStatus {
 }
 
 model Resolution {
-  id            String   @id @default(cuid())
-  resolutionId  String   @unique
-  issue         Issue?   @relation(fields: [issueId], references: [id])
-  issueId       String?
-  grievance     Grievance? @relation(fields: [grievanceId], references: [id])
-  grievanceId   String?
-  description   String
-  status        ResolutionStatus @default(PROPOSED)
-  verifiedByCitizen Boolean @default(false)
-  verifiedByOfficial Boolean @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                 String           @id @default(cuid())
+  resolutionId       String           @unique
+  issue              Issue?           @relation(fields: [issueId], references: [id])
+  issueId            String?
+  grievance          Grievance?       @relation(fields: [grievanceId], references: [id])
+  grievanceId        String?
+  description        String
+  status             ResolutionStatus @default(PROPOSED)
+  verifiedByCitizen  Boolean          @default(false)
+  verifiedByOfficial Boolean          @default(false)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
 
   @@index([resolutionId])
   @@index([issueId])
@@ -366,16 +367,16 @@ enum FollowUpStatus {
 }
 
 model FollowUp {
-  id            String   @id @default(cuid())
-  followUpId    String   @unique
-  grievance     Grievance? @relation(fields: [grievanceId], references: [id])
-  grievanceId   String?
-  issue         Issue?   @relation(fields: [issueId], references: [id])
-  issueId       String?
-  description   String
-  status        FollowUpStatus @default(PENDING)
-  initiatedAt   DateTime @default(now())
-  completedAt   DateTime?
+  id          String         @id @default(cuid())
+  followUpId  String         @unique
+  grievance   Grievance?     @relation(fields: [grievanceId], references: [id])
+  grievanceId String?
+  issue       Issue?         @relation(fields: [issueId], references: [id])
+  issueId     String?
+  description String
+  status      FollowUpStatus @default(PENDING)
+  initiatedAt DateTime       @default(now())
+  completedAt DateTime?
 
   @@index([followUpId])
   @@index([grievanceId])
@@ -385,15 +386,15 @@ model FollowUp {
 
 /// Contractor / builder ledger (GeM, CPPP tender awards).
 model Contractor {
-  id              String @id @default(cuid())
-  name            String
-  registeredState String
-  verified        Boolean @default(false)
-  totalContracts  Int     @default(0)
-  completed       Int     @default(0)
-  ongoing         Int     @default(0)
-  delayed         Int     @default(0)
-  score           Int     @default(0)
+  id                 String              @id @default(cuid())
+  name               String
+  registeredState    String
+  verified           Boolean             @default(false)
+  totalContracts     Int                 @default(0)
+  completed          Int                 @default(0)
+  ongoing            Int                 @default(0)
+  delayed            Int                 @default(0)
+  score              Int                 @default(0)
   contractorProjects ContractorProject[]
 
   createdAt DateTime @default(now())
@@ -438,143 +439,165 @@ model EvidenceMedia {
 
 /// Admin / moderator authentication.
 model User {
-  id           String     @id @default(cuid())
-  email        String     @unique
+  id           String          @id @default(cuid())
+  email        String          @unique
   passwordHash String
   name         String?
-  role         UserRole   @default(CITIZEN)
+  role         UserRole        @default(CITIZEN)
   reviews      CitizenReport[]
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
 }
 
 /// State CM Claims vs CAG (Andhbhakt State) — spec-m2
 model StateCmClaim {
-  id              String   @id @default(cuid())
-  stateCode       String   @db.VarChar(2)
-  category        String
-  claimTitleHindi String
-  claimTitleEn    String
-  claimSource     String
-  claimDetails    String   @db.Text
+  id                String   @id @default(cuid())
+  stateCode         String   @db.VarChar(2)
+  category          String
+  claimTitleHindi   String
+  claimTitleEn      String
+  claimSource       String
+  claimDetails      String   @db.Text
   realityTitleHindi String
   realityTitleEn    String
   realityDetails    String   @db.Text
   cagReportRef      String
   realitySeverity   String
   lastUpdated       DateTime @updatedAt
+
   @@index([stateCode, category])
 }
 
 /// City Municipal Scorecard — spec-m10
 model MunicipalWard {
-  id                String   @id @default(cuid())
-  pincode           String   @db.VarChar(6)
-  wardNo            String
-  garbageClaimedSla String
-  waterClaimedSla   String
+  id                 String       @id @default(cuid())
+  pincode            String       @db.VarChar(6)
+  wardNo             String
+  garbageClaimedSla  String
+  waterClaimedSla    String
   drainageClaimedSla String
-  citizenReviews    WardReview[]
+  citizenReviews     WardReview[]
+
   @@index([pincode])
 }
+
 model WardReview {
-  id            String   @id @default(cuid())
-  wardId        String
+  id              String        @id @default(cuid())
+  wardId          String
   serviceCategory String
-  actualRating  Int
-  feedbackText  String?
-  reportedAt    DateTime @default(now())
-  ward          MunicipalWard @relation(fields: [wardId], references: [id])
+  actualRating    Int
+  feedbackText    String?
+  reportedAt      DateTime      @default(now())
+  ward            MunicipalWard @relation(fields: [wardId], references: [id])
+
   @@index([wardId])
 }
+
 model PincodeBudget {
-  id              String   @id @default(cuid())
-  pincode         String   @unique @db.VarChar(6)
-  financialYear   String
-  totalRevenueCr  Float
+  id               String                   @id @default(cuid())
+  pincode          String                   @unique @db.VarChar(6)
+  financialYear    String
+  totalRevenueCr   Float
   totalAllocatedCr Float
-  allocations     BudgetSectorAllocation[]
+  allocations      BudgetSectorAllocation[]
 }
+
 model BudgetSectorAllocation {
-  id              String   @id @default(cuid())
+  id              String        @id @default(cuid())
   budgetId        String
   sectorNameEn    String
   sectorNameHi    String
   allocatedCr     Float
   utilizedCr      Float
-  stalledProjects Int      @default(0)
+  stalledProjects Int           @default(0)
   budget          PincodeBudget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
   @@index([budgetId])
 }
+
 model RegionalAqiStation {
-  id              String   @id @default(cuid())
-  pincode         String   @db.VarChar(6)
-  stationName     String
-  aqiValue        Int
+  id                String       @id @default(cuid())
+  pincode           String       @db.VarChar(6)
+  stationName       String
+  aqiValue          Int
   dominantPollutant String
-  lastUpdated     DateTime @updatedAt
-  pcbNotices      SpcbNotice[]
+  lastUpdated       DateTime     @updatedAt
+  pcbNotices        SpcbNotice[]
+
   @@index([pincode])
 }
+
 model SpcbNotice {
-  id              String   @id @default(cuid())
+  id              String             @id @default(cuid())
   stationId       String
   industryName    String
   noticeType      String
-  violationReason String   @db.Text
+  violationReason String             @db.Text
   issueDate       String
   station         RegionalAqiStation @relation(fields: [stationId], references: [id], onDelete: Cascade)
+
   @@index([stationId])
 }
+
 model TehsilOffice {
-  id                String   @id @default(cuid())
-  pincode           String   @db.VarChar(6)
-  tehsilName        String
-  district          String
-  promisedSlaDays   Int      @default(45)
-  mutationRecords   LandMutationRecord[]
+  id              String               @id @default(cuid())
+  pincode         String               @db.VarChar(6)
+  tehsilName      String
+  district        String
+  promisedSlaDays Int                  @default(45)
+  mutationRecords LandMutationRecord[]
+
   @@index([pincode])
 }
+
 model LandMutationRecord {
-  id              String   @id @default(cuid())
-  tehsilId        String
-  surveyNumber    String
-  daysTaken       Int
-  status          String
-  appliedDate     String
-  tehsil          TehsilOffice @relation(fields: [tehsilId], references: [id], onDelete: Cascade)
+  id           String       @id @default(cuid())
+  tehsilId     String
+  surveyNumber String
+  daysTaken    Int
+  status       String
+  appliedDate  String
+  tehsil       TehsilOffice @relation(fields: [tehsilId], references: [id], onDelete: Cascade)
+
   @@index([tehsilId])
 }
+
 model DiscomFeeder {
-  id                  String   @id @default(cuid())
-  pincode             String   @db.VarChar(6)
+  id                  String            @id @default(cuid())
+  pincode             String            @db.VarChar(6)
   feederName          String
   substationName      String
-  promisedSupplyHours Int      @default(24)
+  promisedSupplyHours Int               @default(24)
   outageLogs          FeederOutageLog[]
+
   @@index([pincode])
 }
+
 model FeederOutageLog {
-  id              String   @id @default(cuid())
-  feederId        String
-  outageMinutes   Int
-  faultType       String
-  faultTypeHi     String
-  logDate         String
-  feeder          DiscomFeeder @relation(fields: [feederId], references: [id], onDelete: Cascade)
+  id            String       @id @default(cuid())
+  feederId      String
+  outageMinutes Int
+  faultType     String
+  faultTypeHi   String
+  logDate       String
+  feeder        DiscomFeeder @relation(fields: [feederId], references: [id], onDelete: Cascade)
+
   @@index([feederId])
 }
+
 model CandidateSpendRecord {
-  id                String   @id @default(cuid())
-  pincode           String   @db.VarChar(6)
-  candidateName     String
-  party             String
-  constituency      String
-  declaredSpend     Float
-  estimatedSpend    Float
-  sourceAffidavit   String
+  id              String @id @default(cuid())
+  pincode         String @db.VarChar(6)
+  candidateName   String
+  party           String
+  constituency    String
+  declaredSpend   Float
+  estimatedSpend  Float
+  sourceAffidavit String
+
   @@index([pincode])
 }
+
 model CpgramsMonthlyRecord {
   id                String   @id @default(cuid())
   recordType        String
@@ -590,88 +613,98 @@ model CpgramsMonthlyRecord {
   worstCategoryHi   String
   reportMonth       String
   lastUpdated       DateTime @updatedAt
+
   @@index([recordType, rank])
 }
+
 /// Contractor project ledger — spec-m3
 model ContractorProject {
-  id              String   @id @default(cuid())
+  id              String     @id @default(cuid())
   contractorId    String
-  workOrderNo     String   @unique
+  workOrderNo     String     @unique
   workName        String
   workNameHi      String
   sanctionedLakhs Float
   paymentReleased Float
   status          String
-  delayMonths     Int      @default(0)
-  defectReports   Int      @default(0)
+  delayMonths     Int        @default(0)
+  defectReports   Int        @default(0)
   contractor      Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+
   @@index([contractorId])
 }
 
 /// Source governance — every dataset has a Source record (Phase 04)
 model Source {
-  sourceId              String   @id @default(cuid()) @map("source_id")
-  organization          String
-  department            String?
-  governmentLevel       String   @map("government_level")
-  sourceName            String   @map("source_name")
-  sourceUrl             String   @map("source_url")
-  apiUrl                String?  @map("api_url")
-  datasetUrl            String?  @map("dataset_url")
-  sourceType            String   @map("source_type")
-  license               String
-  termsUrl              String?  @map("terms_url")
-  attributionRequirement String  @map("attribution_requirement")
-  reusePermission       String   @map("reuse_permission")
-  dataSensitivity       String   @map("data_sensitivity")
-  updateFrequency       String   @map("update_frequency")
-  expectedRefreshInterval String @map("expected_refresh_interval")
-  lastChecked           DateTime @map("last_checked")
-  lastSuccessfulSync    DateTime? @map("last_successful_sync")
-  lastPublishedDate     String?  @map("last_published_date")
-  parserVersion         String   @map("parser_version")
-  status                String
-  owner                 String
-  notes                 String?  @db.Text
-  records               DataPoint[]
-  rawDocuments          RawDocument[]
+  sourceId                String        @id @default(cuid()) @map("source_id")
+  organization            String
+  department              String?
+  governmentLevel         String        @map("government_level")
+  sourceName              String        @map("source_name")
+  sourceUrl               String        @map("source_url")
+  apiUrl                  String?       @map("api_url")
+  datasetUrl              String?       @map("dataset_url")
+  sourceType              String        @map("source_type")
+  license                 String
+  termsUrl                String?       @map("terms_url")
+  attributionRequirement  String        @map("attribution_requirement")
+  reusePermission         String        @map("reuse_permission")
+  dataSensitivity         String        @map("data_sensitivity")
+  updateFrequency         String        @map("update_frequency")
+  expectedRefreshInterval String        @map("expected_refresh_interval")
+  lastChecked             DateTime      @map("last_checked")
+  lastSuccessfulSync      DateTime?     @map("last_successful_sync")
+  lastPublishedDate       String?       @map("last_published_date")
+  parserVersion           String        @map("parser_version")
+  status                  String
+  owner                   String
+  notes                   String?       @db.Text
+  records                 DataPoint[]
+  rawDocuments            RawDocument[]
+
   @@index([sourceType, status])
   @@index([organization, sourceName])
 }
+
 model RawDocument {
-  id          String   @id @default(cuid())
-  sourceId    String   @map("source_id")
-  source      Source   @relation(fields: [sourceId], references: [sourceId])
-  fetchedAt   DateTime @default(now()) @map("fetched_at")
+  id          String          @id @default(cuid())
+  sourceId    String          @map("source_id")
+  source      Source          @relation(fields: [sourceId], references: [sourceId])
+  fetchedAt   DateTime        @default(now()) @map("fetched_at")
   url         String
-  contentType String   @map("content_type")
+  contentType String          @map("content_type")
   size        Int
   hash        String
-  storagePath String?  @map("storage_path")
-  status      String   // fetched | failed
-  error       String?  @db.Text
+  storagePath String?         @map("storage_path")
+  status      String // fetched | failed
+  error       String?         @db.Text
   parsed      ParsedDocument?
+
   @@index([sourceId, fetchedAt])
 }
+
 model ParsedDocument {
-  id              String   @id @default(cuid())
-  rawDocumentId   String   @unique @map("raw_document_id")
-  rawDocument     RawDocument @relation(fields: [rawDocumentId], references: [id])
-  parsedAt        DateTime @default(now()) @map("parsed_at")
-  rowCount        Int      @map("row_count")
-  parsedJson      Json?    @map("parsed_json")
-  validation      ValidationResult?
+  id            String            @id @default(cuid())
+  rawDocumentId String            @unique @map("raw_document_id")
+  rawDocument   RawDocument       @relation(fields: [rawDocumentId], references: [id])
+  parsedAt      DateTime          @default(now()) @map("parsed_at")
+  rowCount      Int               @map("row_count")
+  parsedJson    Json?             @map("parsed_json")
+  validation    ValidationResult?
+
   @@index([parsedAt])
 }
+
 model ValidationResult {
-  id               String   @id @default(cuid())
-  parsedDocumentId String   @unique @map("parsed_document_id")
+  id               String         @id @default(cuid())
+  parsedDocumentId String         @unique @map("parsed_document_id")
   parsedDocument   ParsedDocument @relation(fields: [parsedDocumentId], references: [id])
-  isValid          Boolean  @map("is_valid")
+  isValid          Boolean        @map("is_valid")
   errors           Json?
   warnings         Json?
-  checkedAt        DateTime @default(now()) @map("checked_at")
+  checkedAt        DateTime       @default(now()) @map("checked_at")
 }
+
 model DataPoint {
   id                String   @id @default(cuid())
   sourceId          String   @map("source_id")
@@ -688,17 +721,75 @@ model DataPoint {
   reportingDays     Int?     @map("reporting_days")
   agreementRate     Float?   @map("agreement_rate")
   capturedAt        DateTime @default(now()) @map("captured_at")
+
   @@index([sourceId, entityId])
 }
 
 /// Users (or anonymous devices) tracking a PIN for alerts.
 model Follow {
-  id           String   @id @default(cuid())
-  userId       String? // nullable for anonymous device tracking
-  pincodeCode  String
-  pincode      Pincode  @relation(fields: [pincodeCode], references: [code])
-  createdAt    DateTime @default(now())
+  id          String   @id @default(cuid())
+  userId      String? // nullable for anonymous device tracking
+  pincodeCode String
+  pincode     Pincode  @relation(fields: [pincodeCode], references: [code])
+  createdAt   DateTime @default(now())
 
   @@unique([userId, pincodeCode])
   @@index([pincodeCode])
+}
+
+/// A post office from India Post's All India Pincode Directory (data.gov.in, GODL-India).
+/// Filled by the `india-post-pincode-directory` connector; one PIN is served by one or more offices.
+model PostOffice {
+  id          String   @id // "<pincode>:<office slug>", stable across refreshes
+  pincodeCode String
+  pincode     Pincode  @relation(fields: [pincodeCode], references: [code])
+  officeName  String
+  officeType  String // BO (branch), SO (sub), HO (head)
+  delivery    Boolean
+  division    String?
+  region      String?
+  circle      String?
+  district    String
+  state       String
+  lat         Float?
+  lng         Float?
+  sourceId    String
+  updatedAt   DateTime @updatedAt
+
+  @@index([pincodeCode])
+  @@index([state, district])
+}
+
+/// A CPCB continuous ambient air quality monitoring station, as named in the real-time AQI feed.
+model AirStation {
+  id         String       @id // slug of state|city|station
+  name       String
+  city       String
+  state      String
+  lat        Float?
+  lng        Float?
+  nearestPin String? // PIN whose post offices sit closest to the station
+  readings   AirReading[]
+  updatedAt  DateTime     @updatedAt
+
+  @@index([state, city])
+  @@index([nearestPin])
+}
+
+/// One pollutant row from the CPCB real-time AQI feed: the published min, max and average
+/// for the station at `observedAt` (the feed's last_update, IST, stored as UTC).
+model AirReading {
+  id         String     @id @default(cuid())
+  stationId  String
+  station    AirStation @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  pollutant  String // PM2.5, PM10, NO2, SO2, CO, OZONE, NH3
+  minValue   Float?
+  maxValue   Float?
+  avgValue   Float?
+  observedAt DateTime
+  sourceId   String
+  fetchedAt  DateTime   @default(now())
+
+  @@unique([stationId, pollutant, observedAt])
+  @@index([stationId, observedAt])
 }

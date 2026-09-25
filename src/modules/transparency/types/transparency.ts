@@ -1,3 +1,6 @@
+/** Connected: data is flowing. Connector ready: built, waiting on configuration. Not connected: planned. */
+export type SourceStatus = 'Connected' | 'Connector ready' | 'Not connected';
+
 export interface GovtSourceDetail {
   id: string;
   sourceName: string;
@@ -12,7 +15,7 @@ export interface GovtSourceDetail {
   licenseAndUsageRules: string; // e.g. "NDSAP GODL-India License", "CAG Public Audit Fair Use Clause 4.2"
   officialUrl: string;
   lastSuccessfulSync: string;
-  status: 'Active Sync' | 'Sync Delayed' | 'Degraded Sync';
+  status: SourceStatus;
 }
 
 export interface SyncStatusItem {
@@ -22,9 +25,8 @@ export interface SyncStatusItem {
   updateFrequency: string;
   lastChecked: string;
   lastSuccessfulSync: string;
-  status: 'Active Sync' | 'Sync Delayed' | 'Degraded Sync';
+  status: SourceStatus;
   totalRecordsIngested: number;
-  syncHealthPct: number;
 }
 
 export interface EvidenceTier {

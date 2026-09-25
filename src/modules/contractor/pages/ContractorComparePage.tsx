@@ -33,7 +33,7 @@ export function ContractorComparePage() {
       {/* Selectors Bar */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
         gap: '1.5rem',
         background: 'var(--surface)',
         padding: '1.25rem',
@@ -74,7 +74,7 @@ export function ContractorComparePage() {
 
       {/* Comparison Grid */}
       {c1 && c2 && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '1.5rem' }}>
           {/* Contractor 1 Column */}
           <div style={{ background: 'var(--surface)', borderRadius: 16, border: '1px solid var(--border)', padding: '1.5rem' }}>
             <span style={{ background: 'var(--brand-soft)', color: 'var(--brand-ink)', fontSize: '0.75rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: 6 }}>

@@ -13,7 +13,9 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev",
+    "data": "tsx server/src/cli/data.ts",
+    "server:typecheck": "tsc -p server/tsconfig.json --noEmit"
   },
   "dependencies": {
     "@fontsource-variable/anek-devanagari": "^5.3.0",

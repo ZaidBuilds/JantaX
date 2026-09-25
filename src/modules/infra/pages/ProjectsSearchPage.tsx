@@ -94,7 +94,7 @@ export function ProjectsSearchPage() {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(280px, 320px) 1fr', gap: '1.5rem' }}>
+      <div className="filter-layout">
         {/* Filters Sidebar */}
         <div style={{
           background: 'var(--surface)',
@@ -332,6 +332,8 @@ export function ProjectsSearchPage() {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '0.5rem',
             marginBottom: '1rem',
             background: 'var(--surface)',
             padding: '0.85rem 1.25rem',

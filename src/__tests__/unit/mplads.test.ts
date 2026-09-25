@@ -28,7 +28,7 @@ describe('MPLADS Module — Unit & Integration Test Suite', () => {
   it('should retrieve a representative by ID', () => {
     const rep = getRepresentativeById('REP-LS-DL-01');
     expect(rep).toBeDefined();
-    expect(rep?.name).toBe('Bansuri Swaraj');
+    expect(rep?.name).toBe('Sample representative A');
     expect(rep?.house).toBe('Lok Sabha');
     expect(rep?.constituencyName).toBe('New Delhi');
 

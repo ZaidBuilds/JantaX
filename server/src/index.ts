@@ -14,13 +14,13 @@ import schoolsRoutes from './routes/schools';
 import infrastructureRoutes from './routes/infrastructure';
 import contractorsRoutes from './routes/contractors';
 import reraRoutes from './routes/rera';
-import evidenceRoutes from './routes/evidence';
 import issuesRoutes from './routes/issues';
 import methodologyRoutes from './routes/methodology';
 import staffingRoutes from './routes/staffing';
 import moderationRoutes from './routes/moderation';
 import v1Routes from './routes/v1';
 import authRoutes from './routes/auth';
+import airRoutes from './routes/air';
 
 const app = express();
 
@@ -85,23 +85,25 @@ app.get('/health', (_req, res) => {
 app.use(requireAuth);
 app.use('/api/auth', authRoutes);
 
+// Routers that declare full paths (/pincode/:code, /reports, ...) share the /api prefix.
 app.use('/api', pincodeRoutes);
 app.use('/api', recordsRoutes);
 app.use('/api', reportsRoutes);
 app.use('/api', correctionsRoutes);
 app.use('/api', sourcesRoutes);
 app.use('/api', adminSyncRoutes);
-app.use('/api', searchRoutes);
-app.use('/api', locationsRoutes);
-app.use('/api', schoolsRoutes);
-app.use('/api', infrastructureRoutes);
-app.use('/api', contractorsRoutes);
-app.use('/api', reraRoutes);
-app.use('/api', evidenceRoutes);
-app.use('/api', issuesRoutes);
-app.use('/api', methodologyRoutes);
-app.use('/api', staffingRoutes);
 app.use('/api', moderationRoutes);
+app.use('/api', airRoutes);
+// Resource routers declare '/' and '/:id', so each needs its own prefix.
+app.use('/api/search', searchRoutes);
+app.use('/api/locations', locationsRoutes);
+app.use('/api/schools', schoolsRoutes);
+app.use('/api/infrastructure', infrastructureRoutes);
+app.use('/api/contractors', contractorsRoutes);
+app.use('/api/rera', reraRoutes);
+app.use('/api/issues', issuesRoutes);
+app.use('/api/methodology', methodologyRoutes);
+app.use('/api/staffing', staffingRoutes);
 app.use('/api/v1', v1Routes);
 
 app.use((_req, res) => {

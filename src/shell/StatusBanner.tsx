@@ -42,8 +42,8 @@ export function StatusBanner() {
       <CloudOff size={14} aria-hidden="true" />
       {online ? (
         <>
-          <span className="hide-mobile">The live records service is not reachable right now, so you are seeing sample records. Figures are illustrative.</span>
-          <span className="show-mobile">Showing sample records. Figures are illustrative.</span>
+          <span className="hide-mobile">The JantaX data service is not reachable, so live readings are unavailable. PIN locations still come from the India Post directory.</span>
+          <span className="show-mobile">Live readings unavailable right now.</span>
         </>
       ) : (
         'You are offline. Showing the last records we could load.'

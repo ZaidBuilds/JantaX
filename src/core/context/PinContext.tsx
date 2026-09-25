@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { nearestKnownPincode } from '../utils/pinCoordinates';
 import { isValidIndianPincode } from '../utils/pinResolver';
+import { onDirectoryLoad, prefetchPin } from '../services/pinDirectory';
 
 interface PinContextValue {
   /** The currently selected PIN code across the whole app. */
@@ -16,6 +17,9 @@ interface PinContextValue {
   isDetecting: boolean;
   detectionError: string | null;
   detectLocation: () => Promise<string | null>;
+
+  /** Bumps when a PIN directory file loads, so screens that call resolvePincode re-render with real districts. */
+  directoryVersion: number;
 }
 
 const FOLLOW_STORAGE_KEY = 'jantax.followedPins';
@@ -38,6 +42,10 @@ export function PinProvider({ children }: { children: ReactNode }) {
   const [followedPins, setFollowedPins] = useState<string[]>(() => loadFollowedPins());
   const [isDetecting, setIsDetecting] = useState(false);
   const [detectionError, setDetectionError] = useState<string | null>(null);
+  const [directoryVersion, setDirectoryVersion] = useState(0);
+
+  useEffect(() => onDirectoryLoad(() => setDirectoryVersion((v) => v + 1)), []);
+  useEffect(() => prefetchPin(selectedPin), [selectedPin]);
 
   useEffect(() => {
     try {
@@ -114,8 +122,9 @@ export function PinProvider({ children }: { children: ReactNode }) {
       isDetecting,
       detectionError,
       detectLocation,
+      directoryVersion,
     }),
-    [selectedPin, followedPins, isFollowing, toggleFollow, isDetecting, detectionError, detectLocation]
+    [selectedPin, followedPins, isFollowing, toggleFollow, isDetecting, detectionError, detectLocation, directoryVersion]
   );
 
   return <PinContext.Provider value={value}>{children}</PinContext.Provider>;

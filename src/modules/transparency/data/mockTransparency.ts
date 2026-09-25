@@ -1,6 +1,39 @@
 import type { GovtSourceDetail, SyncStatusItem, EvidenceTier, ScoringFormulaItem, CorrectionRequest } from '../types/transparency';
 
+/** Registry of sources. Only the first two are connected or connectable today; the rest are planned. */
 export const MOCK_GOVT_SOURCES: GovtSourceDetail[] = [
+  {
+    id: 'src-india-post-pincode',
+    sourceName: 'All India Pincode Directory',
+    publishingEntity: 'Department of Posts (India Post)',
+    ministryOrDepartment: 'Ministry of Communications',
+    governmentLevel: 'Union Government',
+    dataAttributesCovered: ['PIN code', 'Post office name and type', 'Delivery status', 'District and state', 'Office coordinates'],
+    updateFrequency: 'Monthly on data.gov.in',
+    expectedRefreshInterval: '30d',
+    processingPipeline: 'data.gov.in API or CSV download -> validate PIN format, "NA" placeholders and coordinates -> normalise -> upsert 165,521 offices -> one static file per 3-digit PIN prefix',
+    knownLimitations: '715 offices are published with district and state "NA": 609 are filled from offices sharing their PIN, 106 are skipped. 14,617 offices have no usable coordinates. Current snapshot came via the india-pincode npm package (Mar 2026), not yet refreshed from data.gov.in.',
+    licenseAndUsageRules: 'Government Open Data License - India (GODL)',
+    officialUrl: 'https://www.data.gov.in/catalog/all-india-pincode-directory',
+    lastSuccessfulSync: 'Snapshot of Mar 2026',
+    status: 'Connected'
+  },
+  {
+    id: 'src-cpcb-aqi',
+    sourceName: 'Real time Air Quality Index from various locations',
+    publishingEntity: 'Central Pollution Control Board',
+    ministryOrDepartment: 'Ministry of Environment, Forest and Climate Change',
+    governmentLevel: 'Union Government',
+    dataAttributesCovered: ['Station', 'Pollutant (PM2.5, PM10, NO2, SO2, CO, Ozone, NH3)', 'Min, max and average index value', 'Last update time'],
+    updateFrequency: 'Hourly',
+    expectedRefreshInterval: '1h',
+    processingPipeline: 'data.gov.in API every hour -> validate station, pollutant and timestamp -> match each station to its nearest PIN -> keep 30 days of readings',
+    knownLimitations: 'Needs a free data.gov.in API key on the JantaX data service. Stations cover cities far better than rural districts, so many PINs are tens of kilometres from the nearest monitor.',
+    licenseAndUsageRules: 'Government Open Data License - India (GODL)',
+    officialUrl: 'https://www.data.gov.in/resource/real-time-air-quality-index-various-locations',
+    lastSuccessfulSync: 'Waiting for an API key',
+    status: 'Connector ready'
+  },
   {
     id: 'src-cppp',
     sourceName: 'Central Public Procurement Portal (CPPP)',
@@ -10,12 +43,12 @@ export const MOCK_GOVT_SOURCES: GovtSourceDetail[] = [
     dataAttributesCovered: ['Tenders Issued', 'Work Orders Executed', 'Contractor Awarded Value', 'Completion Timelines'],
     updateFrequency: 'Daily at 18:00 IST',
     expectedRefreshInterval: '24h',
-    processingPipeline: 'Automated JSON API sync -> Entity Extraction -> Contractor GSTIN Match -> Immutable SHA-256 Hash Log',
+    processingPipeline: 'Planned: Automated JSON API sync -> Entity Extraction -> Contractor GSTIN Match -> Immutable SHA-256 Hash Log',
     knownLimitations: 'Some state-level local body tenders below ₹10 Lakhs are published on regional gazettes with 48h update lag.',
     licenseAndUsageRules: 'National Data Sharing & Accessibility Policy (NDSAP) / GODL-India License',
     officialUrl: 'https://eprocure.gov.in',
-    lastSuccessfulSync: '2026-08-25 18:00 IST',
-    status: 'Active Sync'
+    lastSuccessfulSync: 'Never',
+    status: 'Not connected'
   },
   {
     id: 'src-cag',
@@ -26,12 +59,12 @@ export const MOCK_GOVT_SOURCES: GovtSourceDetail[] = [
     dataAttributesCovered: ['Public Expenditure Audits', 'Fiscal Overrun Figures', 'Physical Asset Verifications', 'Ministry Performance Observations'],
     updateFrequency: 'Quarterly & Parliamentary Tabled Sessions',
     expectedRefreshInterval: '90d',
-    processingPipeline: 'PDF Tabular Extraction (Tabula Parser v0.8) -> Paragraph Excerpt Normalization -> Source Citation Tagging',
+    processingPipeline: 'Planned: PDF Tabular Extraction (Tabula Parser v0.8) -> Paragraph Excerpt Normalization -> Source Citation Tagging',
     knownLimitations: 'Audit reports cover closed financial years; real-time operational status is supplemented via ground truth verification.',
     licenseAndUsageRules: 'Fair Use Quotation & Statutory Public Record (Constitution of India Article 151)',
     officialUrl: 'https://cag.gov.in',
-    lastSuccessfulSync: '2026-08-20 10:00 IST',
-    status: 'Active Sync'
+    lastSuccessfulSync: 'Never',
+    status: 'Not connected'
   },
   {
     id: 'src-udise',
@@ -42,12 +75,12 @@ export const MOCK_GOVT_SOURCES: GovtSourceDetail[] = [
     dataAttributesCovered: ['School Infrastructure (Toilets, Electricity, Drinking Water)', 'Teacher Ratios', 'Enrollment Statistics'],
     updateFrequency: 'Annual Official Release',
     expectedRefreshInterval: '365d',
-    processingPipeline: 'CSV Batch Ingestion -> Pincode Aggregation -> School Code Mapping',
+    processingPipeline: 'Planned: CSV Batch Ingestion -> Pincode Aggregation -> School Code Mapping',
     knownLimitations: 'Annual reporting cycle reflects status at time of survey.',
     licenseAndUsageRules: 'GODL-India License',
     officialUrl: 'https://udiseplus.gov.in',
-    lastSuccessfulSync: '2026-08-15 12:00 IST',
-    status: 'Active Sync'
+    lastSuccessfulSync: 'Never',
+    status: 'Not connected'
   },
   {
     id: 'src-maharera',
@@ -58,12 +91,12 @@ export const MOCK_GOVT_SOURCES: GovtSourceDetail[] = [
     dataAttributesCovered: ['Promoter Registrations', 'Promised vs Revised Completion Dates', 'RERA Tribunal Order Decrees'],
     updateFrequency: 'Daily Realtime Sync',
     expectedRefreshInterval: '24h',
-    processingPipeline: 'MahaOnline Public API -> Project ID Matching -> Tribunal PDF Parser',
+    processingPipeline: 'Planned: MahaOnline Public API -> Project ID Matching -> Tribunal PDF Parser',
     knownLimitations: 'Appeal stays granted by High Courts require manual legal tracking.',
     licenseAndUsageRules: 'State Public Domain Open Data Portal',
     officialUrl: 'https://maharera.mahaonline.gov.in',
-    lastSuccessfulSync: '2026-08-25 22:00 IST',
-    status: 'Active Sync'
+    lastSuccessfulSync: 'Never',
+    status: 'Not connected'
   },
   {
     id: 'src-uprera',
@@ -74,12 +107,12 @@ export const MOCK_GOVT_SOURCES: GovtSourceDetail[] = [
     dataAttributesCovered: ['Project Sanctions', 'Promoter Extensions', 'Adjudication Bench Orders'],
     updateFrequency: 'Daily at 20:00 IST',
     expectedRefreshInterval: '24h',
-    processingPipeline: 'UP-RERA Scraper API -> Order Summary Extraction -> Promoters Score Card Update',
+    processingPipeline: 'Planned: UP-RERA Scraper API -> Order Summary Extraction -> Promoters Score Card Update',
     knownLimitations: 'Some historical orders from 2017 are scanned images requiring OCR extraction.',
     licenseAndUsageRules: 'State Public Domain Record',
     officialUrl: 'https://up-rera.in',
-    lastSuccessfulSync: '2026-08-25 20:00 IST',
-    status: 'Active Sync'
+    lastSuccessfulSync: 'Never',
+    status: 'Not connected'
   },
   {
     id: 'src-cpgrams',
@@ -90,71 +123,23 @@ export const MOCK_GOVT_SOURCES: GovtSourceDetail[] = [
     dataAttributesCovered: ['Grievance Reference Status', 'Nodal Officer Responses', 'Disposal Timelines'],
     updateFrequency: 'Hourly Status Webhook / Pull',
     expectedRefreshInterval: '1h',
-    processingPipeline: 'DARPG Gateway JSON Pull -> Grievance ID Mapping -> Response Timeline Formatting',
+    processingPipeline: 'Planned: DARPG Gateway JSON Pull -> Grievance ID Mapping -> Response Timeline Formatting',
     knownLimitations: 'First Appeals filed offline require manual reference number linking.',
     licenseAndUsageRules: 'GODL-India License',
     officialUrl: 'https://pgportal.gov.in',
-    lastSuccessfulSync: '2026-08-25 23:00 IST',
-    status: 'Active Sync'
+    lastSuccessfulSync: 'Never',
+    status: 'Not connected'
   }
 ];
 
 export const MOCK_SYNC_STATUSES: SyncStatusItem[] = [
-  {
-    id: 'src-cppp',
-    sourceName: 'Central Public Procurement Portal (CPPP)',
-    publishingEntity: 'Ministry of Finance',
-    updateFrequency: 'Daily',
-    lastChecked: '2026-08-25 23:30 IST',
-    lastSuccessfulSync: '2026-08-25 18:00 IST',
-    status: 'Active Sync',
-    totalRecordsIngested: 142050,
-    syncHealthPct: 99.8
-  },
-  {
-    id: 'src-cag',
-    sourceName: 'CAG Audit Reports Register',
-    publishingEntity: 'CAG of India',
-    updateFrequency: 'Quarterly',
-    lastChecked: '2026-08-25 20:00 IST',
-    lastSuccessfulSync: '2026-08-20 10:00 IST',
-    status: 'Active Sync',
-    totalRecordsIngested: 8420,
-    syncHealthPct: 100.0
-  },
-  {
-    id: 'src-maharera',
-    sourceName: 'MahaRERA Public Portal',
-    publishingEntity: 'Government of Maharashtra',
-    updateFrequency: 'Daily',
-    lastChecked: '2026-08-25 23:45 IST',
-    lastSuccessfulSync: '2026-08-25 22:00 IST',
-    status: 'Active Sync',
-    totalRecordsIngested: 42100,
-    syncHealthPct: 99.4
-  },
-  {
-    id: 'src-uprera',
-    sourceName: 'UP RERA Portal',
-    publishingEntity: 'Government of Uttar Pradesh',
-    updateFrequency: 'Daily',
-    lastChecked: '2026-08-25 23:45 IST',
-    lastSuccessfulSync: '2026-08-25 20:00 IST',
-    status: 'Active Sync',
-    totalRecordsIngested: 38900,
-    syncHealthPct: 98.9
-  },
-  {
-    id: 'src-cpgrams',
-    sourceName: 'CPGRAMS DARPG Portal',
-    publishingEntity: 'DARPG Union Govt',
-    updateFrequency: 'Hourly',
-    lastChecked: '2026-08-25 23:50 IST',
-    lastSuccessfulSync: '2026-08-25 23:00 IST',
-    status: 'Active Sync',
-    totalRecordsIngested: 215000,
-    syncHealthPct: 99.9
-  }
+  { id: 'src-india-post-pincode', sourceName: 'All India Pincode Directory', publishingEntity: 'Department of Posts', updateFrequency: 'Monthly', lastChecked: '25 Sep 2026', lastSuccessfulSync: 'Snapshot of Mar 2026', status: 'Connected', totalRecordsIngested: 165521 },
+  { id: 'src-cpcb-aqi', sourceName: 'CPCB real-time air quality', publishingEntity: 'Central Pollution Control Board', updateFrequency: 'Hourly', lastChecked: 'Not yet', lastSuccessfulSync: 'Waiting for an API key', status: 'Connector ready', totalRecordsIngested: 0 },
+  { id: 'src-cppp', sourceName: 'Central Public Procurement Portal (CPPP)', publishingEntity: 'Ministry of Finance', updateFrequency: 'Daily', lastChecked: 'Never', lastSuccessfulSync: 'Never', status: 'Not connected', totalRecordsIngested: 0 },
+  { id: 'src-cag', sourceName: 'CAG Audit Reports Register', publishingEntity: 'CAG of India', updateFrequency: 'Quarterly', lastChecked: 'Never', lastSuccessfulSync: 'Never', status: 'Not connected', totalRecordsIngested: 0 },
+  { id: 'src-maharera', sourceName: 'MahaRERA Public Portal', publishingEntity: 'Government of Maharashtra', updateFrequency: 'Daily', lastChecked: 'Never', lastSuccessfulSync: 'Never', status: 'Not connected', totalRecordsIngested: 0 },
+  { id: 'src-uprera', sourceName: 'UP RERA Portal', publishingEntity: 'Government of Uttar Pradesh', updateFrequency: 'Daily', lastChecked: 'Never', lastSuccessfulSync: 'Never', status: 'Not connected', totalRecordsIngested: 0 },
+  { id: 'src-cpgrams', sourceName: 'CPGRAMS DARPG Portal', publishingEntity: 'DARPG', updateFrequency: 'Monthly', lastChecked: 'Never', lastSuccessfulSync: 'Never', status: 'Not connected', totalRecordsIngested: 0 },
 ];
 
 export const MOCK_EVIDENCE_TIERS: EvidenceTier[] = [

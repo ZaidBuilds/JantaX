@@ -2,7 +2,11 @@ import { useMemo, useState } from 'react';
 import { ExternalLink, Search, SearchX } from 'lucide-react';
 import { getStoredGovtSources } from '../services/transparencyService';
 import { TransparencyLayout } from '../components/TransparencyLayout';
-import { Badge, EmptyState, toneForStatus } from '../../../ui';
+import { Badge, EmptyState } from '../../../ui';
+import type { Tone } from '../../../ui/Badge';
+import type { SourceStatus } from '../types/transparency';
+
+export const STATUS_TONE: Record<SourceStatus, Tone> = { Connected: 'good', 'Connector ready': 'info', 'Not connected': 'neutral' };
 
 export function SourcesPage() {
   const sources = getStoredGovtSources();
@@ -34,7 +38,7 @@ export function SourcesPage() {
                   <div style={{ minWidth: 0 }}>
                     <div className="cluster">
                       <Badge tone="brand">{s.governmentLevel}</Badge>
-                      <Badge tone={toneForStatus(s.status === 'Active Sync' ? 'active' : 'delayed')}>{s.status}</Badge>
+                      <Badge tone={STATUS_TONE[s.status]}>{s.status}</Badge>
                     </div>
                     <h2 className="card-title" style={{ fontSize: 'var(--text-xl)', marginTop: 'var(--s-2)' }}>{s.sourceName}</h2>
                     <p className="small muted">{s.publishingEntity} · {s.ministryOrDepartment}</p>

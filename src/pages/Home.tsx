@@ -91,8 +91,8 @@ function AreaPreview({ pin }: { pin: string }) {
       </div>
       {lens && (
         <div className="card-foot">
-          <span>{lens.source}</span>
-          <span>{lens.asOfDate}</span>
+          <span>Sample example, not a record for {pin}</span>
+          <Link to={`/pin/${pin}`} className="link">See the area</Link>
         </div>
       )}
     </div>

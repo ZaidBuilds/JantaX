@@ -8,6 +8,6 @@ export { ClaimReality } from './ClaimReality';
 export { PinInput } from './PinInput';
 export { useDismiss } from './useDismiss';
 export { ToastProvider, useToast } from './Toast';
-export { ModuleIcon, MODULE_GROUPS, moduleTone, getModule, moduleHref, canonicalModuleId, type ModuleInfo } from './modules';
+export { ModuleIcon, MODULE_GROUPS, LIVE_FEEDS, moduleTone, getModule, moduleHref, canonicalModuleId, type ModuleInfo } from './modules';
 export { useShare } from './useShare';
 export { decodeEntities, reportForDisplay } from './text';

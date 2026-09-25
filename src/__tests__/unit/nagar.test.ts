@@ -35,7 +35,7 @@ describe('Municipal / Nagar Nigam & Sanitation Module — Unit & Integration Tes
     expect(ward).toBeDefined();
     expect(ward?.wardName).toContain('Connaught Place');
     expect(ward?.wardNumber).toBe(42);
-    expect(ward?.councillor.name).toBe('Virendra Babbar');
+    expect(ward?.councillor.name).toBe('Ward councillor (sample 1)');
 
     const notFound = getWardById('NONEXISTENT-WARD-999');
     expect(notFound).toBeUndefined();
@@ -58,8 +58,8 @@ describe('Municipal / Nagar Nigam & Sanitation Module — Unit & Integration Tes
   });
 
   it('should search wards by councillor name, PIN, and keyword', () => {
-    const babbar = getAllWards({ query: 'Babbar' });
-    expect(babbar.length).toBeGreaterThan(0);
+    const byCouncillor = getAllWards({ query: 'councillor (sample 1)' });
+    expect(byCouncillor.length).toBeGreaterThan(0);
 
     const pinWards = getAllWards({ pinCode: '110001' });
     expect(pinWards.length).toBeGreaterThan(0);

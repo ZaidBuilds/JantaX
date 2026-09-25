@@ -108,6 +108,14 @@ const HINDI_OVERRIDES: Record<string, string> = {
   andhbhakt: 'मुख्यमंत्री दावे बनाम ऑडिट',
 };
 
+/**
+ * Modules that read a connected official feed. Every other module shows illustrative sample data
+ * until its connector exists (see docs/DATA_LAYER.md), and says so on the page.
+ */
+export const LIVE_FEEDS: Record<string, { label: string; sourceId: string }> = {
+  pollution: { label: 'CPCB real-time air quality, via data.gov.in', sourceId: 'cpcb-realtime-aqi' },
+};
+
 export function moduleTone(id: string): string {
   return TONES[id] || 'var(--brand-ink)';
 }

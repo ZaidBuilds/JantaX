@@ -1332,6 +1332,12 @@ a.search-result:hover .search-result-title { color: var(--brand-ink); }
 .evidence-card .card-foot { align-items: center; }
 .meter-row { display: flex; align-items: center; gap: var(--s-3); }
 .module-toolbar { margin-bottom: var(--s-6); }
+.data-status { display: flex; gap: var(--s-2); align-items: flex-start; margin-top: var(--s-3); padding: var(--s-2) var(--s-3); border-radius: var(--r-md); border: 1px solid; font-size: var(--text-sm); line-height: 1.45; max-width: 72ch; }
+.data-status svg { flex: none; margin-top: 3px; }
+.data-status-sample { background: var(--warn-soft); border-color: var(--warn-line); color: var(--ink-2); }
+.data-status-sample svg { color: var(--warn); }
+.data-status-live { background: var(--good-soft); border-color: var(--good-line); color: var(--ink-2); }
+.data-status-live svg { color: var(--good); }
 .module-disclaimer { display: flex; gap: var(--s-2); align-items: flex-start; margin-top: var(--s-10); padding-top: var(--s-4); border-top: 1px solid var(--border); font-size: var(--text-xs); color: var(--ink-3); max-width: 90ch; }
 .module-disclaimer svg { margin-top: 1px; }
 
@@ -1351,4 +1357,15 @@ a.search-result:hover .search-result-title { color: var(--brand-ink); }
   /* Section nav becomes a swipeable tab strip so the school itself stays above the fold. */
   .sd-aside nav { grid-auto-flow: column; grid-auto-columns: max-content; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
   .sd-aside nav a { white-space: nowrap; }
+}
+
+.filter-layout { display: grid; grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+@media (max-width: 900px) { .filter-layout { grid-template-columns: minmax(0, 1fr); } }
+
+/* Module screens are mostly inline-styled. On phones, let long codes and names break so implicit
+   grid tracks cannot grow past the viewport; tables keep normal wrapping inside their scrollers. */
+@media (max-width: 640px) {
+  .module-body { overflow-wrap: anywhere; }
+  .module-body table { overflow-wrap: normal; }
+  .chip { max-width: 100%; white-space: normal; text-align: left; height: auto; min-height: 34px; padding-block: 6px; }
 }

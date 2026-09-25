@@ -141,8 +141,8 @@ export function ReportsPage() {
           }}
         >
           <label className="label" htmlFor="reports-pin">PIN code</label>
-          <div style={{ display: 'flex', gap: 'var(--s-2)' }}>
-            <div className="input-group" style={{ width: 180 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--s-2)' }}>
+            <div className="input-group" style={{ flex: '1 1 160px', maxWidth: 220 }}>
               <MapPin size={16} aria-hidden="true" />
               <input
                 id="reports-pin"

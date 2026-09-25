@@ -92,7 +92,7 @@ JantaX follows a modern, scalable architecture with clearly separated concerns:
 - **React 18** with TypeScript and **React Router 7**, each screen lazy-loaded
 - **Vite 5** for development and production builds
 - **Design system** in plain CSS variables with light and dark themes (`src/tokens.css`, `src/components.css`), shared React primitives in `src/ui/`, and Tailwind utilities mapped to the same tokens. See [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)
-- **Offline-first data layer**: when the API is unreachable, `src/core/services/api.ts` falls back to bundled sample records and a local search index, and the UI says so
+- **Data layer**: PIN locations come from India Post's All India Pincode Directory, served as static files from `public/data/pins`. Live air quality comes from the CPCB feed through the API server. Every other module shows labelled sample data until its connector exists. See [docs/DATA_LAYER.md](docs/DATA_LAYER.md) for sources, the sync pipeline and the runbook (`npm run data -- sources`)
 - **Leaflet** maps, **lucide-react** icons, self-hosted Inter and Anek fonts
 
 ### Backend Layer

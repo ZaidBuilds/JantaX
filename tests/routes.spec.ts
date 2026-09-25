@@ -23,7 +23,8 @@ async function open(page: Page, path: string) {
 }
 
 test.beforeEach(({}, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop', 'route checks run once, on desktop');
+  if (testInfo.title.startsWith('fits the phone width')) test.skip(testInfo.project.name !== 'mobile', 'phone layout runs on mobile');
+  else test.skip(testInfo.project.name !== 'desktop', 'route checks run once, on desktop');
 });
 
 test('the router has static routes to check', () => {
@@ -90,3 +91,14 @@ test('in-app links from the hub pages all resolve', async ({ page }) => {
   expect(hrefs.size).toBeGreaterThan(30);
   expect(broken).toEqual([]);
 });
+
+// Mobile emulation widens the layout viewport to fit oversized content, which hides horizontal
+// scroll from innerWidth. Compare the document width with the configured viewport instead.
+for (const path of [...staticRoutes, '/pin/110001', '/pin/504273', '/schools/mock-school-110001-0', '/compare?type=schools&ids=mock-school-110001-0']) {
+  test(`fits the phone width: ${path}`, async ({ page }) => {
+    await open(page, path);
+    const width = page.viewportSize()!.width;
+    const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+    expect(scrollWidth, `${path} scrolls sideways`).toBeLessThanOrEqual(width + 1);
+  });
+}
