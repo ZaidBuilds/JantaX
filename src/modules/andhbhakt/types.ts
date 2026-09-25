@@ -65,8 +65,8 @@ export interface ClaimCard {
   claimTextHi: string;        // Exact quote in Hindi
   claimTextEn: string;        // English translation
   claimNumber: string;        // "5 लाख ICU बेड", "₹6,812 Cr spent"
-  claimedBy: string;          // "Yogi Adityanath"
-  claimedByHi: string;        // "योगी आदित्यनाथ"
+  claimedBy: string;          // "Chief Minister (sample)"
+  claimedByHi: string;        // "मुख्यमंत्री (नमूना)"
   claimedByDesignation: string; // "मुख्यमंत्री, उत्तर प्रदेश"
   claimDate: string;          // "2024-03-14"
   claimOccasion: string;      // "Independence Day Speech"

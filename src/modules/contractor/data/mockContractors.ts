@@ -2,8 +2,8 @@ import type { ContractorProfile } from '../types/contractorIntelligence';
 
 export const MOCK_CONTRACTORS: ContractorProfile[] = [
   {
-    id: 'cont-lt-infra',
-    companyName: 'Larsen & Toubro Construction Limited',
+    id: 'cont-sample-a',
+    companyName: 'Sample Contractor A Limited',
     registrationNumber: 'DL-PWD-CAT1-2018-092',
     category: 'Class 1 Heavy Infrastructure',
     incorporationYear: 1946,
@@ -76,8 +76,8 @@ export const MOCK_CONTRACTORS: ContractorProfile[] = [
     }
   },
   {
-    id: 'cont-ncc-afcons',
-    companyName: 'NCC Ltd - Afcons Infrastructure JV',
+    id: 'cont-sample-bc',
+    companyName: 'Sample Contractor B - Sample Contractor C JV',
     registrationNumber: 'KA-BMRCL-JV-2020-009',
     category: 'Urban Transit & Metro',
     incorporationYear: 1990,
@@ -180,9 +180,9 @@ export const MOCK_CONTRACTORS: ContractorProfile[] = [
     }
   },
   {
-    id: 'cont-wabag',
-    companyName: 'VA Tech Wabag Limited',
-    registrationNumber: 'TN-WABAG-NMCG-2019-108',
+    id: 'cont-sample-d',
+    companyName: 'Sample Water Works D Limited',
+    registrationNumber: 'TN-SAMPLE-NMCG-2019-108',
     category: 'Water & Sewage Specialist',
     incorporationYear: 1996,
     headquarters: 'Chennai, Tamil Nadu',

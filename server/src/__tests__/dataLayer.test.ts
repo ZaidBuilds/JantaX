@@ -5,7 +5,8 @@ import { distanceKm, isInIndia, medianPoint } from '../jobs/lib/geo';
 import { mode, num, text, titleCase } from '../jobs/lib/normalize';
 import { aqiCategory, normalizePollutant, parseIstTimestamp, stationAqi } from '../jobs/lib/aqi';
 import { fetchOgdResource, OgdConfigError, ogdUrl, redactKey } from '../jobs/lib/ogd';
-import { fillMissingLocations, normalizeDirectory, readDirectoryRow, summarisePins, validateDirectory } from '../jobs/connectors/pincodeDirectory';
+import { cleanCoords, fillMissingLocations, normalizeDirectory, readDirectoryRow, summarisePins, validateDirectory } from '../jobs/connectors/pincodeDirectory';
+import { inState } from '../jobs/lib/stateBounds';
 import { readAqiRow, validateAqi } from '../jobs/connectors/cpcbAqi';
 import { nextRunAt } from '../jobs/scheduler';
 
@@ -88,6 +89,41 @@ describe('India Post directory connector', () => {
     const [pin] = summarisePins(offices);
     expect(pin).toMatchObject({ code: '110001', district: 'New Delhi', state: 'Delhi', region: 'NORTH' });
     expect(pin.lat).toBeCloseTo(28.6315, 3);
+  });
+
+  it('treats coordinates outside the office\'s state, or shared across districts, as unknown', () => {
+    const at = (district: string, state: string, lat: number, lng: number) => ({ district, state, lat, lng });
+    const { rows, outOfState, placeholders } = cleanCoords([
+      at('Vadodara', 'Gujarat', 15.59, 73.34), // published at Goa's latitude
+      at('Vadodara', 'Gujarat', 22.3, 73.2),
+      at('Azamgarh', 'Uttar Pradesh', 12.1668, 77.1066), // placeholder used across states
+      at('Kohima', 'Nagaland', 12.1668, 77.1066),
+      at('Rohtas', 'Bihar', 12.1668, 77.1066),
+      at('Mandya', 'Karnataka', 12.1668, 77.1066),
+      at('Mandya', 'Karnataka', 12.52, 76.9),
+    ]);
+    expect(outOfState).toBe(4); // Vadodara at 15.59, and Azamgarh, Kohima and Rohtas placed in Karnataka
+    expect(rows.map((r) => r.lat)).toEqual([null, 22.3, null, null, null, 12.1668, 12.52]);
+    expect(placeholders).toBe(0); // after the state check only Karnataka offices remain at the placeholder point
+    expect(inState('Andaman and Nicobar Islands', 7.0, 93.9)).toBe(true); // Campbell Bay
+    expect(inState('Gujarat', 15.59, 73.34)).toBe(false);
+  });
+
+  it('drops a shared placeholder point even inside the right state', () => {
+    const rows = ['Mandya', 'Mysuru', 'Hassan'].map((district) => ({ district, state: 'Karnataka', lat: 12.1668, lng: 77.1066 }));
+    expect(cleanCoords(rows)).toMatchObject({ placeholders: 3, rows: rows.map((r) => ({ ...r, lat: null, lng: null })) });
+  });
+
+  it('drops a PIN centre far from the rest of its district', () => {
+    const offices = [
+      ['110001', 28.63, 77.22],
+      ['110002', 28.64, 77.24],
+      ['110003', 28.59, 77.23],
+      ['110004', 26.0, 77.2], // ~290 km south of the others
+    ].map(([pincode, lat, lng]) => ({ id: String(pincode), pincode, officeName: 'X', officeType: 'PO', delivery: true, division: null, region: null, circle: null, district: 'New Delhi', state: 'Delhi', lat, lng }));
+    const pins = summarisePins(offices as never);
+    expect(pins.find((p) => p.code === '110004')).toMatchObject({ lat: null, lng: null });
+    expect(pins.filter((p) => p.lat !== null)).toHaveLength(3);
   });
 
   it('rejects bad PINs and warns when a download looks partial', () => {

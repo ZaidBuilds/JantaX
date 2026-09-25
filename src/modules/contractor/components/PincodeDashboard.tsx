@@ -25,6 +25,7 @@ import { Language, WhatsAppCardData, Contractor, WorkOrder, PincodeRecord } from
 import { getTranslation } from '../translations';
 
 import { generatePanIndiaPincodeRecord, decodeIndianPincode } from '../utils/panIndiaPincodes';
+import { nearestPin } from '../../../core/services/pinDirectory';
 
 interface PincodeDashboardProps {
   language: Language;
@@ -79,37 +80,20 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
     }
     setIsLocating(true);
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
+        // The PIN whose post offices are closest, from India Post's directory.
+        const near = await nearestPin(pos.coords.latitude, pos.coords.longitude);
         setIsLocating(false);
-        const { latitude, longitude } = pos.coords;
-        // Map common Indian metropolitan coordinates to representative PINs
-        let detected = '110001';
-        if (latitude > 28.0 && latitude < 29.0 && longitude > 76.8 && longitude < 77.5) {
-          detected = '110001'; // Delhi
-        } else if (latitude > 18.8 && latitude < 19.4 && longitude > 72.7 && longitude < 73.1) {
-          detected = '400053'; // Mumbai
-        } else if (latitude > 12.8 && latitude < 13.2 && longitude > 77.4 && longitude < 77.8) {
-          detected = '560034'; // Bengaluru
-        } else if (latitude > 12.9 && latitude < 13.3 && longitude > 80.1 && longitude < 80.4) {
-          detected = '600001'; // Chennai
-        } else if (latitude > 22.4 && latitude < 22.7 && longitude > 88.2 && longitude < 88.5) {
-          detected = '700001'; // Kolkata
-        } else if (latitude > 17.2 && latitude < 17.6 && longitude > 78.2 && longitude < 78.7) {
-          detected = '500032'; // Hyderabad
-        } else if (latitude > 26.7 && latitude < 27.0 && longitude > 80.8 && longitude < 81.1) {
-          detected = '226001'; // Lucknow
-        } else if (latitude > 25.5 && latitude < 25.7 && longitude > 85.0 && longitude < 85.3) {
-          detected = '800001'; // Patna
-        } else {
-          // Default fallback based on northern vs southern latitude
-          detected = latitude > 20 ? '110001' : '560034';
+        if (!near || near.km > 100) {
+          alert('Could not match your location to a PIN code. Please enter your 6-digit PIN code.');
+          return;
         }
-        setSearchInput(detected);
-        onSelectPincode(detected);
+        setSearchInput(near.pin);
+        onSelectPincode(near.pin);
       },
       (err) => {
         setIsLocating(false);
-        console.warn('GPS detection failed, fallback applied:', err);
+        console.warn('Location detection failed:', err);
       },
       { timeout: 8000 }
     );

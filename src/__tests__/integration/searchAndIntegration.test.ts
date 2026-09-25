@@ -38,9 +38,9 @@ describe('Integration Tests: Search, Monitoring & Transparency Services', () => 
     const req = submitCorrectionRequest({
       requestType: 'Official Data Challenge',
       submitterName: 'Shri Legal Counsel',
-      organization: 'M/s L&T Infra',
+      organization: 'M/s Sample Contractor A Infra',
       email: 'legal@example.com',
-      entityId: 'cont-lt-infra',
+      entityId: 'cont-sample-a',
       claimDetails: 'Challenging penalty order date with High Court stay order.',
       supportingGazetteUrl: 'https://cag.gov.in/stay.pdf'
     });

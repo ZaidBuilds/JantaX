@@ -5,6 +5,7 @@ import { Search, Crosshair, List, Map as MapIcon, X, ArrowRight, Layers, SearchX
 import { usePin } from '../core/context/PinContext';
 import { useCatalog } from '../core/hooks/useCatalog';
 import { getCoordinateForPin } from '../core/utils/pinCoordinates';
+import { usePinRecord } from '../core/services/pinDirectory';
 import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver';
 import { getAllWorks } from '../modules/mplads/services/mpladsService';
 import { getAllBooths } from '../modules/booth/services/boothService';
@@ -83,7 +84,12 @@ export function MapExplorer() {
     setSelectedPin(pin);
   }, [pin, setSelectedPin]);
 
-  const base = getCoordinateForPin(pin) || { lat: 28.6139, lng: 77.209 };
+  // Centre on the PIN's post offices (India Post directory); the prefix table and Delhi are fallbacks only.
+  const dir = usePinRecord(pin);
+  const base =
+    dir.record && dir.record.lat !== null && dir.record.lng !== null
+      ? { lat: dir.record.lat, lng: dir.record.lng }
+      : getCoordinateForPin(pin) || { lat: 28.6139, lng: 77.209 };
   const loc = resolvePincode(pin);
   const { records, isLoading } = useCatalog(pin);
 

@@ -5,7 +5,8 @@ import type { ChangeSet, FetchResult, NormalizedEntity, ParsedRow, SourceConnect
 import { fetchOgdResource, ogdApiKey, OgdConfigError } from '../lib/ogd';
 import { parseCsv } from '../lib/csv';
 import { bulkUpsert } from '../lib/bulk';
-import { isInIndia, medianPoint } from '../lib/geo';
+import { distanceKm, isInIndia, medianPoint } from '../lib/geo';
+import { inState } from '../lib/stateBounds';
 import { mode, num, picker, slug, text, titleCase } from '../lib/normalize';
 import { regionForState } from '../../routes/pinHelpers';
 import { RESOURCE_IDS, SOURCES } from '../sources';
@@ -95,6 +96,48 @@ export function fillMissingLocations(rows: Omit<PostOfficeRow, 'id'>[]) {
   return { rows: out, filled, dropped };
 }
 
+type Located = { district: string; state: string; lat: number | null; lng: number | null };
+
+/**
+ * Coordinates India Post publishes that cannot be right are treated as unknown:
+ * - outside the office's own state (Vadodara offices at latitude 15.59; Bihar's Aurangabad placed at
+ *   Aurangabad, Maharashtra);
+ * - placeholders: one point given to offices in three or more districts (for example 12.1668, 77.1066,
+ *   used across Karnataka, Uttar Pradesh and Nagaland).
+ */
+export function cleanCoords<T extends Located>(rows: T[]) {
+  let outOfState = 0;
+  const inside = rows.map((r) => {
+    if (r.lat === null || r.lng === null || inState(r.state, r.lat, r.lng)) return r;
+    outOfState++;
+    return { ...r, lat: null, lng: null };
+  });
+  const { rows: out, dropped: placeholders } = dropPlaceholderCoords(inside);
+  return { rows: out, outOfState, placeholders };
+}
+
+export function dropPlaceholderCoords<T extends Located>(rows: T[]) {
+  const districtsAt = new Map<string, Set<string>>();
+  const at = (r: T) => `${r.lat!.toFixed(4)},${r.lng!.toFixed(4)}`;
+  for (const r of rows) {
+    if (r.lat === null || r.lng === null) continue;
+    const k = at(r);
+    const set = districtsAt.get(k) ?? new Set<string>();
+    set.add(`${r.state}|${r.district}`);
+    districtsAt.set(k, set);
+  }
+  let dropped = 0;
+  const out = rows.map((r) => {
+    if (r.lat === null || r.lng === null || (districtsAt.get(at(r))?.size ?? 0) < 3) return r;
+    dropped++;
+    return { ...r, lat: null, lng: null };
+  });
+  return { rows: out, dropped };
+}
+
+/** A PIN centre this far from the middle of its district's other PINs is mis-geocoded, not remote. */
+export const PIN_OUTLIER_KM = 250;
+
 export function validateDirectory(rows: ParsedRow[]): ValidationResult {
   const errors: ValidationResult['errors'] = [];
   const warnings: ValidationResult['warnings'] = [];
@@ -108,6 +151,9 @@ export function validateDirectory(rows: ParsedRow[]): ValidationResult {
     return r;
   });
   const { filled, dropped } = fillMissingLocations(read);
+  const { outOfState, placeholders } = cleanCoords(read.filter((r) => r.district && r.state));
+  if (outOfState) warnings.push({ row: 0, field: 'latitude', message: `${outOfState} offices have coordinates outside their own state; their location is treated as unknown` });
+  if (placeholders) warnings.push({ row: 0, field: 'latitude', message: `${placeholders} offices share placeholder coordinates used across three or more districts; their location is treated as unknown` });
   if (filled) warnings.push({ row: 0, field: 'district', message: `${filled} offices had no district or state; filled from other offices with the same PIN` });
   if (dropped) warnings.push({ row: 0, field: 'district', message: `${dropped} offices have no district or state and no labelled office shares their PIN; skipped` });
   if (missingCoords) warnings.push({ row: 0, field: 'latitude', message: `${missingCoords} offices have no usable coordinates (blank, NA or outside India)` });
@@ -122,7 +168,7 @@ export function normalizeDirectory(rows: ParsedRow[]): NormalizedEntity[] {
   const seen = new Map<string, number>();
   const out: NormalizedEntity[] = [];
   const read = rows.map(readDirectoryRow).filter((r) => /^[1-9]\d{5}$/.test(r.pincode) && r.officeName);
-  for (const r of fillMissingLocations(read).rows) {
+  for (const r of cleanCoords(fillMissingLocations(read).rows).rows) {
     let id = `${r.pincode}:${slug(r.officeName)}`;
     const n = (seen.get(id) || 0) + 1;
     seen.set(id, n);
@@ -140,7 +186,7 @@ export function summarisePins(offices: PostOfficeRow[]) {
     if (list) list.push(o);
     else byPin.set(o.pincode, [o]);
   }
-  return [...byPin.entries()].map(([code, list]) => {
+  const pins = [...byPin.entries()].map(([code, list]) => {
     const state = mode(list.map((o) => o.state));
     const centre = medianPoint(list.filter((o) => o.lat !== null).map((o) => ({ lat: o.lat!, lng: o.lng! })));
     return {
@@ -151,6 +197,20 @@ export function summarisePins(offices: PostOfficeRow[]) {
       lat: centre?.lat ?? null,
       lng: centre?.lng ?? null,
     };
+  });
+
+  // A PIN placed far from the rest of its district (at least 3 located PINs) has wrong coordinates; drop them.
+  const byDistrict = new Map<string, { lat: number; lng: number }[]>();
+  for (const p of pins) {
+    if (p.lat === null || p.lng === null) continue;
+    const k = `${p.state}|${p.district}`;
+    byDistrict.set(k, [...(byDistrict.get(k) ?? []), { lat: p.lat, lng: p.lng }]);
+  }
+  const middle = new Map([...byDistrict].filter(([, pts]) => pts.length >= 3).map(([k, pts]) => [k, medianPoint(pts)!]));
+  return pins.map((p) => {
+    const mid = middle.get(`${p.state}|${p.district}`);
+    if (p.lat === null || p.lng === null || !mid || distanceKm(mid, { lat: p.lat, lng: p.lng }) <= PIN_OUTLIER_KM) return p;
+    return { ...p, lat: null, lng: null };
   });
 }
 

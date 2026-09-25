@@ -6,7 +6,7 @@ How official data gets into JantaX, what is real today, and how to connect the n
 
 | Data | Status | Where users see it |
 |---|---|---|
-| **PIN directory** (India Post, 165,521 post offices, 19,486 PINs) | Connected. Committed as a static snapshot, refreshable from data.gov.in. Also builds the district spine (745 districts) | Every PIN lookup: district and state, map centre, "Post offices in this PIN" card, PIN input hints |
+| **PIN directory** (India Post, 165,521 post offices, 19,486 PINs) | Connected. Committed as a static snapshot, refreshable from data.gov.in. Also builds the district spine (745 districts) | Every PIN lookup: district and state, map centre, "Post offices in this PIN" card, PIN input hints, and "use my location", which finds the PIN with the nearest centre from the static files alone |
 | **Air quality** (CPCB real-time feed via data.gov.in) | Connector built and tested. Needs a data.gov.in API key and a hosted API server | "Live: stations nearest your PIN" card on the Air quality module |
 | **25 catalogued datasets** covering all 17 other modules (see [DATASETS.md](DATASETS.md)) | Built and tested end to end. Each switches on with one setting (16 data.gov.in resource ids, 1 CKAN id, 2 download links) or a file import (6 registers with no feed) | "Official records" panel on each module screen, "Official figures for this area" on the PIN dashboard, live status on Data sources, Data freshness and Monitoring |
 | Module dashboards below the "Official records" panel | **Sample data**, labelled as such | Each module's banner says which official datasets are connected and that the other figures are samples |
@@ -48,6 +48,11 @@ source ─ fetch ─ raw copy ─ change check ─ parse ─ validate ─ normal
 - Field names are matched loosely (`officename`, `Office Name` and `office_name` are the same field), so the API and the CSV download both work.
 - "NA", blank and "-" are treated as missing. 715 offices are published with district and state "NA": 609 are filled from offices that share their PIN, and 106 are skipped rather than guessed.
 - Coordinates outside India's bounding box, or swapped, are dropped (14,617 offices). A PIN's location is the median of its offices, so one mis-geocoded office cannot move it.
+- Coordinates that cannot belong to the office's own state are dropped (3,600 offices), checked against a table of state and UT extents (`server/src/jobs/lib/stateBounds.ts`). For example, Vadodara offices are published at latitude 15.59, near Goa, and Bihar's Aurangabad offices at Aurangabad, Maharashtra.
+- Placeholder points, meaning one coordinate given to offices in three or more districts, are dropped (3,130 offices). For example, 12.1668, 77.1066 is used for offices in Uttar Pradesh, Nagaland and Bihar.
+- A PIN centre more than 250 km from the middle of its district's other PINs is dropped (57 PINs).
+- Result: 274 of 19,486 PINs have no location (previously 26). Before this cleaning, 248 of them were placed in the wrong part of the country, including every Azamgarh (UP) PIN placed in Karnataka, and 1,662 more were pulled off-centre.
+- Known limit: a district where about half the offices are wrong but still inside the right state can keep some wrong centres, because no independent district location is available to arbitrate. Mainpuri, UP is an example, with several PINs placed near Lalitpur.
 
 ### Air quality: how AQI is worked out
 
@@ -146,5 +151,4 @@ Likely official sources for each module, how they are published, and a rough eff
 1. **Real company names in sample data.** The infra, RERA and contractor samples use real firms (for example Supertech, Lodha, Brigade, L&T, Wabag) with invented delays and scores. Replace them with sample names before launch, as was done for people.
 2. **CM claims** name real Chief Ministers against placeholder sources; verify against CAG reports or replace.
 3. **Host the API server** (with Postgres) so live feeds reach users: `Dockerfile.api` and `render.yaml` are ready, see [GO_LIVE.md](GO_LIVE.md).
-4. **Geolocation** still maps a browser location to the nearest of 24 hard-coded PINs; switch it to the directory's PIN centres.
-5. **100 PINs** have no office with a published district, so they are missing from the directory until India Post fixes the data.
+4. **100 PINs** have no office with a published district, so they are missing from the directory until India Post fixes the data.
