@@ -54,11 +54,11 @@ export function ReraDirectoryPage() {
   }, [projects]);
 
   return (
-    <div style={{ padding: '1.75rem 0', maxWidth: 1200, margin: '0 auto' }}>
+    <div>
       {/* Non-Legal Advice Disclaimer Banner */}
       <div style={{
         background: '#fffbebf',
-        border: '1px solid #fde68a',
+        border: '1px solid var(--warn-line)',
         borderRadius: 12,
         padding: '0.75rem 1.25rem',
         marginBottom: '1.5rem',
@@ -66,7 +66,7 @@ export function ReraDirectoryPage() {
         alignItems: 'center',
         gap: '0.6rem',
         fontSize: '0.84rem',
-        color: '#b45309'
+        color: 'var(--warn)'
       }}>
         <Scale size={18} style={{ flexShrink: 0 }} />
         <div>
@@ -75,57 +75,11 @@ export function ReraDirectoryPage() {
       </div>
 
       {/* Main Header Banner */}
-      <div style={{
-        background: 'linear-gradient(135deg, #0e7490 0%, #155e75 50%, #0f172a 100%)',
-        borderRadius: 20,
-        padding: '2.25rem 2rem',
-        color: '#ffffff',
-        marginBottom: '2rem',
-        boxShadow: '0 12px 32px rgba(14, 116, 144, 0.18)'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.6rem' }}>
-          <span style={{
-            background: 'rgba(255, 255, 255, 0.2)',
-            border: '1px solid rgba(255, 255, 255, 0.4)',
-            color: '#ffffff',
-            fontSize: '0.75rem',
-            fontWeight: 800,
-            padding: '0.25rem 0.75rem',
-            borderRadius: '9999px',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.35rem'
-          }}>
-            <Home size={14} /> JANTAX PHASE 22
-          </span>
-          <span style={{ fontSize: '0.78rem', color: '#cffaff', fontWeight: 600 }}>
-            State RERA Integrated Intelligence · Official Record Provenance
-          </span>
-        </div>
-
-        <h1 style={{
-          fontSize: '2.1rem',
-          fontWeight: 800,
-          fontFamily: 'var(--font-heading)',
-          lineHeight: 1.25,
-          marginBottom: '0.6rem'
-        }}>
-          RERA Real Estate & Builder Intelligence Gateway
-        </h1>
-        <p style={{
-          fontSize: '0.96rem',
-          color: '#e0f2fe',
-          maxWidth: 820,
-          lineHeight: 1.55,
-          marginBottom: '1.5rem'
-        }}>
-          Track state RERA registrations, promised vs actual completion timelines, regulatory tribunal orders, and promoter track records across India. Explicit source provenance guarantees data integrity.
-        </p>
-
-        {/* Quick Search & Compare Action */}
+      <div className="card card-pad module-toolbar">
+{/* Quick Search & Compare Action */}
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', maxWidth: 740 }}>
           <div style={{ flex: 1, minWidth: 280, position: 'relative', display: 'flex', alignItems: 'center' }}>
-            <Search size={18} style={{ position: 'absolute', left: '1rem', color: '#94a3b8' }} />
+            <Search size={18} style={{ position: 'absolute', left: '1rem', color: 'var(--ink-4)' }} />
             <input
               type="text"
               placeholder="Search RERA Reg #, Project Name, Builder, PIN code..."
@@ -135,9 +89,9 @@ export function ReraDirectoryPage() {
                 width: '100%',
                 padding: '0.75rem 1rem 0.75rem 2.8rem',
                 borderRadius: 12,
-                border: '1px solid rgba(255,255,255,0.2)',
-                background: 'rgba(255, 255, 255, 0.08)',
-                color: '#ffffff',
+                border: '1px solid var(--border-strong)',
+                background: 'var(--surface)',
+                color: 'var(--ink)',
                 fontSize: '0.9rem',
                 outline: 'none',
                 backdropFilter: 'blur(8px)'
@@ -152,8 +106,8 @@ export function ReraDirectoryPage() {
               gap: '0.5rem',
               padding: '0.75rem 1.4rem',
               borderRadius: 12,
-              background: 'var(--gradient-accent)',
-              color: '#ffffff',
+              background: 'var(--brand)',
+              color: 'var(--on-solid)',
               fontWeight: 700,
               fontSize: '0.88rem',
               textDecoration: 'none',
@@ -170,8 +124,8 @@ export function ReraDirectoryPage() {
               gap: '0.5rem',
               padding: '0.75rem 1.2rem',
               borderRadius: 12,
-              background: '#0891b2',
-              color: '#ffffff',
+              background: 'var(--viz-6)',
+              color: 'var(--on-solid)',
               fontWeight: 700,
               fontSize: '0.88rem',
               textDecoration: 'none'
@@ -180,7 +134,7 @@ export function ReraDirectoryPage() {
             <BarChart3 size={16} /> Compare Projects
           </Link>
         </div>
-      </div>
+</div>
 
       {/* Metrics Bar */}
       <div style={{
@@ -189,34 +143,34 @@ export function ReraDirectoryPage() {
         gap: '1rem',
         marginBottom: '2rem'
       }}>
-        <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 16, border: '1px solid #e2e8f0' }}>
-          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>RERA Projects Tracked</div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginTop: '0.2rem' }}>{stats.totalProjects}</div>
-          <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>State RERA Portals</div>
+        <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 16, border: '1px solid var(--border)' }}>
+          <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>RERA Projects Tracked</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.2rem' }}>{stats.totalProjects}</div>
+          <div style={{ fontSize: '0.74rem', color: 'var(--ink-4)' }}>State RERA Portals</div>
         </div>
 
-        <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 16, border: '1px solid #e2e8f0' }}>
-          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Housing Units Tracked</div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0891b2', marginTop: '0.2rem' }}>{stats.totalUnits}</div>
-          <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>Allottee Inventory</div>
+        <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 16, border: '1px solid var(--border)' }}>
+          <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>Housing Units Tracked</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--viz-6)', marginTop: '0.2rem' }}>{stats.totalUnits}</div>
+          <div style={{ fontSize: '0.74rem', color: 'var(--ink-4)' }}>Allottee Inventory</div>
         </div>
 
-        <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 16, border: '1px solid #e2e8f0' }}>
-          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Documented Schedule Adjustments</div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#f59e0b', marginTop: '0.2rem' }}>{stats.delayedCount}</div>
-          <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>Extended / Delayed Projects</div>
+        <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 16, border: '1px solid var(--border)' }}>
+          <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>Documented Schedule Adjustments</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--warn)', marginTop: '0.2rem' }}>{stats.delayedCount}</div>
+          <div style={{ fontSize: '0.74rem', color: 'var(--ink-4)' }}>Extended / Delayed Projects</div>
         </div>
 
-        <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 16, border: '1px solid #e2e8f0' }}>
-          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>RERA Tribunal Orders</div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f2d59', marginTop: '0.2rem' }}>{stats.totalOrders}</div>
-          <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>Official Adjudications</div>
+        <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 16, border: '1px solid var(--border)' }}>
+          <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>RERA Tribunal Orders</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.2rem' }}>{stats.totalOrders}</div>
+          <div style={{ fontSize: '0.74rem', color: 'var(--ink-4)' }}>Official Adjudications</div>
         </div>
       </div>
 
       {/* State Portal Filter Chips */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.75rem', marginBottom: '1.5rem' }}>
-        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748b', marginRight: '0.5rem', whiteSpace: 'nowrap' }}>
+        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-3)', marginRight: '0.5rem', whiteSpace: 'nowrap' }}>
           State RERA Portal:
         </span>
         {portals.map((p) => (
@@ -226,9 +180,9 @@ export function ReraDirectoryPage() {
             style={{
               padding: '0.45rem 0.95rem',
               borderRadius: '9999px',
-              border: selectedPortal === p ? '1px solid #0891b2' : '1px solid #e2e8f0',
-              background: selectedPortal === p ? '#ecfeff' : '#ffffff',
-              color: selectedPortal === p ? '#0e7490' : '#475569',
+              border: selectedPortal === p ? '1px solid var(--viz-6)' : '1px solid var(--border)',
+              background: selectedPortal === p ? 'var(--info-soft)' : 'var(--surface)',
+              color: selectedPortal === p ? 'var(--viz-6)' : 'var(--ink-2)',
               fontWeight: selectedPortal === p ? 700 : 500,
               fontSize: '0.82rem',
               cursor: 'pointer',
@@ -246,9 +200,9 @@ export function ReraDirectoryPage() {
           <div
             key={p.id}
             style={{
-              background: '#ffffff',
+              background: 'var(--surface)',
               borderRadius: 16,
-              border: '1px solid #e2e8f0',
+              border: '1px solid var(--border)',
               padding: '1.5rem',
               boxShadow: '0 2px 10px rgba(15,23,42,0.03)'
             }}
@@ -258,9 +212,9 @@ export function ReraDirectoryPage() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
                   {/* Provenance Badge */}
                   <span style={{
-                    background: '#ecfeff',
+                    background: 'var(--info-soft)',
                     border: '1px solid #a5f3fc',
-                    color: '#0e7490',
+                    color: 'var(--viz-6)',
                     fontSize: '0.74rem',
                     fontWeight: 700,
                     padding: '0.18rem 0.6rem',
@@ -272,19 +226,19 @@ export function ReraDirectoryPage() {
                     <ShieldCheck size={12} /> {p.statusProvenances.officialStatus}
                   </span>
 
-                  <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--ink-3)', fontWeight: 600 }}>
                     {p.statePortal} · Reg #{p.reraRegistrationNumber}
                   </span>
                 </div>
 
                 <h3
                   onClick={() => navigate(`/rera/projects/${p.id}`)}
-                  style={{ fontSize: '1.3rem', fontWeight: 800, color: '#0f172a', cursor: 'pointer', margin: 0 }}
+                  style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--ink)', cursor: 'pointer', margin: 0 }}
                 >
                   {p.projectName}
                 </h3>
-                <div style={{ fontSize: '0.88rem', color: '#64748b', marginTop: '0.2rem' }}>
-                  Promoter: <strong style={{ color: '#0f172a' }}>{p.builderName}</strong> · {p.locationName}, {p.district} (PIN {p.pinCode})
+                <div style={{ fontSize: '0.88rem', color: 'var(--ink-3)', marginTop: '0.2rem' }}>
+                  Promoter: <strong style={{ color: 'var(--ink)' }}>{p.builderName}</strong> · {p.locationName}, {p.district} (PIN {p.pinCode})
                 </div>
               </div>
 
@@ -293,12 +247,12 @@ export function ReraDirectoryPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
-                  background: '#f8fafc',
-                  border: '1px solid #e2e8f0',
+                  background: 'var(--surface-2)',
+                  border: '1px solid var(--border)',
                   borderRadius: 8,
                   padding: '0.35rem 0.65rem',
                   fontSize: '0.74rem',
-                  color: '#0f2d59',
+                  color: 'var(--ink)',
                   fontWeight: 700,
                   textDecoration: 'none',
                   display: 'inline-flex',
@@ -315,34 +269,34 @@ export function ReraDirectoryPage() {
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
               gap: '0.85rem',
-              background: '#f8fafc',
+              background: 'var(--surface-2)',
               padding: '0.85rem 1.1rem',
               borderRadius: 12,
               marginBottom: '1rem'
             }}>
               <div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Promised Completion</div>
-                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#0f172a' }}>{p.promisedCompletionDate}</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Promised Completion</div>
+                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--ink)' }}>{p.promisedCompletionDate}</div>
               </div>
 
               <div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Revised Completion</div>
-                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#f97316' }}>{p.revisedCompletionDate}</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Revised Completion</div>
+                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--accent-ink)' }}>{p.revisedCompletionDate}</div>
               </div>
 
               <div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>Documented Delay</div>
-                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: p.documentedDelayMonths > 0 ? '#b45309' : '#047857' }}>
+                <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Documented Delay</div>
+                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: p.documentedDelayMonths > 0 ? 'var(--warn)' : 'var(--good)' }}>
                   {p.documentedDelayMonths} Months
-                  <span style={{ fontSize: '0.68rem', background: '#e0f2fe', color: '#0369a1', padding: '1px 4px', borderRadius: 4, marginLeft: 4 }}>
+                  <span style={{ fontSize: '0.68rem', background: 'var(--info-soft)', color: 'var(--viz-6)', padding: '1px 4px', borderRadius: 4, marginLeft: 4 }}>
                     {p.statusProvenances.delayCalculation}
                   </span>
                 </div>
               </div>
 
               <div>
-                <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 600 }}>RERA Orders</div>
-                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#0f172a' }}>{p.orders.length} Adjudication(s)</div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>RERA Orders</div>
+                <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--ink)' }}>{p.orders.length} Adjudication(s)</div>
               </div>
             </div>
 
@@ -351,19 +305,19 @@ export function ReraDirectoryPage() {
               <div style={{ display: 'flex', gap: '0.4rem' }}>
                 <Link
                   to={`/rera/projects/${p.id}`}
-                  style={{ padding: '0.35rem 0.75rem', borderRadius: 8, background: '#eff6ff', color: '#1d4ed8', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}
+                  style={{ padding: '0.35rem 0.75rem', borderRadius: 8, background: 'var(--brand-soft)', color: 'var(--brand-ink)', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}
                 >
                   Project Overview
                 </Link>
                 <Link
                   to={`/rera/projects/${p.id}/orders`}
-                  style={{ padding: '0.35rem 0.75rem', borderRadius: 8, background: '#f8fafc', border: '1px solid #e2e8f0', color: '#475569', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}
+                  style={{ padding: '0.35rem 0.75rem', borderRadius: 8, background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--ink-2)', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}
                 >
                   RERA Tribunal Orders ({p.orders.length})
                 </Link>
                 <Link
                   to={`/rera/builders/${p.builderId}`}
-                  style={{ padding: '0.35rem 0.75rem', borderRadius: 8, background: '#f8fafc', border: '1px solid #e2e8f0', color: '#475569', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}
+                  style={{ padding: '0.35rem 0.75rem', borderRadius: 8, background: 'var(--surface-2)', border: '1px solid var(--border)', color: 'var(--ink-2)', fontSize: '0.78rem', fontWeight: 600, textDecoration: 'none' }}
                 >
                   Builder Track Record
                 </Link>
@@ -371,7 +325,7 @@ export function ReraDirectoryPage() {
 
               <button
                 onClick={() => navigate(`/rera/projects/${p.id}`)}
-                style={{ background: 'none', border: 'none', color: '#0891b2', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
+                style={{ background: 'none', border: 'none', color: 'var(--viz-6)', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
               >
                 View Details <ArrowRight size={14} />
               </button>

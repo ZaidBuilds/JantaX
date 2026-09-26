@@ -25,6 +25,7 @@ import { Language, WhatsAppCardData, Contractor, WorkOrder, PincodeRecord } from
 import { getTranslation } from '../translations';
 
 import { generatePanIndiaPincodeRecord, decodeIndianPincode } from '../utils/panIndiaPincodes';
+import { nearestPin } from '../../../core/services/pinDirectory';
 
 interface PincodeDashboardProps {
   language: Language;
@@ -79,37 +80,20 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
     }
     setIsLocating(true);
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
+        // The PIN whose post offices are closest, from India Post's directory.
+        const near = await nearestPin(pos.coords.latitude, pos.coords.longitude);
         setIsLocating(false);
-        const { latitude, longitude } = pos.coords;
-        // Map common Indian metropolitan coordinates to representative PINs
-        let detected = '110001';
-        if (latitude > 28.0 && latitude < 29.0 && longitude > 76.8 && longitude < 77.5) {
-          detected = '110001'; // Delhi
-        } else if (latitude > 18.8 && latitude < 19.4 && longitude > 72.7 && longitude < 73.1) {
-          detected = '400053'; // Mumbai
-        } else if (latitude > 12.8 && latitude < 13.2 && longitude > 77.4 && longitude < 77.8) {
-          detected = '560034'; // Bengaluru
-        } else if (latitude > 12.9 && latitude < 13.3 && longitude > 80.1 && longitude < 80.4) {
-          detected = '600001'; // Chennai
-        } else if (latitude > 22.4 && latitude < 22.7 && longitude > 88.2 && longitude < 88.5) {
-          detected = '700001'; // Kolkata
-        } else if (latitude > 17.2 && latitude < 17.6 && longitude > 78.2 && longitude < 78.7) {
-          detected = '500032'; // Hyderabad
-        } else if (latitude > 26.7 && latitude < 27.0 && longitude > 80.8 && longitude < 81.1) {
-          detected = '226001'; // Lucknow
-        } else if (latitude > 25.5 && latitude < 25.7 && longitude > 85.0 && longitude < 85.3) {
-          detected = '800001'; // Patna
-        } else {
-          // Default fallback based on northern vs southern latitude
-          detected = latitude > 20 ? '110001' : '560034';
+        if (!near || near.km > 100) {
+          alert('Could not match your location to a PIN code. Please enter your 6-digit PIN code.');
+          return;
         }
-        setSearchInput(detected);
-        onSelectPincode(detected);
+        setSearchInput(near.pin);
+        onSelectPincode(near.pin);
       },
       (err) => {
         setIsLocating(false);
-        console.warn('GPS detection failed, fallback applied:', err);
+        console.warn('Location detection failed:', err);
       },
       { timeout: 8000 }
     );
@@ -163,26 +147,26 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
     <div className="space-y-6">
       
       {/* Primary Key Header & Search */}
-      <div className="border-2 border-[#1A1A1A] bg-white p-5 sm:p-6 shadow-sm">
+      <div className="border rounded-[10px] border-line bg-surface p-5 sm:p-6 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2">
-              <span className="bg-[#D43F33] text-white text-[11px] font-mono font-bold px-2 py-0.5 uppercase">
+              <span className="bg-[var(--bad-solid)] text-white text-xs font-bold px-2 py-0.5">
                 {getTranslation(language, 'pincodePrimaryKeyBadge')}
               </span>
-              <span className="bg-[#1A1A1A] text-white text-[11px] font-mono font-bold px-2 py-0.5 uppercase flex items-center gap-1">
-                <Globe2 className="w-3 h-3 text-amber-300" />
+              <span className="bg-[var(--surface-inverse)] text-white text-xs font-bold px-2 py-0.5 flex items-center gap-1">
+                <Globe2 className="w-3 h-3 text-warn" />
                 {currentPinRecord.city}
               </span>
-              <span className="bg-blue-900 text-white text-[10px] font-mono font-bold px-2 py-0.5 uppercase">
+              <span className="bg-blue-900 text-white text-xs font-bold px-2 py-0.5">
                 {postalInfo.statutoryAct}
               </span>
             </div>
             
-            <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#1A1A1A] tracking-tight">
-              PIN {currentPinRecord.pincode} — {currentPinRecord.areaName}
+            <h2 className="text-2xl sm:text-3xl font-bold text-ink tracking-tight">
+              PIN {currentPinRecord.pincode} · {currentPinRecord.areaName}
             </h2>
-            <p className="font-mono text-xs text-[#1A1A1A]/80 uppercase mt-1">
+            <p className="text-xs text-ink-2 mt-1">
               {currentPinRecord.wardName} • {currentPinRecord.state} • {postalInfo.pwdDivision} • {getTranslation(language, 'pincodeSummary')}
             </p>
           </div>
@@ -191,20 +175,20 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
           <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={handleAudioReadout}
-              className={`px-3 py-2 text-xs font-bold uppercase tracking-tight flex items-center gap-1.5 border-2 transition-colors cursor-pointer ${
-                isSpeaking 
-                  ? 'bg-amber-400 border-[#1A1A1A] text-[#1A1A1A] animate-pulse' 
-                  : 'bg-white border-[#1A1A1A] hover:bg-black/5 text-[#1A1A1A]'
-              }`}
+              className={`px-3 py-2 text-xs font-bold tracking-tight flex items-center gap-1.5 border rounded-[10px] transition-colors cursor-pointer ${
+ isSpeaking 
+ ? 'bg-amber-400 border-line text-ink animate-pulse' 
+ : 'bg-surface border-line hover:bg-surface-3 text-ink'
+ }`}
               title="Listen to Audio Audit (Accessible for all citizens)"
             >
-              {isSpeaking ? <VolumeX className="w-4 h-4 text-[#D43F33]" /> : <Volume2 className="w-4 h-4 text-[#1A1A1A]" />}
+              {isSpeaking ? <VolumeX className="w-4 h-4 text-bad" /> : <Volume2 className="w-4 h-4 text-ink" />}
               <span>{isSpeaking ? 'Stop Audio' : getTranslation(language, 'listenAudioAudit')}</span>
             </button>
 
             <button
               onClick={handleSharePincode}
-              className="bg-[#25D366] hover:bg-[#1EBE5D] text-white px-4 py-2 text-xs font-bold uppercase tracking-tight flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
+              className="bg-[var(--good-solid)] hover:opacity-90 text-white px-4 py-2 text-xs font-bold tracking-tight flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
             >
               <Share2 className="w-4 h-4" />
               <span>{getTranslation(language, 'btnShareWhatsApp')}</span>
@@ -212,7 +196,7 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
             
             <button
               onClick={onOpenAnonymousDrop}
-              className="bg-[#1A1A1A] hover:bg-[#D43F33] text-white px-4 py-2 text-xs font-bold uppercase tracking-tight flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="bg-[var(--surface-inverse)] hover:bg-[var(--bad-solid)] text-white px-4 py-2 text-xs font-bold tracking-tight flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <Camera className="w-4 h-4" />
               <span>{getTranslation(language, 'btnAnonymousDrop')}</span>
@@ -221,17 +205,17 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
         </div>
 
         {/* PIN Code Search Input & Presets */}
-        <div className="mt-5 pt-4 border-t border-black/15">
+        <div className="mt-5 pt-4 border-t border-line">
           <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2 max-w-2xl">
             <div className="relative flex-1">
-              <MapPin className="w-4 h-4 text-[#D43F33] absolute left-3 top-1/2 -translate-y-1/2" />
+              <MapPin className="w-4 h-4 text-bad absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchInput}
                 maxLength={6}
                 onChange={(e) => setSearchInput(e.target.value)}
                 placeholder={getTranslation(language, 'pincodeSearchPlaceholder')}
-                className="w-full bg-[#FAFAFA] border-2 border-[#1A1A1A] pl-9 pr-3 py-2.5 text-xs font-mono font-bold text-[#1A1A1A] focus:outline-none focus:bg-white"
+                className="w-full bg-surface-2 border rounded-[10px] border-line pl-9 pr-3 py-2.5 text-xs font-bold text-ink focus:outline-none focus:bg-surface"
               />
             </div>
             
@@ -239,16 +223,16 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
               type="button"
               onClick={handleAutoDetectPin}
               disabled={isLocating}
-              className="bg-white border-2 border-[#1A1A1A] hover:bg-black/5 text-[#1A1A1A] px-3.5 py-2 text-xs font-bold uppercase tracking-tight flex items-center justify-center gap-1.5 shrink-0 transition-colors cursor-pointer"
+              className="bg-surface border rounded-[10px] border-line hover:bg-surface-3 text-ink px-3.5 py-2 text-xs font-bold tracking-tight flex items-center justify-center gap-1.5 shrink-0 transition-colors cursor-pointer"
               title="Detect PIN code from GPS location"
             >
-              <Navigation className={`w-3.5 h-3.5 text-[#D43F33] ${isLocating ? 'animate-spin' : ''}`} />
+              <Navigation className={`w-3.5 h-3.5 text-bad ${isLocating ? 'animate-spin' : ''}`} />
               <span>{isLocating ? 'Locating...' : getTranslation(language, 'autoDetectPin')}</span>
             </button>
 
             <button
               type="submit"
-              className="bg-[#1A1A1A] hover:bg-black text-white px-5 py-2 text-xs font-bold uppercase tracking-tight shrink-0 transition-colors cursor-pointer"
+              className="bg-[var(--surface-inverse)] hover:bg-black text-white px-5 py-2 text-xs font-bold tracking-tight shrink-0 transition-colors cursor-pointer"
             >
               {getTranslation(language, 'searchPincodeBtn')}
             </button>
@@ -256,7 +240,7 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
 
           {/* Preset Buttons covering all zones of India */}
           <div className="mt-3 flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] font-mono uppercase text-black/60 font-bold mr-1">
+            <span className="text-xs text-ink-3 font-bold mr-1">
               Popular Audited PINs:
             </span>
             {[].map((p: any) => (
@@ -266,11 +250,11 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
                   setSearchInput(p.pincode);
                   onSelectPincode(p.pincode);
                 }}
-                className={`text-xs font-mono px-2.5 py-1 border transition-all cursor-pointer ${
-                  currentPinRecord.pincode === p.pincode
-                    ? 'bg-[#1A1A1A] text-white border-[#1A1A1A] font-bold'
-                    : 'bg-white text-[#1A1A1A] border-black/20 hover:border-black'
-                }`}
+                className={`text-xs px-2.5 py-1 border rounded-[10px] transition-all cursor-pointer ${
+ currentPinRecord.pincode === p.pincode
+ ? 'bg-[var(--surface-inverse)] text-white border-line font-bold'
+ : 'bg-surface text-ink border-line hover:border-black'
+ }`}
               >
                 {p.pincode} ({p.areaName.split(' ')[0]})
               </button>
@@ -283,53 +267,53 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* Total Funds Spent */}
-        <div className="border-2 border-[#1A1A1A] bg-white p-4 space-y-1">
-          <span className="text-[10px] font-mono uppercase font-bold text-black/60">
+        <div className="border rounded-[10px] border-line bg-surface p-4 space-y-1">
+          <span className="text-xs font-bold text-ink-3">
             {getTranslation(language, 'fundsSpentInPincode')}
           </span>
-          <div className="text-2xl font-black font-mono text-[#1A1A1A]">
+          <div className="text-2xl font-bold text-ink">
             ₹{currentPinRecord.totalFundsSpentCrores} Cr
           </div>
-          <p className="text-[11px] font-mono text-black/70">
+          <p className="text-xs text-ink-3">
             Across {currentPinRecord.totalAuditedWorks} Scraped Work Orders
           </p>
         </div>
 
         {/* Monopoly Share */}
-        <div className="border-2 border-[#1A1A1A] bg-white p-4 space-y-1">
-          <span className="text-[10px] font-mono uppercase font-bold text-black/60">
+        <div className="border rounded-[10px] border-line bg-surface p-4 space-y-1">
+          <span className="text-xs font-bold text-ink-3">
             {getTranslation(language, 'wardMonopolyShare')}
           </span>
-          <div className="text-2xl font-black font-mono text-[#D43F33]">
+          <div className="text-2xl font-bold text-bad">
             {currentPinRecord.dominantContractor.sharePercent}%
           </div>
-          <p className="text-[11px] font-mono text-black/70 truncate">
+          <p className="text-xs text-ink-3 truncate">
             {currentPinRecord.dominantContractor.name}
           </p>
         </div>
 
         {/* Failed Works */}
-        <div className="border-2 border-[#1A1A1A] bg-white p-4 space-y-1">
-          <span className="text-[10px] font-mono uppercase font-bold text-black/60">
+        <div className="border rounded-[10px] border-line bg-surface p-4 space-y-1">
+          <span className="text-xs font-bold text-ink-3">
             {getTranslation(language, 'failedWorks')}
           </span>
-          <div className="text-2xl font-black font-mono text-[#D43F33]">
+          <div className="text-2xl font-bold text-bad">
             {currentPinRecord.failedWorksCount} / {currentPinRecord.totalAuditedWorks}
           </div>
-          <p className="text-[11px] font-mono text-black/70">
+          <p className="text-xs text-ink-3">
             {Math.round((currentPinRecord.failedWorksCount / currentPinRecord.totalAuditedWorks) * 100)}% Failure Rate
           </p>
         </div>
 
         {/* Active DLP Warranty Breaches */}
-        <div className="border-2 border-[#1A1A1A] bg-white p-4 space-y-1">
-          <span className="text-[10px] font-mono uppercase font-bold text-black/60">
+        <div className="border rounded-[10px] border-line bg-surface p-4 space-y-1">
+          <span className="text-xs font-bold text-ink-3">
             {getTranslation(language, 'activeDlpViolations')}
           </span>
-          <div className="text-2xl font-black font-mono text-[#D43F33]">
+          <div className="text-2xl font-bold text-bad">
             {currentPinRecord.activeDlpBreachesCount} Breaches
           </div>
-          <p className="text-[11px] font-mono text-black/70">
+          <p className="text-xs text-ink-3">
             Under 36-Month Mandatory Warranty
           </p>
         </div>
@@ -337,16 +321,16 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
       </div>
 
       {/* Named Accountability Duo: Contractor vs Executive Engineer vs MLA */}
-      <div className="border-2 border-[#1A1A1A] bg-white p-5 space-y-4">
+      <div className="border rounded-[10px] border-line bg-surface p-5 space-y-4">
         
-        <div className="flex items-center justify-between pb-3 border-b border-black/15">
+        <div className="flex items-center justify-between pb-3 border-b border-line">
           <div className="flex items-center gap-2">
-            <UserCheck className="w-5 h-5 text-[#D43F33]" />
-            <h3 className="text-base font-black uppercase text-[#1A1A1A]">
+            <UserCheck className="w-5 h-5 text-bad" />
+            <h3 className="text-base font-bold text-ink">
               Named Accountability In PIN {currentPinRecord.pincode}
             </h3>
           </div>
-          <span className="font-mono text-xs text-[#D43F33] font-bold uppercase">
+          <span className="text-xs text-bad font-bold">
             {postalInfo.statutoryAct}
           </span>
         </div>
@@ -354,21 +338,21 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           
           {/* Dominant Contractor */}
-          <div className="border border-black/20 bg-[#FAFAFA] p-4 space-y-2">
-            <span className="text-[10px] font-mono uppercase text-[#D43F33] font-bold block">
+          <div className="border rounded-[10px] border-line bg-surface-2 p-4 space-y-2">
+            <span className="text-xs text-bad font-bold block">
               Dominant Monopoly Contractor ({currentPinRecord.dominantContractor.sharePercent}% Wards)
             </span>
-            <h4 className="text-sm font-black uppercase text-[#1A1A1A]">
+            <h4 className="text-sm font-bold text-ink">
               {currentPinRecord.dominantContractor.name}
             </h4>
-            <div className="text-xs font-mono space-y-1 text-black/80">
+            <div className="text-xs space-y-1 text-ink-2">
               <p><strong>Directors:</strong> {currentPinRecord.dominantContractor.directors.join(', ')}</p>
               <p><strong>Primary Operating Ward:</strong> {currentPinRecord.wardName}</p>
             </div>
             {dominantContractorObj && (
               <button
                 onClick={() => onSelectContractor(dominantContractorObj)}
-                className="mt-2 text-xs font-mono font-bold text-[#1A1A1A] hover:text-[#D43F33] underline decoration-1 flex items-center gap-1 cursor-pointer"
+                className="mt-2 text-xs font-bold text-ink hover:text-bad underline decoration-1 flex items-center gap-1 cursor-pointer"
               >
                 <span>View Full Contractor Scorecard</span>
                 <ArrowRight className="w-3 h-3" />
@@ -377,14 +361,14 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
           </div>
 
           {/* Executive Engineer */}
-          <div className="border border-black/20 bg-[#FAFAFA] p-4 space-y-2">
-            <span className="text-[10px] font-mono uppercase text-[#1A1A1A]/70 font-bold block">
+          <div className="border rounded-[10px] border-line bg-surface-2 p-4 space-y-2">
+            <span className="text-xs text-ink-3 font-bold block">
               Responsible Executive Engineer (EE)
             </span>
-            <h4 className="text-sm font-black uppercase text-[#1A1A1A]">
+            <h4 className="text-sm font-bold text-ink">
               {currentPinRecord.executiveEngineer.name}
             </h4>
-            <div className="text-xs font-mono space-y-1 text-black/80">
+            <div className="text-xs space-y-1 text-ink-2">
               <p><strong>Designation:</strong> {currentPinRecord.executiveEngineer.designation}</p>
               <p><strong>Office Address:</strong> {currentPinRecord.executiveEngineer.officeAddress}</p>
               {currentPinRecord.executiveEngineer.phoneOffice && (
@@ -394,19 +378,19 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
           </div>
 
           {/* Elected MLA / Corporator */}
-          <div className="border border-black/20 bg-[#FAFAFA] p-4 space-y-2">
-            <span className="text-[10px] font-mono uppercase text-[#1A1A1A]/70 font-bold block">
+          <div className="border rounded-[10px] border-line bg-surface-2 p-4 space-y-2">
+            <span className="text-xs text-ink-3 font-bold block">
               Elected Representative (MLA / MP / Corporator)
             </span>
-            <h4 className="text-sm font-black uppercase text-[#1A1A1A]">
+            <h4 className="text-sm font-bold text-ink">
               {currentPinRecord.electedRepresentative.name} ({currentPinRecord.electedRepresentative.role})
             </h4>
-            <div className="text-xs font-mono space-y-1 text-black/80">
+            <div className="text-xs space-y-1 text-ink-2">
               <p><strong>Constituency:</strong> {currentPinRecord.electedRepresentative.constituency}</p>
               {currentPinRecord.electedRepresentative.party && (
                 <p><strong>Political Party:</strong> {currentPinRecord.electedRepresentative.party}</p>
               )}
-              <p className="text-[#D43F33] font-bold mt-1">Ward Committee Chairperson</p>
+              <p className="text-bad font-bold mt-1">Ward Committee Chairperson</p>
             </div>
           </div>
 
@@ -414,15 +398,15 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
 
         {/* Scraped CAG Audit Findings */}
         {currentPinRecord.cagAuditNotes.length > 0 && (
-          <div className="mt-4 pt-3 border-t border-black/10 bg-amber-50/50 p-3 border border-amber-200">
-            <span className="text-xs font-mono font-bold uppercase text-amber-900 flex items-center gap-1.5 mb-1.5">
-              <Landmark className="w-4 h-4 text-amber-800" />
+          <div className="mt-4 pt-3 border-t border-line bg-warn-soft/50 p-3 border rounded-[10px] border-amber-200">
+            <span className="text-xs font-bold text-warn flex items-center gap-1.5 mb-1.5">
+              <Landmark className="w-4 h-4 text-warn" />
               <span>Scraped CAG & Statutory Audit Findings in PIN {currentPinRecord.pincode}:</span>
             </span>
-            <ul className="space-y-1 text-xs font-sans text-[#1A1A1A]">
+            <ul className="space-y-1 text-xs font-sans text-ink">
               {currentPinRecord.cagAuditNotes.map((note, idx) => (
                 <li key={idx} className="flex items-start gap-1.5">
-                  <span className="text-[#D43F33] font-bold">•</span>
+                  <span className="text-bad font-bold">•</span>
                   <span>{note}</span>
                 </li>
               ))}
@@ -435,12 +419,12 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
       {/* Claim vs Reality Audits For This Pincode */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-black uppercase text-[#1A1A1A]">
+          <h3 className="text-lg font-bold text-ink">
             Tenders & Road Audits In PIN {currentPinRecord.pincode}
           </h3>
           <button
             onClick={() => onNavigateToTab('claim-reality')}
-            className="text-xs font-mono font-bold text-[#D43F33] hover:underline flex items-center gap-1 cursor-pointer"
+            className="text-xs font-bold text-bad hover:underline flex items-center gap-1 cursor-pointer"
           >
             <span>View All Claim vs Reality Audits</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -452,39 +436,39 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
             {pinWorkOrders.map((wo) => (
               <div 
                 key={wo.id}
-                className="border-2 border-[#1A1A1A] bg-white p-4 space-y-3 shadow-sm flex flex-col justify-between"
+                className="border rounded-[10px] border-line bg-surface p-4 space-y-3 shadow-sm flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex items-center justify-between border-b border-black/10 pb-2">
-                    <span className="text-xs font-mono font-bold text-[#D43F33] uppercase">
+                  <div className="flex items-center justify-between border-b border-line pb-2">
+                    <span className="text-xs font-bold text-bad">
                       {wo.tenderNumber}
                     </span>
-                    <span className="bg-[#1A1A1A] text-white text-[10px] font-mono px-2 py-0.5">
+                    <span className="bg-[var(--surface-inverse)] text-white text-xs px-2 py-0.5">
                       {wo.claimVsReality.sanctionedCostFormatted}
                     </span>
                   </div>
 
-                  <h4 className="text-sm font-black uppercase text-[#1A1A1A] mt-2">
+                  <h4 className="text-sm font-bold text-ink mt-2">
                     {wo.roadName}
                   </h4>
 
                   {/* Split */}
                   <div className="mt-2 space-y-1.5 text-xs">
-                    <div className="bg-blue-50 p-2 border-l-2 border-blue-600">
-                      <span className="font-mono text-[10px] text-blue-900 font-bold uppercase block">Official Claim:</span>
-                      <p className="text-[11px] text-[#1A1A1A]">{wo.claimVsReality.officialClaim}</p>
+                    <div className="bg-info-soft p-2 border-l-2 border-blue-600">
+                      <span className="text-xs text-info font-bold block">Official Claim:</span>
+                      <p className="text-xs text-ink">{wo.claimVsReality.officialClaim}</p>
                     </div>
 
-                    <div className="bg-red-50 p-2 border-l-2 border-[#D43F33]">
-                      <span className="font-mono text-[10px] text-[#D43F33] font-bold uppercase block">Ground Truth:</span>
-                      <p className="text-[11px] text-[#1A1A1A]">{wo.claimVsReality.realityGroundTruth}</p>
+                    <div className="bg-bad-soft p-2 border-l-2 border-bad">
+                      <span className="text-xs text-bad font-bold block">Ground Truth:</span>
+                      <p className="text-xs text-ink">{wo.claimVsReality.realityGroundTruth}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Footer Button */}
-                <div className="pt-2 border-t border-black/10 flex items-center justify-between">
-                  <span className="text-[10px] font-mono text-[#D43F33] font-bold uppercase">
+                <div className="pt-2 border-t border-line flex items-center justify-between">
+                  <span className="text-xs text-bad font-bold">
                     {wo.claimVsReality.discrepancyPercentage}% Deficit
                   </span>
                   <button
@@ -507,7 +491,7 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
                       };
                       onOpenWhatsAppModal(cardData);
                     }}
-                    className="bg-[#25D366] hover:bg-[#1EBE5D] text-white px-3 py-1 text-xs font-bold uppercase flex items-center gap-1 transition-colors cursor-pointer"
+                    className="bg-[var(--good-solid)] hover:opacity-90 text-white px-3 py-1 text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
                   >
                     <Share2 className="w-3 h-3" />
                     <span>WhatsApp</span>
@@ -517,13 +501,13 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
             ))}
           </div>
         ) : (
-          <div className="p-8 border-2 border-dashed border-black/20 bg-[#FAFAFA] text-center">
-            <p className="text-xs font-mono uppercase text-black/60">
+          <div className="p-8 border rounded-[10px] border-dashed border-line bg-surface-2 text-center">
+            <p className="text-xs text-ink-3">
               No active road tenders scraped yet for PIN {currentPinRecord.pincode}.
             </p>
             <button
               onClick={onOpenAnonymousDrop}
-              className="mt-3 bg-[#1A1A1A] hover:bg-[#D43F33] text-white px-4 py-2 text-xs font-bold uppercase transition-colors cursor-pointer"
+              className="mt-3 bg-[var(--surface-inverse)] hover:bg-[var(--bad-solid)] text-white px-4 py-2 text-xs font-bold transition-colors cursor-pointer"
             >
               Be First to Drop Ground Truth Photo
             </button>

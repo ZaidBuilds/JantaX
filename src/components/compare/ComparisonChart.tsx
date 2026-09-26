@@ -8,7 +8,7 @@ interface ComparisonChartProps {
 }
 
 export function ComparisonChart({ rows, entityNames, metricId }: ComparisonChartProps) {
-  const targetRows = metricId ? rows.filter(r => r.id === metricId) : rows.filter(r => r.metrics.some(m => m.value !== null && m.value !== '—')).slice(0, 4);
+  const targetRows = metricId ? rows.filter(r => r.id === metricId) : rows.filter(r => r.metrics.some(m => m.value !== null && m.value !== '-')).slice(0, 4);
 
   if (targetRows.length === 0) {
     return (
@@ -44,11 +44,11 @@ export function ComparisonChart({ rows, entityNames, metricId }: ComparisonChart
                         {entityNames[idx] || `Entity ${idx + 1}`}
                       </span>
                       <span style={{ fontSize: '0.8rem', fontWeight: 800, color: metric.color || 'var(--color-primary)' }}>
-                        {metric.value ?? '—'}
+                        {metric.value ?? '-'}
                         {metric.unit && <span style={{ opacity: 0.6, fontSize: '0.7em' }}>{metric.unit}</span>}
                       </span>
                     </div>
-                    <div style={{ height: 8, background: '#f1f5f9', borderRadius: 999, overflow: 'hidden' }}>
+                    <div style={{ height: 8, background: 'var(--surface-3)', borderRadius: 999, overflow: 'hidden' }}>
                       <div
                         style={{
                           height: '100%',
@@ -77,10 +77,10 @@ export function ComparisonChart({ rows, entityNames, metricId }: ComparisonChart
 }
 
 function getBarColor(pct: number): string {
-  if (pct >= 75) return '#10b981';
-  if (pct >= 50) return '#f59e0b';
-  if (pct >= 25) return '#f97316';
-  return '#ef4444';
+  if (pct >= 75) return 'var(--good)';
+  if (pct >= 50) return 'var(--warn)';
+  if (pct >= 25) return 'var(--accent-ink)';
+  return 'var(--bad)';
 }
 
 interface ComparisonRadarProps {
@@ -135,7 +135,7 @@ export function ComparisonRadar({ labels, datasets }: ComparisonRadarProps) {
                             justifyContent: 'center',
                           }}
                         >
-                          <span style={{ fontSize: '0.65rem', fontWeight: 800, color: '#fff' }}>
+                          <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--on-solid)' }}>
                             {val}
                           </span>
                         </div>

@@ -15,10 +15,10 @@ export function MpladsFundSummaryCard({ fund, houseTitle = '5-Year MPLADS Quota'
     <div className="jantax-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f2d59', margin: 0 }}>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
             Fund Utilization & Expenditure Ledger
           </h3>
-          <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>
+          <span style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>
             {houseTitle} • Audited by Ministry of Statistics (MoSPI)
           </span>
         </div>
@@ -41,59 +41,59 @@ export function MpladsFundSummaryCard({ fund, houseTitle = '5-Year MPLADS Quota'
 
       {/* 4-Stat Metric Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: 12, border: '1px solid #e2e8f0' }}>
-          <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
+        <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
+          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             Govt Released
           </span>
-          <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f2d59', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.25rem' }}>
             ₹{fund.releasedByGovtCr.toFixed(2)} Cr
           </div>
-          <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Of ₹{fund.entitledAmountCr} Cr Entitled</span>
+          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Of ₹{fund.entitledAmountCr} Cr Entitled</span>
         </div>
 
-        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: 12, border: '1px solid #e2e8f0' }}>
-          <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
+        <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
+          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             Sanctioned Works
           </span>
-          <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#2563eb', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--brand-ink)', marginTop: '0.25rem' }}>
             ₹{fund.sanctionedWorksCr.toFixed(2)} Cr
           </div>
-          <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>District Collector Approved</span>
+          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>District Collector Approved</span>
         </div>
 
-        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: 12, border: '1px solid #e2e8f0' }}>
-          <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
+        <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
+          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             Actual Spent
           </span>
-          <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#10b981', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--good)', marginTop: '0.25rem' }}>
             ₹{fund.expenditureReportedCr.toFixed(2)} Cr
           </div>
-          <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>UCs (Util Certs) Submitted</span>
+          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>UCs (Util Certs) Submitted</span>
         </div>
 
-        <div style={{ background: '#f8fafc', padding: '1rem', borderRadius: 12, border: '1px solid #e2e8f0' }}>
-          <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
+        <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
+          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             Unspent Balance
           </span>
-          <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#f59e0b', marginTop: '0.25rem' }}>
+          <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--warn)', marginTop: '0.25rem' }}>
             ₹{fund.unspentBalanceCr.toFixed(2)} Cr
           </div>
-          <span style={{ fontSize: '0.68rem', color: '#94a3b8' }}>Available for Sanction</span>
+          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Available for Sanction</span>
         </div>
       </div>
 
       {/* Progress Bar */}
       <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, color: '#475569', marginBottom: '0.4rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.4rem' }}>
           <span>Overall Fund Execution Progress</span>
           <span>{fund.utilizationPercentage}% of Released Funds</span>
         </div>
-        <div style={{ width: '100%', height: 10, background: '#e2e8f0', borderRadius: 9999, overflow: 'hidden' }}>
+        <div style={{ width: '100%', height: 10, background: 'var(--border)', borderRadius: 9999, overflow: 'hidden' }}>
           <div
             style={{
               width: `${Math.min(fund.utilizationPercentage, 100)}%`,
               height: '100%',
-              background: isHighUtilization ? '#10b981' : isModerate ? '#f59e0b' : '#ef4444',
+              background: isHighUtilization ? 'var(--good-solid)' : isModerate ? 'var(--warn-solid)' : 'var(--bad-solid)',
               borderRadius: 9999,
               transition: 'width 0.4s ease',
             }}

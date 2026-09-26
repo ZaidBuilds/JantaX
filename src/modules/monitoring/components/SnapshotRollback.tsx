@@ -14,23 +14,23 @@ export const SnapshotRollback: React.FC<SnapshotRollbackProps> = ({
   return (
     <div style={{ display: 'grid', gap: '1.25rem' }}>
       <div style={{
-        background: '#eff6ff',
-        border: '1px solid #bfdbfe',
+        background: 'var(--brand-soft)',
+        border: '1px solid var(--brand-line)',
         borderRadius: 14,
         padding: '1rem 1.25rem',
         display: 'flex',
         alignItems: 'center',
         gap: '0.75rem',
         fontSize: '0.86rem',
-        color: '#1e40af'
+        color: 'var(--ink)'
       }}>
-        <RotateCcw size={22} style={{ flexShrink: 0, color: '#2563eb' }} />
+        <RotateCcw size={22} style={{ flexShrink: 0, color: 'var(--brand-ink)' }} />
         <div>
           <strong>1-Click Immutable Dataset Rollback:</strong> Every data ingestion cycle creates a versioned snapshot. If an anomalous update bypasses checks, administrators can instantly revert to a known-good baseline dataset snapshot.
         </div>
       </div>
 
-      <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+      <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
         Versioned Dataset Snapshots & Restore Controls ({snapshots.length})
       </h3>
 
@@ -39,9 +39,9 @@ export const SnapshotRollback: React.FC<SnapshotRollbackProps> = ({
           <div
             key={snap.id}
             style={{
-              background: '#ffffff',
+              background: 'var(--surface)',
               borderRadius: 16,
-              border: snap.isCurrentActive ? '2px solid #10b981' : '1px solid #e2e8f0',
+              border: snap.isCurrentActive ? '2px solid var(--good)' : '1px solid var(--border)',
               padding: '1.25rem',
               boxShadow: '0 4px 14px rgba(15,23,42,0.03)'
             }}
@@ -50,15 +50,15 @@ export const SnapshotRollback: React.FC<SnapshotRollbackProps> = ({
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.2rem' }}>
                   {snap.isCurrentActive && (
-                    <span style={{ background: '#ecfdf5', color: '#047857', fontSize: '0.74rem', fontWeight: 800, padding: '0.15rem 0.55rem', borderRadius: 4, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                    <span style={{ background: 'var(--good-soft)', color: 'var(--good)', fontSize: '0.74rem', fontWeight: 800, padding: '0.15rem 0.55rem', borderRadius: 4, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
                       <CheckCircle2 size={12} /> Active Live Version
                     </span>
                   )}
-                  <span style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: 600 }}>
+                  <span style={{ fontSize: '0.76rem', color: 'var(--ink-3)', fontWeight: 600 }}>
                     Created {snap.createdAt}
                   </span>
                 </div>
-                <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
                   {snap.moduleName} ({snap.versionTag})
                 </h4>
               </div>
@@ -70,8 +70,8 @@ export const SnapshotRollback: React.FC<SnapshotRollbackProps> = ({
                   style={{
                     padding: '0.45rem 1rem',
                     borderRadius: 8,
-                    background: '#b91c1c',
-                    color: '#ffffff',
+                    background: 'var(--bad-solid)',
+                    color: 'var(--on-solid)',
                     fontWeight: 800,
                     fontSize: '0.8rem',
                     border: 'none',
@@ -86,11 +86,11 @@ export const SnapshotRollback: React.FC<SnapshotRollbackProps> = ({
               )}
             </div>
 
-            <div style={{ fontSize: '0.82rem', color: '#475569', marginBottom: '0.65rem' }}>
+            <div style={{ fontSize: '0.82rem', color: 'var(--ink-2)', marginBottom: '0.65rem' }}>
               {snap.notes}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc', padding: '0.5rem 0.75rem', borderRadius: 8, fontSize: '0.74rem', color: '#64748b', fontFamily: 'monospace' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface-2)', padding: '0.5rem 0.75rem', borderRadius: 8, fontSize: '0.74rem', color: 'var(--ink-3)', fontFamily: 'monospace' }}>
               <span>Records: <strong>{snap.recordCount.toLocaleString()}</strong></span>
               <span>SHA-256: {snap.sha256Hash.substring(0, 20)}...</span>
             </div>

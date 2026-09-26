@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Search, X, MapPin, GraduationCap, HardHat, Construction, Home, Hospital, Flag } from 'lucide-react';
 import { EntityType, ComparisonEntity, getEntityTypeLabel, getCompatibleTypes } from './types';
+import { apiUrl } from '../../core/services/api';
 
 const ENTITY_ICONS: Record<string, React.ElementType> = {
   school: GraduationCap,
@@ -14,12 +15,12 @@ const ENTITY_ICONS: Record<string, React.ElementType> = {
 
 const ENTITY_COLORS: Record<string, string> = {
   school: '#3b82f6',
-  contractor: '#ef4444',
-  builder: '#ef4444',
-  project: '#f59e0b',
-  location: '#06b6d4',
-  hospital: '#ec4899',
-  rera: '#8b5cf6',
+  contractor: 'var(--bad)',
+  builder: 'var(--bad)',
+  project: 'var(--warn)',
+  location: 'var(--viz-6)',
+  hospital: 'var(--viz-5)',
+  rera: 'var(--viz-4)',
 };
 
 interface CompareSelectorProps {
@@ -60,7 +61,7 @@ export function CompareSelector({
       <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
         {value.map((entity, idx) => {
           const Icon = ENTITY_ICONS[entity.type] || MapPin;
-          const color = ENTITY_COLORS[entity.type] || '#6b7280';
+          const color = ENTITY_COLORS[entity.type] || 'var(--ink-3)';
           return (
             <div
               key={entity.id}
@@ -172,7 +173,7 @@ export function CompareSelector({
                   top: 'calc(100% + 4px)',
                   left: 0,
                   right: 0,
-                  background: '#fff',
+                  background: 'var(--surface)',
                   border: '1px solid var(--border-color)',
                   borderRadius: 10,
                   boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
@@ -219,7 +220,7 @@ function QuickSearchResults({ query, onSelect, compatibleTypes, excludeIds = [] 
     const timer = setTimeout(async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(`/api/search/autocomplete?q=${encodeURIComponent(query)}${compatibleTypes ? `&type=${compatibleTypes[0]}` : ''}`);
+        const res = await fetch(apiUrl(`/api/search/autocomplete?q=${encodeURIComponent(query)}${compatibleTypes ? `&type=${compatibleTypes[0]}` : ''}`));
         const data = await res.json();
         const mapped: ComparisonEntity[] = (data.suggestions || []).map((s: any) => ({
           id: `${s.type}-${s.text}`,
@@ -258,7 +259,7 @@ function QuickSearchResults({ query, onSelect, compatibleTypes, excludeIds = [] 
     <div>
       {results.map((result, i) => {
         const Icon = ENTITY_ICONS[result.type] || MapPin;
-        const color = ENTITY_COLORS[result.type] || '#6b7280';
+        const color = ENTITY_COLORS[result.type] || 'var(--ink-3)';
         return (
           <div
             key={result.id}
@@ -268,9 +269,9 @@ function QuickSearchResults({ query, onSelect, compatibleTypes, excludeIds = [] 
               alignItems: 'center',
               gap: '0.75rem',
               cursor: 'pointer',
-              borderBottom: i < results.length - 1 ? '1px solid #f1f5f9' : 'none',
+              borderBottom: i < results.length - 1 ? '1px solid var(--border)' : 'none',
             }}
-            onMouseEnter={e => (e.currentTarget.style.background = '#f8fafc')}
+            onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-2)')}
             onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
             onMouseDown={() => onSelect(result)}
           >

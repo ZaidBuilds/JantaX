@@ -46,8 +46,8 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
   if (!contractor) {
     return (
       <div style={{ padding: '4rem 1.5rem', textAlign: 'center', maxWidth: 600, margin: '0 auto' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a' }}>Contractor Profile Not Found</h2>
-        <p style={{ color: '#64748b', margin: '0.5rem 0 1.5rem' }}>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--ink)' }}>Contractor Profile Not Found</h2>
+        <p style={{ color: 'var(--ink-3)', margin: '0.5rem 0 1.5rem' }}>
           The requested contractor ID "{id}" could not be located in the database.
         </p>
         <Link
@@ -55,8 +55,8 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
           style={{
             padding: '0.65rem 1.25rem',
             borderRadius: 10,
-            background: 'var(--gradient-accent)',
-            color: '#ffffff',
+            background: 'var(--brand)',
+            color: 'var(--on-solid)',
             fontWeight: 700,
             textDecoration: 'none'
           }}
@@ -78,7 +78,7 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
   const pi = contractor.performanceIndicators;
 
   return (
-    <div style={{ padding: '1.75rem 0', maxWidth: 1200, margin: '0 auto' }}>
+    <div>
       {/* Top Navigation Back Bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <button
@@ -86,7 +86,7 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
           style={{
             background: 'none',
             border: 'none',
-            color: '#2563eb',
+            color: 'var(--brand-ink)',
             fontWeight: 700,
             fontSize: '0.86rem',
             cursor: 'pointer',
@@ -103,13 +103,13 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
           <button
             onClick={handleShare}
             style={{
-              background: '#ffffff',
-              border: '1px solid #cbd5e1',
+              background: 'var(--surface)',
+              border: '1px solid var(--border-strong)',
               borderRadius: 8,
               padding: '0.4rem 0.75rem',
               fontSize: '0.78rem',
               fontWeight: 700,
-              color: '#334155',
+              color: 'var(--ink-2)',
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
@@ -124,7 +124,7 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
             rel="noopener noreferrer"
             style={{
               background: '#0a66c2',
-              color: '#ffffff',
+              color: 'var(--on-solid)',
               borderRadius: 8,
               padding: '0.4rem 0.75rem',
               fontSize: '0.78rem',
@@ -142,9 +142,9 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
 
       {/* Main Header Card */}
       <div style={{
-        background: '#ffffff',
+        background: 'var(--surface)',
         borderRadius: 20,
-        border: '1px solid #e2e8f0',
+        border: '1px solid var(--border)',
         padding: '1.75rem',
         boxShadow: '0 4px 16px rgba(15,23,42,0.04)',
         marginBottom: '1.5rem'
@@ -153,8 +153,8 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.4rem' }}>
               <span style={{
-                background: '#eff6ff',
-                color: '#1d4ed8',
+                background: 'var(--brand-soft)',
+                color: 'var(--brand-ink)',
                 fontSize: '0.78rem',
                 fontWeight: 700,
                 padding: '0.2rem 0.65rem',
@@ -162,7 +162,7 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
               }}>
                 {contractor.category}
               </span>
-              <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>
+              <span style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>
                 Reg ID: {contractor.registrationNumber} · Est. {contractor.incorporationYear}
               </span>
             </div>
@@ -170,7 +170,7 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
             <h1 style={{
               fontSize: '1.9rem',
               fontWeight: 800,
-              color: '#0f172a',
+              color: 'var(--ink)',
               fontFamily: 'var(--font-heading)',
               lineHeight: 1.3,
               margin: '0.2rem 0 0.4rem'
@@ -178,22 +178,22 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
               {contractor.companyName}
             </h1>
 
-            <div style={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 500 }}>
+            <div style={{ fontSize: '0.9rem', color: 'var(--ink-3)', fontWeight: 500 }}>
               Headquarters: {contractor.headquarters} · Directors: {contractor.directors.join(', ')}
             </div>
           </div>
 
           <div style={{
-            background: '#f8fafc',
-            border: '1px solid #cbd5e1',
+            background: 'var(--surface-2)',
+            border: '1px solid var(--border-strong)',
             borderRadius: 14,
             padding: '0.85rem 1.25rem',
             textAlign: 'right'
           }}>
-            <div style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
               Transparent Performance Score
             </div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f2d59', marginTop: '0.1rem' }}>
+            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.1rem' }}>
               {pi.overallScore}%
             </div>
           </div>
@@ -204,7 +204,7 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
       <div style={{
         display: 'flex',
         gap: '0.5rem',
-        borderBottom: '2px solid #e2e8f0',
+        borderBottom: '2px solid var(--border)',
         marginBottom: '1.5rem',
         overflowX: 'auto',
         paddingBottom: 2
@@ -213,8 +213,8 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
           to={`/contractors/${contractor.id}`}
           style={{
             padding: '0.65rem 1.15rem',
-            borderBottom: activeTab === 'overview' ? '3px solid #f97316' : '3px solid transparent',
-            color: activeTab === 'overview' ? '#f97316' : '#64748b',
+            borderBottom: activeTab === 'overview' ? '3px solid var(--accent)' : '3px solid transparent',
+            color: activeTab === 'overview' ? 'var(--accent-ink)' : 'var(--ink-3)',
             fontWeight: activeTab === 'overview' ? 800 : 600,
             fontSize: '0.88rem',
             textDecoration: 'none',
@@ -228,8 +228,8 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
           to={`/contractors/${contractor.id}/scorecard`}
           style={{
             padding: '0.65rem 1.15rem',
-            borderBottom: activeTab === 'scorecard' ? '3px solid #f97316' : '3px solid transparent',
-            color: activeTab === 'scorecard' ? '#f97316' : '#64748b',
+            borderBottom: activeTab === 'scorecard' ? '3px solid var(--accent)' : '3px solid transparent',
+            color: activeTab === 'scorecard' ? 'var(--accent-ink)' : 'var(--ink-3)',
             fontWeight: activeTab === 'scorecard' ? 800 : 600,
             fontSize: '0.88rem',
             textDecoration: 'none',
@@ -243,8 +243,8 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
           to={`/contractors/${contractor.id}/projects`}
           style={{
             padding: '0.65rem 1.15rem',
-            borderBottom: activeTab === 'projects' ? '3px solid #f97316' : '3px solid transparent',
-            color: activeTab === 'projects' ? '#f97316' : '#64748b',
+            borderBottom: activeTab === 'projects' ? '3px solid var(--accent)' : '3px solid transparent',
+            color: activeTab === 'projects' ? 'var(--accent-ink)' : 'var(--ink-3)',
             fontWeight: activeTab === 'projects' ? 800 : 600,
             fontSize: '0.88rem',
             textDecoration: 'none',
@@ -258,8 +258,8 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
           to={`/contractors/${contractor.id}/history`}
           style={{
             padding: '0.65rem 1.15rem',
-            borderBottom: activeTab === 'history' ? '3px solid #f97316' : '3px solid transparent',
-            color: activeTab === 'history' ? '#f97316' : '#64748b',
+            borderBottom: activeTab === 'history' ? '3px solid var(--accent)' : '3px solid transparent',
+            color: activeTab === 'history' ? 'var(--accent-ink)' : 'var(--ink-3)',
             fontWeight: activeTab === 'history' ? 800 : 600,
             fontSize: '0.88rem',
             textDecoration: 'none',
@@ -275,36 +275,36 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
       {activeTab === 'overview' && (
         <div style={{ display: 'grid', gap: '1.5rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
-            <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 14, border: '1px solid #e2e8f0' }}>
-              <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Total Contracts Awarded</div>
-              <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', marginTop: '0.2rem' }}>
+            <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 14, border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>Total Contracts Awarded</div>
+              <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.2rem' }}>
                 ₹{pi.totalAwardedValueCr.toLocaleString()} Cr
               </div>
-              <div style={{ fontSize: '0.74rem', color: '#64748b' }}>Across {pi.totalContractsCount} projects</div>
+              <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)' }}>Across {pi.totalContractsCount} projects</div>
             </div>
 
-            <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 14, border: '1px solid #e2e8f0' }}>
-              <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Project Completion Rate</div>
-              <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#047857', marginTop: '0.2rem' }}>
+            <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 14, border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>Project Completion Rate</div>
+              <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--good)', marginTop: '0.2rem' }}>
                 {pi.completionRatePct}%
               </div>
-              <div style={{ fontSize: '0.74rem', color: '#64748b' }}>Handed over & commissioned</div>
+              <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)' }}>Handed over & commissioned</div>
             </div>
 
-            <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 14, border: '1px solid #e2e8f0' }}>
-              <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>On-Time Delivery Index</div>
-              <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#2563eb', marginTop: '0.2rem' }}>
+            <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 14, border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>On-Time Delivery Index</div>
+              <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--brand-ink)', marginTop: '0.2rem' }}>
                 {pi.onTimeDeliveryRatePct}%
               </div>
-              <div style={{ fontSize: '0.74rem', color: '#64748b' }}>Completed without timeline extension</div>
+              <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)' }}>Completed without timeline extension</div>
             </div>
 
-            <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 14, border: '1px solid #e2e8f0' }}>
-              <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Average Extension Duration</div>
-              <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#b45309', marginTop: '0.2rem' }}>
+            <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 14, border: '1px solid var(--border)' }}>
+              <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>Average Extension Duration</div>
+              <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--warn)', marginTop: '0.2rem' }}>
                 {pi.averageExtensionMonths} Months
               </div>
-              <div style={{ fontSize: '0.74rem', color: '#64748b' }}>Across active & completed works</div>
+              <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)' }}>Across active & completed works</div>
             </div>
           </div>
         </div>
@@ -312,34 +312,34 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
 
       {/* Tab 2: Scorecard */}
       {activeTab === 'scorecard' && (
-        <div style={{ background: '#ffffff', borderRadius: 16, border: '1px solid #e2e8f0', padding: '1.5rem' }}>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', marginTop: 0, marginBottom: '1.25rem' }}>
+        <div style={{ background: 'var(--surface)', borderRadius: 16, border: '1px solid var(--border)', padding: '1.5rem' }}>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--ink)', marginTop: 0, marginBottom: '1.25rem' }}>
             Transparent Performance Scorecard Indicators
           </h3>
 
           <div style={{ display: 'grid', gap: '1.25rem' }}>
-            <div style={{ background: '#f8fafc', padding: '1rem 1.15rem', borderRadius: 12, border: '1px solid #f1f5f9' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.35rem' }}>
+            <div style={{ background: 'var(--surface-2)', padding: '1rem 1.15rem', borderRadius: 12, border: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem', fontWeight: 700, color: 'var(--ink)', marginBottom: '0.35rem' }}>
                 <span>Quality Audit Score</span>
                 <span>{pi.qualityAuditScore} / 100</span>
               </div>
-              <div style={{ height: 8, background: '#e2e8f0', borderRadius: 999, overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: `${pi.qualityAuditScore}%`, background: '#2563eb', borderRadius: 999 }} />
+              <div style={{ height: 8, background: 'var(--border)', borderRadius: 999, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${pi.qualityAuditScore}%`, background: 'var(--brand)', borderRadius: 999 }} />
               </div>
-              <div style={{ fontSize: '0.76rem', color: '#64748b', marginTop: '0.35rem' }}>
+              <div style={{ fontSize: '0.76rem', color: 'var(--ink-3)', marginTop: '0.35rem' }}>
                 Derived from official quality core-cut reports and third-party safety audits.
               </div>
             </div>
 
-            <div style={{ background: '#f8fafc', padding: '1rem 1.15rem', borderRadius: 12, border: '1px solid #f1f5f9' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.35rem' }}>
+            <div style={{ background: 'var(--surface-2)', padding: '1rem 1.15rem', borderRadius: 12, border: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem', fontWeight: 700, color: 'var(--ink)', marginBottom: '0.35rem' }}>
                 <span>On-Time Milestone Delivery</span>
                 <span>{pi.onTimeDeliveryRatePct}%</span>
               </div>
-              <div style={{ height: 8, background: '#e2e8f0', borderRadius: 999, overflow: 'hidden' }}>
-                <div style={{ height: '100%', width: `${pi.onTimeDeliveryRatePct}%`, background: '#10b981', borderRadius: 999 }} />
+              <div style={{ height: 8, background: 'var(--border)', borderRadius: 999, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${pi.onTimeDeliveryRatePct}%`, background: 'var(--good-solid)', borderRadius: 999 }} />
               </div>
-              <div style={{ fontSize: '0.76rem', color: '#64748b', marginTop: '0.35rem' }}>
+              <div style={{ fontSize: '0.76rem', color: 'var(--ink-3)', marginTop: '0.35rem' }}>
                 Percentage of project packages delivered on or before the original target completion date.
               </div>
             </div>
@@ -349,32 +349,32 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
 
       {/* Tab 3: Projects */}
       {activeTab === 'projects' && (
-        <div style={{ background: '#ffffff', borderRadius: 16, border: '1px solid #e2e8f0', padding: '1.5rem' }}>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', marginTop: 0, marginBottom: '1.25rem' }}>
+        <div style={{ background: 'var(--surface)', borderRadius: 16, border: '1px solid var(--border)', padding: '1.5rem' }}>
+          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--ink)', marginTop: 0, marginBottom: '1.25rem' }}>
             Associated Projects & Public Works ({contractor.projects.length})
           </h3>
 
           <div style={{ display: 'grid', gap: '1rem' }}>
             {contractor.projects.map((p) => (
-              <div key={p.id} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '1.15rem' }}>
+              <div key={p.id} style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 12, padding: '1.15rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem' }}>
                   <div>
-                    <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', margin: '0 0 0.2rem' }}>{p.projectName}</h4>
-                    <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                    <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ink)', margin: '0 0 0.2rem' }}>{p.projectName}</h4>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--ink-3)' }}>
                       {p.sector} · {p.district}, {p.state}
                     </div>
                   </div>
 
-                  <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f2d59', background: '#eff6ff', padding: '0.3rem 0.75rem', borderRadius: 8 }}>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--ink)', background: 'var(--brand-soft)', padding: '0.3rem 0.75rem', borderRadius: 8 }}>
                     Awarded: ₹{(p.awardedValueLakhs / 100).toFixed(2)} Cr
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                  <div style={{ fontSize: '0.78rem', color: '#475569', fontWeight: 600 }}>
-                    Status: <strong style={{ color: p.status === 'Completed' || p.status === 'Verified' ? '#047857' : '#b45309' }}>{p.status}</strong> · Extensions: {p.extensionsMonths} Mos
+                  <div style={{ fontSize: '0.78rem', color: 'var(--ink-2)', fontWeight: 600 }}>
+                    Status: <strong style={{ color: p.status === 'Completed' || p.status === 'Verified' ? 'var(--good)' : 'var(--warn)' }}>{p.status}</strong> · Extensions: {p.extensionsMonths} Mos
                   </div>
-                  <Link to={`/projects/${p.id}`} style={{ fontSize: '0.78rem', color: '#1d4ed8', fontWeight: 700, textDecoration: 'none' }}>
+                  <Link to={`/projects/${p.id}`} style={{ fontSize: '0.78rem', color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none' }}>
                     View Project Page →
                   </Link>
                 </div>
@@ -388,34 +388,34 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
       {activeTab === 'history' && (
         <div style={{ display: 'grid', gap: '1.5rem' }}>
           {/* Documented Penalties Card */}
-          <div style={{ background: '#ffffff', borderRadius: 16, border: '1px solid #e2e8f0', padding: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginTop: 0, marginBottom: '1rem' }}>
+          <div style={{ background: 'var(--surface)', borderRadius: 16, border: '1px solid var(--border)', padding: '1.5rem' }}>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ink)', marginTop: 0, marginBottom: '1rem' }}>
               Documented Competent Authority Penalty Orders ({contractor.penalties.length})
             </h3>
 
             {contractor.penalties.length === 0 ? (
-              <div style={{ fontSize: '0.86rem', color: '#64748b' }}>No penalty orders issued by competent authorities on record.</div>
+              <div style={{ fontSize: '0.86rem', color: 'var(--ink-3)' }}>No penalty orders issued by competent authorities on record.</div>
             ) : (
               <div style={{ display: 'grid', gap: '0.85rem' }}>
                 {contractor.penalties.map((pen) => (
-                  <div key={pen.id} style={{ background: '#fffbebf', border: '1px solid #fde68a', borderRadius: 12, padding: '1rem' }}>
+                  <div key={pen.id} style={{ background: '#fffbebf', border: '1px solid var(--warn-line)', borderRadius: 12, padding: '1rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem' }}>
                       <div>
-                        <div style={{ fontSize: '0.75rem', color: '#b45309', fontWeight: 800 }}>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--warn)', fontWeight: 800 }}>
                           Order #{pen.orderNumber} · {pen.date}
                         </div>
-                        <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#0f172a', marginTop: '0.2rem' }}>
+                        <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.2rem' }}>
                           Issuing Authority: {pen.issuingAuthority}
                         </div>
                       </div>
-                      <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#b91c1c' }}>
+                      <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--bad)' }}>
                         Penalty: ₹{pen.penaltyAmountLakhs} Lakhs
                       </div>
                     </div>
-                    <div style={{ fontSize: '0.84rem', color: '#334155', marginTop: '0.5rem', lineHeight: 1.45 }}>
+                    <div style={{ fontSize: '0.84rem', color: 'var(--ink-2)', marginTop: '0.5rem', lineHeight: 1.45 }}>
                       <strong>Documented Reason (Neutral):</strong> {pen.reasonNeutral}
                     </div>
-                    <a href={pen.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.76rem', color: '#1d4ed8', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem', marginTop: '0.5rem' }}>
+                    <a href={pen.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.76rem', color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem', marginTop: '0.5rem' }}>
                       Official Penalty Gazette Entry ({pen.sourceTitle}) <ExternalLink size={11} />
                     </a>
                   </div>
@@ -425,31 +425,31 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
           </div>
 
           {/* Debarment Records Card */}
-          <div style={{ background: '#ffffff', borderRadius: 16, border: '1px solid #e2e8f0', padding: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', marginTop: 0, marginBottom: '1rem' }}>
+          <div style={{ background: 'var(--surface)', borderRadius: 16, border: '1px solid var(--border)', padding: '1.5rem' }}>
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ink)', marginTop: 0, marginBottom: '1rem' }}>
               Official Debarment & Blacklisting Records
             </h3>
 
             {contractor.debarmentRecords.length === 0 ? (
-              <div style={{ fontSize: '0.86rem', color: '#047857', background: '#ecfdf5', padding: '0.85rem', borderRadius: 10, border: '1px solid #a7f3d0', fontWeight: 700 }}>
+              <div style={{ fontSize: '0.86rem', color: 'var(--good)', background: 'var(--good-soft)', padding: '0.85rem', borderRadius: 10, border: '1px solid var(--good-line)', fontWeight: 700 }}>
                 ✓ No active debarment or blacklisting notices published by competent authorities.
               </div>
             ) : (
               <div style={{ display: 'grid', gap: '0.85rem' }}>
                 {contractor.debarmentRecords.map((deb) => (
-                  <div key={deb.id} style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 12, padding: '1rem' }}>
+                  <div key={deb.id} style={{ background: 'var(--bad-soft)', border: '1px solid var(--bad-line)', borderRadius: 12, padding: '1rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-                      <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#b91c1c' }}>
+                      <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--bad)' }}>
                         Debarment Notice #{deb.noticeNumber} ({deb.status})
                       </span>
-                      <span style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                      <span style={{ fontSize: '0.78rem', color: 'var(--ink-3)' }}>
                         Period: {deb.startDate} to {deb.endDate} ({deb.debarmentPeriodMonths} Mos)
                       </span>
                     </div>
-                    <div style={{ fontSize: '0.84rem', color: '#334155', marginTop: '0.4rem' }}>
+                    <div style={{ fontSize: '0.84rem', color: 'var(--ink-2)', marginTop: '0.4rem' }}>
                       <strong>Issuing Body:</strong> {deb.issuingMinistry}
                     </div>
-                    <div style={{ fontSize: '0.84rem', color: '#334155', marginTop: '0.25rem' }}>
+                    <div style={{ fontSize: '0.84rem', color: 'var(--ink-2)', marginTop: '0.25rem' }}>
                       <strong>Official Ground:</strong> {deb.officialGroundNeutral}
                     </div>
                   </div>

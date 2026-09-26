@@ -43,10 +43,10 @@ Reported by:
     <div className="jantax-card" style={{ padding: '1.75rem', marginBottom: '1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
         <div>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f2d59', margin: '0 0 0.3rem' }}>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: '0 0 0.3rem' }}>
             Pollution & Smog Violation Complaint Generator
           </h3>
-          <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--ink-3)', margin: 0 }}>
             Generate formal violation drafts for illegal open waste burning, construction dust, and industrial smoke for direct submission on CPCB SAMEER & DPCC Green Delhi apps.
           </p>
         </div>
@@ -60,8 +60,8 @@ Reported by:
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.35rem',
-              background: '#f97316',
-              color: '#ffffff',
+              background: 'var(--accent-solid)',
+              color: 'var(--on-solid)',
               padding: '0.55rem 1.1rem',
               borderRadius: 10,
               fontSize: '0.82rem',
@@ -81,8 +81,8 @@ Reported by:
             key={type}
             onClick={() => setViolationType(type)}
             style={{
-              background: violationType === type ? '#0f2d59' : '#f1f5f9',
-              color: violationType === type ? '#ffffff' : '#334155',
+              background: violationType === type ? 'var(--brand)' : 'var(--surface-3)',
+              color: violationType === type ? 'var(--on-solid)' : 'var(--ink-2)',
               border: 'none',
               padding: '0.5rem 1rem',
               borderRadius: 8,
@@ -91,9 +91,9 @@ Reported by:
               cursor: 'pointer',
             }}
           >
-            {type === 'Garbage Burning' && '🔥 '}
-            {type === 'Construction Dust' && '🏗️ '}
-            {type === 'Industrial Smoke' && '🏭 '}
+            {type === 'Garbage Burning' && ''}
+            {type === 'Construction Dust' && ''}
+            {type === 'Industrial Smoke' && ''}
             {type}
           </button>
         ))}
@@ -106,7 +106,7 @@ Reported by:
           placeholder="Enter exact spot / landmark (e.g. Near Ring Road underpass, vacant plot behind market)..."
           value={exactSpot}
           onChange={(e) => setExactSpot(e.target.value)}
-          style={{ width: '100%', padding: '0.6rem 0.85rem', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+          style={{ width: '100%', padding: '0.6rem 0.85rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.85rem' }}
         />
       </div>
 
@@ -120,11 +120,11 @@ Reported by:
             width: '100%',
             padding: '1rem',
             borderRadius: 10,
-            border: '1px solid #cbd5e1',
+            border: '1px solid var(--border-strong)',
             fontSize: '0.82rem',
             fontFamily: 'monospace',
             lineHeight: 1.5,
-            background: '#ffffff',
+            background: 'var(--surface)',
           }}
         />
         <button
@@ -136,8 +136,8 @@ Reported by:
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.3rem',
-            background: copied ? '#10b981' : '#0f2d59',
-            color: '#ffffff',
+            background: copied ? 'var(--good-solid)' : 'var(--brand)',
+            color: 'var(--on-solid)',
             border: 'none',
             padding: '0.4rem 0.8rem',
             borderRadius: 6,
@@ -153,7 +153,7 @@ Reported by:
       </div>
 
       {/* Footer Info */}
-      <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '0.85rem 1rem', fontSize: '0.78rem', color: '#991b1b' }}>
+      <div style={{ background: 'var(--bad-soft)', border: '1px solid var(--bad-line)', borderRadius: 10, padding: '0.85rem 1rem', fontSize: '0.78rem', color: 'var(--bad)' }}>
         <strong>Enforcement Proviso:</strong> Under National Green Tribunal (NGT) orders and Section 15 of Environment (Protection) Act 1986, open waste burning attracts an on-the-spot environmental penalty of ₹5,000 to ₹25,000.
       </div>
     </div>

@@ -164,7 +164,7 @@ router.get('/pincode/:code/records', async (req: Request, res: Response) => {
         result.pds = await prisma.pdsShop.findMany({ where, orderBy: { quotaDistributedPct: 'asc' } });
         break;
       case 'grievance':
-        result.grievance = await prisma.grievance.findMany({ where, orderBy: { delayDays: 'desc' } });
+        result.grievance = await prisma.cpgramGrievance.findMany({ where, orderBy: { delayDays: 'desc' } });
         break;
       case 'contractor':
         result.contractor = await prisma.contractor.findMany({ where: { verified: true }, orderBy: { score: 'desc' } });
@@ -289,7 +289,7 @@ router.get('/records/:module/:id', async (req: Request, res: Response) => {
       record = await prisma.pdsShop.findUnique({ where: { id } });
       break;
     case 'grievance':
-      record = await prisma.grievance.findUnique({ where: { id } });
+      record = await prisma.cpgramGrievance.findUnique({ where: { id } });
       break;
     case 'contractor':
       record = await prisma.contractor.findUnique({ where: { id } });

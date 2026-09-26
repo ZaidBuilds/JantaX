@@ -1,67 +1,254 @@
-/* JantaX Clean Design Tokens — Public Information Utility */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+/*
+ * JantaX design tokens.
+ *
+ * One palette, two themes. Every colour in the app should resolve to one of
+ * these variables so light/dark stay in sync. Legacy aliases at the bottom keep
+ * older module code (which still reads --bg-primary, --text-muted, etc.) on the
+ * same palette.
+ *
+ * Radius rule: controls (buttons, inputs, selects) use --r-md, surfaces
+ * (cards, panels, tables) use --r-lg, badges/chips/pills use --r-pill.
+ */
 
 :root {
-  /* Neutral Color Palette */
-  --bg-primary: #f9fafb;
-  --bg-surface: #ffffff;
-  --bg-subtle: #f3f4f6;
-  --bg-muted: #e5e7eb;
+  color-scheme: light;
 
-  --border-color: #e5e7eb;
-  --border-subtle: #f3f4f6;
-  --border-dark: #d1d5db;
-  --border-focus: #0f2d59;
+  /* Neutrals: cool ink on a near-white canvas */
+  --canvas: #f4f6f9;
+  --surface: #ffffff;
+  --surface-2: #f8f9fb;
+  --surface-3: #eef1f5;
+  --border: #e2e6ec;
+  --border-strong: #cbd2dc;
+  --ink: #0c1424;
+  --ink-2: #384357;
+  --ink-3: #5a6679;
+  --ink-4: #8a94a6;
+  --on-solid: #ffffff;
 
-  /* Typography Colors */
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --text-muted: #6b7280;
-  --text-inverse: #ffffff;
+  /* Brand: navy spine + saffron accent */
+  --brand: #13306a;
+  --brand-hover: #0c2352;
+  --brand-ink: #1b46a8;
+  --brand-soft: #ebf0fb;
+  --brand-line: #c8d6f2;
+  --accent: #e2600c;
+  --accent-ink: #b44a05;
+  --accent-soft: #fdf1e7;
+  --accent-line: #f6cfae;
 
-  /* Brand / Primary Civic Color */
-  --color-primary: #0f2d59;
-  --color-primary-hover: #0a1f3d;
-  --color-primary-subtle: #eff6ff;
-  --color-primary-border: #bfdbfe;
+  /* Semantic status */
+  --good: #12774a;
+  --good-soft: #e7f5ed;
+  --good-line: #b7e1c8;
+  --warn: #975700;
+  --warn-soft: #fff5de;
+  --warn-line: #f1d494;
+  --bad: #b3261e;
+  --bad-soft: #fdecea;
+  --bad-line: #f5c2bd;
+  --info: #1f55c0;
+  --info-soft: #eaf1fe;
+  --info-line: #c4d6fa;
 
-  --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
+  /* Solid fills that carry white text in both themes */
+  --good-solid: #12774a;
+  --warn-solid: #a95f06;
+  --bad-solid: #b3261e;
+  --info-solid: #1f55c0;
+  --accent-solid: #c9540a;
+  --surface-inverse: #121a2b;
 
-  /* Semantic Status Colors (Used purely for meaning) */
-  --status-good-text: #166534;
-  --status-good-bg: #f0fdf4;
-  --status-good-border: #bbf7d0;
+  /* Categorical data colours (charts, map layers, module marks) */
+  --viz-1: #1b46a8;
+  --viz-2: #e2600c;
+  --viz-3: #12774a;
+  --viz-4: #7440b5;
+  --viz-5: #bf2f52;
+  --viz-6: #0d7a84;
+  --viz-7: #8a6a00;
+  --viz-8: #52607a;
 
-  --status-warn-text: #92400e;
-  --status-warn-bg: #fffbeb;
-  --status-warn-border: #fde68a;
+  /* Type */
+  --font-sans: 'Inter Variable', 'Noto Sans Devanagari Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Anek Latin Variable', 'Anek Devanagari Variable', 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --status-alert-text: #991b1b;
-  --status-alert-bg: #fef2f2;
-  --status-alert-border: #fecaca;
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.3125rem;
+  --text-2xl: 1.625rem;
+  --text-3xl: 2.125rem;
+  --text-4xl: 2.75rem;
 
-  --status-info-text: #1e40af;
-  --status-info-bg: #eff6ff;
-  --status-info-border: #dbeafe;
+  /* Spacing (4px base) */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.25rem;
+  --s-6: 1.5rem;
+  --s-8: 2rem;
+  --s-10: 2.5rem;
+  --s-12: 3rem;
+  --s-16: 4rem;
 
-  /* Typography Scale */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  /* Shape */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-pill: 999px;
 
-  /* Sizing & Radius */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-pill: 9999px;
+  /* Elevation: tinted to the navy, never pure black */
+  --shadow-xs: 0 1px 2px rgb(19 48 106 / 0.05);
+  --shadow-sm: 0 1px 2px rgb(19 48 106 / 0.06), 0 1px 3px rgb(19 48 106 / 0.05);
+  --shadow-md: 0 8px 24px -10px rgb(19 48 106 / 0.18), 0 2px 6px rgb(19 48 106 / 0.05);
+  --shadow-lg: 0 24px 48px -16px rgb(19 48 106 / 0.28);
+  --focus-ring: 0 0 0 3px var(--surface), 0 0 0 5px var(--brand-ink);
 
-  /* Shadows — Minimal / Subtle */
-  --shadow-none: none;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --focus-ring: 0 0 0 2px #ffffff, 0 0 0 4px #0f2d59;
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-1: 120ms;
+  --dur-2: 200ms;
 
   /* Layout */
+  --header-h: 64px;
+  --page-max: 1240px;
+  --prose-max: 68ch;
+
+  /* Layers */
+  --z-sticky: 40;
+  --z-overlay: 80;
+  --z-modal: 90;
+  --z-toast: 100;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --canvas: #0a0f19;
+  --surface: #111826;
+  --surface-2: #0d1420;
+  --surface-3: #192236;
+  --border: #212c40;
+  --border-strong: #334159;
+  --ink: #e8ecf3;
+  --ink-2: #b9c2d1;
+  --ink-3: #8f9aae;
+  --ink-4: #667188;
+  --on-solid: #ffffff;
+
+  --brand: #3563d8;
+  --brand-hover: #4a76e6;
+  --brand-ink: #8fb0ff;
+  --brand-soft: #16233f;
+  --brand-line: #27396a;
+  --accent: #ff8a3d;
+  --accent-ink: #ffa76e;
+  --accent-soft: #2b1b10;
+  --accent-line: #5a3417;
+
+  --good: #52cc8f;
+  --good-soft: #0f2a1e;
+  --good-line: #1f4d36;
+  --warn: #f1b544;
+  --warn-soft: #2a2110;
+  --warn-line: #54401a;
+  --bad: #ff7b70;
+  --bad-soft: #2e1414;
+  --bad-line: #5c2723;
+  --info: #82a9ff;
+  --info-soft: #132142;
+  --info-line: #24396b;
+
+  --good-solid: #1d8656;
+  --warn-solid: #b06a0c;
+  --bad-solid: #c2392f;
+  --info-solid: #2c62d0;
+  --accent-solid: #d4600f;
+  --surface-inverse: #1c2638;
+
+  --viz-1: #7fa2ff;
+  --viz-2: #ff8a3d;
+  --viz-3: #52cc8f;
+  --viz-4: #b28cf0;
+  --viz-5: #ff7b98;
+  --viz-6: #4fc9d2;
+  --viz-7: #e0bd4a;
+  --viz-8: #95a2bb;
+
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.35), 0 1px 3px rgb(0 0 0 / 0.25);
+  --shadow-md: 0 10px 28px -12px rgb(0 0 0 / 0.6), 0 2px 6px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 24px 48px -16px rgb(0 0 0 / 0.7);
+}
+
+/* Legacy aliases: older modules read these names. */
+:root {
+  --bg-primary: var(--canvas);
+  --bg-surface: var(--surface);
+  --bg-subtle: var(--surface-2);
+  --bg-muted: var(--surface-3);
+  --bg-secondary: var(--surface-2);
+  --bg-card: var(--surface);
+  --border-color: var(--border);
+  --border-subtle: var(--surface-3);
+  --border-dark: var(--border-strong);
+  --border-focus: var(--brand-ink);
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-2);
+  --text-muted: var(--ink-3);
+  --text-inverse: var(--on-solid);
+  --color-primary: var(--brand);
+  --color-primary-hover: var(--brand-hover);
+  --color-primary-subtle: var(--brand-soft);
+  --color-primary-border: var(--brand-line);
+  --color-accent: var(--brand-ink);
+  --color-accent-hover: var(--brand);
+  --color-success: var(--good);
+  --color-warning: var(--warn);
+  --color-danger: var(--bad);
+
+  --status-good-text: var(--good);
+  --status-good-bg: var(--good-soft);
+  --status-good-border: var(--good-line);
+  --status-warn-text: var(--warn);
+  --status-warn-bg: var(--warn-soft);
+  --status-warn-border: var(--warn-line);
+  --status-alert-text: var(--bad);
+  --status-alert-bg: var(--bad-soft);
+  --status-alert-border: var(--bad-line);
+  --status-info-text: var(--info);
+  --status-info-bg: var(--info-soft);
+  --status-info-border: var(--info-line);
+  --status-critical: var(--bad);
+  --status-critical-bg: var(--bad-soft);
+  --status-good: var(--good);
+  --status-warning: var(--warn);
+
+  --status-completed: var(--good);
+  --status-completed-bg: var(--good-soft);
+  --status-approved: var(--good);
+  --status-approved-bg: var(--good-soft);
+  --status-delayed: var(--bad);
+  --status-construction: var(--warn);
+  --status-construction-bg: var(--warn-soft);
+  --color-primary-50: var(--brand-soft);
+  --color-primary-200: var(--brand-line);
+  --color-primary-500: var(--brand-ink);
+  --color-primary-700: var(--brand);
+  --gradient-accent: linear-gradient(135deg, var(--accent), var(--accent-ink));
+  --font-heading: var(--font-display);
+  --radius-control: var(--r-md);
+
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-pill: var(--r-pill);
+  --shadow-none: none;
   --max-width-content: 960px;
-  --max-width-wide: 1140px;
+  --max-width-wide: var(--page-max);
 }

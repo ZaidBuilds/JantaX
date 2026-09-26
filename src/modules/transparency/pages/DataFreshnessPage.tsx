@@ -1,92 +1,112 @@
-import React from 'react';
 import { getSyncStatuses } from '../services/transparencyService';
-import { TransparencyDisclaimer } from '../components/TransparencyDisclaimer';
-import { Clock, CheckCircle2, AlertTriangle, RefreshCw, Database } from 'lucide-react';
+import { TransparencyLayout } from '../components/TransparencyLayout';
+import { Badge, Stat } from '../../../ui';
+import { STATE_TONE, STATUS_TONE } from './SourcesPage';
+import { formatWhen, isConnected, STATE_LABEL, useCatalog } from '../../../core/services/officialData';
 
+const SCHEDULE: Record<string, string> = { hourly: 'Hourly', daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly', quarterly: 'Quarterly', annual: 'Yearly', event: 'On import' };
+
+/** Live status from the data service; the documented list only when the service can't be reached. */
 export function DataFreshnessPage() {
-  const syncItems = getSyncStatuses();
+  const catalog = useCatalog();
+  const lede = 'When each source was last fetched successfully and how many records it holds, so you know how current a figure is.';
 
+  if (catalog.status === 'ok') {
+    const rows = [
+      ...catalog.data.feeds.map((f) => ({ ...f, module: null as string | null, nextRun: null as string | null })),
+      ...catalog.data.datasets.map((d) => ({ id: d.id, title: d.title, publisher: d.publisher, schedule: d.schedule, state: d.state, rows: d.rows, lastSync: d.lastSync, lastError: d.lastError, module: d.module, nextRun: d.nextRun })),
+    ];
+    const connected = rows.filter((r) => isConnected(r.state));
+    const waiting = rows.filter((r) => r.state === 'needs-setting' || r.state === 'ready').length;
+    const imports = rows.filter((r) => r.state === 'needs-file').length;
+    return (
+      <TransparencyLayout current="Data freshness" title="Data freshness" lede={lede}>
+        <div className="stat-row" style={{ marginBottom: 'var(--s-6)' }}>
+          <Stat label="Official sources" value={rows.length} />
+          <Stat label="Connected" value={connected.length} meta={`${rows.filter((r) => r.state === 'stale' || r.state === 'failing').length} need attention`} />
+          <Stat label="Waiting on setup" value={waiting} meta={`${imports} need a file import`} />
+          <Stat label="Records held" value={connected.reduce((a, r) => a + r.rows, 0).toLocaleString('en-IN')} />
+        </div>
+        <div className="table-wrap">
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">Source</th>
+                <th scope="col">Refresh</th>
+                <th scope="col">Last success</th>
+                <th scope="col" className="num">Records</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.id}>
+                  <td>
+                    <div className="strong">{r.title}</div>
+                    <div className="tiny muted">{r.publisher}{r.module ? ` · ${r.module}` : ''}</div>
+                    {r.lastError && <div className="tiny text-warn" style={{ marginTop: 2 }}>Last attempt failed: {r.lastError.slice(0, 160)}</div>}
+                  </td>
+                  <td className="small" style={{ color: 'var(--ink-2)' }}>
+                    {SCHEDULE[r.schedule] ?? r.schedule}
+                    {r.nextRun && <div className="tiny muted">next {formatWhen(r.nextRun)}</div>}
+                  </td>
+                  <td className="small num">{formatWhen(r.lastSync) ?? 'Never'}</td>
+                  <td className="num">{r.rows.toLocaleString('en-IN')}</td>
+                  <td><Badge tone={STATE_TONE[r.state]}>{STATE_LABEL[r.state]}</Badge></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="tiny muted" style={{ marginTop: 'var(--s-3)' }}>Status as of {formatWhen(catalog.data.generatedAt)}, read from the JantaX data service.</p>
+      </TransparencyLayout>
+    );
+  }
+
+  const rows = getSyncStatuses();
+  const connected = rows.filter((r) => r.status === 'Connected').length;
+  const ready = rows.filter((r) => r.status === 'Connector ready').length;
+  const records = rows.reduce((a, r) => a + r.totalRecordsIngested, 0);
   return (
-    <div style={{ padding: '1.75rem 0', maxWidth: 1100, margin: '0 auto' }}>
-      <TransparencyDisclaimer />
-
-      <div style={{ marginBottom: '2rem' }}>
-        <span style={{ background: '#ecfeff', color: '#0e7490', fontSize: '0.75rem', fontWeight: 800, padding: '0.25rem 0.75rem', borderRadius: '9999px' }}>
-          LIVE SYNC DASHBOARD
-        </span>
-        <h1 style={{ fontSize: '2.1rem', fontWeight: 800, color: '#0f172a', fontFamily: 'var(--font-heading)', margin: '0.4rem 0 0.4rem' }}>
-          Data Freshness & Realtime Sync Status
-        </h1>
-        <p style={{ fontSize: '0.96rem', color: '#64748b', lineHeight: 1.55 }}>
-          Real-time operational status of JantaX automated ingestion workers, API webhooks, and gazette parser sync cycles.
-        </p>
+    <TransparencyLayout current="Data freshness" title="Data freshness" lede={lede}>
+      {catalog.status !== 'loading' && (
+        <div className="callout" style={{ marginBottom: 'var(--s-5)' }}>
+          <span>The JantaX data service isn't reachable, so this is the documented status of each source rather than a live reading.</span>
+        </div>
+      )}
+      <div className="stat-row" style={{ marginBottom: 'var(--s-6)' }}>
+        <Stat label="Sources listed" value={rows.length} />
+        <Stat label="Connected" value={connected} meta={`${ready} ready, waiting on setup`} />
+        <Stat label="Not connected yet" value={rows.length - connected - ready} />
+        <Stat label="Records ingested" value={records.toLocaleString('en-IN')} />
       </div>
-
-      {/* Sync Health Summary Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-        <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 16, border: '1px solid #e2e8f0' }}>
-          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Active Ingestion Feeds</div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#047857', marginTop: '0.2rem' }}>{syncItems.length} Feeds</div>
-          <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>100% Operational</div>
-        </div>
-
-        <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 16, border: '1px solid #e2e8f0' }}>
-          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Total Records Ingested</div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#2563eb', marginTop: '0.2rem' }}>
-            {syncItems.reduce((acc, s) => acc + s.totalRecordsIngested, 0).toLocaleString()}
-          </div>
-          <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>Indexed Across Modules</div>
-        </div>
-
-        <div style={{ background: '#ffffff', padding: '1.25rem', borderRadius: 16, border: '1px solid #e2e8f0' }}>
-          <div style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Average Sync Health</div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', marginTop: '0.2rem' }}>99.6%</div>
-          <div style={{ fontSize: '0.74rem', color: '#94a3b8' }}>99.9% Uptime Target</div>
-        </div>
-      </div>
-
-      {/* Sync Table */}
-      <div style={{ background: '#ffffff', borderRadius: 18, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 4px 16px rgba(15,23,42,0.03)' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
+      <div className="table-wrap">
+        <table className="table">
           <thead>
-            <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569', fontSize: '0.78rem', textTransform: 'uppercase' }}>
-              <th style={{ padding: '1rem 1.25rem' }}>Government Source Name</th>
-              <th style={{ padding: '1rem 1.25rem' }}>Refresh Cycle</th>
-              <th style={{ padding: '1rem 1.25rem' }}>Last Successful Sync</th>
-              <th style={{ padding: '1rem 1.25rem' }}>Records Ingested</th>
-              <th style={{ padding: '1rem 1.25rem' }}>Sync Status</th>
+            <tr>
+              <th scope="col">Source</th>
+              <th scope="col">Schedule</th>
+              <th scope="col">Last success</th>
+              <th scope="col" style={{ textAlign: 'right' }}>Records</th>
+              <th scope="col">Status</th>
             </tr>
           </thead>
           <tbody>
-            {syncItems.map((item) => (
-              <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                <td style={{ padding: '1rem 1.25rem', fontWeight: 800, color: '#0f172a' }}>
-                  {item.sourceName}
-                  <div style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: 500 }}>{item.publishingEntity}</div>
+            {rows.map((r) => (
+              <tr key={r.id}>
+                <td>
+                  <div className="strong">{r.sourceName}</div>
+                  <div className="tiny muted">{r.publishingEntity}</div>
                 </td>
-                <td style={{ padding: '1rem 1.25rem', color: '#334155', fontWeight: 600 }}>{item.updateFrequency}</td>
-                <td style={{ padding: '1rem 1.25rem', color: '#334155' }}>{item.lastSuccessfulSync}</td>
-                <td style={{ padding: '1rem 1.25rem', fontWeight: 700, color: '#0f172a' }}>{item.totalRecordsIngested.toLocaleString()}</td>
-                <td style={{ padding: '1rem 1.25rem' }}>
-                  <span style={{
-                    background: '#ecfdf5',
-                    color: '#047857',
-                    fontWeight: 800,
-                    fontSize: '0.76rem',
-                    padding: '0.25rem 0.65rem',
-                    borderRadius: '9999px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.25rem'
-                  }}>
-                    <CheckCircle2 size={12} /> {item.status} ({item.syncHealthPct}%)
-                  </span>
-                </td>
+                <td className="small" style={{ color: 'var(--ink-2)' }}>{r.updateFrequency}</td>
+                <td className="small num">{r.lastSuccessfulSync}</td>
+                <td className="num" style={{ textAlign: 'right' }}>{r.totalRecordsIngested.toLocaleString('en-IN')}</td>
+                <td><Badge tone={STATUS_TONE[r.status]}>{r.status}</Badge></td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-    </div>
+    </TransparencyLayout>
   );
 }

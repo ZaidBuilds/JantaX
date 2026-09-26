@@ -54,7 +54,7 @@ export function PollutionDashboard() {
   return (
     <div className="module-dashboard">
       <div className="glass-card dash-header-card" style={{ borderLeftColor: '#65a30d' }}>
-        <h2>🌫️ प्रदूषण नक्शा (Pollution Notice Overlay)</h2>
+        <h2>प्रदूषण नक्शा (Pollution Notice Overlay)</h2>
         <p>
           केंद्रीय प्रदूषण नियंत्रण बोर्ड (CPCB) वायु सूचकांक एवं राज्य बोर्डों द्वारा जारी औद्योगिक बंदी और कारण बताओ नोटिसों का स्थानीय संकलन।
         </p>
@@ -77,14 +77,14 @@ export function PollutionDashboard() {
         </div>
         {loc.isValid && (
           <p className="dash-location-label">
-            📍 Active: {loc.district} ({loc.state})
+            Active: {loc.district} ({loc.state})
           </p>
         )}
       </div>
 
       <div className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
         <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Air Quality Index / वायु गुणवत्ता सूचकांक</h3>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc', padding: '0.75rem 1.25rem', borderRadius: '8px', borderLeft: '4px solid var(--status-critical)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface-2)', padding: '0.75rem 1.25rem', borderRadius: '8px', borderLeft: '4px solid var(--status-critical)' }}>
           <span style={{ fontSize: '0.9rem', fontWeight: 700 }}>AQI Value: {pollutionRecords.aqiValue}</span>
           <span style={{ fontSize: '0.85rem', color: 'var(--status-critical)', fontWeight: 700 }}>{pollutionRecords.aqiStatus}</span>
         </div>
@@ -98,12 +98,12 @@ export function PollutionDashboard() {
             <div style={{ fontSize: '0.75rem', color: 'var(--status-critical)', fontWeight: 700, marginBottom: '0.75rem' }}>{n.noticeType}</div>
             
             <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-              📜 <strong>उल्लंघन कारण (Violation):</strong> {n.violationReason}
+              <strong>उल्लंघन कारण (Violation):</strong> {n.violationReason}
             </p>
             <div className="card-footer-meta">
               <span>Issue Date: {n.issueDate}</span>
               <button onClick={handleShare} className="btn-whatsapp">
-                📤 Share SPCB Notice
+                Share SPCB Notice
               </button>
             </div>
           </div>

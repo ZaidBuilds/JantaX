@@ -1,731 +1,458 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Search,
+  X,
+  SlidersHorizontal,
+  SearchX,
+  History,
+  ChevronLeft,
+  ChevronRight,
+  ArrowUpRight,
   MapPin,
   GraduationCap,
   Construction,
   HardHat,
   Home as HomeIcon,
+  Landmark,
+  Scale,
+  Vote,
+  Building,
+  CloudFog,
+  FileText,
   Hospital,
   Wheat,
-  Users,
-  AlertCircle,
-  Clock,
-  X,
-  SlidersHorizontal,
-  ChevronRight,
-  Loader2,
-  Bookmark,
-  Share2,
-  History,
-  TrendingUp,
-  CheckCircle,
-  AlertTriangle,
+  MessageSquareWarning,
+  Database,
+  type LucideIcon,
 } from 'lucide-react';
-import {
-  useSearch,
-  useAutocomplete,
-  getRecentSearches,
-  addRecentSearch,
-  clearRecentSearches,
-  removeRecentSearch,
-  POPULAR_SEARCHES,
-} from '../core/hooks/useSearch';
-import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver';
-import { SourceBadge } from '../components/UI/SourceBadge';
-import {
-  SkeletonCard,
-  ErrorState,
-  NoResultsState,
-  EmptyState,
-  DataFreshnessBadge,
-} from '../components/data-states';
-import type { SearchResult, SearchEntityType } from '../core/services/api';
+import { api, type SearchResponse, type SearchResult, type AutocompleteSuggestion } from '../core/services/api';
+import { isValidIndianPincode } from '../core/utils/pinResolver';
+import { Badge, Breadcrumbs, EmptyState, toneForStatus, useDismiss } from '../ui';
 
-const ENTITY_ICONS: Record<string, React.ElementType> = {
-  school: GraduationCap,
-  infra: Construction,
-  rera: HomeIcon,
-  hospital: Hospital,
-  contractor: HardHat,
-  pds: Wheat,
-  issue: AlertTriangle,
-  grievance: Users,
+const TYPES: Record<string, { label: string; icon: LucideIcon; tone: string }> = {
+  location: { label: 'Areas', icon: MapPin, tone: 'var(--accent)' },
+  school: { label: 'Schools', icon: GraduationCap, tone: 'var(--viz-1)' },
+  infra: { label: 'Public works', icon: Construction, tone: 'var(--viz-2)' },
+  contractor: { label: 'Contractors', icon: HardHat, tone: 'var(--viz-2)' },
+  rera: { label: 'RERA projects', icon: HomeIcon, tone: 'var(--viz-6)' },
+  mplads: { label: 'MP/MLA works', icon: Landmark, tone: 'var(--viz-6)' },
+  court: { label: 'Courts', icon: Scale, tone: 'var(--viz-4)' },
+  booth: { label: 'Polling booths', icon: Vote, tone: 'var(--viz-3)' },
+  ward: { label: 'Wards', icon: Building, tone: 'var(--viz-4)' },
+  station: { label: 'AQI stations', icon: CloudFog, tone: 'var(--viz-8)' },
+  authority: { label: 'RTI authorities', icon: FileText, tone: 'var(--viz-1)' },
+  hospital: { label: 'Health facilities', icon: Hospital, tone: 'var(--viz-5)' },
+  pds: { label: 'Ration shops', icon: Wheat, tone: 'var(--viz-7)' },
+  grievance: { label: 'Grievances', icon: MessageSquareWarning, tone: 'var(--viz-5)' },
+  issue: { label: 'Citizen reports', icon: MessageSquareWarning, tone: 'var(--viz-5)' },
+  source: { label: 'Data sources', icon: Database, tone: 'var(--viz-8)' },
 };
 
-const ENTITY_COLORS: Record<string, string> = {
-  school: '#3b82f6',
-  infra: '#f59e0b',
-  rera: '#06b6d4',
-  hospital: '#ec4899',
-  contractor: '#ef4444',
-  pds: '#d97706',
-  issue: '#8b5cf6',
-  grievance: '#10b981',
-};
+const SUGGESTED = ['Narela', 'Meerut', 'Barapullah', 'district court', 'Bengaluru', 'ration'];
+const RECENT_KEY = 'jantax.recentSearches';
+const PAGE_SIZE = 10;
 
-const ENTITY_LABELS: Record<string, string> = {
-  school: 'School',
-  infra: 'Public Works',
-  rera: 'RERA Project',
-  hospital: 'Healthcare',
-  contractor: 'Contractor',
-  pds: 'Welfare Shop',
-  issue: 'Issue',
-  grievance: 'Grievance',
-};
-
-const MATCH_TYPE_LABELS: Record<string, { label: string; color: string }> = {
-  exact: { label: 'Exact Match', color: '#10b981' },
-  related: { label: 'Related', color: '#f59e0b' },
-  location: { label: 'Location Match', color: '#3b82f6' },
-};
-
-interface SearchResultCardProps {
-  result: SearchResult;
-  onNavigate: (result: SearchResult) => void;
+function loadRecent(): string[] {
+  try {
+    const raw = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
+    return Array.isArray(raw) ? raw.filter((x) => typeof x === 'string').slice(0, 6) : [];
+  } catch {
+    return [];
+  }
 }
 
-function SearchResultCard({ result, onNavigate }: SearchResultCardProps) {
-  const Icon = ENTITY_ICONS[result.type] || MapPin;
-  const color = ENTITY_COLORS[result.type] || '#6b7280';
-  const matchType = result.matchType || (result.score > 0.5 ? 'exact' : 'related');
-  const matchInfo = MATCH_TYPE_LABELS[matchType];
+function saveRecent(q: string) {
+  try {
+    const next = [q, ...loadRecent().filter((x) => x.toLowerCase() !== q.toLowerCase())].slice(0, 6);
+    localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+  } catch {
+    /* storage blocked */
+  }
+}
 
-  const freshnessDate = result.source.freshness ? new Date(result.source.freshness) : null;
-  const status = result.metadata.status as string | undefined;
-  const statusColor = status
-    ? status.toLowerCase().includes('delay') || status.toLowerCase().includes('pending')
-      ? '#f97316'
-      : status.toLowerCase().includes('complete') || status.toLowerCase().includes('resolved')
-      ? '#10b981'
-      : '#6b7280'
-    : '#6b7280';
+function hrefFor(r: SearchResult): string {
+  const meta = r.metadata as { href?: string };
+  if (meta?.href) return meta.href;
+  const pin = r.location?.pincode;
+  switch (r.type) {
+    case 'school':
+      return `/schools/${r.id}`;
+    case 'infra':
+      return `/projects/${r.id}`;
+    case 'contractor':
+      return `/contractors/${r.id}`;
+    case 'rera':
+      return `/rera/projects/${r.id}`;
+    case 'hospital':
+      return `/module/hospital${pin ? `?pin=${pin}` : ''}`;
+    case 'pds':
+      return `/module/ration${pin ? `?pin=${pin}` : ''}`;
+    case 'grievance':
+      return '/module/grievance';
+    case 'location':
+      return `/pin/${pin || r.id}`;
+    default:
+      return pin ? `/pin/${pin}` : '/explore';
+  }
+}
 
+function TypeIcon({ type }: { type: string }) {
+  const t = TYPES[type] || TYPES.source;
+  const Icon = t.icon;
   return (
-    <div
-      className="glass-card"
-      style={{
-        padding: '1rem',
-        display: 'flex',
-        gap: '1rem',
-        cursor: 'pointer',
-        transition: 'box-shadow 0.2s',
-      }}
-      onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)')}
-      onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}
-      onClick={() => onNavigate(result)}
-    >
-      <div
-        style={{
-          width: 48,
-          height: 48,
-          borderRadius: 12,
-          background: `${color}14`,
-          border: `1px solid ${color}18`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color,
-          flexShrink: 0,
-        }}
-      >
-        <Icon size={22} strokeWidth={1.9} />
-      </div>
-
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
-          <h4 style={{ fontSize: '0.95rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
-            {result.title}
-          </h4>
-          <span
-            style={{
-              fontSize: '0.65rem',
-              fontWeight: 700,
-              padding: '2px 6px',
-              borderRadius: 4,
-              background: `${color}15`,
-              color,
-              textTransform: 'uppercase',
-            }}
-          >
-            {ENTITY_LABELS[result.type] || result.type}
-          </span>
-          <span
-            style={{
-              fontSize: '0.65rem',
-              fontWeight: 600,
-              padding: '2px 6px',
-              borderRadius: 4,
-              background: `${matchInfo.color}15`,
-              color: matchInfo.color,
-            }}
-          >
-            {matchInfo.label}
-          </span>
-        </div>
-
-        <p style={{ fontSize: '0.78rem', opacity: 0.7, margin: '0 0 0.35rem 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {result.description}
-        </p>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', fontSize: '0.72rem' }}>
-          {result.location && (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', opacity: 0.7 }}>
-              <MapPin size={11} /> {result.location.district}, {result.location.state} ({result.location.pincode})
-            </span>
-          )}
-          {status && (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: statusColor }}>
-              {statusColor === '#10b981' ? <CheckCircle size={11} /> : statusColor === '#f97316' ? <AlertTriangle size={11} /> : null}
-              {status}
-            </span>
-          )}
-          {freshnessDate && (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', opacity: 0.5 }}>
-              <Clock size={11} /> Updated {freshnessDate.toLocaleDateString()}
-            </span>
-          )}
-        </div>
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem', flexShrink: 0 }}>
-        <SourceBadge
-          sourceType={result.source.reliability === 'high' ? 'A' : result.source.reliability === 'medium' ? 'B' : 'C'}
-          sourceName={result.source.name}
-        />
-        <ChevronRight size={16} style={{ opacity: 0.4 }} />
-      </div>
-    </div>
+    <span className="icon-tile sm" style={{ ['--tile' as string]: t.tone }} aria-hidden="true">
+      <Icon size={16} />
+    </span>
   );
 }
 
-function SkeletonResultCard() {
+function ResultRow({ r }: { r: SearchResult }) {
+  const meta = r.metadata as { status?: string; score?: number; hindi?: string };
+  const t = TYPES[r.type] || TYPES.source;
   return (
-    <div className="glass-card" style={{ padding: '1rem', display: 'flex', gap: '1rem' }}>
-      <div className="skeleton" style={{ width: 48, height: 48, borderRadius: 12, flexShrink: 0 }} />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <div className="skeleton" style={{ height: 16, width: '60%', borderRadius: 4 }} />
-        <div className="skeleton" style={{ height: 12, width: '80%', borderRadius: 4 }} />
-        <div className="skeleton" style={{ height: 12, width: '40%', borderRadius: 4 }} />
+    <Link to={hrefFor(r)} className="list-row search-result">
+      <TypeIcon type={r.type} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="search-result-title">{r.title}</div>
+        {meta?.hindi && <div className="tiny muted truncate" lang="hi">{meta.hindi}</div>}
+        <div className="small" style={{ color: 'var(--ink-2)', marginTop: 2 }}>{r.description}</div>
+        <div className="source-row" style={{ marginTop: 6 }}>
+          <span>{t.label}</span>
+          {r.location && (
+            <span>
+              PIN {r.location.pincode} · {r.location.district}
+              {r.location.state && r.location.state !== r.location.district ? `, ${r.location.state}` : ''}
+            </span>
+          )}
+          <span>Source: {r.source.name}</span>
+        </div>
       </div>
-    </div>
+      <div className="report-row-meta">
+        {meta?.status && <Badge tone={toneForStatus(meta.status)}>{meta.status}</Badge>}
+        {typeof meta?.score === 'number' && (
+          <span className="tiny muted num">Ground truth {meta.score}/100</span>
+        )}
+      </div>
+      <ArrowUpRight size={16} className="muted" aria-hidden="true" />
+    </Link>
   );
 }
 
 export function SearchPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const initialQuery = searchParams.get('q') || '';
+  const [params, setParams] = useSearchParams();
+  const q = params.get('q') || '';
+  const type = params.get('type') || '';
+  const pin = params.get('pin') || '';
+  const state = params.get('state') || '';
+  const page = Math.max(1, Number(params.get('page')) || 1);
 
-  const [inputValue, setInputValue] = useState(initialQuery);
-  const [showAutocomplete, setShowAutocomplete] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [draft, setDraft] = useState(q);
+  const [data, setData] = useState<SearchResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [recent, setRecent] = useState<string[]>(loadRecent);
+  const [suggestions, setSuggestions] = useState<AutocompleteSuggestion[]>([]);
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const closeSuggest = useCallback(() => setSuggestOpen(false), []);
+  useDismiss(boxRef, suggestOpen, closeSuggest);
 
-  const {
-    query,
-    setQuery,
-    results,
-    isLoading,
-    isError,
-    error,
-    pagination,
-    filters,
-    updateFilter,
-    page,
-    setPage,
-    total,
-    refetch,
-    search,
-  } = useSearch({ debounceMs: 300, pageSize: 10 });
-
-  const { suggestions, isLoading: autocompleteLoading, setQuery: setAutocompleteQuery, clear: clearAutocomplete } = useAutocomplete({ debounceMs: 200, minLength: 2 });
-
-  const inputRef = useRef<HTMLInputElement>(null);
-  const autocompleteRef = useRef<HTMLDivElement>(null);
+  useEffect(() => setDraft(q), [q]);
 
   useEffect(() => {
-    setRecentSearches(getRecentSearches());
-  }, []);
-
-  useEffect(() => {
-    if (initialQuery) {
-      search(initialQuery);
-      setInputValue(initialQuery);
+    if (!q.trim()) {
+      setData(null);
+      return;
     }
-  }, [initialQuery]);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (autocompleteRef.current && !autocompleteRef.current.contains(e.target as Node) && inputRef.current && !inputRef.current.contains(e.target as Node)) {
-        setShowAutocomplete(false);
-      }
+    let alive = true;
+    setLoading(true);
+    api
+      .search({ q, type: type || undefined, pincode: pin || undefined, state: state || undefined, page, limit: PAGE_SIZE })
+      .then((r) => alive && setData(r))
+      .catch(() => alive && setData({ results: [], pagination: { page: 1, limit: PAGE_SIZE, total: 0, totalPages: 1 }, query: q, filters: {} }))
+      .finally(() => alive && setLoading(false));
+    saveRecent(q);
+    setRecent(loadRecent());
+    return () => {
+      alive = false;
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [q, type, pin, state, page]);
 
-  const handleSearch = useCallback((q: string) => {
-    if (!q.trim()) return;
-    addRecentSearch(q);
-    setRecentSearches(getRecentSearches());
-    setShowAutocomplete(false);
-    search(q);
-    navigate(`/search?q=${encodeURIComponent(q)}`, { replace: true });
-  }, [search, navigate]);
-
-  const handleInputChange = useCallback((value: string) => {
-    setInputValue(value);
-    setAutocompleteQuery(value);
-    if (value.length >= 2) {
-      setShowAutocomplete(true);
-    } else {
-      setShowAutocomplete(false);
+  useEffect(() => {
+    const value = draft.trim();
+    if (value.length < 2 || value === q) {
+      setSuggestions([]);
+      return;
     }
-  }, [setAutocompleteQuery]);
-
-  const handleSuggestionClick = useCallback((suggestion: { text: string; type?: string; pincode?: string }) => {
-    setInputValue(suggestion.text);
-    clearAutocomplete();
-    setShowAutocomplete(false);
-    if (suggestion.pincode) {
-      navigate(`/pin/${suggestion.pincode}`);
-    } else {
-      handleSearch(suggestion.text);
-    }
-  }, [clearAutocomplete, handleSearch, navigate]);
-
-  const handleRecentClick = useCallback((q: string) => {
-    setInputValue(q);
-    handleSearch(q);
-  }, [handleSearch]);
-
-  const handleResultNavigate = useCallback((result: SearchResult) => {
-    const typeToRoute: Record<string, string> = {
-      school: 'school',
-      infra: 'infra',
-      rera: 'rera',
-      hospital: 'hospital',
-      contractor: 'contractor',
-      pds: 'ration',
-      issue: 'reports',
-      grievance: 'reports',
+    let alive = true;
+    const t = window.setTimeout(() => {
+      api
+        .searchAutocomplete(value)
+        .then((r) => alive && setSuggestions(r.suggestions || []))
+        .catch(() => alive && setSuggestions([]));
+    }, 180);
+    return () => {
+      alive = false;
+      window.clearTimeout(t);
     };
-    const route = typeToRoute[result.type] || 'search';
-    if (result.location?.pincode) {
-      navigate(`/${route}?pin=${result.location.pincode}&q=${encodeURIComponent(result.title)}`);
-    } else {
-      navigate(`/${route}?q=${encodeURIComponent(result.title)}`);
-    }
-  }, [navigate]);
+  }, [draft, q]);
 
-  const activeTypes = Object.entries(filters)
-    .filter(([, v]) => v)
-    .map(([k]) => k);
-
-  const clearFilters = () => {
-    updateFilter('type', undefined);
-    updateFilter('pincode', undefined);
-    updateFilter('state', undefined);
-    updateFilter('district', undefined);
-    updateFilter('status', undefined);
-    setPage(1);
+  const setParam = (updates: Record<string, string>) => {
+    const next = new URLSearchParams(params);
+    Object.entries(updates).forEach(([k, v]) => (v ? next.set(k, v) : next.delete(k)));
+    if (!('page' in updates)) next.delete('page');
+    setParams(next);
   };
 
-  const handleTypeToggle = (type: string) => {
-    if (filters.type === type) {
-      updateFilter('type', undefined);
-    } else {
-      updateFilter('type', type);
+  const submit = (e?: FormEvent, value = draft) => {
+    e?.preventDefault();
+    const v = value.trim();
+    setSuggestOpen(false);
+    if (!v) return;
+    if (isValidIndianPincode(v)) {
+      navigate(`/pin/${v}`);
+      return;
     }
-    setPage(1);
+    setParam({ q: v });
   };
 
-  const sidebar = (
-    <aside className="glass-card" style={{ padding: '1.25rem' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-        <h3 style={{ fontSize: '0.95rem', margin: 0, fontWeight: 700 }}>Refine Your Search</h3>
-        {(filters.type || filters.pincode || filters.state || filters.status) && (
-          <button className="btn btn-secondary" type="button" onClick={clearFilters} style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem' }}>
-            Clear
+  const facets = useMemo(() => {
+    const f = (data?.filters as { facets?: Record<string, number> } | undefined)?.facets;
+    if (f) return f;
+    const counts: Record<string, number> = {};
+    data?.results.forEach((r) => (counts[r.type] = (counts[r.type] || 0) + 1));
+    return counts;
+  }, [data]);
+
+  const total = data?.pagination.total ?? 0;
+  const totalPages = data?.pagination.totalPages ?? 1;
+  const activeFilters = [type && (TYPES[type]?.label || type), pin && `PIN ${pin}`, state].filter(Boolean) as string[];
+
+  const Filters = (
+    <div className="stack" style={{ gap: 'var(--s-5)' }}>
+      <div>
+        <div className="label" style={{ marginBottom: 'var(--s-2)' }}>Type of record</div>
+        <div className="stack-sm" role="radiogroup" aria-label="Type of record">
+          <button type="button" className={`facet ${!type ? 'is-active' : ''}`} onClick={() => setParam({ type: '' })} role="radio" aria-checked={!type}>
+            <span>All types</span>
+            <span className="chip-count">{Object.values(facets).reduce((a, b) => a + b, 0) || ''}</span>
           </button>
-        )}
-      </div>
-
-      <div style={{ marginBottom: '1.25rem' }}>
-        <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.5rem' }}>Category</label>
-        <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.8rem' }}>
-          {Object.entries(ENTITY_LABELS).slice(0, 6).map(([type, label]) => (
-            <label key={type} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
-              <input
-                type="checkbox"
-                checked={filters.type === type}
-                onChange={() => handleTypeToggle(type)}
-                style={{ accentColor: ENTITY_COLORS[type] }}
-              />
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                {React.createElement(ENTITY_ICONS[type] || MapPin, { size: 14, style: { color: ENTITY_COLORS[type] } })}
-                {label}
-              </span>
-            </label>
-          ))}
+          {Object.entries(facets)
+            .sort((a, b) => b[1] - a[1])
+            .map(([t, n]) => (
+              <button key={t} type="button" className={`facet ${type === t ? 'is-active' : ''}`} onClick={() => setParam({ type: type === t ? '' : t })} role="radio" aria-checked={type === t}>
+                <span>{TYPES[t]?.label || t}</span>
+                <span className="chip-count">{n}</span>
+              </button>
+            ))}
         </div>
       </div>
-
-      <div style={{ marginBottom: '1.25rem', borderTop: '1px solid #e2e8f0', paddingTop: '1rem' }}>
-        <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.5rem' }}>PIN Code</label>
-        <input
-          type="text"
-          placeholder="e.g. 110001"
-          className="form-input"
-          style={{ fontSize: '0.8rem' }}
-          value={filters.pincode || ''}
-          onChange={e => updateFilter('pincode', e.target.value.replace(/\D/g, '').slice(0, 6) || undefined)}
-        />
-      </div>
-
-      <div style={{ marginBottom: '1.25rem' }}>
-        <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.5rem' }}>State</label>
-        <input
-          type="text"
-          placeholder="e.g. Delhi"
-          className="form-input"
-          style={{ fontSize: '0.8rem' }}
-          value={filters.state || ''}
-          onChange={e => updateFilter('state', e.target.value || undefined)}
-        />
-      </div>
-
-      <div style={{ marginBottom: '1.25rem' }}>
-        <label style={{ fontSize: '0.8rem', fontWeight: 700, display: 'block', marginBottom: '0.5rem' }}>Status</label>
-        <select
-          className="form-input"
-          style={{ fontSize: '0.8rem' }}
-          value={filters.status || ''}
-          onChange={e => updateFilter('status', e.target.value || undefined)}
-        >
-          <option value="">All Statuses</option>
-          <option value="active">Active</option>
-          <option value="completed">Completed</option>
-          <option value="delayed">Delayed</option>
-          <option value="pending">Pending</option>
+      <form
+        className="field"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const v = (new FormData(e.currentTarget).get('pin') as string) || '';
+          setParam({ pin: isValidIndianPincode(v) ? v : '' });
+        }}
+      >
+        <label className="label" htmlFor="filter-pin">PIN code</label>
+        <div style={{ display: 'flex', gap: 'var(--s-2)' }}>
+          <input id="filter-pin" name="pin" className="input num" inputMode="numeric" maxLength={6} defaultValue={pin} placeholder="Any" key={pin} />
+          <button type="submit" className="btn btn-secondary">Apply</button>
+        </div>
+      </form>
+      <div className="field">
+        <label className="label" htmlFor="filter-state">State</label>
+        <select id="filter-state" className="select" value={state} onChange={(e) => setParam({ state: e.target.value })}>
+          <option value="">All states</option>
+          {['Delhi', 'Uttar Pradesh', 'Maharashtra', 'Karnataka', 'Tamil Nadu', 'West Bengal', 'Bihar', 'Telangana', 'Gujarat', 'Rajasthan', 'Kerala'].map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
         </select>
       </div>
-    </aside>
+      {activeFilters.length > 0 && (
+        <button type="button" className="btn btn-ghost" onClick={() => setParam({ type: '', pin: '', state: '' })}>
+          <X size={15} aria-hidden="true" /> Clear filters
+        </button>
+      )}
+    </div>
   );
 
   return (
-    <div className="container" style={{ padding: '1.5rem 1rem', maxWidth: 1200 }}>
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: '0.25rem', fontWeight: 800 }}>
-          Universal Search
-        </h1>
-        <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>Search across locations, schools, projects, contractors, builders, healthcare, schemes and issues</p>
-      </div>
+    <div className="page">
+      <Breadcrumbs items={[{ label: 'Search' }]} />
+      <h1 className="page-title" style={{ marginBottom: 'var(--s-5)' }}>Search public records</h1>
 
-      <div style={{ position: 'relative', marginBottom: '1.5rem' }} ref={autocompleteRef}>
-        <form
-          onSubmit={e => { e.preventDefault(); handleSearch(inputValue); }}
-          style={{ display: 'flex', gap: '0.75rem' }}
-        >
-          <div style={{ flex: 1, position: 'relative' }}>
-            <div style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }}>
-              <Search size={18} />
-            </div>
-            <input
-              ref={inputRef}
-              type="text"
-              value={inputValue}
-              onChange={e => handleInputChange(e.target.value)}
-              onFocus={() => inputValue.length >= 2 && setShowAutocomplete(true)}
-              placeholder="Search PIN, school, builder, contractor, project, location…"
-              style={{
-                width: '100%',
-                padding: '0.85rem 1rem 0.85rem 2.75rem',
-                border: '1.5px solid var(--border-color)',
-                borderRadius: 12,
-                fontSize: '0.95rem',
-                outline: 'none',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-              }}
-              onFocusCapture={e => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37,99,235,0.1)'; }}
-              onBlurCapture={e => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'; }}
-            />
-            {isLoading && (
-              <div style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)' }}>
-                <Loader2 size={18} style={{ animation: 'spin 1s linear infinite', opacity: 0.6 }} />
-              </div>
-            )}
-            {inputValue && !isLoading && (
-              <button
-                type="button"
-                onClick={() => { setInputValue(''); clearAutocomplete(); setShowAutocomplete(false); setQuery(''); inputRef.current?.focus(); }}
-                style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', opacity: 0.4, padding: 4 }}
-              >
-                <X size={16} />
-              </button>
-            )}
-          </div>
-          <button type="submit" className="search-action-btn" style={{ padding: '0.85rem 1.5rem', borderRadius: 12 }}>
-            Search
-          </button>
-          <button type="button" className="btn btn-secondary" onClick={() => setShowFilters(!showFilters)} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <SlidersHorizontal size={16} />
-          </button>
-        </form>
-
-        {showAutocomplete && (suggestions.length > 0 || autocompleteLoading) && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 'calc(100% + 4px)',
-              left: 0,
-              right: 0,
-              background: '#fff',
-              border: '1px solid var(--border-color)',
-              borderRadius: 12,
-              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-              zIndex: 50,
-              maxHeight: 360,
-              overflowY: 'auto',
+      <div ref={boxRef} style={{ position: 'relative', maxWidth: 760 }}>
+        <form role="search" onSubmit={submit} className="search-field">
+          <Search size={20} aria-hidden="true" />
+          <input
+            type="search"
+            className="search-field-input"
+            value={draft}
+            onChange={(e) => {
+              setDraft(e.target.value);
+              setSuggestOpen(true);
             }}
-          >
-            {autocompleteLoading && (
-              <div style={{ padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
-                <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Searching…
-              </div>
-            )}
-            {suggestions.map((s, i) => {
-              const Icon = ENTITY_ICONS[s.type] || Search;
-              const color = ENTITY_COLORS[s.type] || '#6b7280';
-              return (
-                <div
-                  key={i}
-                  style={{
-                    padding: '0.75rem 1rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    cursor: 'pointer',
-                    borderBottom: i < suggestions.length - 1 ? '1px solid #f1f5f9' : 'none',
-                  }}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#f8fafc')}
-                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                  onClick={() => handleSuggestionClick(s)}
-                >
-                  <div style={{ width: 32, height: 32, borderRadius: 8, background: `${color}12`, display: 'flex', alignItems: 'center', justifyContent: 'center', color, flexShrink: 0 }}>
-                    <Icon size={16} />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{s.text}</div>
-                    {s.subtitle && <div style={{ fontSize: '0.72rem', opacity: 0.6 }}>{s.subtitle}</div>}
-                  </div>
-                  <span style={{ fontSize: '0.68rem', opacity: 0.5, flexShrink: 0 }}>{ENTITY_LABELS[s.type] || s.type}</span>
-                </div>
-              );
-            })}
+            onFocus={() => setSuggestOpen(true)}
+            placeholder="School, project, contractor, court, ward or PIN"
+            aria-label="Search public records"
+            aria-autocomplete="list"
+            aria-controls="search-suggest"
+            autoFocus={!q}
+          />
+          {draft && (
+            <button type="button" className="btn btn-ghost btn-icon btn-sm" onClick={() => setDraft('')} aria-label="Clear search">
+              <X size={16} aria-hidden="true" />
+            </button>
+          )}
+          <button type="submit" className="btn btn-primary btn-lg">Search</button>
+        </form>
+        {suggestOpen && suggestions.length > 0 && (
+          <div id="search-suggest" className="popover" role="listbox" style={{ left: 0, right: 0, top: 'calc(100% + 6px)' }}>
+            {suggestions.map((s, i) => (
+              <button
+                key={`${s.text}-${i}`}
+                type="button"
+                role="option"
+                aria-selected={false}
+                className="menu-item"
+                onClick={() => {
+                  setDraft(s.text);
+                  submit(undefined, s.text);
+                }}
+              >
+                <TypeIcon type={s.type} />
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <span className="strong truncate" style={{ display: 'block' }}>{s.text}</span>
+                  {s.subtitle && <span className="tiny muted truncate" style={{ display: 'block' }}>{s.subtitle}</span>}
+                </span>
+              </button>
+            ))}
           </div>
         )}
       </div>
 
-      {(recentSearches.length > 0 || POPULAR_SEARCHES.length > 0) && !query && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-          {recentSearches.length > 0 && (
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                <h3 style={{ fontSize: '0.85rem', fontWeight: 700, opacity: 0.6, margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <History size={14} /> Recent
-                </h3>
-                <button onClick={() => { clearRecentSearches(); setRecentSearches([]); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.72rem', opacity: 0.5 }}>
+      {!q ? (
+        <div className="grid-2" style={{ marginTop: 'var(--s-8)', maxWidth: 760 }}>
+          <div className="card card-pad">
+            <div className="spread" style={{ marginBottom: 'var(--s-3)' }}>
+              <span className="cluster">
+                <History size={16} className="muted" aria-hidden="true" />
+                <span className="strong">Recent searches</span>
+              </span>
+              {recent.length > 0 && (
+                <button
+                  type="button"
+                  className="link small"
+                  onClick={() => {
+                    try {
+                      localStorage.removeItem(RECENT_KEY);
+                    } catch {
+                      /* storage blocked */
+                    }
+                    setRecent([]);
+                  }}
+                >
                   Clear
                 </button>
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                {recentSearches.map(s => (
-                  <span
-                    key={s}
-                    onClick={() => handleRecentClick(s)}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.35rem',
-                      padding: '0.4rem 0.75rem',
-                      background: 'var(--color-primary-50)',
-                      border: '1px solid var(--color-primary-200)',
-                      borderRadius: 999,
-                      fontSize: '0.8rem',
-                      cursor: 'pointer',
-                      color: 'var(--color-primary-700)',
-                    }}
-                  >
-                    <X size={12} onClick={e => { e.stopPropagation(); removeRecentSearch(s); setRecentSearches(getRecentSearches()); }} />
-                    {s}
-                  </span>
+              )}
+            </div>
+            {recent.length === 0 ? (
+              <p className="small muted">Your searches stay on this device.</p>
+            ) : (
+              <div className="cluster">
+                {recent.map((r) => (
+                  <button key={r} type="button" className="chip" onClick={() => setParam({ q: r })}>{r}</button>
                 ))}
               </div>
-            </div>
-          )}
-
-          <div>
-            <h3 style={{ fontSize: '0.85rem', fontWeight: 700, opacity: 0.6, margin: '0 0 0.75rem 0', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-              <TrendingUp size={14} /> Popular
-            </h3>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-              {POPULAR_SEARCHES.map(s => (
-                <span
-                  key={s}
-                  onClick={() => { setInputValue(s); handleSearch(s); }}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.25rem',
-                    padding: '0.4rem 0.75rem',
-                    background: '#f1f5f9',
-                    borderRadius: 999,
-                    fontSize: '0.8rem',
-                    cursor: 'pointer',
-                    color: 'var(--text-secondary)',
-                    transition: 'all 0.15s',
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.background = '#e2e8f0'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = '#f1f5f9'; }}
-                >
-                  {s}
-                </span>
+            )}
+          </div>
+          <div className="card card-pad">
+            <div className="strong" style={{ marginBottom: 'var(--s-3)' }}>Try searching for</div>
+            <div className="cluster">
+              {SUGGESTED.map((s) => (
+                <button key={s} type="button" className="chip" onClick={() => setParam({ q: s })}>{s}</button>
               ))}
             </div>
           </div>
         </div>
-      )}
+      ) : (
+        <div className="split-left" style={{ marginTop: 'var(--s-8)' }}>
+          <aside className="hide-tablet sticky-aside">{Filters}</aside>
 
-      <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
-        <div className="hidden md:block" style={{ width: 260, flexShrink: 0, position: 'sticky', top: '1rem' }}>
-          {sidebar}
-        </div>
-
-        <div style={{ flex: 1, minWidth: 0 }}>
-          {query && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-              <div>
-                <h2 style={{ fontSize: '1.2rem', color: 'var(--color-primary)', margin: 0 }}>
-                  Results for "{query}"
-                </h2>
-                <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>
-                  {isLoading ? 'Searching…' : `${total} result${total !== 1 ? 's' : ''}`}
-                </span>
-              </div>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem' }}>
-                  <Bookmark size={14} /> Save
+          <section aria-live="polite" aria-busy={loading}>
+            <div className="spread" style={{ marginBottom: 'var(--s-3)', flexWrap: 'wrap' }}>
+              <p className="small" style={{ color: 'var(--ink-2)' }}>
+                {loading ? 'Searching…' : (
+                  <>
+                    <strong className="num">{total}</strong> {total === 1 ? 'result' : 'results'} for <strong>“{q}”</strong>
+                  </>
+                )}
+              </p>
+              <div className="cluster">
+                {activeFilters.map((f) => (
+                  <Badge key={f} tone="brand">{f}</Badge>
+                ))}
+                <button type="button" className="btn btn-secondary btn-sm show-filters" onClick={() => setFiltersOpen((o) => !o)} aria-expanded={filtersOpen}>
+                  <SlidersHorizontal size={14} aria-hidden="true" /> Filters
                 </button>
               </div>
             </div>
-          )}
+            {filtersOpen && <div className="card card-pad show-filters-panel" style={{ marginBottom: 'var(--s-4)' }}>{Filters}</div>}
 
-          {activeTypes.length > 0 && (
-            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-              {activeTypes.map(type => (
-                <span
-                  key={type}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.35rem',
-                    padding: '0.3rem 0.6rem',
-                    background: `${ENTITY_COLORS[type]}15`,
-                    border: `1px solid ${ENTITY_COLORS[type]}30`,
-                    borderRadius: 999,
-                    fontSize: '0.72rem',
-                    fontWeight: 600,
-                    color: ENTITY_COLORS[type],
-                  }}
-                >
-                  {ENTITY_LABELS[type]}
-                  <X size={12} style={{ cursor: 'pointer' }} onClick={() => handleTypeToggle(type)} />
-                </span>
-              ))}
-            </div>
-          )}
-
-          {isError && (
-            <ErrorState
-              title="Search failed"
-              message={error?.message || 'An error occurred while searching. Please try again.'}
-              onRetry={refetch}
-            />
-          )}
-
-          {!isError && query && !isLoading && results.length === 0 && (
-            <NoResultsState
-              query={query}
-              onClear={() => { clearFilters(); setQuery(''); setInputValue(''); }}
-            />
-          )}
-
-          {!query && !isLoading && (
-            <EmptyState
-              title="Start searching"
-              description="Enter a search term to find schools, projects, contractors, builders, healthcare centers, schemes, or issues."
-            />
-          )}
-
-          {results.length > 0 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {isLoading && results.length === 0 ? (
-                [...Array(5)].map((_, i) => <SkeletonResultCard key={i} />)
+            <div className="card">
+              {loading && !data ? (
+                <div className="list">
+                  {[0, 1, 2, 3].map((i) => (
+                    <div key={i} className="list-row">
+                      <span className="skeleton" style={{ width: 32, height: 32 }} />
+                      <div style={{ flex: 1 }} className="stack-sm">
+                        <span className="skeleton" style={{ height: 14, width: '60%' }} />
+                        <span className="skeleton" style={{ height: 12, width: '85%' }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : data && data.results.length > 0 ? (
+                <div className="list">
+                  {data.results.map((r) => (
+                    <ResultRow key={`${r.type}-${r.id}`} r={r} />
+                  ))}
+                </div>
               ) : (
-                results.map(result => (
-                  <SearchResultCard key={result.id} result={result} onNavigate={handleResultNavigate} />
-                ))
+                <EmptyState
+                  icon={SearchX}
+                  title={`Nothing found for “${q}”`}
+                  text="Check the spelling, search a district or PIN code instead, or remove filters."
+                  action={
+                    <div className="cluster" style={{ justifyContent: 'center' }}>
+                      {activeFilters.length > 0 && (
+                        <button type="button" className="btn btn-secondary" onClick={() => setParam({ type: '', pin: '', state: '' })}>Clear filters</button>
+                      )}
+                      <Link to="/explore" className="btn btn-primary">Browse modules</Link>
+                    </div>
+                  }
+                />
               )}
             </div>
-          )}
 
-          {isLoading && results.length > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
-              <Loader2 size={24} style={{ animation: 'spin 1s linear infinite', opacity: 0.5 }} />
-            </div>
-          )}
-
-          {pagination.totalPages > 1 && (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem', marginTop: '2rem', flexWrap: 'wrap' }}>
-              <button
-                className="btn btn-secondary"
-                onClick={() => setPage(page - 1)}
-                disabled={page <= 1}
-                style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
-              >
-                Previous
-              </button>
-              <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>
-                Page {page} of {pagination.totalPages}
-              </span>
-              <button
-                className="btn btn-secondary"
-                onClick={() => setPage(page + 1)}
-                disabled={page >= pagination.totalPages}
-                style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
-              >
-                Next
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {showFilters && (
-        <div className="fixed inset-0 z-50 flex" role="dialog" aria-modal="true">
-          <div className="fixed inset-0 bg-black/40" onClick={() => setShowFilters(false)} />
-          <div className="relative bg-white w-[300px] max-w-[85%] h-full overflow-y-auto p-4 shadow-xl" style={{ marginLeft: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
-              <button onClick={() => setShowFilters(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
-                <X size={20} />
-              </button>
-            </div>
-            {sidebar}
-          </div>
+            {totalPages > 1 && (
+              <nav className="pager" aria-label="Pagination">
+                <button type="button" className="btn btn-secondary btn-sm" disabled={page <= 1} onClick={() => setParam({ page: String(page - 1) })}>
+                  <ChevronLeft size={15} aria-hidden="true" /> Previous
+                </button>
+                <span className="small muted num">
+                  Page {page} of {totalPages}
+                </span>
+                <button type="button" className="btn btn-secondary btn-sm" disabled={page >= totalPages} onClick={() => setParam({ page: String(page + 1) })}>
+                  Next <ChevronRight size={15} aria-hidden="true" />
+                </button>
+              </nav>
+            )}
+          </section>
         </div>
       )}
     </div>

@@ -171,14 +171,13 @@ async function main() {
 
   console.log('✓ Contractor');
 
-  // 9. Sources — Tier A-E (canonical governance)
+  // 9. Sources — Tier A-E (canonical governance). None of these has a connector yet, so they are
+  // registered as 'planned' with no sync time. Real connectors register their own sources (server/src/jobs/sources.ts).
   const sources = [
     // Tier A — GODL datasets
     { sourceId: 'src_udise_2324', organization: 'Ministry of Education', department: 'UDISE+', governmentLevel: 'union', sourceName: 'UDISE+ 2023-24', sourceUrl: 'https://udiseplus.gov.in', datasetUrl: 'https://udiseplus.gov.in/p/dataset', sourceType: 'A-dataset', license: 'GODL-India', termsUrl: 'https://data.gov.in/sites/default/files/GODL.pdf', attributionRequirement: 'Source: UDISE+ 2023-24 | GODL', reusePermission: 'store/transform/display/redistribute: yes (attribution)', dataSensitivity: 'public', updateFrequency: 'annual', expectedRefreshInterval: '365d', lastPublishedDate: '2024-08-15', parserVersion: 'udise_csv_v1.2', status: 'active', owner: 'data-ops' },
     { sourceId: 'src_hmis_2024', organization: 'MoHFW', department: 'HMIS', governmentLevel: 'union', sourceName: 'HMIS Facility Registry 2024', sourceUrl: 'https://hmis.mohfw.gov.in', datasetUrl: 'https://hmis.mohfw.gov.in/api', sourceType: 'A-dataset', license: 'GODL-India', termsUrl: 'https://data.gov.in/sites/default/files/GODL.pdf', attributionRequirement: 'Source: HMIS 2024 | GODL', reusePermission: 'store/transform/display/redistribute: yes', dataSensitivity: 'public', updateFrequency: 'monthly', expectedRefreshInterval: '30d', lastPublishedDate: '2024-08-01', parserVersion: 'hmis_api_v1.0', status: 'active', owner: 'data-ops' },
     { sourceId: 'src_darpg_202408', organization: 'DARPG', department: 'CPGRAMS', governmentLevel: 'union', sourceName: 'CPGRAMS Monthly Report 2024-08', sourceUrl: 'https://darpg.gov.in', datasetUrl: 'https://darpg.gov.in/en/cpgrams-reports', sourceType: 'A-dataset', license: 'GODL-India', termsUrl: 'https://data.gov.in/sites/default/files/GODL.pdf', attributionRequirement: 'Source: DARPG CPGRAMS Monthly Report 2024-08 | GODL', reusePermission: 'store/transform/display/redistribute: yes', dataSensitivity: 'public', updateFrequency: 'monthly', expectedRefreshInterval: '30d', lastPublishedDate: '2024-08-31', parserVersion: 'darpg_pdf_v1.0', status: 'active', owner: 'data-ops' },
-    // Tier B — Official API
-    { sourceId: 'src_cpcb_aqi', organization: 'CPCB', department: 'AQI', governmentLevel: 'union', sourceName: 'CPCB AQI API', sourceUrl: 'https://cpcb.nic.in', apiUrl: 'https://api.cpcb.nic.in/aqi', sourceType: 'B-api', license: 'GODL-India', termsUrl: 'https://cpcb.nic.in/terms', attributionRequirement: 'Source: CPCB | GODL', reusePermission: 'store: cache 1h, display: yes', dataSensitivity: 'public', updateFrequency: 'realtime', expectedRefreshInterval: '1h', lastPublishedDate: '2024-08-25', parserVersion: 'cpcb_api_v1.0', status: 'active', owner: 'data-ops' },
     // Tier C — Official webpage/document (quote only)
     { sourceId: 'src_cag_mh_2024', organization: 'CAG', department: 'PAG Maharashtra', governmentLevel: 'state', sourceName: 'CAG Audit Report No.4 2023-24', sourceUrl: 'https://cag.gov.in/uploads/en/.../Report-4-MH.pdf', sourceType: 'C-document', license: 'Fair-use-quotation', termsUrl: 'https://cag.gov.in/terms', attributionRequirement: 'Source: CAG Report No.4 of 2024, Para 3.7', reusePermission: 'store: excerpt ≤200 chars, display: quote + link, redistribute: no', dataSensitivity: 'public', updateFrequency: 'annual', expectedRefreshInterval: '365d', lastPublishedDate: '2024-03-14', parserVersion: 'cag_pdf_tabula_v0.8', status: 'active', owner: 'data-ops' },
     { sourceId: 'src_maharera', organization: 'MahaRERA', department: 'Housing', governmentLevel: 'state', sourceName: 'MahaRERA Project Page', sourceUrl: 'https://maharera.mahaonline.gov.in', sourceType: 'C-webpage', license: 'Fair-use', termsUrl: 'https://maharera.mahaonline.gov.in/terms', attributionRequirement: 'Source: MahaRERA', reusePermission: 'store: excerpt, display: quote + link', dataSensitivity: 'public', updateFrequency: 'daily', expectedRefreshInterval: '1d', lastPublishedDate: '2024-08-20', parserVersion: 'rera_scrape_v0.5', status: 'degraded', owner: 'data-ops', notes: 'CAPTCHA proxy required' },
@@ -190,7 +189,7 @@ async function main() {
   for (const s of sources) {
     await prisma.source.upsert({
       where: { sourceId: s.sourceId },
-      update: { lastChecked: new Date(), lastSuccessfulSync: new Date(), status: s.status as any },
+      update: { status: 'planned', lastSuccessfulSync: null },
       create: {
         sourceId: s.sourceId,
         organization: s.organization,
@@ -209,10 +208,10 @@ async function main() {
         updateFrequency: s.updateFrequency,
         expectedRefreshInterval: s.expectedRefreshInterval,
         lastChecked: new Date(),
-        lastSuccessfulSync: new Date(),
+        lastSuccessfulSync: null,
         lastPublishedDate: s.lastPublishedDate,
         parserVersion: s.parserVersion,
-        status: s.status,
+        status: 'planned',
         owner: s.owner,
         notes: (s as any).notes || null,
       },

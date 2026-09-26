@@ -1,11 +1,12 @@
-import React from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { SchoolProfile } from '../../components/school/SchoolProfile';
+import { Breadcrumbs } from '../../ui';
 
 export function SchoolProfilePage() {
-  const params = useParams();
-  const location = useLocation();
-  const segments = location.pathname.split('/').filter(Boolean);
-  const schoolId = params.id || segments[segments.length - 1];
-  return <SchoolProfile schoolId={schoolId} />;
+  const { id = '' } = useParams<{ id: string; tab?: string }>();
+  return (
+    <div className="page page-wide">
+      <SchoolProfile schoolId={id} />
+    </div>
+  );
 }

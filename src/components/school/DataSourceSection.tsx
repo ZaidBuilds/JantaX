@@ -18,33 +18,33 @@ interface DataSourceSectionProps {
 
 const SOURCE_CONFIG: Record<DataSourceType, { color: string; bg: string; border: string; label: string; icon: React.ElementType; description: string }> = {
   official: {
-    color: '#2563eb',
-    bg: '#eff6ff',
-    border: '#dbeafe',
+    color: 'var(--brand-ink)',
+    bg: 'var(--brand-soft)',
+    border: 'var(--brand-line)',
     label: 'Official Data',
     icon: Shield,
     description: 'Government-reported data from UDISE+, DISE, state portals, and official returns.',
   },
   community: {
-    color: '#7c3aed',
-    bg: '#f5f3ff',
-    border: '#ede9fe',
+    color: 'var(--viz-4)',
+    bg: 'var(--brand-soft)',
+    border: 'var(--border)',
     label: 'Community Data',
     icon: Users,
     description: 'Crowdsourced citizen check-ins, parent submissions, and local reports.',
   },
   independent: {
-    color: '#059669',
-    bg: '#f0fdf4',
-    border: '#d1fae5',
+    color: 'var(--good)',
+    bg: 'var(--good-soft)',
+    border: 'var(--good-line)',
     label: 'Independent Data',
     icon: BarChart3,
     description: 'Third-party audits, NGO studies, academic surveys, and media investigations.',
   },
   verified: {
-    color: '#d97706',
-    bg: '#fffbeb',
-    border: '#fde68a',
+    color: 'var(--warn)',
+    bg: 'var(--warn-soft)',
+    border: 'var(--warn-line)',
     label: 'Verified Evidence',
     icon: CheckCircle2,
     description: 'Photo/video evidence, GPS-tagged observations, and cross-verified reports.',
@@ -90,7 +90,7 @@ export function DataSourceSection({
           <span style={{ fontWeight: 800, fontSize: '0.82rem', color: config.color }}>
             {config.label}
           </span>
-          <span style={{ fontSize: '0.72rem', opacity: 0.6 }}>— {config.description}</span>
+          <span style={{ fontSize: '0.72rem', opacity: 0.6 }}>- {config.description}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           {recordCount !== undefined && (
@@ -117,7 +117,7 @@ export function DataSourceSection({
           {titleHi && <span style={{ fontSize: '0.82rem', opacity: 0.6, marginLeft: '0.4rem' }}>{titleHi}</span>}
         </div>
         {methodologyNote && (
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.35rem', marginTop: '0.5rem', fontSize: '0.72rem', color: '#64748b' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.35rem', marginTop: '0.5rem', fontSize: '0.72rem', color: 'var(--ink-3)' }}>
             <Info size={12} style={{ flexShrink: 0, marginTop: 2 }} />
             {methodologyNote}
           </div>
@@ -135,9 +135,9 @@ interface ConfidenceBadgeProps {
 
 export function ConfidenceBadge({ confidence, showLabel = true }: ConfidenceBadgeProps) {
   const config = {
-    high: { color: '#166534', bg: '#dcfce7', border: '#bbf7d0', label: 'High Confidence' },
-    medium: { color: '#92400e', bg: '#fef3c7', border: '#fde68a', label: 'Medium Confidence' },
-    low: { color: '#991b1b', bg: '#fee2e2', border: '#fecaca', label: 'Low Confidence' },
+    high: { color: 'var(--good)', bg: 'var(--good-soft)', border: 'var(--good-line)', label: 'High Confidence' },
+    medium: { color: 'var(--warn)', bg: 'var(--warn-soft)', border: 'var(--warn-line)', label: 'Medium Confidence' },
+    low: { color: 'var(--bad)', bg: 'var(--bad-soft)', border: 'var(--bad-line)', label: 'Low Confidence' },
   }[confidence];
 
   return (
@@ -193,7 +193,7 @@ export function DataComparisonRow({
   source,
 }: DataRowProps) {
   return (
-    <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
+    <tr style={{ borderBottom: '1px solid var(--border)' }}>
       <td style={{ padding: '0.75rem 0.5rem', fontWeight: 600, fontSize: '0.82rem' }}>
         <div>{label}</div>
         {labelHi && <div style={{ fontSize: '0.72rem', opacity: 0.5 }}>{labelHi}</div>}
@@ -205,7 +205,7 @@ export function DataComparisonRow({
         { val: verifiedValue, type: 'verified' as DataSourceType },
       ].map(({ val, type }) => {
         const config = SOURCE_CONFIG[type];
-        const hasVal = val !== null && val !== undefined && val !== '—';
+        const hasVal = val !== null && val !== undefined && val !== '-';
         return (
           <td
             key={type}
@@ -214,11 +214,11 @@ export function DataComparisonRow({
               textAlign: 'center',
               fontSize: '0.85rem',
               fontWeight: hasVal ? 700 : 400,
-              color: hasVal ? 'var(--text-primary)' : '#cbd5e1',
+              color: hasVal ? 'var(--text-primary)' : 'var(--ink-4)',
               background: hasVal ? config.bg : 'transparent',
             }}
           >
-            <div>{val ?? '—'}</div>
+            <div>{val ?? '-'}</div>
             {unit && hasVal && <div style={{ fontSize: '0.68rem', opacity: 0.5 }}>{unit}</div>}
           </td>
         );
@@ -230,9 +230,9 @@ export function DataComparisonRow({
 export function DataComparisonTableHeader({ types }: { types: DataSourceType[] }) {
   return (
     <thead>
-      <tr style={{ borderBottom: '2px solid #e2e8f0' }}>
+      <tr style={{ borderBottom: '2px solid var(--border)' }}>
         <th style={{ textAlign: 'left', padding: '0.6rem 0.5rem', minWidth: 160 }}>
-          <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Metric</span>
+          <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--ink-3)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Metric</span>
         </th>
         {types.map(t => {
           const config = SOURCE_CONFIG[t];

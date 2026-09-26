@@ -1,4 +1,3 @@
-export { Header } from './Header';
+export { Header, Brand } from './Header';
 export { Footer } from './Footer';
-export { Breadcrumbs } from './Breadcrumbs';
-export { Layout } from './Layout';
+export { StatusBanner } from './StatusBanner';

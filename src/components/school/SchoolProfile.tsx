@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { Link, useParams, useLocation } from 'react-router-dom';
 import { api } from '../../core/services/api';
 import type { SchoolRecord } from '../../modules/school/types';
 import { getConfidence, getCompositeScore, SCORING_VERSION } from '../../core/utils/scoring';
@@ -27,11 +27,12 @@ import {
   MessageSquare,
   BarChart3,
   ExternalLink,
-  ChevronRight,
   Check,
   X,
   HelpCircle,
 } from 'lucide-react';
+import { normalizeSchool } from '../../modules/school/normalize';
+import { Breadcrumbs, EmptyState } from '../../ui';
 
 const TAB_MAP: Record<string, string> = {
   overview: 'overview',
@@ -67,7 +68,6 @@ interface Props {
 
 export function SchoolProfile({ schoolId: propId }: Props) {
   const params = useParams();
-  const navigate = useNavigate();
   const location = useLocation();
   const urlId = params.id || new URLSearchParams(location.search).get('id');
   const schoolId = propId || urlId || '';
@@ -85,15 +85,25 @@ export function SchoolProfile({ schoolId: propId }: Props) {
   const [following, setFollowing] = useState(false);
   const [showShareToast, setShowShareToast] = useState(false);
   const [showCheckIn, setShowCheckIn] = useState(false);
+  const sectionNav = useRef<HTMLElement>(null);
+
+  // On narrow screens the section nav is a horizontal strip; keep the current section in view.
+  useEffect(() => {
+    const nav = sectionNav.current;
+    const current = nav?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (nav && current && nav.scrollWidth > nav.clientWidth) {
+      nav.scrollLeft = current.offsetLeft - nav.offsetLeft - (nav.clientWidth - current.offsetWidth) / 2;
+    }
+  }, [activeTab, loading]);
 
   useEffect(() => {
     if (!schoolId) { setLoading(false); return; }
     setLoading(true);
     api.getRecord('school', schoolId).then((res: any) => {
-      setSchool(res.record || res || null);
+      setSchool(normalizeSchool(res.record || res));
       setLoading(false);
     }).catch(() => {
-      setError('Failed to load school data');
+      setError('not-found');
       setLoading(false);
     });
   }, [schoolId]);
@@ -112,7 +122,7 @@ export function SchoolProfile({ schoolId: propId }: Props) {
     if (!school) return [];
     const base = {
       scoringVersion: SCORING_VERSION,
-      methodologyUrl: '/methodology',
+      methodologyUrl: '/schools/methodology',
     };
     return [
       {
@@ -266,14 +276,10 @@ export function SchoolProfile({ schoolId: propId }: Props) {
 
   const handleShare = async () => {
     if (!school) return;
-    const text = `${school.titleHindi} — PIN ${school.location.pinCode} | Ground Truth: ${school.groundTruthScore}/100 | ${window.location.href}`;
+    const text = `${school.titleHindi} · PIN ${school.location.pinCode} | Ground Truth: ${school.groundTruthScore}/100 | ${window.location.href}`;
     try { await navigator.clipboard.writeText(text); } catch {}
     setShowShareToast(true);
     setTimeout(() => setShowShareToast(false), 2000);
-  };
-
-  const navigateToTab = (tab: string) => {
-    navigate(`/schools/${schoolId}/${tab}`);
   };
 
   if (loading) return (
@@ -283,36 +289,39 @@ export function SchoolProfile({ schoolId: propId }: Props) {
   );
 
   if (error || !school) return (
-    <div style={{ padding: '4rem', textAlign: 'center' }}>
-      <p style={{ color: '#ef4444', marginBottom: '1rem' }}>{error || 'School not found'}</p>
-      <button onClick={() => navigate('/schools')} className="btn btn-primary">Back to Schools</button>
+    <div className="page-narrow" style={{ margin: '0 auto' }}>
+      <Breadcrumbs items={[{ label: 'Schools', to: '/schools' }, { label: 'Not found' }]} />
+      <div className="card" style={{ marginTop: 'var(--s-4)' }}>
+        <EmptyState
+          icon={GraduationCap}
+          title="We could not find that school"
+          text={`No school with the reference "${schoolId}" is in our records. Search by name, PIN code or UDISE code instead.`}
+          action={<Link to="/schools/search" className="btn btn-primary">Search schools</Link>}
+        />
+      </div>
     </div>
   );
 
   return (
-    <div style={{ background: '#f8fafc', minHeight: '100vh' }}>
+    <div>
       {showShareToast && (
-        <div style={{ position: 'fixed', bottom: 20, right: 20, background: '#0f2d59', color: '#fff', padding: '0.6rem 1rem', borderRadius: 8, fontSize: '0.8rem', zIndex: 50 }}>
+        <div style={{ position: 'fixed', bottom: 20, right: 20, background: 'var(--brand)', color: 'var(--on-solid)', padding: '0.6rem 1rem', borderRadius: 8, fontSize: '0.8rem', zIndex: 50 }}>
           Link copied!
         </div>
       )}
 
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '1rem 1.25rem 0' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem' }}>
-          <div style={{ fontSize: '0.78rem', color: '#64748b', display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
-            <span style={{ cursor: 'pointer' }} onClick={() => navigate('/schools')}>Schools</span>
-            <ChevronRight size={12} />
-            <span>{school.titleEnglish || school.titleHindi}</span>
-          </div>
+          <Breadcrumbs items={[{ label: 'Schools', to: '/schools' }, { label: school.titleEnglish || school.titleHindi }]} />
           <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <button onClick={() => setFollowing(v => !v)} style={{ padding: '0.45rem 0.9rem', borderRadius: 8, border: '1px solid #e2e8f0', background: following ? '#dcfce7' : '#fff', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
-              <Heart size={14} fill={following ? '#ef4444' : 'none'} style={{ color: following ? '#ef4444' : 'inherit' }} />
+            <button onClick={() => setFollowing(v => !v)} style={{ padding: '0.45rem 0.9rem', borderRadius: 8, border: '1px solid var(--border)', background: following ? 'var(--good-soft)' : 'var(--surface)', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
+              <Heart size={14} fill={following ? '#ef4444' : 'none'} style={{ color: following ? 'var(--bad)' : 'inherit' }} />
               {following ? 'Following' : 'Follow'}
             </button>
-            <button onClick={handleShare} style={{ padding: '0.45rem 0.9rem', borderRadius: 8, border: '1px solid #e2e8f0', background: '#fff', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
+            <button onClick={handleShare} style={{ padding: '0.45rem 0.9rem', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface)', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
               <Share2 size={14} /> Share
             </button>
-            <button onClick={() => setShowCheckIn(v => !v)} style={{ padding: '0.45rem 0.9rem', borderRadius: 8, border: 'none', background: '#0f2d59', color: '#fff', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
+            <button onClick={() => setShowCheckIn(v => !v)} style={{ padding: '0.45rem 0.9rem', borderRadius: 8, border: 'none', background: 'var(--brand)', color: 'var(--on-solid)', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
               <CheckCircle2 size={14} /> Check-in
             </button>
           </div>
@@ -325,36 +334,41 @@ export function SchoolProfile({ schoolId: propId }: Props) {
         </div>
       )}
 
-      <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem 2rem', display: 'flex', gap: '1.25rem', alignItems: 'flex-start' }}>
-        <aside style={{ width: 250, flexShrink: 0, position: 'sticky', top: 88, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <div style={{ background: '#fff', border: '1px solid #eef2f7', borderRadius: 12, padding: '0.75rem', boxShadow: '0 1px 3px rgba(0,0,0,.04)' }}>
-            <button onClick={() => navigate('/schools')} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.75rem', borderRadius: 8, border: '1px solid #e2e8f0', background: '#fff', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', marginBottom: '0.75rem' }}>
-              <ArrowLeft size={14} /> All Schools
-            </button>
-            <div style={{ display: 'grid', gap: '2px' }}>
-              {Object.entries(TAB_LABELS).map(([key, { label, icon: Icon }]) => (
-                <button
+      <div className="sd-layout" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 0 2rem', display: 'flex', gap: '1.25rem', alignItems: 'flex-start' }}>
+        <aside className="sd-aside" style={{ width: 250, flexShrink: 0, position: 'sticky', top: 88, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '0.75rem', boxShadow: '0 1px 3px rgba(0,0,0,.04)' }}>
+            <Link to={`/schools?pin=${school.location.pinCode}`} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 0.75rem', borderRadius: 8, border: '1px solid var(--border)', color: 'var(--ink)', textDecoration: 'none', background: 'var(--surface)', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', marginBottom: '0.75rem' }}>
+              <ArrowLeft size={14} aria-hidden="true" /> Schools in this PIN
+            </Link>
+            <nav ref={sectionNav} aria-label="School sections" style={{ display: 'grid', gap: '2px' }}>
+              {Object.entries(TAB_LABELS).map(([key, { label, icon: Icon }]) => {
+                const current = TAB_MAP[key] === activeTab;
+                return (
+                <Link
                   key={key}
-                  onClick={() => navigateToTab(key)}
+                  to={key === 'overview' ? `/schools/${schoolId}` : `/schools/${schoolId}/${key}`}
+                  aria-current={current ? 'page' : undefined}
                   style={{
+                    textDecoration: 'none',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.55rem',
                     padding: '0.5rem 0.6rem',
                     borderRadius: 8,
                     cursor: 'pointer',
-                    background: activeTab === key ? '#eff6ff' : 'transparent',
-                    color: activeTab === key ? '#1d4ed8' : '#334155',
-                    fontWeight: activeTab === key ? 700 : 500,
+                    background: current ? 'var(--brand-soft)' : 'transparent',
+                    color: current ? 'var(--brand-ink)' : 'var(--ink-2)',
+                    fontWeight: current ? 700 : 500,
                     fontSize: '0.82rem',
-                    border: activeTab === key ? '1px solid #dbeafe' : '1px solid transparent',
+                    border: current ? '1px solid var(--brand-line)' : '1px solid transparent',
                     textAlign: 'left',
                   }}
                 >
-                  <Icon size={15} /> {label}
-                </button>
-              ))}
-            </div>
+                  <Icon size={15} aria-hidden="true" /> {label}
+                </Link>
+                );
+              })}
+            </nav>
           </div>
         </aside>
 
@@ -370,23 +384,25 @@ export function SchoolProfile({ schoolId: propId }: Props) {
 
 function SchoolHeaderCard({ school, composite, conf }: { school: SchoolRecord; composite: number | null; conf: string }) {
   return (
-    <div style={{ background: '#fff', border: '1px solid #eef2f7', borderRadius: 12, padding: '1rem', display: 'flex', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,.04)', flexWrap: 'wrap' }}>
-      <div style={{ width: 140, height: 105, borderRadius: 10, overflow: 'hidden', background: '#cbd5e1', flexShrink: 0, position: 'relative' }}>
-        <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=400&q=80" alt="school" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+    <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: '1rem', display: 'flex', gap: '1rem', boxShadow: '0 1px 3px rgba(0,0,0,.04)', flexWrap: 'wrap' }}>
+      <div style={{ width: 140, height: 105, borderRadius: 10, overflow: 'hidden', background: 'var(--border-strong)', flexShrink: 0, position: 'relative' }}>
+        <div style={{ width: '100%', height: '100%', display: 'grid', placeItems: 'center', color: 'var(--brand-ink)', background: 'var(--brand-soft)' }} aria-hidden="true">
+          <GraduationCap size={40} />
+        </div>
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <h2 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>{school.titleHindi || school.titleEnglish}</h2>
-          {school.groundTruthScore >= 70 && <span style={{ fontSize: '0.62rem', background: '#dcfce7', color: '#166534', padding: '2px 7px', borderRadius: 999, fontWeight: 800, border: '1px solid #bbf7d0' }}>● Verified</span>}
+          <h1 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>{school.titleEnglish || school.titleHindi}</h1>
+          {school.groundTruthScore >= 70 && <span style={{ fontSize: '0.62rem', background: 'var(--good-soft)', color: 'var(--good)', padding: '2px 7px', borderRadius: 999, fontWeight: 800, border: '1px solid var(--good-line)' }}>● Verified</span>}
         </div>
-        <div style={{ fontSize: '0.74rem', color: '#64748b', marginTop: '0.25rem', display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
+        <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', marginTop: '0.25rem', display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
           <MapPin size={12} /> {school.location.district}, {school.location.state} – {school.location.pinCode}
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.4rem 0.9rem', marginTop: '0.6rem', fontSize: '0.72rem' }}>
-          <span style={{ color: '#64748b' }}><strong style={{ color: '#0f172a' }}>UDISE:</strong> {school.udiseCode}</span>
-          <span style={{ color: '#64748b' }}><strong style={{ color: '#0f172a' }}>Level:</strong> {school.schoolLevel}</span>
-          <span style={{ color: '#64748b' }}><strong style={{ color: '#0f172a' }}>Management:</strong> {school.managementType}</span>
-          <span style={{ color: '#64748b' }}><strong style={{ color: '#0f172a' }}>Students:</strong> {school.officialStudentCount ?? '—'}</span>
+          <span style={{ color: 'var(--ink-3)' }}><strong style={{ color: 'var(--ink)' }}>UDISE:</strong> {school.udiseCode}</span>
+          <span style={{ color: 'var(--ink-3)' }}><strong style={{ color: 'var(--ink)' }}>Level:</strong> {school.schoolLevel}</span>
+          <span style={{ color: 'var(--ink-3)' }}><strong style={{ color: 'var(--ink)' }}>Management:</strong> {school.managementType}</span>
+          <span style={{ color: 'var(--ink-3)' }}><strong style={{ color: 'var(--ink)' }}>Students:</strong> {school.officialStudentCount ?? '-'}</span>
         </div>
       </div>
     </div>
@@ -402,7 +418,7 @@ function SchoolHealthScoreSection({ school, dimensions, composite, conf }: { sch
         compositeScore={composite}
         compositeStatus={compositeStatus}
         scoringVersion={SCORING_VERSION}
-        methodologyUrl="/methodology"
+        methodologyUrl="/schools/methodology"
       />
       <ProvenanceBar
         observedAt={school.lastCheckInDate?.slice(0, 10) || new Date().toISOString().slice(0, 10)}
@@ -454,13 +470,13 @@ function OverviewTab({ school, dimensions }: { school: SchoolRecord; dimensions:
             { label: 'UDISE Code', value: school.udiseCode },
             { label: 'School Level', value: school.schoolLevel },
             { label: 'Management', value: school.managementType },
-            { label: 'Students', value: school.officialStudentCount ?? '—' },
-            { label: 'Teachers', value: school.officialTeacherCount ?? '—' },
+            { label: 'Students', value: school.officialStudentCount ?? '-' },
+            { label: 'Teachers', value: school.officialTeacherCount ?? '-' },
             { label: 'PTR', value: '28:1' },
           ].map(item => (
-            <div key={item.label} style={{ background: '#f8fafc', borderRadius: 8, padding: '0.6rem 0.75rem' }}>
-              <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>{item.label}</div>
-              <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a', marginTop: '0.15rem' }}>{item.value}</div>
+            <div key={item.label} style={{ background: 'var(--surface-2)', borderRadius: 8, padding: '0.6rem 0.75rem' }}>
+              <div style={{ fontSize: '0.65rem', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.15rem' }}>{item.value}</div>
             </div>
           ))}
         </div>
@@ -478,14 +494,14 @@ function OverviewTab({ school, dimensions }: { school: SchoolRecord; dimensions:
       >
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.75rem', marginTop: '0.5rem' }}>
           {[
-            { label: 'Teacher Present', value: school.metrics.teacherPresent === 'yes' ? <span style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={14} /> Yes</span> : school.metrics.teacherPresent === 'no' ? <span style={{ color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><X size={14} /> No</span> : <span style={{ color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><HelpCircle size={14} /> Not Sure</span> },
-            { label: 'Toilet Usable', value: school.metrics.toiletUsable === 'yes' ? <span style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={14} /> Usable</span> : school.metrics.toiletUsable === 'no' ? <span style={{ color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><X size={14} /> Not Usable</span> : <span style={{ color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><HelpCircle size={14} /> Not Sure</span> },
-            { label: 'MDM Served', value: school.metrics.mdmServed === 'yes' ? <span style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={14} /> Served</span> : school.metrics.mdmServed === 'no' ? <span style={{ color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><X size={14} /> Not Served</span> : <span style={{ color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><HelpCircle size={14} /> Not Sure</span> },
+            { label: 'Teacher Present', value: school.metrics.teacherPresent === 'yes' ? <span style={{ color: 'var(--good)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={14} /> Yes</span> : school.metrics.teacherPresent === 'no' ? <span style={{ color: 'var(--bad)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><X size={14} /> No</span> : <span style={{ color: 'var(--warn)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><HelpCircle size={14} /> Not Sure</span> },
+            { label: 'Toilet Usable', value: school.metrics.toiletUsable === 'yes' ? <span style={{ color: 'var(--good)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={14} /> Usable</span> : school.metrics.toiletUsable === 'no' ? <span style={{ color: 'var(--bad)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><X size={14} /> Not Usable</span> : <span style={{ color: 'var(--warn)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><HelpCircle size={14} /> Not Sure</span> },
+            { label: 'MDM Served', value: school.metrics.mdmServed === 'yes' ? <span style={{ color: 'var(--good)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={14} /> Served</span> : school.metrics.mdmServed === 'no' ? <span style={{ color: 'var(--bad)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><X size={14} /> Not Served</span> : <span style={{ color: 'var(--warn)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><HelpCircle size={14} /> Not Sure</span> },
             { label: 'Ground Score', value: `${school.groundTruthScore}/100` },
           ].map(item => (
-            <div key={item.label} style={{ background: '#f5f3ff', borderRadius: 'var(--radius-control)', padding: '0.6rem 0.75rem' }}>
-              <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>{item.label}</div>
-              <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a', marginTop: '0.15rem' }}>{item.value}</div>
+            <div key={item.label} style={{ background: 'var(--brand-soft)', borderRadius: 'var(--radius-control)', padding: '0.6rem 0.75rem' }}>
+              <div style={{ fontSize: '0.65rem', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.15rem' }}>{item.value}</div>
             </div>
           ))}
         </div>
@@ -502,7 +518,7 @@ function InfrastructureTab({ school }: { school: SchoolRecord }) {
       <DataSourceSection type="official" title="UDISE+ Infrastructure Data" lastUpdated="2024-03-15" source={{ name: 'UDISE+', type: 'A' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', marginTop: '0.5rem' }}>
           <thead>
-            <tr style={{ textAlign: 'left', color: '#64748b', borderBottom: '2px solid #e2e8f0' }}>
+            <tr style={{ textAlign: 'left', color: 'var(--ink-3)', borderBottom: '2px solid var(--border)' }}>
               <th style={{ padding: '0.5rem' }}>Facility</th>
               <th style={{ padding: '0.5rem' }}>UDISE Claim</th>
               <th style={{ padding: '0.5rem' }}>Community Report</th>
@@ -511,16 +527,16 @@ function InfrastructureTab({ school }: { school: SchoolRecord }) {
           </thead>
           <tbody>
             {[
-              { item: 'Toilets', udise: <span style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={13} /> Functional</span>, community: school.metrics.toiletUsable === 'yes' ? <span style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={13} /> Usable</span> : <span style={{ color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><X size={13} /> Not usable</span>, match: school.metrics.toiletUsable === 'yes' },
-              { item: 'Water', udise: <span style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={13} /> RO Available</span>, community: <span style={{ color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><AlertTriangle size={13} /> Taps dry recently</span>, match: null },
-              { item: 'Electricity', udise: <span style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={13} /> Connected</span>, community: school.metrics.classroomReady === 'yes' ? <span style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={13} /> Fans working</span> : <span style={{ color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><X size={13} /> Some broken</span>, match: school.metrics.classroomReady === 'yes' },
-              { item: 'Classrooms', udise: <span style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={13} /> All ready</span>, community: school.metrics.classroomReady === 'yes' ? <span style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={13} /> Ready</span> : <span style={{ color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><X size={13} /> Not ready</span>, match: school.metrics.classroomReady === 'yes' },
-              { item: 'Boundary Wall', udise: <span style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={13} /> Present</span>, community: '—', match: true },
+              { item: 'Toilets', udise: <span style={{ color: 'var(--good)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={13} /> Functional</span>, community: school.metrics.toiletUsable === 'yes' ? <span style={{ color: 'var(--good)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={13} /> Usable</span> : <span style={{ color: 'var(--bad)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><X size={13} /> Not usable</span>, match: school.metrics.toiletUsable === 'yes' },
+              { item: 'Water', udise: <span style={{ color: 'var(--good)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={13} /> RO Available</span>, community: <span style={{ color: 'var(--warn)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><AlertTriangle size={13} /> Taps dry recently</span>, match: null },
+              { item: 'Electricity', udise: <span style={{ color: 'var(--good)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={13} /> Connected</span>, community: school.metrics.classroomReady === 'yes' ? <span style={{ color: 'var(--good)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={13} /> Fans working</span> : <span style={{ color: 'var(--bad)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><X size={13} /> Some broken</span>, match: school.metrics.classroomReady === 'yes' },
+              { item: 'Classrooms', udise: <span style={{ color: 'var(--good)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={13} /> All ready</span>, community: school.metrics.classroomReady === 'yes' ? <span style={{ color: 'var(--good)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={13} /> Ready</span> : <span style={{ color: 'var(--bad)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><X size={13} /> Not ready</span>, match: school.metrics.classroomReady === 'yes' },
+              { item: 'Boundary Wall', udise: <span style={{ color: 'var(--good)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}><Check size={13} /> Present</span>, community: '-', match: true },
             ].map(r => (
-              <tr key={r.item} style={{ borderBottom: '1px solid #f1f5f9' }}>
+              <tr key={r.item} style={{ borderBottom: '1px solid var(--border)' }}>
                 <td style={{ padding: '0.6rem 0.5rem', fontWeight: 600 }}>{r.item}</td>
                 <td style={{ padding: '0.6rem 0.5rem' }}>{r.udise}</td>
-                <td style={{ padding: '0.6rem 0.5rem', fontWeight: 700, color: r.match === false ? '#ef4444' : r.match === null ? '#f59e0b' : '#10b981' }}>{r.community}</td>
+                <td style={{ padding: '0.6rem 0.5rem', fontWeight: 700, color: r.match === false ? 'var(--bad)' : r.match === null ? 'var(--warn)' : 'var(--good)' }}>{r.community}</td>
                 <td style={{ padding: '0.6rem 0.5rem' }}>
                   {r.match === true && <span className="badge badge-success" style={{ fontSize: '0.72rem' }}><Check size={10} /> Match</span>}
                   {r.match === false && <span className="badge badge-danger" style={{ fontSize: '0.72rem' }}><AlertTriangle size={10} /> Mismatch</span>}
@@ -541,14 +557,14 @@ function StaffingTab({ school }: { school: SchoolRecord }) {
       <DataSourceSection type="official" title="Teacher Staffing Data" lastUpdated="2024-03-15" source={{ name: 'UDISE+', type: 'A' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.75rem', marginTop: '0.5rem' }}>
           {[
-            { label: 'Total Teachers', value: school.officialTeacherCount ?? '—' },
+            { label: 'Total Teachers', value: school.officialTeacherCount ?? '-' },
             { label: 'Student-Teacher Ratio', value: '28:1' },
             { label: 'Pupil-Teacher Ratio', value: '30:1' },
             { label: 'Female Teachers', value: '60%' },
           ].map(item => (
-            <div key={item.label} style={{ background: '#f8fafc', borderRadius: 'var(--radius-control)', padding: '0.6rem 0.75rem' }}>
-              <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>{item.label}</div>
-              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginTop: '0.15rem' }}>{item.value}</div>
+            <div key={item.label} style={{ background: 'var(--surface-2)', borderRadius: 'var(--radius-control)', padding: '0.6rem 0.75rem' }}>
+              <div style={{ fontSize: '0.65rem', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.15rem' }}>{item.value}</div>
             </div>
           ))}
         </div>
@@ -566,9 +582,9 @@ function AttendanceTab({ school }: { school: SchoolRecord }) {
           { label: 'Teacher Attendance', value: '81%' },
           { label: 'Average Days Present', value: '185/200' },
         ].map(item => (
-          <div key={item.label} style={{ background: '#f8fafc', borderRadius: 'var(--radius-control)', padding: '0.6rem 0.75rem' }}>
-            <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>{item.label}</div>
-            <div style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginTop: '0.15rem' }}>{item.value}</div>
+          <div key={item.label} style={{ background: 'var(--surface-2)', borderRadius: 'var(--radius-control)', padding: '0.6rem 0.75rem' }}>
+            <div style={{ fontSize: '0.65rem', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
+            <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.15rem' }}>{item.value}</div>
           </div>
         ))}
       </div>
@@ -579,12 +595,12 @@ function AttendanceTab({ school }: { school: SchoolRecord }) {
 function MealsTab({ school }: { school: SchoolRecord }) {
   return (
     <div style={{ display: 'grid', gap: '1rem' }}>
-      <DataSourceSection type="official" title="Mid-Day Meal — Official" lastUpdated="2024-03-15" source={{ name: 'MDM Portal', type: 'A' }}>
+      <DataSourceSection type="official" title="Mid-Day Meal · Official" lastUpdated="2024-03-15" source={{ name: 'MDM Portal', type: 'A' }}>
         <p style={{ fontSize: '0.82rem', opacity: 0.7 }}>Meal served on {school.metrics.mdmServed === 'yes' ? 'reported school days' : 'select days'}.</p>
       </DataSourceSection>
-      <DataSourceSection type="community" title="Mid-Day Meal — Community Reports" lastUpdated={school.lastCheckInDate} source={{ name: `${school.totalCheckIns} Check-ins`, type: 'C' }} recordCount={school.totalCheckIns}>
+      <DataSourceSection type="community" title="Mid-Day Meal · Community Reports" lastUpdated={school.lastCheckInDate} source={{ name: `${school.totalCheckIns} Check-ins`, type: 'C' }} recordCount={school.totalCheckIns}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-          {school.metrics.mdmServed === 'yes' ? <CheckCircle2 size={24} style={{ color: '#10b981' }} /> : school.metrics.mdmServed === 'no' ? <X size={24} style={{ color: '#ef4444' }} /> : <AlertTriangle size={24} style={{ color: '#f59e0b' }} />}
+          {school.metrics.mdmServed === 'yes' ? <CheckCircle2 size={24} style={{ color: 'var(--good)' }} /> : school.metrics.mdmServed === 'no' ? <X size={24} style={{ color: 'var(--bad)' }} /> : <AlertTriangle size={24} style={{ color: 'var(--warn)' }} />}
           <span style={{ fontSize: '0.9rem', fontWeight: 700 }}>
             {school.metrics.mdmServed === 'yes' ? 'Meal confirmed served' : school.metrics.mdmServed === 'no' ? 'Meal NOT served' : 'Not confirmed'}
           </span>
@@ -603,9 +619,9 @@ function LearningTab({ school }: { school: SchoolRecord }) {
           { label: 'Math (Gr 3)', value: '55%' },
           { label: 'EVS (Gr 3)', value: '62%' },
         ].map(item => (
-          <div key={item.label} style={{ background: '#f8fafc', borderRadius: 'var(--radius-control)', padding: '0.6rem 0.75rem' }}>
-            <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>{item.label}</div>
-            <div style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginTop: '0.15rem' }}>{item.value}</div>
+          <div key={item.label} style={{ background: 'var(--surface-2)', borderRadius: 'var(--radius-control)', padding: '0.6rem 0.75rem' }}>
+            <div style={{ fontSize: '0.65rem', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
+            <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.15rem' }}>{item.value}</div>
           </div>
         ))}
       </div>
@@ -618,8 +634,8 @@ function GroundTruthTab({ school }: { school: SchoolRecord }) {
     <div style={{ display: 'grid', gap: '1rem' }}>
       <DataSourceSection
         type="verified"
-        title="Ground Truth — Citizen Check-ins"
-        titleHi="जमीनी हकीकत — नागरिक जांच"
+        title="Ground Truth · Citizen Check-ins"
+        titleHi="जमीनी हकीकत · नागरिक जांच"
         source={{ name: `${school.totalCheckIns} Citizen Reports`, type: 'C' }}
         lastUpdated={school.lastCheckInDate}
         confidence={school.confidenceLevel}
@@ -630,12 +646,12 @@ function GroundTruthTab({ school }: { school: SchoolRecord }) {
           {[
             { label: 'Ground Score', value: `${school.groundTruthScore}/100` },
             { label: 'Check-in Count', value: school.totalCheckIns },
-            { label: 'Last Check-in', value: school.lastCheckInDate ? new Date(school.lastCheckInDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—' },
+            { label: 'Last Check-in', value: school.lastCheckInDate ? new Date(school.lastCheckInDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '-' },
             { label: 'Confidence', value: school.confidenceLevel },
           ].map(item => (
-            <div key={item.label} style={{ background: '#fffbeb', borderRadius: 8, padding: '0.6rem 0.75rem' }}>
-              <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 600 }}>{item.label}</div>
-              <div style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginTop: '0.15rem' }}>{item.value}</div>
+            <div key={item.label} style={{ background: 'var(--warn-soft)', borderRadius: 8, padding: '0.6rem 0.75rem' }}>
+              <div style={{ fontSize: '0.65rem', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
+              <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.15rem' }}>{item.value}</div>
             </div>
           ))}
         </div>
@@ -649,7 +665,7 @@ function EvidenceTab({ school }: { school: SchoolRecord }) {
   return (
     <DataSourceSection type="verified" title="Photo & Video Evidence" lastUpdated={school.lastCheckInDate} source={{ name: 'Citizen Submissions', type: 'C' }} recordCount={school.reality?.evidenceCount || 0}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem', marginTop: '0.5rem' }}>
-        <div style={{ background: '#f8fafc', borderRadius: 8, padding: '0.75rem', textAlign: 'center' }}>
+        <div style={{ background: 'var(--surface-2)', borderRadius: 8, padding: '0.75rem', textAlign: 'center' }}>
           <Camera size={24} style={{ opacity: 0.4, marginBottom: '0.4rem' }} />
           <div style={{ fontSize: '0.85rem', fontWeight: 700 }}>{school.reality?.evidenceCount || 0}</div>
           <div style={{ fontSize: '0.68rem', opacity: 0.6 }}>Photos submitted</div>
@@ -671,9 +687,9 @@ function TimelineTab({ school }: { school: SchoolRecord }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
         {events.map((e, i) => (
           <div key={i} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: e.type === 'official' ? '#2563eb' : '#7c3aed', marginTop: 6, flexShrink: 0 }} />
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: e.type === 'official' ? 'var(--brand)' : 'var(--viz-4)', marginTop: 6, flexShrink: 0 }} />
             <div>
-              <div style={{ fontSize: '0.65rem', color: '#64748b' }}>{new Date(e.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+              <div style={{ fontSize: '0.65rem', color: 'var(--ink-3)' }}>{new Date(e.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
               <div style={{ fontSize: '0.82rem', fontWeight: 600 }}>{e.event}</div>
             </div>
           </div>
@@ -703,7 +719,7 @@ function CompareTab({ school }: { school: SchoolRecord }) {
     <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center' }}>
       <BarChart3 size={32} style={{ opacity: 0.3, marginBottom: '0.5rem' }} />
       <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>
-        Compare this school with other schools on the <a href="/schools/compare" style={{ color: '#2563eb' }}>Schools Compare page</a>.
+        <Link to={`/compare?type=schools&ids=${school.id}`} style={{ color: 'var(--brand-ink)' }}>Compare this school</Link> with others in the same PIN code.
       </p>
     </div>
   );

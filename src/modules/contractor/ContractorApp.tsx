@@ -17,6 +17,7 @@ import { INDIAN_STATES, getCitiesByState, getStateById, getCityById, findStateAn
 import { Contractor, WorkOrder, RoadDefectReport, WardData, Language, WhatsAppCardData } from './types';
 import { getTranslation } from './translations';
 import { generateMockContractorDataset } from './data/mockContractorDataset';
+import { apiUrl } from '../../core/services/api';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'claim-reality' | 'pincode' | 'leaderboard' | 'map' | 'action' | 'ai-audit' | 'compare'>('claim-reality');
@@ -88,10 +89,10 @@ export default function App() {
     let hasRealData = false;
     try {
       const [cRes, wRes, warRes, dRes] = await Promise.all([
-        fetch('/api/contractors'),
-        fetch('/api/work-orders'),
-        fetch('/api/wards'),
-        fetch('/api/defects'),
+        fetch(apiUrl('/api/contractors')),
+        fetch(apiUrl('/api/work-orders')),
+        fetch(apiUrl('/api/wards')),
+        fetch(apiUrl('/api/defects')),
       ]);
       if (cRes.ok) { const j = await cRes.json(); if (Array.isArray(j) && j.length) { setContractors(j); hasRealData = true; } }
       if (wRes.ok) { const j = await wRes.json(); if (Array.isArray(j) && j.length) setWorkOrders(j); }
@@ -170,7 +171,7 @@ export default function App() {
   const activeDlpBreachesCount = contractors.reduce((acc, c) => acc + c.activeDlpViolationsCount, 0);
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] text-[#1A1A1A] flex flex-col font-sans selection:bg-[#D43F33] selection:text-white">
+    <div className="stack contractor-app" style={{ gap: 'var(--s-6)' }}>
       
       {/* Top Navigation */}
       <Navbar
@@ -194,7 +195,7 @@ export default function App() {
       />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <div className="stack" style={{ gap: 'var(--s-6)' }}>
         
         {/* Executive Metrics Overview */}
         <MetricsOverview
@@ -289,29 +290,9 @@ export default function App() {
           />
         )}
 
-      </main>
+      </div>
 
-      {/* Footer */}
-      <footer className="border-t-2 border-[#1A1A1A] bg-white py-6 text-center text-xs font-mono text-[#1A1A1A]">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="font-bold uppercase">
-            {getTranslation(language, 'brandTitle')} • {getTranslation(language, 'brandSubtitle')}
-          </p>
-          <div className="flex items-center space-x-4 text-xs font-bold uppercase">
-            <button onClick={() => setIsAboutModalOpen(true)} className="hover:text-[#D43F33] transition-colors underline decoration-1">
-              IRC SP:98 Standards
-            </button>
-            <span>•</span>
-            <button onClick={() => setActiveTab('action')} className="hover:text-[#D43F33] transition-colors underline decoration-1">
-              RTI Section 6(1)
-            </button>
-            <span>•</span>
-            <button onClick={() => setActiveTab('claim-reality')} className="hover:text-[#D43F33] transition-colors underline decoration-1">
-              {getTranslation(language, 'navClaimsVsReality')}
-            </button>
-          </div>
-        </div>
-      </footer>
+
 
       {/* WhatsApp Share Card Modal */}
       <WhatsAppShareModal

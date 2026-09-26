@@ -145,22 +145,22 @@ export const AnonymousPhotoDropModal: React.FC<AnonymousPhotoDropModalProps> = (
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in">
-      <div className="bg-[#FAFAFA] border-2 border-[#1A1A1A] max-w-xl w-full max-h-[90vh] flex flex-col shadow-2xl">
+      <div className="bg-surface-2 border rounded-[10px] border-line max-w-xl w-full max-h-[90vh] flex flex-col shadow-lg">
         
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b-2 border-[#1A1A1A] bg-white">
+        <div className="flex items-center justify-between p-4 border-b border-line bg-surface">
           <div className="flex items-center gap-2">
-            <span className="bg-[#D43F33] text-white p-1.5 font-mono text-xs font-bold flex items-center gap-1.5">
+            <span className="bg-[var(--bad-solid)] text-white p-1.5 text-xs font-bold flex items-center gap-1.5">
               <Camera className="w-3.5 h-3.5" />
               <span>{getTranslation(language, 'anonymousDropTitle')}</span>
             </span>
-            <span className="bg-emerald-100 text-emerald-800 border border-emerald-400 text-[10px] font-mono font-bold px-2 py-0.5 uppercase">
+            <span className="bg-emerald-100 text-good border rounded-[10px] border-emerald-400 text-xs font-bold px-2 py-0.5">
               0 Login • 100% Anonymous
             </span>
           </div>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-black/5 text-[#1A1A1A] transition-colors"
+            className="p-1 hover:bg-surface-3 text-ink transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -169,16 +169,16 @@ export const AnonymousPhotoDropModal: React.FC<AnonymousPhotoDropModalProps> = (
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 overflow-y-auto space-y-4">
           
-          <div className="bg-white border border-black/15 p-3 flex items-start gap-2.5">
-            <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
-            <p className="font-mono text-xs text-[#1A1A1A] leading-relaxed">
+          <div className="bg-surface border rounded-[10px] border-line p-3 flex items-start gap-2.5">
+            <ShieldCheck className="w-5 h-5 text-good shrink-0 mt-0.5" />
+            <p className="text-xs text-ink leading-relaxed">
               {getTranslation(language, 'anonymousDropSubtitle')}
             </p>
           </div>
 
           {/* Quick Presets */}
           <div>
-            <label className="block text-xs font-mono font-bold uppercase text-[#1A1A1A] mb-2">
+            <label className="block text-xs font-bold text-ink mb-2">
               {getTranslation(language, 'photoDropPreset')}
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -187,14 +187,14 @@ export const AnonymousPhotoDropModal: React.FC<AnonymousPhotoDropModalProps> = (
                   type="button"
                   key={preset.id}
                   onClick={() => handleSelectPreset(preset)}
-                  className={`p-2.5 text-left border text-xs font-mono transition-all cursor-pointer ${
-                    selectedPreset === preset.id
-                      ? 'bg-[#1A1A1A] text-white border-[#1A1A1A] font-bold shadow-xs'
-                      : 'bg-white text-[#1A1A1A] border-black/20 hover:border-black'
-                  }`}
+                  className={`p-2.5 text-left border rounded-[10px] text-xs transition-all cursor-pointer ${
+ selectedPreset === preset.id
+ ? 'bg-[var(--surface-inverse)] text-white border-line font-bold shadow-xs'
+ : 'bg-surface text-ink border-line hover:border-black'
+ }`}
                 >
                   <span className="block truncate">{preset.title}</span>
-                  <span className="text-[10px] opacity-70 block mt-0.5 font-normal">
+                  <span className="text-xs opacity-70 block mt-0.5 font-normal">
                     PIN {preset.pincode} • {preset.defectType}
                   </span>
                 </button>
@@ -203,29 +203,29 @@ export const AnonymousPhotoDropModal: React.FC<AnonymousPhotoDropModalProps> = (
           </div>
 
           {/* Photo Preview / Dropzone */}
-          <div className="border-2 border-dashed border-[#1A1A1A] bg-white p-4 text-center">
+          <div className="border rounded-[10px] border-dashed border-line bg-surface p-4 text-center">
             <img 
               src={customPhotoUrl || presets.find(p => p.id === selectedPreset)?.photoUrl} 
               alt="Evidence preview" 
-              className="w-full h-36 object-cover border border-black/20 mb-2"
+              className="w-full h-36 object-cover border rounded-[10px] border-line mb-2"
             />
-            <div className="text-xs font-mono text-black/70 flex items-center justify-center gap-1.5">
-              <Camera className="w-4 h-4 text-[#D43F33]" />
+            <div className="text-xs text-ink-3 flex items-center justify-center gap-1.5">
+              <Camera className="w-4 h-4 text-bad" />
               <span>Timestamp Stamp & Geotag EXIF Verified</span>
             </div>
           </div>
 
           {/* Hierarchical Location: State then City */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-[#FAFAFA] border border-black/15 p-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-surface-2 border rounded-[10px] border-line p-3">
             <div>
-              <label className="block text-[11px] font-mono font-bold uppercase text-black/70 mb-1 flex items-center gap-1">
-                <Landmark className="w-3 h-3 text-[#1A1A1A]" />
+              <label className="block text-xs font-bold text-ink-3 mb-1 flex items-center gap-1">
+                <Landmark className="w-3 h-3 text-ink" />
                 <span>1. {getTranslation(language, 'selectState')}:</span>
               </label>
               <select
                 value={selectedStateId}
                 onChange={(e) => handleStateChange(e.target.value)}
-                className="w-full bg-white border-2 border-[#1A1A1A] px-2.5 py-1.5 text-xs font-mono font-bold text-[#1A1A1A]"
+                className="w-full bg-surface border rounded-[10px] border-line px-2.5 py-1.5 text-xs font-bold text-ink"
               >
                 {INDIAN_STATES.map((st) => (
                   <option key={st.id} value={st.id}>
@@ -236,14 +236,14 @@ export const AnonymousPhotoDropModal: React.FC<AnonymousPhotoDropModalProps> = (
             </div>
 
             <div>
-              <label className="block text-[11px] font-mono font-bold uppercase text-black/70 mb-1 flex items-center gap-1">
-                <Building2 className="w-3 h-3 text-[#D43F33]" />
+              <label className="block text-xs font-bold text-ink-3 mb-1 flex items-center gap-1">
+                <Building2 className="w-3 h-3 text-bad" />
                 <span>2. {getTranslation(language, 'selectCity')}:</span>
               </label>
               <select
                 value={selectedCityId}
                 onChange={(e) => handleCityChange(e.target.value)}
-                className="w-full bg-white border-2 border-[#1A1A1A] px-2.5 py-1.5 text-xs font-mono font-bold text-[#1A1A1A]"
+                className="w-full bg-surface border rounded-[10px] border-line px-2.5 py-1.5 text-xs font-bold text-ink"
               >
                 {availableCities.map((ct) => (
                   <option key={ct.id} value={ct.id}>
@@ -257,7 +257,7 @@ export const AnonymousPhotoDropModal: React.FC<AnonymousPhotoDropModalProps> = (
           {/* PIN Code & Location Input */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-[11px] font-mono font-bold uppercase text-black/70 mb-1">
+              <label className="block text-xs font-bold text-ink-3 mb-1">
                 PIN Code (Primary Key):
               </label>
               <input
@@ -266,12 +266,12 @@ export const AnonymousPhotoDropModal: React.FC<AnonymousPhotoDropModalProps> = (
                 maxLength={6}
                 value={pincode}
                 onChange={(e) => setPincode(e.target.value)}
-                className="w-full bg-white border-2 border-[#1A1A1A] px-3 py-2 text-xs font-mono font-bold text-[#1A1A1A]"
+                className="w-full bg-surface border rounded-[10px] border-line px-3 py-2 text-xs font-bold text-ink"
               />
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-[11px] font-mono font-bold uppercase text-black/70 mb-1">
+              <label className="block text-xs font-bold text-ink-3 mb-1">
                 {getTranslation(language, 'locationLandmark')}:
               </label>
               <input
@@ -279,20 +279,20 @@ export const AnonymousPhotoDropModal: React.FC<AnonymousPhotoDropModalProps> = (
                 required
                 value={locationName}
                 onChange={(e) => setLocationName(e.target.value)}
-                className="w-full bg-white border-2 border-[#1A1A1A] px-3 py-2 text-xs font-mono text-[#1A1A1A]"
+                className="w-full bg-surface border rounded-[10px] border-line px-3 py-2 text-xs text-ink"
               />
             </div>
           </div>
 
           {/* Defect Type Selection */}
           <div>
-            <label className="block text-[11px] font-mono font-bold uppercase text-black/70 mb-1">
+            <label className="block text-xs font-bold text-ink-3 mb-1">
               Defect Category:
             </label>
             <select
               value={defectType}
               onChange={(e) => setDefectType(e.target.value as DefectType)}
-              className="w-full bg-white border-2 border-[#1A1A1A] px-3 py-2 text-xs font-mono text-[#1A1A1A]"
+              className="w-full bg-surface border rounded-[10px] border-line px-3 py-2 text-xs text-ink"
             >
               <option value="Pothole Cluster">Pothole Cluster</option>
               <option value="Locked PHC / Clinic">Locked PHC / Primary Health Centre</option>
@@ -305,7 +305,7 @@ export const AnonymousPhotoDropModal: React.FC<AnonymousPhotoDropModalProps> = (
 
           {/* Description */}
           <div>
-            <label className="block text-[11px] font-mono font-bold uppercase text-black/70 mb-1">
+            <label className="block text-xs font-bold text-ink-3 mb-1">
               Ground Truth Notes / Evidence Summary:
             </label>
             <textarea
@@ -313,14 +313,14 @@ export const AnonymousPhotoDropModal: React.FC<AnonymousPhotoDropModalProps> = (
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-white border-2 border-[#1A1A1A] p-3 text-xs font-mono text-[#1A1A1A]"
+              className="w-full bg-surface border rounded-[10px] border-line p-3 text-xs text-ink"
             />
           </div>
 
           {/* Success Banner */}
           {success && (
-            <div className="p-3 bg-emerald-100 border-2 border-emerald-700 text-emerald-900 font-mono font-bold text-xs flex items-center gap-2">
-              <Check className="w-5 h-5 text-emerald-700" />
+            <div className="p-3 bg-emerald-100 border rounded-[10px] border-emerald-700 text-emerald-900 font-bold text-xs flex items-center gap-2">
+              <Check className="w-5 h-5 text-good" />
               <span>Ground truth evidence successfully added to public PIN ledger!</span>
             </div>
           )}
@@ -330,7 +330,7 @@ export const AnonymousPhotoDropModal: React.FC<AnonymousPhotoDropModalProps> = (
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#D43F33] hover:bg-[#B32E24] text-white py-3.5 text-xs font-bold uppercase tracking-tight flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
+              className="w-full bg-[var(--bad-solid)] hover:opacity-90 text-white py-3.5 text-xs font-bold tracking-tight flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
             >
               <Camera className="w-4 h-4" />
               <span>{isSubmitting ? 'Posting Evidence...' : getTranslation(language, 'submitGroundTruth')}</span>

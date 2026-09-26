@@ -16,27 +16,27 @@ export const QuarantineQueue: React.FC<QuarantineQueueProps> = ({
     <div style={{ display: 'grid', gap: '1.25rem' }}>
       <div style={{
         background: '#fffbebf',
-        border: '1px solid #fde68a',
+        border: '1px solid var(--warn-line)',
         borderRadius: 14,
         padding: '1rem 1.25rem',
         display: 'flex',
         alignItems: 'center',
         gap: '0.75rem',
         fontSize: '0.86rem',
-        color: '#b45309'
+        color: 'var(--warn)'
       }}>
-        <ShieldAlert size={22} style={{ flexShrink: 0, color: '#d97706' }} />
+        <ShieldAlert size={22} style={{ flexShrink: 0, color: 'var(--warn)' }} />
         <div>
           <strong>Suspicious Data Quarantine Policy:</strong> JantaX never automatically publishes suspicious dataset updates. Updates with confidence scores below 90%, schema anomalies, or high rejection rates are quarantined for human auditor review.
         </div>
       </div>
 
-      <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+      <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
         Quarantine & Human Review Queue ({quarantinedAlerts.length})
       </h3>
 
       {quarantinedAlerts.length === 0 ? (
-        <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: 12, padding: '1.25rem', textAlign: 'center', color: '#047857', fontWeight: 700 }}>
+        <div style={{ background: 'var(--good-soft)', border: '1px solid var(--good-line)', borderRadius: 12, padding: '1.25rem', textAlign: 'center', color: 'var(--good)', fontWeight: 700 }}>
           ✓ Quarantine queue clean. All active dataset syncs meet automated validation standards.
         </div>
       ) : (

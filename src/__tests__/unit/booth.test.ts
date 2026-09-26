@@ -31,7 +31,7 @@ describe('Booth / Electoral Roll Module — Unit & Integration Test Suite', () =
     expect(booth).toBeDefined();
     expect(booth?.stationNumber).toBe(42);
     expect(booth?.buildingName).toContain('Sarvodaya Kanya Vidyalaya');
-    expect(booth?.blo.name).toBe('Rakesh Sharma');
+    expect(booth?.blo.name).toBe('Booth level officer (sample 1)');
 
     const notFound = getBoothById('NONEXISTENT-BOOTH-999');
     expect(notFound).toBeUndefined();
@@ -53,7 +53,7 @@ describe('Booth / Electoral Roll Module — Unit & Integration Test Suite', () =
     expect(searchByPin.length).toBeGreaterThan(0);
     searchByPin.forEach((b) => expect(b.pinCode).toBe('110001'));
 
-    const searchByBlo = getAllBooths({ query: 'Rakesh' });
+    const searchByBlo = getAllBooths({ query: 'Booth level officer (sample 2)' });
     expect(searchByBlo.length).toBeGreaterThan(0);
   });
 

@@ -3,8 +3,8 @@ import type { Representative, MpladsWork } from '../types/mplads';
 export const MOCK_REPRESENTATIVES: Representative[] = [
   {
     id: 'REP-LS-DL-01',
-    name: 'Bansuri Swaraj',
-    nameHi: 'बांसुरी स्वराज',
+    name: 'Sample representative A',
+    nameHi: 'नमूना प्रतिनिधि A',
     house: 'Lok Sabha',
     constituencyName: 'New Delhi',
     constituencyNameHi: 'नई दिल्ली',
@@ -36,8 +36,8 @@ export const MOCK_REPRESENTATIVES: Representative[] = [
   },
   {
     id: 'REP-LS-MH-02',
-    name: 'Nitin Gadkari',
-    nameHi: 'नितिन गडकरी',
+    name: 'Sample representative B',
+    nameHi: 'नमूना प्रतिनिधि B',
     house: 'Lok Sabha',
     constituencyName: 'Nagpur',
     constituencyNameHi: 'नागपुर',
@@ -69,8 +69,8 @@ export const MOCK_REPRESENTATIVES: Representative[] = [
   },
   {
     id: 'REP-LS-KA-03',
-    name: 'Tejasvi Surya',
-    nameHi: 'तेजस्वी सूर्या',
+    name: 'Sample representative C',
+    nameHi: 'नमूना प्रतिनिधि C',
     house: 'Lok Sabha',
     constituencyName: 'Bangalore South',
     constituencyNameHi: 'बैंगलोर दक्षिण',
@@ -102,8 +102,8 @@ export const MOCK_REPRESENTATIVES: Representative[] = [
   },
   {
     id: 'REP-VS-UP-04',
-    name: 'Pramod Kumar Tiwari',
-    nameHi: 'प्रमोद कुमार तिवारी',
+    name: 'Sample representative D',
+    nameHi: 'नमूना प्रतिनिधि D',
     house: 'Vidhan Sabha',
     constituencyName: 'Rampur',
     constituencyNameHi: 'रामपुर',
@@ -139,7 +139,7 @@ export const MOCK_MPLADS_WORKS: MpladsWork[] = [
   {
     id: 'MPLAD-DL01-2025-001',
     representativeId: 'REP-LS-DL-01',
-    representativeName: 'Bansuri Swaraj',
+    representativeName: 'Sample representative A',
     workTitle: 'Installation of 50kL Solar Powered Drinking Water RO Plant in Lodhi Colony',
     workTitleHi: 'लोधी कॉलोनी में 50 केएल सौर ऊर्जा संचालित पेयजल आरओ प्लांट की स्थापना',
     sector: 'Drinking Water',
@@ -177,7 +177,7 @@ export const MOCK_MPLADS_WORKS: MpladsWork[] = [
   {
     id: 'MPLAD-DL01-2025-002',
     representativeId: 'REP-LS-DL-01',
-    representativeName: 'Bansuri Swaraj',
+    representativeName: 'Sample representative A',
     workTitle: 'Construction of Modern Digital Science Laboratory at Sarvodaya Kanya Vidyalaya',
     workTitleHi: 'सर्वोदय कन्या विद्यालय में आधुनिक डिजिटल विज्ञान प्रयोगशाला का निर्माण',
     sector: 'Education',
@@ -208,7 +208,7 @@ export const MOCK_MPLADS_WORKS: MpladsWork[] = [
   {
     id: 'MPLAD-DL01-2025-003',
     representativeId: 'REP-LS-DL-01',
-    representativeName: 'Bansuri Swaraj',
+    representativeName: 'Sample representative A',
     workTitle: 'Installation of 40 High-Mast LED Solar Lights in Connaught Place & Bengali Market Outer Periphery',
     workTitleHi: 'कनॉट प्लेस और बंगाली मार्केट के बाहरी परिधि में 40 हाई-मास्ट एलईडी सोलर लाइटों की स्थापना',
     sector: 'Electricity & Solar',
@@ -240,7 +240,7 @@ export const MOCK_MPLADS_WORKS: MpladsWork[] = [
   {
     id: 'MPLAD-MH02-2025-010',
     representativeId: 'REP-LS-MH-02',
-    representativeName: 'Nitin Gadkari',
+    representativeName: 'Sample representative B',
     workTitle: 'Widening and Bituminous Concrete Resurfacing of Subhash Nagar Arterial Link Road',
     workTitleHi: 'सुभाष नगर मुख्य लिंक रोड का चौड़ीकरण और डामरीकरण सुदृढ़ीकरण',
     sector: 'Roads & Pathways',
@@ -272,7 +272,7 @@ export const MOCK_MPLADS_WORKS: MpladsWork[] = [
   {
     id: 'MPLAD-KA03-2025-022',
     representativeId: 'REP-LS-KA-03',
-    representativeName: 'Tejasvi Surya',
+    representativeName: 'Sample representative C',
     workTitle: 'Establishment of 24/7 Digital Dialysis Unit at Jayanagar General Hospital',
     workTitleHi: 'जयनगर जनरल अस्पताल में 24/7 डिजिटल डायलिसिस यूनिट की स्थापना',
     sector: 'Health & Sanitation',

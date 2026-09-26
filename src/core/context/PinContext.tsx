@@ -1,6 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { nearestKnownPincode } from '../utils/pinCoordinates';
 import { isValidIndianPincode } from '../utils/pinResolver';
+import { nearestPin, onDirectoryLoad, prefetchPin } from '../services/pinDirectory';
+
+/** PIN centres are rarely more than a few tens of km apart in India; further than this, the location is not in the directory. */
+const MAX_DETECT_KM = 100;
 
 interface PinContextValue {
   /** The currently selected PIN code across the whole app. */
@@ -12,10 +15,13 @@ interface PinContextValue {
   isFollowing: (pin: string) => boolean;
   toggleFollow: (pin: string) => void;
 
-  /** Browser geolocation detection -> resolves nearest known PIN. */
+  /** Browser location → the PIN whose post offices are closest (India Post directory). */
   isDetecting: boolean;
   detectionError: string | null;
   detectLocation: () => Promise<string | null>;
+
+  /** Bumps when a PIN directory file loads, so screens that call resolvePincode re-render with real districts. */
+  directoryVersion: number;
 }
 
 const FOLLOW_STORAGE_KEY = 'jantax.followedPins';
@@ -38,6 +44,10 @@ export function PinProvider({ children }: { children: ReactNode }) {
   const [followedPins, setFollowedPins] = useState<string[]>(() => loadFollowedPins());
   const [isDetecting, setIsDetecting] = useState(false);
   const [detectionError, setDetectionError] = useState<string | null>(null);
+  const [directoryVersion, setDirectoryVersion] = useState(0);
+
+  useEffect(() => onDirectoryLoad(() => setDirectoryVersion((v) => v + 1)), []);
+  useEffect(() => prefetchPin(selectedPin), [selectedPin]);
 
   useEffect(() => {
     try {
@@ -78,16 +88,19 @@ export function PinProvider({ children }: { children: ReactNode }) {
       setIsDetecting(true);
       setDetectionError(null);
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const { latitude, longitude } = position.coords;
-          const pin = nearestKnownPincode(latitude, longitude);
+          const near = await nearestPin(latitude, longitude);
           setIsDetecting(false);
-          if (pin) {
-            setSelectedPinState(pin);
-            resolve(pin);
-          } else {
-            setDetectionError('No matching area found for your location.');
+          if (!near) {
+            setDetectionError("Couldn't load the PIN directory. Enter your PIN code instead.");
             resolve(null);
+          } else if (near.km > MAX_DETECT_KM) {
+            setDetectionError('Your location is far from every PIN in the India Post directory. Enter your PIN code instead.');
+            resolve(null);
+          } else {
+            setSelectedPinState(near.pin);
+            resolve(near.pin);
           }
         },
         (error) => {
@@ -114,8 +127,9 @@ export function PinProvider({ children }: { children: ReactNode }) {
       isDetecting,
       detectionError,
       detectLocation,
+      directoryVersion,
     }),
-    [selectedPin, followedPins, isFollowing, toggleFollow, isDetecting, detectionError, detectLocation]
+    [selectedPin, followedPins, isFollowing, toggleFollow, isDetecting, detectionError, detectLocation, directoryVersion]
   );
 
   return <PinContext.Provider value={value}>{children}</PinContext.Provider>;

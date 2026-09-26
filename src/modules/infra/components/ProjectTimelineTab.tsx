@@ -20,15 +20,15 @@ export const ProjectTimelineTab: React.FC<ProjectTimelineTabProps> = ({ project 
     switch (status) {
       case 'Completed':
       case 'Verified':
-        return { bg: '#ecfdf5', border: '#a7f3d0', color: '#047857', icon: <CheckCircle2 size={13} /> };
+        return { bg: 'var(--good-soft)', border: 'var(--good-line)', color: 'var(--good)', icon: <CheckCircle2 size={13} /> };
       case 'Extended':
       case 'Delayed':
-        return { bg: '#fffbebf', border: '#fde68a', color: '#b45309', icon: <Clock size={13} /> };
+        return { bg: '#fffbebf', border: 'var(--warn-line)', color: 'var(--warn)', icon: <Clock size={13} /> };
       case 'Incomplete':
-        return { bg: '#fef2f2', border: '#fecaca', color: '#b91c1c', icon: <Clock size={13} /> };
+        return { bg: 'var(--bad-soft)', border: 'var(--bad-line)', color: 'var(--bad)', icon: <Clock size={13} /> };
       case 'Under Review':
       default:
-        return { bg: '#eff6ff', border: '#bfdbfe', color: '#1d4ed8', icon: <ShieldCheck size={13} /> };
+        return { bg: 'var(--brand-soft)', border: 'var(--brand-line)', color: 'var(--brand-ink)', icon: <ShieldCheck size={13} /> };
     }
   };
 
@@ -36,55 +36,55 @@ export const ProjectTimelineTab: React.FC<ProjectTimelineTabProps> = ({ project 
     <div style={{ display: 'grid', gap: '1.5rem' }}>
       {/* Neutral Language Timeline Banner */}
       <div style={{
-        background: '#f8fafc',
-        border: '1px solid #e2e8f0',
+        background: 'var(--surface-2)',
+        border: '1px solid var(--border)',
         borderRadius: 16,
         padding: '1.25rem 1.5rem'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
-          <Calendar size={18} style={{ color: '#f97316' }} />
-          <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+          <Calendar size={18} style={{ color: 'var(--accent-ink)' }} />
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
             Source-Linked Project History & Schedule Log
           </h3>
         </div>
-        <p style={{ fontSize: '0.86rem', color: '#475569', margin: 0, lineHeight: 1.5 }}>
+        <p style={{ fontSize: '0.86rem', color: 'var(--ink-2)', margin: 0, lineHeight: 1.5 }}>
           Chronological events verified from government publications, gazette notices, CPPP procurement records, and MoSPI flash reports. Neutral terminology strictly enforced.
         </p>
       </div>
 
       {/* Target Schedule vs Extension Summary Card */}
       <div style={{
-        background: '#ffffff',
+        background: 'var(--surface)',
         borderRadius: 16,
-        border: '1px solid #e2e8f0',
+        border: '1px solid var(--border)',
         padding: '1.25rem 1.5rem'
       }}>
-        <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: '#1e293b', marginTop: 0, marginBottom: '0.85rem' }}>
+        <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--ink)', marginTop: 0, marginBottom: '0.85rem' }}>
           Key Dates & Extension Approvals
         </h4>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
           <div>
-            <div style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: 600 }}>Start Date</div>
-            <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>{project.startDate}</div>
+            <div style={{ fontSize: '0.76rem', color: 'var(--ink-3)', fontWeight: 600 }}>Start Date</div>
+            <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--ink)' }}>{project.startDate}</div>
           </div>
           <div>
-            <div style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: 600 }}>Original Target Deadline</div>
-            <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>{project.originalCompletionDate}</div>
+            <div style={{ fontSize: '0.76rem', color: 'var(--ink-3)', fontWeight: 600 }}>Original Target Deadline</div>
+            <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--ink)' }}>{project.originalCompletionDate}</div>
           </div>
           <div>
-            <div style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: 600 }}>Anticipated Target Completion</div>
-            <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#f97316' }}>{project.anticipatedCompletionDate}</div>
+            <div style={{ fontSize: '0.76rem', color: 'var(--ink-3)', fontWeight: 600 }}>Anticipated Target Completion</div>
+            <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--accent-ink)' }}>{project.anticipatedCompletionDate}</div>
           </div>
           <div>
-            <div style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: 600 }}>Extensions Granted</div>
-            <div style={{ fontSize: '0.95rem', fontWeight: 800, color: '#2563eb' }}>{project.extensions.length} Extension(s)</div>
+            <div style={{ fontSize: '0.76rem', color: 'var(--ink-3)', fontWeight: 600 }}>Extensions Granted</div>
+            <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--brand-ink)' }}>{project.extensions.length} Extension(s)</div>
           </div>
         </div>
 
         {/* Extensions Table */}
         {project.extensions.length > 0 && (
-          <div style={{ marginTop: '1.25rem', borderTop: '1px solid #f1f5f9', paddingTop: '1rem' }}>
-            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '0.65rem' }}>
+          <div style={{ marginTop: '1.25rem', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
+            <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.65rem' }}>
               Approved Extension Records:
             </div>
             <div style={{ display: 'grid', gap: '0.65rem' }}>
@@ -93,26 +93,26 @@ export const ProjectTimelineTab: React.FC<ProjectTimelineTabProps> = ({ project 
                   key={ext.id}
                   style={{
                     background: '#fffbebf',
-                    border: '1px solid #fde68a',
+                    border: '1px solid var(--warn-line)',
                     borderRadius: 10,
                     padding: '0.75rem 1rem',
                     fontSize: '0.82rem'
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    <span style={{ fontWeight: 800, color: '#b45309' }}>
+                    <span style={{ fontWeight: 800, color: 'var(--warn)' }}>
                       + {ext.grantedMonths} Months Granted ({ext.grantDate}) → New Deadline: {ext.revisedCompletionDate}
                     </span>
                     <a
                       href={ext.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ color: '#1d4ed8', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
+                      style={{ color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
                     >
                       {ext.sourceTitle} <ExternalLink size={12} />
                     </a>
                   </div>
-                  <div style={{ color: '#475569', marginTop: '0.25rem' }}>
+                  <div style={{ color: 'var(--ink-2)', marginTop: '0.25rem' }}>
                     <strong>Neutral Reason:</strong> {ext.neutralReason} (Approved by: {ext.approvingAuthority})
                   </div>
                 </div>
@@ -123,12 +123,12 @@ export const ProjectTimelineTab: React.FC<ProjectTimelineTabProps> = ({ project 
       </div>
 
       {/* Source-Linked Timeline Chain */}
-      <div style={{ background: '#ffffff', borderRadius: 16, border: '1px solid #e2e8f0', padding: '1.5rem' }}>
-        <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginTop: 0, marginBottom: '1.5rem' }}>
+      <div style={{ background: 'var(--surface)', borderRadius: 16, border: '1px solid var(--border)', padding: '1.5rem' }}>
+        <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ink)', marginTop: 0, marginBottom: '1.5rem' }}>
           Chronological Source-Linked History
         </h4>
 
-        <div style={{ position: 'relative', paddingLeft: '1.5rem', borderLeft: '2px solid #e2e8f0' }}>
+        <div style={{ position: 'relative', paddingLeft: '1.5rem', borderLeft: '2px solid var(--border)' }}>
           {project.history.map((event, index) => {
             const badgeStyle = getStatusBadgeStyle(event.statusBadge);
 
@@ -148,23 +148,23 @@ export const ProjectTimelineTab: React.FC<ProjectTimelineTabProps> = ({ project 
                   width: 18,
                   height: 18,
                   borderRadius: '50%',
-                  background: '#ffffff',
-                  border: '3px solid #f97316',
+                  background: 'var(--surface)',
+                  border: '3px solid var(--accent)',
                   boxShadow: '0 0 0 3px rgba(249, 115, 22, 0.15)'
                 }} />
 
                 <div style={{
-                  background: '#f8fafc',
-                  border: '1px solid #e2e8f0',
+                  background: 'var(--surface-2)',
+                  border: '1px solid var(--border)',
                   borderRadius: 12,
                   padding: '1rem 1.15rem'
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.4rem' }}>
                     <div>
-                      <span style={{ fontSize: '0.76rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>
+                      <span style={{ fontSize: '0.76rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
                         {event.date} · {event.eventType}
                       </span>
-                      <h5 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a', margin: '0.15rem 0 0' }}>
+                      <h5 style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ink)', margin: '0.15rem 0 0' }}>
                         {event.title}
                       </h5>
                     </div>
@@ -185,14 +185,14 @@ export const ProjectTimelineTab: React.FC<ProjectTimelineTabProps> = ({ project 
                     </span>
                   </div>
 
-                  <p style={{ fontSize: '0.86rem', color: '#334155', margin: '0.4rem 0 0.75rem', lineHeight: 1.5 }}>
+                  <p style={{ fontSize: '0.86rem', color: 'var(--ink-2)', margin: '0.4rem 0 0.75rem', lineHeight: 1.5 }}>
                     {event.neutralDescription}
                   </p>
 
                   {/* Clickable Source Badge */}
                   <div style={{
-                    background: '#ffffff',
-                    border: '1px solid #cbd5e1',
+                    background: 'var(--surface)',
+                    border: '1px solid var(--border-strong)',
                     borderRadius: 8,
                     padding: '0.45rem 0.75rem',
                     fontSize: '0.76rem',
@@ -200,13 +200,13 @@ export const ProjectTimelineTab: React.FC<ProjectTimelineTabProps> = ({ project 
                     alignItems: 'center',
                     gap: '0.4rem'
                   }}>
-                    <FileCheck size={14} style={{ color: '#059669' }} />
-                    <span style={{ color: '#475569' }}>Source Reference:</span>
+                    <FileCheck size={14} style={{ color: 'var(--good)' }} />
+                    <span style={{ color: 'var(--ink-2)' }}>Source Reference:</span>
                     <a
                       href={event.source.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ color: '#1d4ed8', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
+                      style={{ color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
                     >
                       {event.source.title} ({event.source.publisher}) <ExternalLink size={11} />
                     </a>

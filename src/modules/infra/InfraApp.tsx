@@ -14,7 +14,7 @@ export function InfraApp() {
   const resolvedPin = activePin ? resolvePincode(activePin) : null;
    
   // Navigation states
-  const [activeSpineView, setActiveSpineView] = useState<'spine' | 'national'>('spine');
+  const [activeSpineView, setActiveSpineView] = useState<'spine' | 'national'>('national');
   const [currentView, setCurrentView] = useState<'dashboard' | 'detail'>('dashboard');
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
    
@@ -130,264 +130,17 @@ export function InfraApp() {
   const activeProject = projects.find(p => p.id === selectedProjectId);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', paddingBottom: '3rem' }}>
-      
-      {/* Module controls */}
-      <div className="container" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.5rem' }}>
-        <button
-              onClick={() => setShowGateway(!showGateway)}
-              style={{
-                padding: '0.35rem 0.75rem',
-                background: showGateway ? 'rgba(37, 99, 235, 0.08)' : 'rgba(255,255,255,0.03)',
-                border: `1px solid ${showGateway ? 'var(--color-primary)' : 'var(--border-color)'}`,
-                borderRadius: '6px',
-                color: showGateway ? 'var(--color-primary)' : 'var(--text-secondary)',
-                fontSize: '0.7rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.2s',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.35rem'
-              }}
-              title="Open MoSPI / PAIMANA Data Gateway Interface"
-            >
-              📡 Data Gateway
-          </button>
-          <button
-              onClick={() => {
-                if (window.confirm("Are you sure you want to reset the database? This will clear all submitted reports.")) {
-                  resetDB();
-                  setCurrentView('dashboard');
-                  setSelectedProjectId(null);
-                  setSelectedState('');
-                }
-              }}
-              style={{
-                padding: '0.35rem 0.75rem',
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '6px',
-                color: 'var(--text-muted)',
-                fontSize: '0.7rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.2s'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = 'var(--status-critical)';
-                e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--text-muted)';
-                e.currentTarget.style.borderColor = 'var(--border-color)';
-              }}
-              title="Reset to default mock database"
-            >
-              Reset Database
-          </button>
-          <span 
-              style={{ 
-                fontSize: '0.75rem', 
-                color: 'var(--status-completed)', 
-                background: 'var(--status-completed-bg)',
-                padding: '3px 8px',
-                borderRadius: '4px',
-                fontWeight: 600
-              }}
-            >
-              ● LIVE
-        </span>
+    <div className="stack" style={{ gap: 'var(--s-6)' }}>
+      <div className="segmented" role="tablist" aria-label="Public works views">
+        <button type="button" role="tab" aria-selected={activeSpineView === 'national'} aria-pressed={activeSpineView === 'national'} onClick={() => setActiveSpineView('national')}>
+          Projects and progress
+        </button>
+        <button type="button" role="tab" aria-selected={activeSpineView === 'spine'} aria-pressed={activeSpineView === 'spine'} onClick={() => setActiveSpineView('spine')}>
+          Who is accountable, MP to gram panchayat
+        </button>
       </div>
 
-      {/* MoSPI Data Gateway Drawer */}
-      {showGateway && (
-        <div className="container animate-fade-in" style={{ marginBottom: '2rem' }}>
-          <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '1.35rem' }}>📡</span>
-                <div>
-                  <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>Government Data Gateway (MoSPI Interface)</h3>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                    Reference Link: <a href="https://ipm.mospi.gov.in/" target="_blank" rel="noreferrer" style={{ color: 'var(--color-primary)', textDecoration: 'none', fontWeight: 600 }}>ipm.mospi.gov.in</a> (PAIMANA System)
-                  </p>
-                </div>
-              </div>
-              <button 
-                onClick={() => setShowGateway(false)}
-                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.25rem' }}
-              >
-                ✕
-              </button>
-            </div>
-
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: '1fr', 
-              gap: '1.5rem',
-              alignItems: 'start'
-            }} className="gateway-split">
-              <style>{`
-                @media (min-width: 768px) {
-                  .gateway-split { grid-template-columns: 1fr 1fr !important; }
-                }
-              `}</style>
-
-              {/* Left Column: Live Sync Simulator */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1rem', background: 'rgba(15,23,42,0.02)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-                <h4 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)' }}>MoSPI API Sync Gateway</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                  <div>📡 <strong>Gateway Status:</strong> <span style={{ color: 'var(--status-completed)', fontWeight: 700 }}>🟢 CONNECTED</span></div>
-                  <div>🔌 <strong>Mock Endpoint:</strong> <code style={{ background: 'rgba(15,23,42,0.04)', padding: '2px 4px', borderRadius: '4px', fontSize: '0.75rem' }}>api.mospi.gov.in/paimana/v2</code></div>
-                  <div>⏳ <strong>Latency:</strong> <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>12ms (Simulated)</span></div>
-                  <div>📅 <strong>Last Synced:</strong> <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{syncTime}</span></div>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
-                  <button
-                    onClick={handleSync}
-                    disabled={isSyncing}
-                    style={{
-                      padding: '0.6rem',
-                      background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%)',
-                      border: 'none',
-                      borderRadius: '8px',
-                      color: '#ffffff',
-                      fontWeight: 600,
-                      cursor: isSyncing ? 'not-allowed' : 'pointer',
-                      opacity: isSyncing ? 0.7 : 1,
-                      transition: 'all 0.2s',
-                      fontSize: '0.85rem'
-                    }}
-                  >
-                    {isSyncing ? "Syncing with Gateway..." : "Sync Live Gateway Data"}
-                  </button>
-
-                  {syncMessage && (
-                    <div style={{ 
-                      padding: '0.65rem', 
-                      background: 'rgba(37,99,235,0.06)', 
-                      border: '1px solid rgba(37,99,235,0.15)', 
-                      borderRadius: '6px',
-                      fontSize: '0.75rem',
-                      color: 'var(--color-primary)',
-                      lineHeight: '1.4',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem'
-                    }}>
-                      <span className="pulse-dot construction" style={{ width: 6, height: 6 }}></span>
-                      {syncMessage}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Right Column: Custom JSON Importer */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1rem', background: 'rgba(15,23,42,0.02)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h4 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)' }}>Custom JSON Dataset Importer</h4>
-                  <button 
-                    onClick={loadTemplate}
-                    style={{ background: 'transparent', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700 }}
-                  >
-                    📂 Load Template
-                  </button>
-                </div>
-
-                <form onSubmit={handleImport} style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
-                  <textarea
-                    placeholder='Paste custom project array JSON here...'
-                    className="form-input"
-                    style={{ minHeight: '90px', resize: 'vertical', fontFamily: 'monospace', fontSize: '0.75rem', background: '#ffffff', color: 'var(--text-primary)' }}
-                    value={importText}
-                    onChange={(e) => setImportText(e.target.value)}
-                  />
-
-                  {importStatus.type && (
-                    <div style={{ 
-                      padding: '0.5rem', 
-                      background: importStatus.type === 'success' ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,0.08)',
-                      border: `1px solid ${importStatus.type === 'success' ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
-                      borderRadius: '6px',
-                      fontSize: '0.75rem',
-                      color: importStatus.type === 'success' ? 'var(--status-completed)' : 'var(--status-critical)'
-                    }}>
-                      {importStatus.type === 'success' ? '✓ ' : '⚠️ '}{importStatus.message}
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    style={{
-                      padding: '0.5rem',
-                      background: 'var(--color-primary)',
-                      border: 'none',
-                      borderRadius: '6px',
-                      color: '#ffffff',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      fontSize: '0.8rem'
-                    }}
-                  >
-                    Import Custom Dataset
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* View Selector Tabs */}
-      <div className="container" style={{ marginBottom: '1.5rem' }}>
-        <div className="glass-card" style={{ display: 'flex', gap: '1rem', padding: '0.75rem 1.25rem' }}>
-          <button
-            onClick={() => setActiveSpineView('spine')}
-            style={{
-              flex: 1,
-              padding: '0.65rem 1rem',
-              borderRadius: '8px',
-              border: 'none',
-              background: activeSpineView === 'spine' ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)',
-              color: activeSpineView === 'spine' ? 'white' : 'var(--text-secondary)',
-              fontWeight: 700,
-              fontSize: '0.8rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem',
-            }}
-          >
-            <span>🔥 Project 777:</span> ५-स्तरीय मेरठ जवाबदेही (Meerut 5-Level Spine)
-          </button>
-          <button
-            onClick={() => setActiveSpineView('national')}
-            style={{
-              flex: 1,
-              padding: '0.65rem 1rem',
-              borderRadius: '8px',
-              border: 'none',
-              background: activeSpineView === 'national' ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)',
-              color: activeSpineView === 'national' ? 'white' : 'var(--text-secondary)',
-              fontWeight: 700,
-              fontSize: '0.8rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem',
-            }}
-          >
-            <span>🏗️</span> राष्ट्रीय अवसंरचना (National Infrastructure Projects)
-          </button>
-        </div>
-      </div>
-
-      {/* Main Core Views Container */}
-      <main className="container" style={{ flex: 1 }}>
+      <div>
         {activeSpineView === 'spine' ? (
           <SpineDashboard />
         ) : currentView === 'dashboard' ? (
@@ -395,7 +148,7 @@ export function InfraApp() {
             {activePin && (
               <div className="glass-card" style={{ padding: '0.85rem 1.1rem', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
                 <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                  📍 PIN {activePin} · {resolvedPin?.district}, {resolvedPin?.state}
+                  PIN {activePin} · {resolvedPin?.district}, {resolvedPin?.state}
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                   <SourceBadge sourceType="A" sourceName="MoSPI PAIMANA" />
@@ -421,13 +174,7 @@ export function InfraApp() {
             />
           )
         )}
-      </main>
-
-      {/* Modern footer details */}
-      <footer style={{ marginTop: '4rem', textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-        <p>Bharat Vikas Project Tracker • Developed for Citizens of India</p>
-        <p style={{ marginTop: '0.25rem', fontSize: '0.75rem', color: 'rgba(255,255,255,0.1)' }}>Official parameters sourced abstractly from central reporting systems.</p>
-      </footer>
+      </div>
     </div>
   );
 }

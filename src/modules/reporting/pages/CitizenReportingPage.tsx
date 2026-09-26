@@ -1,37 +1,29 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { ShieldCheck, EyeOff, Clock } from 'lucide-react';
 import { ReportForm } from '../components/ReportForm';
-import { ArrowLeft, ShieldCheck, FileText, CheckCircle2 } from 'lucide-react';
+import { PageHeader } from '../../../ui';
 
 export function CitizenReportingPage() {
   return (
-    <div style={{ padding: '1.75rem 0', maxWidth: 900, margin: '0 auto' }}>
-      {/* Top Back Navigation Bar */}
-      <div style={{ marginBottom: '1.25rem' }}>
-        <Link to="/reports" style={{ color: '#2563eb', fontWeight: 700, fontSize: '0.86rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-          <ArrowLeft size={16} /> Back to Reports Directory
-        </Link>
-      </div>
-
-      <div style={{ marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
-          <span style={{ background: '#fff7ed', border: '1px solid #ffedd5', color: '#ea580c', fontSize: '0.75rem', fontWeight: 800, padding: '0.2rem 0.65rem', borderRadius: '9999px' }}>
-            JANTAX PHASE 23 & 24
-          </span>
-          <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>
-            Civic Evidence & Official Action Gateway
-          </span>
+    <div className="page page-narrow">
+      <PageHeader
+        crumbs={[{ label: 'Citizen reports', to: '/reports' }, { label: 'Report an issue' }]}
+        title="Report an issue"
+        lede="Tell us what you found on the ground, add a photo, and we will route it to the responsible office once it is reviewed."
+      />
+      <div className="grid-3" style={{ marginBottom: 'var(--s-6)' }}>
+        <div className="callout">
+          <EyeOff size={16} aria-hidden="true" />
+          <span>Anonymous by default. Photo location data is stripped before storage.</span>
         </div>
-
-        <h1 style={{ fontSize: '2rem', fontWeight: 800, color: '#0f172a', fontFamily: 'var(--font-heading)', margin: '0 0 0.3rem' }}>
-          Submit Citizen Civic Defect Report
-        </h1>
-        <p style={{ fontSize: '0.92rem', color: '#64748b', margin: 0 }}>
-          File a verified civic defect with media evidence. Select anonymous public reporting or public auditor profile.
-        </p>
+        <div className="callout">
+          <ShieldCheck size={16} aria-hidden="true" />
+          <span>A moderator checks every report before it goes public.</span>
+        </div>
+        <div className="callout">
+          <Clock size={16} aria-hidden="true" />
+          <span>You get a tracking link and a ready grievance draft.</span>
+        </div>
       </div>
-
-      {/* Main Report Form Multi-Step Wizard */}
       <ReportForm />
     </div>
   );

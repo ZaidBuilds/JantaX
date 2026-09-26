@@ -19,7 +19,7 @@ export function CivicComplaintGenerator({ wardNumber = 42, wardName = 'Connaught
 
   const generatedText = `To: The Sanitary Inspector / Zonal Executive Engineer,
 ${corporationName}
-Ward #${wardNumber} (${wardName}) — PIN: ${pinCode}
+Ward #${wardNumber} (${wardName}) · PIN: ${pinCode}
 
 Subject: Urgent Civic Grievance regarding ${selectedCat.name} (Statutory SLA: ${selectedCat.statutorySlaHours} Hours)
 
@@ -48,10 +48,10 @@ Yours faithfully,
     <div className="jantax-card" style={{ padding: '1.75rem', marginBottom: '1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
         <div>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f2d59', margin: '0 0 0.3rem' }}>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: '0 0 0.3rem' }}>
             Structured Municipal 311 Complaint Generator
           </h3>
-          <p style={{ fontSize: '0.85rem', color: '#64748b', margin: 0 }}>
+          <p style={{ fontSize: '0.85rem', color: 'var(--ink-3)', margin: 0 }}>
             Generate legally compliant civic grievance drafts citing official Citizen Charter statutory SLA hours (12h - 48h).
           </p>
         </div>
@@ -65,8 +65,8 @@ Yours faithfully,
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.35rem',
-              background: '#f97316',
-              color: '#ffffff',
+              background: 'var(--accent-solid)',
+              color: 'var(--on-solid)',
               padding: '0.55rem 1.1rem',
               borderRadius: 10,
               fontSize: '0.82rem',
@@ -86,8 +86,8 @@ Yours faithfully,
             key={cat.id}
             onClick={() => setSelectedCatId(cat.id)}
             style={{
-              background: selectedCatId === cat.id ? '#0f2d59' : '#f1f5f9',
-              color: selectedCatId === cat.id ? '#ffffff' : '#334155',
+              background: selectedCatId === cat.id ? 'var(--brand)' : 'var(--surface-3)',
+              color: selectedCatId === cat.id ? 'var(--on-solid)' : 'var(--ink-2)',
               border: 'none',
               padding: '0.5rem 0.9rem',
               borderRadius: 8,
@@ -108,7 +108,7 @@ Yours faithfully,
           placeholder="Enter exact street name / colony / landmark (e.g. Block C Market, Outer Ring Road)..."
           value={streetAddress}
           onChange={(e) => setStreetAddress(e.target.value)}
-          style={{ width: '100%', padding: '0.6rem 0.85rem', borderRadius: 8, border: '1px solid #cbd5e1', fontSize: '0.85rem' }}
+          style={{ width: '100%', padding: '0.6rem 0.85rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.85rem' }}
         />
       </div>
 
@@ -122,11 +122,11 @@ Yours faithfully,
             width: '100%',
             padding: '1rem',
             borderRadius: 10,
-            border: '1px solid #cbd5e1',
+            border: '1px solid var(--border-strong)',
             fontSize: '0.82rem',
             fontFamily: 'monospace',
             lineHeight: 1.5,
-            background: '#ffffff',
+            background: 'var(--surface)',
           }}
         />
         <button
@@ -138,8 +138,8 @@ Yours faithfully,
             display: 'inline-flex',
             alignItems: 'center',
             gap: '0.3rem',
-            background: copied ? '#10b981' : '#0f2d59',
-            color: '#ffffff',
+            background: copied ? 'var(--good-solid)' : 'var(--brand)',
+            color: 'var(--on-solid)',
             border: 'none',
             padding: '0.4rem 0.8rem',
             borderRadius: 6,
@@ -155,7 +155,7 @@ Yours faithfully,
       </div>
 
       {/* Escalation Hierarchy Footer */}
-      <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 10, padding: '0.85rem 1rem', fontSize: '0.78rem', color: '#1e40af' }}>
+      <div style={{ background: 'var(--brand-soft)', border: '1px solid var(--brand-line)', borderRadius: 10, padding: '0.85rem 1rem', fontSize: '0.78rem', color: 'var(--ink)' }}>
         <strong>SLA Escalation Officer:</strong> {selectedCat.escalationOfficer} • If unaddressed within {selectedCat.statutorySlaHours} hours, lodge a secondary escalation on the Municipal Commissioner Helpline (155304 / 1916).
       </div>
     </div>

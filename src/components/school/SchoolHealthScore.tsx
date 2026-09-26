@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { AlertTriangle, CheckCircle2, Eye, EyeOff, Info, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { AlertTriangle, CheckCircle2, Eye, EyeOff, Info, ChevronDown, ChevronUp } from 'lucide-react';
 import { SourceBadge } from '../UI/SourceBadge';
 
 export type ScoreStatus = 'stable' | 'watch' | 'needs_attention' | 'critical';
@@ -40,30 +41,30 @@ interface SchoolHealthScoreProps {
 const STATUS_CONFIG: Record<ScoreStatus, { label: string; color: string; bg: string; border: string; icon: React.ElementType }> = {
   stable: {
     label: 'Stable',
-    color: '#166534',
-    bg: '#dcfce7',
-    border: '#bbf7d0',
+    color: 'var(--good)',
+    bg: 'var(--good-soft)',
+    border: 'var(--good-line)',
     icon: CheckCircle2,
   },
   watch: {
     label: 'Watch',
-    color: '#92400e',
-    bg: '#fef3c7',
-    border: '#fde68a',
+    color: 'var(--warn)',
+    bg: 'var(--warn-soft)',
+    border: 'var(--warn-line)',
     icon: Eye,
   },
   needs_attention: {
     label: 'Needs Attention',
-    color: '#c2410c',
-    bg: '#ffedd5',
-    border: '#fed7aa',
+    color: 'var(--accent-ink)',
+    bg: 'var(--accent-soft)',
+    border: 'var(--accent-line)',
     icon: AlertTriangle,
   },
   critical: {
     label: 'Critical',
-    color: '#991b1b',
-    bg: '#fee2e2',
-    border: '#fecaca',
+    color: 'var(--bad)',
+    bg: 'var(--bad-soft)',
+    border: 'var(--bad-line)',
     icon: AlertTriangle,
   },
 };
@@ -122,7 +123,7 @@ function CompositeScoreCard({
   return (
     <div
       style={{
-        background: '#fff',
+        background: 'var(--surface)',
         border: `2px solid ${config.border}`,
         borderRadius: 16,
         padding: '1.25rem',
@@ -160,7 +161,7 @@ function CompositeScoreCard({
             </svg>
             <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               <span style={{ fontSize: '1.6rem', fontWeight: 900, color: config.color, lineHeight: 1 }}>{score}</span>
-              <span style={{ fontSize: '0.6rem', color: '#64748b', fontWeight: 600 }}>/100</span>
+              <span style={{ fontSize: '0.6rem', color: 'var(--ink-3)', fontWeight: 600 }}>/100</span>
             </div>
           </div>
           <div>
@@ -173,13 +174,13 @@ function CompositeScoreCard({
               Requires minimum 5 reports across 3 days.
             </p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-              <span style={{ fontFamily: 'monospace', background: '#f8fafc', border: '1px solid #e2e8f0', padding: '1px 5px', borderRadius: 4, fontSize: '0.68rem' }}>
+              <span style={{ fontFamily: 'monospace', background: 'var(--surface-2)', border: '1px solid var(--border)', padding: '1px 5px', borderRadius: 4, fontSize: '0.68rem' }}>
                 {version}
               </span>
               {methodologyUrl && (
-                <a href={methodologyUrl} target="_blank" rel="noreferrer" style={{ fontSize: '0.72rem', color: '#2563eb', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
-                  Methodology <ExternalLink size={10} />
-                </a>
+                <Link to={methodologyUrl} style={{ fontSize: '0.72rem', color: 'var(--brand-ink)', fontWeight: 600 }}>
+                  Methodology
+                </Link>
               )}
             </div>
           </div>
@@ -208,7 +209,7 @@ function DimensionCard({
   return (
     <div
       style={{
-        background: '#fff',
+        background: 'var(--surface)',
         border: `1px solid ${hasScore ? config.border : '#e2e8f0'}`,
         borderRadius: 12,
         overflow: 'hidden',
@@ -251,7 +252,7 @@ function DimensionCard({
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{ flex: 1 }}>
-            <div style={{ height: 8, background: '#f1f5f9', borderRadius: 999, overflow: 'hidden' }}>
+            <div style={{ height: 8, background: 'var(--surface-3)', borderRadius: 999, overflow: 'hidden' }}>
               <div
                 style={{
                   height: '100%',
@@ -263,8 +264,8 @@ function DimensionCard({
               />
             </div>
           </div>
-          <span style={{ fontSize: '1rem', fontWeight: 900, color: hasScore ? config.color : '#cbd5e1', minWidth: 48, textAlign: 'right' }}>
-            {dim.score !== null ? `${dim.score}` : '—'}
+          <span style={{ fontSize: '1rem', fontWeight: 900, color: hasScore ? config.color : 'var(--ink-4)', minWidth: 48, textAlign: 'right' }}>
+            {dim.score !== null ? `${dim.score}` : '-'}
             {dim.unit && dim.score !== null && <span style={{ fontSize: '0.7em', opacity: 0.6 }}>{dim.unit}</span>}
           </span>
         </div>
@@ -275,28 +276,28 @@ function DimensionCard({
             Calc: {new Date(dim.lastCalculation).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
           </span>
           {dim.confidence !== 'high' && (
-            <span style={{ fontSize: '0.62rem', color: dim.confidence === 'low' ? '#ef4444' : '#f59e0b' }}>
-              {dim.confidence === 'low' ? '⚠ Low confidence' : '◐ Medium confidence'}
+            <span style={{ fontSize: '0.62rem', color: dim.confidence === 'low' ? 'var(--bad)' : 'var(--warn)' }}>
+              {dim.confidence === 'low' ? 'Low confidence' : '◐ Medium confidence'}
             </span>
           )}
         </div>
       </div>
 
       {isExpanded && (
-        <div style={{ padding: '0 1rem 1rem', borderTop: '1px solid #f1f5f9', marginTop: 0 }}>
+        <div style={{ padding: '0 1rem 1rem', borderTop: '1px solid var(--border)', marginTop: 0 }}>
           <div style={{ display: 'grid', gap: '0.75rem', marginTop: '0.75rem' }}>
             <div>
-              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Formula</div>
-              <code style={{ fontSize: '0.78rem', background: '#f8fafc', padding: '0.4rem 0.6rem', borderRadius: 6, display: 'block', border: '1px solid #e2e8f0' }}>
+              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Formula</div>
+              <code style={{ fontSize: '0.78rem', background: 'var(--surface-2)', padding: '0.4rem 0.6rem', borderRadius: 6, display: 'block', border: '1px solid var(--border)' }}>
                 {dim.formula}
               </code>
             </div>
 
             <div>
-              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Inputs & Weights</div>
+              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Inputs & Weights</div>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.74rem' }}>
                 <thead>
-                  <tr style={{ color: '#64748b', borderBottom: '1px solid #f1f5f9' }}>
+                  <tr style={{ color: 'var(--ink-3)', borderBottom: '1px solid var(--border)' }}>
                     <th style={{ textAlign: 'left', padding: '0.3rem 0.4rem', fontWeight: 600 }}>Input</th>
                     <th style={{ textAlign: 'center', padding: '0.3rem 0.4rem', fontWeight: 600 }}>Value</th>
                     <th style={{ textAlign: 'center', padding: '0.3rem 0.4rem', fontWeight: 600 }}>Weight</th>
@@ -305,10 +306,10 @@ function DimensionCard({
                 </thead>
                 <tbody>
                   {dim.inputs.map((input, i) => (
-                    <tr key={i} style={{ borderBottom: '1px solid #f8fafc' }}>
+                    <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
                       <td style={{ padding: '0.35rem 0.4rem', fontWeight: 600 }}>{input.name}</td>
                       <td style={{ padding: '0.35rem 0.4rem', textAlign: 'center', fontWeight: 700 }}>{input.value}</td>
-                      <td style={{ padding: '0.35rem 0.4rem', textAlign: 'center', color: '#64748b' }}>{input.weight}</td>
+                      <td style={{ padding: '0.35rem 0.4rem', textAlign: 'center', color: 'var(--ink-3)' }}>{input.weight}</td>
                       <td style={{ padding: '0.35rem 0.4rem', fontSize: '0.68rem', opacity: 0.6 }}>{input.source}</td>
                     </tr>
                   ))}
@@ -317,7 +318,7 @@ function DimensionCard({
             </div>
 
             <div>
-              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#64748b', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 <AlertTriangle size={12} /> Limitations
               </div>
               <p style={{ fontSize: '0.74rem', opacity: 0.7, margin: 0, lineHeight: 1.5 }}>{dim.limitations}</p>

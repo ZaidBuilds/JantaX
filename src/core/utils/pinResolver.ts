@@ -1,3 +1,5 @@
+import { getCachedPin } from '../services/pinDirectory';
+
 // PIN Code Range → State & District Mappings
 export const PIN_STATE_MAP: Record<string, { state: string; stateCode: string; district: string }> = {
   '110': { state: 'Delhi', stateCode: 'DL', district: 'New Delhi' },
@@ -31,7 +33,18 @@ export interface ResolvedLocation {
   district: string;
   region: 'North' | 'South' | 'East' | 'West' | 'Central';
   isValid: boolean;
+  /** 'india-post' when the PIN was found in the India Post directory; 'prefix' for the rough prefix table. */
+  source?: 'india-post' | 'prefix' | 'none';
 }
+
+const STATE_CODES: Record<string, string> = {
+  'Andaman and Nicobar Islands': 'AN', 'Andhra Pradesh': 'AP', 'Arunachal Pradesh': 'AR', Assam: 'AS', Bihar: 'BR',
+  Chandigarh: 'CH', Chhattisgarh: 'CG', Delhi: 'DL', Goa: 'GA', Gujarat: 'GJ', Haryana: 'HR', 'Himachal Pradesh': 'HP',
+  'Jammu and Kashmir': 'JK', Jharkhand: 'JH', Karnataka: 'KA', Kerala: 'KL', Ladakh: 'LA', Lakshadweep: 'LD',
+  'Madhya Pradesh': 'MP', Maharashtra: 'MH', Manipur: 'MN', Meghalaya: 'ML', Mizoram: 'MZ', Nagaland: 'NL', Odisha: 'OD',
+  Puducherry: 'PY', Punjab: 'PB', Rajasthan: 'RJ', Sikkim: 'SK', 'Tamil Nadu': 'TN', Telangana: 'TS', Tripura: 'TR',
+  'The Dadra and Nagar Haveli and Daman and Diu': 'DH', 'Uttar Pradesh': 'UP', Uttarakhand: 'UK', 'West Bengal': 'WB',
+};
 
 export function isValidIndianPincode(pin: string): boolean {
   return /^[1-9]\d{5}$/.test(pin.trim());
@@ -55,7 +68,14 @@ export function resolvePincode(pin: string): ResolvedLocation {
   const isValid = isValidIndianPincode(cleaned);
 
   if (!isValid) {
-    return { pinCode: cleaned, state: 'Unknown', stateCode: '--', district: 'Unknown', region: 'North', isValid: false };
+    return { pinCode: cleaned, state: 'Unknown', stateCode: '--', district: 'Unknown', region: 'North', isValid: false, source: 'none' };
+  }
+
+  // The India Post directory, once its file for this PIN has loaded (see pinDirectory.prefetchPin).
+  const hit = getCachedPin(cleaned);
+  if (hit) {
+    const region = DIGIT_REGION_MAP[cleaned[0]] || 'North';
+    return { pinCode: cleaned, state: hit.state, stateCode: STATE_CODES[hit.state] ?? '--', district: hit.district, region, isValid: true, source: 'india-post' };
   }
 
   const prefix3 = cleaned.substring(0, 3);
@@ -64,10 +84,10 @@ export function resolvePincode(pin: string): ResolvedLocation {
   if (match) {
     const firstDigit = cleaned[0];
     const region = DIGIT_REGION_MAP[firstDigit] || 'North';
-    return { pinCode: cleaned, state: match.state, stateCode: match.stateCode, district: match.district, region, isValid: true };
+    return { pinCode: cleaned, state: match.state, stateCode: match.stateCode, district: match.district, region, isValid: true, source: 'prefix' };
   }
 
-  return { pinCode: cleaned, state: 'Unknown', stateCode: '--', district: 'Unknown', region: 'North', isValid: true };
+  return { pinCode: cleaned, state: 'Unknown', stateCode: '--', district: 'Unknown', region: 'North', isValid: true, source: 'none' };
 }
 
 // Simple deterministic hash generator

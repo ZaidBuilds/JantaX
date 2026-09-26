@@ -1,0 +1,30 @@
+# Render blueprint for the JantaX data API and its database (https://render.com/docs/blueprint-spec).
+# The frontend deploys separately (vercel.json); point its VITE_API_URL at this service's URL.
+# Settings marked sync: false are asked for when the blueprint is applied. Dataset settings can be
+# added later from the dashboard; see docs/GO_LIVE.md for the full list.
+databases:
+  - name: jantax-db
+    databaseName: jantax
+    postgresMajorVersion: "16"
+    plan: basic-256mb
+
+services:
+  - type: web
+    name: jantax-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile.api
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: jantax-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATA_GOV_IN_API_KEY
+        sync: false
+      - key: SYNC_SCHEDULE
+        value: "on"
+      - key: NODE_ENV
+        value: production

@@ -146,7 +146,7 @@ export const StateMap: React.FC<StateMapProps> = ({
               <span style={{ 
                 fontSize: '0.8rem', 
                 fontWeight: 700, 
-                color: isSelected ? '#ffffff' : 'var(--text-primary)',
+                color: isSelected ? 'var(--on-solid)' : 'var(--text-primary)',
                 fontFamily: 'var(--font-heading)'
               }}>
                 {node.id}

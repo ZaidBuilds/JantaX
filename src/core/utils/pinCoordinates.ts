@@ -1,5 +1,5 @@
 // Approximate coordinates for known PIN-code prefixes.
-// Used by location detection to resolve the nearest known PIN code.
+// A fallback map centre for a PIN prefix when the India Post directory has no location for it.
 export interface PinCoordinate {
   prefix: string;
   lat: number;
@@ -34,36 +34,6 @@ export const PIN_COORDINATES: PinCoordinate[] = [
   { prefix: '795', lat: 24.8170, lng: 93.9368, state: 'Manipur', district: 'Imphal' },
 ];
 
-function toRad(value: number): number {
-  return (value * Math.PI) / 180;
-}
-
-function haversineKm(aLat: number, aLng: number, bLat: number, bLng: number): number {
-  const R = 6371;
-  const dLat = toRad(bLat - aLat);
-  const dLng = toRad(bLng - aLng);
-  const lat1 = toRad(aLat);
-  const lat2 = toRad(bLat);
-  const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(h));
-}
-
-export function nearestKnownPincode(lat: number, lng: number): string | null {
-  let best: PinCoordinate | null = null;
-  let bestDistance = Infinity;
-  for (const coord of PIN_COORDINATES) {
-    const distance = haversineKm(lat, lng, coord.lat, coord.lng);
-    if (distance < bestDistance) {
-      bestDistance = distance;
-      best = coord;
-    }
-  }
-  if (!best) return null;
-  // Reconstruct a full 6-digit PIN from the 3-digit prefix.
-  return `${best.prefix}001`;
-}
 
 export function getCoordinateForPin(pinCode: string): PinCoordinate | undefined {
   const prefix = pinCode.trim().substring(0, 3);

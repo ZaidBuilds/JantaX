@@ -16,9 +16,9 @@ export const FreshnessBadge: React.FC<FreshnessBadgeProps> = ({
   if (status === 'FRESH') {
     return (
       <span style={{
-        background: '#ecfdf5',
-        color: '#047857',
-        border: '1px solid #a7f3d0',
+        background: 'var(--good-soft)',
+        color: 'var(--good)',
+        border: '1px solid var(--good-line)',
         fontSize: '0.75rem',
         fontWeight: 800,
         padding: '0.2rem 0.6rem',
@@ -35,9 +35,9 @@ export const FreshnessBadge: React.FC<FreshnessBadgeProps> = ({
   if (status === 'CACHED') {
     return (
       <span style={{
-        background: '#eff6ff',
-        color: '#1e40af',
-        border: '1px solid #bfdbfe',
+        background: 'var(--brand-soft)',
+        color: 'var(--ink)',
+        border: '1px solid var(--brand-line)',
         fontSize: '0.75rem',
         fontWeight: 800,
         padding: '0.2rem 0.6rem',
@@ -53,9 +53,9 @@ export const FreshnessBadge: React.FC<FreshnessBadgeProps> = ({
 
   return (
     <span style={{
-      background: '#fef2f2',
-      color: '#b91c1c',
-      border: '1px solid #fecaca',
+      background: 'var(--bad-soft)',
+      color: 'var(--bad)',
+      border: '1px solid var(--bad-line)',
       fontSize: '0.75rem',
       fontWeight: 800,
       padding: '0.2rem 0.6rem',

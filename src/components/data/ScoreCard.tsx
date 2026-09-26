@@ -11,7 +11,7 @@ export function ScoreCard({ score, label, subLabel, size = 120 }: ScoreCardProps
   const safeScore = Number.isFinite(score) ? Math.min(100, Math.max(0, score)) : 0;
 
   // Determine color based on rating range
-  const scoreColor = safeScore >= 70 ? '#10b981' : safeScore >= 40 ? '#f97316' : '#ef4444';
+  const scoreColor = safeScore >= 70 ? 'var(--good)' : safeScore >= 40 ? 'var(--accent-ink)' : 'var(--bad)';
 
   return (
     <div className="glass-card score-card" aria-label={`${label ? `${label}: ` : ''}${safeScore} out of 100`}>

@@ -207,8 +207,8 @@ router.get('/:section', async (req: Request, res: Response) => {
     const methodology: MethodologyInfo[] = [
       {
         section: section,
-        title: Methodology Section: ,
-        description: Detailed information about ,
+        title: `Methodology section: ${section}`,
+        description: `Detailed information about ${section}`,
         details: [
           {
             info: 'This section provides detailed information about ' + section,

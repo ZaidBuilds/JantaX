@@ -1,109 +1,72 @@
-import React, { useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useMemo } from 'react';
 import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
-import { resolvePincode } from '../../../core/utils/pinResolver';
+import { Stat } from '../../../ui';
+import { EvidenceCard, Kv, ModulePinBar, SectionTitle, pinSeed, useModulePin } from '../../shared/ModuleKit';
 
 export function LandDashboard() {
   const { share } = useWhatsAppShare();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const initialPin = searchParams.get('pin') || '250001';
-  const [pinInput, setPinInput] = useState(initialPin);
-  const [currentPin, setCurrentPin] = useState(initialPin);
+  const { pin, loc, setPin } = useModulePin();
 
-  React.useEffect(() => {
-    const p = searchParams.get('pin') || '250001';
-    setPinInput(p);
-    setCurrentPin(p);
-  }, [searchParams]);
-
-  const loc = useMemo(() => resolvePincode(currentPin), [currentPin]);
-
-  const landMutationStats = useMemo(() => {
-    const suffix = parseInt(currentPin.substring(4, 6)) || 1;
+  const d = useMemo(() => {
+    const s = pinSeed(pin);
+    const actual = loc.region === 'North' ? 120 + (s % 50) : loc.region === 'South' ? 70 + (s % 30) : 95 + (s % 40);
     return {
-      tehsilName: `${loc.district} Tehsil Block #${suffix}`,
-      slaDaysLimit: 45,
-      actualAverageDays: loc.region === 'North' ? 145 : loc.region === 'South' ? 82 : 110,
-      backlogMutationCount: loc.region === 'North' ? 1480 : loc.region === 'South' ? 420 : 890,
-      briberyIndicationText: 'तहसील स्तर पर बिना सुविधा शुल्क (रिश्वत) के म्यूटेशन फाइलों को दबाए रखने की अत्यधिक शिकायतें।',
-      source: 'State Bhulekh Land Records System / e-District Statistics 2025',
+      tehsil: `${loc.district} Tehsil, circle ${1 + (s % 9)}`,
+      sla: 45,
+      actual,
+      backlog: loc.region === 'North' ? 1200 + (s % 600) : 380 + (s % 500),
+      disputed: 40 + (s % 110),
+      encroachment: 3 + (s % 11),
+      digitised: 62 + (s % 35),
     };
-  }, [currentPin, loc]);
-
-  const handleShare = () => {
-    share({
-      pinCode: currentPin,
-      titleHindi: `ज़मीन म्यूटेशन विलंब: ${landMutationStats.tehsilName}`,
-      titleEnglish: `Land Mutation Delay Report: ${landMutationStats.tehsilName}`,
-      claimLabel: `Promised SLA Time: ${landMutationStats.slaDaysLimit} Days`,
-      claimLabelHindi: `सरकारी समय सीमा (SLA): ${landMutationStats.slaDaysLimit} दिन`,
-      realityLabel: `Actual Average: ${landMutationStats.actualAverageDays} Days`,
-      realityLabelHindi: `वास्तविक औसत समय: ${landMutationStats.actualAverageDays} दिन`,
-      responsiblePerson: 'Tehsildar / Patwari',
-      responsibleOrg: 'Revenue Department',
-      sourceUrl: 'https://upbhulekh.gov.in',
-      moduleNameHindi: 'M12 - ज़मीन रजिस्ट्री (Land Registry Watch)',
-    });
-  };
+  }, [pin, loc.district, loc.region]);
 
   return (
-    <div className="module-dashboard">
-      <div className="glass-card dash-header-card" style={{ borderLeftColor: '#65a30d' }}>
-        <h2>🗺️ ज़मीन रजिस्ट्री और म्यूटेशन ट्रैकर (Land Mutation Tracker)</h2>
-        <p>
-          राजस्व विभाग (Bhulekh) द्वारा तय नामांतरण (Mutation) की समय सीमा बनाम तहसील कार्यालयों में फाइलों के लटके रहने के वास्तविक दिनों की सांख्यिकी।
-        </p>
+    <div className="stack" style={{ gap: 'var(--s-6)' }}>
+      <ModulePinBar pin={pin} loc={loc} onChange={setPin} />
+      <div className="stat-row">
+        <Stat label="Average mutation time" value={d.actual} unit=" days" meta={`Legal limit ${d.sla} days`} />
+        <Stat label="Mutations pending" value={d.backlog.toLocaleString('en-IN')} />
+        <Stat label="Disputed cases" value={d.disputed} />
+        <Stat label="Records digitised" value={d.digitised} unit="%" />
       </div>
-
-      <div className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
-        <h3 style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>Search Tehsil Records</h3>
-        <div className="dash-search-row">
-          <input
-            type="text"
-            className="form-input"
-            maxLength={6}
-            value={pinInput}
-            onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ''))}
-            placeholder="पिन कोड दर्ज करें..."
+      <SectionTitle title="Your tehsil" sub="Service-level limits under the state Public Services Guarantee Act against e-District processing data." />
+      <EvidenceCard
+        title={d.tehsil}
+        meta="Revenue department, land records"
+        status={d.actual > d.sla * 2 ? { label: 'Well past the limit', tone: 'bad' } : { label: 'Past the limit', tone: 'warn' }}
+        claimLabel="Guaranteed service time"
+        realityLabel="e-District processing data"
+        claim={<Kv items={[{ label: 'Mutation', value: `${d.sla} days` }, { label: 'Record copy (khatauni)', value: '7 days' }]} />}
+        reality={
+          <Kv
+            items={[
+              { label: 'Mutation, average', value: `${d.actual} days`, tone: 'bad' },
+              { label: 'Files over the limit', value: d.backlog.toLocaleString('en-IN'), tone: 'bad' },
+              { label: 'Encroachment notices', value: d.encroachment },
+            ]}
           />
-          <button onClick={() => { setCurrentPin(pinInput); setSearchParams({ pin: pinInput }); }} className="dash-search-btn">
-            खोजें
-          </button>
-        </div>
-        {loc.isValid && (
-          <p className="dash-location-label">
-            📍 Active: {loc.district} ({loc.state}) · {landMutationStats.tehsilName}
-          </p>
-        )}
-      </div>
-
-      <div className="glass-card" style={{ padding: '1.25rem' }}>
-        <h3 style={{ fontSize: '1.15rem', marginBottom: '0.5rem' }}>Mutation processing time / म्यूटेशन प्रक्रिया समय</h3>
-        <div className="dash-panel-grid">
-          <div className="dash-panel claim">
-            <span className="dash-panel-label">📢 SLA PROMISED (SLA समय सीमा)</span>
-            <p className="dash-panel-value">{landMutationStats.slaDaysLimit} Days</p>
-          </div>
-          <div className="dash-panel reality">
-            <span className="dash-panel-label">👁️ ACTUAL AVERAGE (वास्तविक औसत)</span>
-            <p className="dash-panel-value">{landMutationStats.actualAverageDays} Days</p>
-          </div>
-        </div>
-
-        <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.8rem', marginBottom: '1rem' }}>
-          <div>🔴 <strong>तहसील में कुल लंबित आवेदन (Pending Backlog):</strong> {landMutationStats.backlogMutationCount.toLocaleString('hi-IN')} मामले</div>
-          <div style={{ color: 'var(--status-critical)', background: 'var(--status-critical-bg)', padding: '0.5rem', borderRadius: '4px', borderLeft: '3px solid var(--status-critical)' }}>
-            ⚠️ <strong>शिकायतें:</strong> {landMutationStats.briberyIndicationText}
-          </div>
-        </div>
-
-        <div className="card-footer-meta">
-          <span>Source: {landMutationStats.source}</span>
-          <button onClick={handleShare} className="btn-whatsapp">
-            📤 Share Mutation Report
-          </button>
-        </div>
-      </div>
+        }
+        finding="Residents have filed repeated complaints on the district grievance portal about mutation files pending well beyond the 45-day limit."
+        responsible="Tehsildar, Revenue Department"
+        source={{ name: 'State Bhulekh / e-District statistics', url: 'https://upbhulekh.gov.in', updated: '2026-07-31' }}
+        recordRef={d.tehsil}
+        onShare={() =>
+          share({
+            pinCode: pin,
+            titleHindi: `ज़मीन म्यूटेशन: ${d.tehsil}`,
+            titleEnglish: `Land mutation: ${d.tehsil}`,
+            claimLabel: `Legal limit ${d.sla} days`,
+            claimLabelHindi: `कानूनी समय सीमा ${d.sla} दिन`,
+            realityLabel: `Average ${d.actual} days, ${d.backlog} pending`,
+            realityLabelHindi: `औसत ${d.actual} दिन, ${d.backlog} लंबित`,
+            responsiblePerson: 'Tehsildar',
+            responsibleOrg: 'Revenue Department',
+            sourceUrl: 'https://upbhulekh.gov.in',
+            moduleNameHindi: 'ज़मीन रजिस्ट्री',
+          })
+        }
+      />
     </div>
   );
 }

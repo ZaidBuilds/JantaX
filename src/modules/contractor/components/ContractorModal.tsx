@@ -30,23 +30,23 @@ export const ContractorModal: React.FC<ContractorModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs overflow-y-auto">
-      <div className="bg-white border-2 border-[#1A1A1A] max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden my-8">
+      <div className="bg-surface border rounded-[10px] border-line max-w-4xl w-full max-h-[90vh] flex flex-col shadow-lg overflow-hidden my-8">
         
         {/* Modal Header */}
-        <div className="p-5 sm:p-6 border-b-2 border-[#1A1A1A] flex items-start justify-between bg-[#FAFAFA]">
+        <div className="p-5 sm:p-6 border-b border-line flex items-start justify-between bg-surface-2">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="bg-[#1A1A1A] text-white px-2 py-0.5 text-[10px] font-mono font-bold uppercase">
+              <span className="bg-[var(--surface-inverse)] text-white px-2 py-0.5 text-xs font-bold">
                 Audited Contractor Profile
               </span>
-              <span className="font-mono text-xs font-bold text-[#1A1A1A] border border-[#1A1A1A] px-2 py-0.5">
+              <span className="text-xs font-bold text-ink border rounded-[10px] border-line px-2 py-0.5">
                 {contractor.registrationNumber}
               </span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#1A1A1A] mt-1">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink mt-1">
               {contractor.name}
             </h2>
-            <p className="text-xs font-serif text-[#1A1A1A]/70 mt-1 flex flex-wrap items-center gap-2">
+            <p className="text-xs text-ink-3 mt-1 flex flex-wrap items-center gap-2">
               <span>{contractor.class}</span>
               <span>•</span>
               <span>Registered in {contractor.registeredCity}</span>
@@ -56,7 +56,7 @@ export const ContractorModal: React.FC<ContractorModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1 border border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white transition-colors"
+            className="p-1 border rounded-[10px] border-line text-ink hover:bg-[var(--surface-inverse)] hover:text-white transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -68,46 +68,46 @@ export const ContractorModal: React.FC<ContractorModalProps> = ({
           {/* Key Metrics Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             
-            <div className="bg-[#FAFAFA] p-3.5 border-2 border-[#1A1A1A]">
-              <span className="text-[10px] font-mono uppercase font-bold text-[#1A1A1A]/70 block">
+            <div className="bg-surface-2 p-3.5 border rounded-[10px] border-line">
+              <span className="text-xs font-bold text-ink-3 block">
                 Integrity Score
               </span>
-              <span className={`text-2xl sm:text-3xl font-black font-mono ${
-                contractor.integrityScore < 40 ? 'text-[#D43F33]' : contractor.integrityScore < 70 ? 'text-[#1A1A1A]' : 'text-emerald-800'
-              }`}>
+              <span className={`text-2xl sm:text-3xl font-bold ${
+ contractor.integrityScore < 40 ? 'text-[var(--bad)]' : contractor.integrityScore < 70 ? 'text-ink' : 'text-good'
+ }`}>
                 {contractor.integrityScore}/100
               </span>
-              <span className="text-[10px] font-mono font-bold uppercase text-[#1A1A1A]/60 block">{contractor.riskTier.replace('_', ' ')}</span>
+              <span className="text-xs font-bold text-ink-3 block">{contractor.riskTier.replace('_', ' ')}</span>
             </div>
 
-            <div className="bg-[#FAFAFA] p-3.5 border-2 border-[#1A1A1A]">
-              <span className="text-[10px] font-mono uppercase font-bold text-[#1A1A1A]/70 block">
+            <div className="bg-surface-2 p-3.5 border rounded-[10px] border-line">
+              <span className="text-xs font-bold text-ink-3 block">
                 Monsoon Failure Rate
               </span>
-              <span className="text-2xl sm:text-3xl font-black font-mono text-[#D43F33]">
+              <span className="text-2xl sm:text-3xl font-bold text-bad">
                 {contractor.monsoonFailureRate}%
               </span>
-              <span className="text-[10px] font-mono text-[#1A1A1A]/60 block">Breakdown in {contractor.avgPotholeAppearanceMonths} mo</span>
+              <span className="text-xs text-ink-3 block">Breakdown in {contractor.avgPotholeAppearanceMonths} mo</span>
             </div>
 
-            <div className="bg-[#FAFAFA] p-3.5 border-2 border-[#1A1A1A]">
-              <span className="text-[10px] font-mono uppercase font-bold text-[#1A1A1A]/70 block">
+            <div className="bg-surface-2 p-3.5 border rounded-[10px] border-line">
+              <span className="text-xs font-bold text-ink-3 block">
                 Active DLP Violations
               </span>
-              <span className="text-2xl sm:text-3xl font-black font-mono text-[#D43F33]">
+              <span className="text-2xl sm:text-3xl font-bold text-bad">
                 {contractor.activeDlpViolationsCount}
               </span>
-              <span className="text-[10px] font-mono text-[#1A1A1A]/60 block">Of {contractor.activeDlpRoadsCount} protected roads</span>
+              <span className="text-xs text-ink-3 block">Of {contractor.activeDlpRoadsCount} protected roads</span>
             </div>
 
-            <div className="bg-[#FAFAFA] p-3.5 border-2 border-[#1A1A1A]">
-              <span className="text-[10px] font-mono uppercase font-bold text-[#1A1A1A]/70 block">
+            <div className="bg-surface-2 p-3.5 border rounded-[10px] border-line">
+              <span className="text-xs font-bold text-ink-3 block">
                 Public Funds Won
               </span>
-              <span className="text-2xl sm:text-3xl font-black font-mono text-[#1A1A1A]">
+              <span className="text-2xl sm:text-3xl font-bold text-ink">
                 ₹{contractor.totalContractsValueCrores} Cr
               </span>
-              <span className="text-[10px] font-mono text-[#1A1A1A]/60 block">{contractor.totalRoadLengthKm} km built</span>
+              <span className="text-xs text-ink-3 block">{contractor.totalRoadLengthKm} km built</span>
             </div>
 
           </div>
@@ -115,22 +115,22 @@ export const ContractorModal: React.FC<ContractorModalProps> = ({
           {/* Historical Notices & Penalties */}
           {contractor.notices.length > 0 && (
             <div className="space-y-2">
-              <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A1A1A] flex items-center gap-1.5">
-                <AlertTriangle className="w-4 h-4 text-[#D43F33]" />
+              <h4 className="text-xs font-bold text-ink flex items-center gap-1.5">
+                <AlertTriangle className="w-4 h-4 text-bad" />
                 <span>Statutory Notices, Fines & Vigilance Records ({contractor.notices.length})</span>
               </h4>
               <div className="space-y-2">
                 {contractor.notices.map((n) => (
-                  <div key={n.id} className="p-3 bg-[#FAFAFA] border-2 border-[#1A1A1A]">
+                  <div key={n.id} className="p-3 bg-surface-2 border rounded-[10px] border-line">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold uppercase text-[#D43F33]">{n.title}</span>
-                      <span className="text-[10px] font-mono text-[#1A1A1A]/70">{n.date}</span>
+                      <span className="text-xs font-bold text-bad">{n.title}</span>
+                      <span className="text-xs text-ink-3">{n.date}</span>
                     </div>
-                    <p className="text-xs font-serif text-[#1A1A1A] mt-1">{n.description}</p>
-                    <div className="mt-2 flex items-center justify-between text-[11px] font-mono border-t border-[#1A1A1A]/10 pt-1.5">
-                      <span className="opacity-70">Issued by: <strong className="text-[#1A1A1A]">{n.authority}</strong></span>
+                    <p className="text-xs text-ink mt-1">{n.description}</p>
+                    <div className="mt-2 flex items-center justify-between text-xs border-t border-line pt-1.5">
+                      <span className="opacity-70">Issued by: <strong className="text-ink">{n.authority}</strong></span>
                       {n.penaltyAmountLakhs && (
-                        <span className="text-[#D43F33] font-bold">Fine: ₹{n.penaltyAmountLakhs} Lakhs</span>
+                        <span className="text-bad font-bold">Fine: ₹{n.penaltyAmountLakhs} Lakhs</span>
                       )}
                     </div>
                   </div>
@@ -141,17 +141,17 @@ export const ContractorModal: React.FC<ContractorModalProps> = ({
 
           {/* Awarded Municipal Work Orders Table */}
           <div className="space-y-2">
-            <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A1A1A] flex items-center justify-between">
+            <h4 className="text-xs font-bold text-ink flex items-center justify-between">
               <span className="flex items-center gap-1.5">
-                <FileSpreadsheet className="w-4 h-4 text-[#1A1A1A]" />
+                <FileSpreadsheet className="w-4 h-4 text-ink" />
                 <span>Audited Work Orders & DLP Status ({contractorWorkOrders.length})</span>
               </span>
-              <span className="text-[10px] font-mono opacity-60 font-normal">State e-Procurement Verified</span>
+              <span className="text-xs opacity-60 font-normal">State e-Procurement Verified</span>
             </h4>
 
-            <div className="border-2 border-[#1A1A1A] overflow-x-auto">
-              <table className="w-full text-left text-xs text-[#1A1A1A]">
-                <thead className="bg-[#FAFAFA] text-[10px] uppercase font-mono font-bold text-[#1A1A1A] border-b-2 border-[#1A1A1A]">
+            <div className="border rounded-[10px] border-line overflow-x-auto">
+              <table className="w-full text-left text-xs text-ink">
+                <thead className="bg-surface-2 text-xs font-bold text-ink border-b border-line">
                   <tr>
                     <th className="p-3">Work Order</th>
                     <th className="p-3">Road Name & Ward</th>
@@ -161,33 +161,33 @@ export const ContractorModal: React.FC<ContractorModalProps> = ({
                     <th className="p-3">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#1A1A1A]/10 bg-white font-mono">
+                <tbody className="divide-y divide-[#1A1A1A]/10 bg-surface">
                   {contractorWorkOrders.map((wo) => {
                     const isBreach = wo.dlpStatus === 'DLP_BREACH_UNRESOLVED';
                     return (
-                      <tr key={wo.id} className="hover:bg-black/5">
-                        <td className="p-3 font-bold text-[#1A1A1A]">
+                      <tr key={wo.id} className="hover:bg-surface-3">
+                        <td className="p-3 font-bold text-ink">
                           {wo.tenderNumber}
                         </td>
                         <td className="p-3 font-sans">
-                          <p className="font-bold text-[#1A1A1A] uppercase">{wo.roadName}</p>
-                          <p className="text-[10px] font-mono opacity-70">{wo.wardName}</p>
+                          <p className="font-bold text-ink">{wo.roadName}</p>
+                          <p className="text-xs opacity-70">{wo.wardName}</p>
                         </td>
-                        <td className="p-3 font-bold text-[#1A1A1A]">
+                        <td className="p-3 font-bold text-ink">
                           ₹{wo.sanctionedAmountLakhs} L
                         </td>
                         <td className="p-3">
-                          <span className="px-1.5 py-0.5 bg-[#FAFAFA] border border-[#1A1A1A] text-[10px] font-bold">
+                          <span className="px-1.5 py-0.5 bg-surface-2 border rounded-[10px] border-line text-xs font-bold">
                             {wo.specifications.bitumenGrade} ({wo.specifications.thicknessMm}mm)
                           </span>
                         </td>
-                        <td className="p-3 text-[11px]">
+                        <td className="p-3 text-xs">
                           {wo.dlpExpiryDate}
                         </td>
                         <td className="p-3">
-                          <span className={`px-2 py-0.5 text-[10px] font-bold uppercase border ${
-                            isBreach ? 'bg-[#D43F33] text-white border-[#D43F33]' : 'bg-[#1A1A1A] text-white border-[#1A1A1A]'
-                          }`}>
+                          <span className={`px-2 py-0.5 text-xs font-bold border rounded-[10px] ${
+ isBreach ? 'bg-[var(--bad)] text-white border-[var(--bad)]' : 'bg-[var(--surface-inverse)] text-white border-line'
+ }`}>
                             {isBreach ? `${wo.activeFailuresCount} DLP Violations` : 'Protected'}
                           </span>
                         </td>
@@ -202,26 +202,26 @@ export const ContractorModal: React.FC<ContractorModalProps> = ({
           {/* Citizen Failure Reports on this Contractor */}
           {contractorDefects.length > 0 && (
             <div className="space-y-2">
-              <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-[#1A1A1A] flex items-center gap-1.5">
-                <ShieldAlert className="w-4 h-4 text-[#D43F33]" />
+              <h4 className="text-xs font-bold text-ink flex items-center gap-1.5">
+                <ShieldAlert className="w-4 h-4 text-bad" />
                 <span>Citizen Verified Road Failures ({contractorDefects.length})</span>
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {contractorDefects.map((d) => (
-                  <div key={d.id} className="p-3 bg-[#FAFAFA] border-2 border-[#1A1A1A] flex gap-3">
+                  <div key={d.id} className="p-3 bg-surface-2 border rounded-[10px] border-line flex gap-3">
                     <img 
                       src={d.photoUrl} 
                       alt="Defect" 
-                      className="w-16 h-16 object-cover border-2 border-[#1A1A1A] shrink-0" 
+                      className="w-16 h-16 object-cover border rounded-[10px] border-line shrink-0" 
                       referrerPolicy="no-referrer"
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-[#1A1A1A] uppercase truncate">{d.defectType}</span>
-                        <span className="text-[10px] text-[#D43F33] font-mono font-bold uppercase">{d.severity}</span>
+                        <span className="text-xs font-bold text-ink truncate">{d.defectType}</span>
+                        <span className="text-xs text-bad font-bold">{d.severity}</span>
                       </div>
-                      <p className="text-[11px] font-serif text-[#1A1A1A]/80 line-clamp-2 mt-1">{d.description}</p>
-                      <p className="text-[10px] font-mono text-[#1A1A1A]/60 mt-1">Reported by {d.reporterName} • {d.citizenUpvotes} citizen verifications</p>
+                      <p className="text-xs text-ink-2 line-clamp-2 mt-1">{d.description}</p>
+                      <p className="text-xs text-ink-3 mt-1">Reported by {d.reporterName} • {d.citizenUpvotes} citizen verifications</p>
                     </div>
                   </div>
                 ))}
@@ -232,10 +232,10 @@ export const ContractorModal: React.FC<ContractorModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 sm:p-5 border-t-2 border-[#1A1A1A] bg-[#FAFAFA] flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-t border-line bg-surface-2 flex items-center justify-between">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-white hover:bg-black/5 text-xs font-bold uppercase text-[#1A1A1A] border-2 border-[#1A1A1A] transition-colors"
+            className="px-4 py-2 bg-surface hover:bg-surface-3 text-xs font-bold text-ink border rounded-[10px] border-line transition-colors"
           >
             Close Dossier
           </button>
@@ -245,7 +245,7 @@ export const ContractorModal: React.FC<ContractorModalProps> = ({
               onClose();
               onGenerateAction(contractor);
             }}
-            className="inline-flex items-center space-x-2 bg-[#D43F33] hover:bg-[#1A1A1A] text-white text-xs font-bold uppercase tracking-tight px-4 py-2 transition-colors shadow-sm"
+            className="inline-flex items-center space-x-2 bg-[var(--bad-solid)] hover:bg-[var(--surface-inverse)] text-white text-xs font-bold tracking-tight px-4 py-2 transition-colors shadow-sm"
           >
             <FileText className="w-4 h-4" />
             <span>Generate 1-Click Action & RTI Dossier</span>

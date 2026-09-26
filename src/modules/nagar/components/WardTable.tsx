@@ -11,7 +11,7 @@ export function WardTable({ wards }: Props) {
   if (wards.length === 0) {
     return (
       <div className="jantax-card" style={{ padding: '3rem 1.5rem', textAlign: 'center' }}>
-        <p style={{ color: '#64748b', fontSize: '0.95rem', margin: 0 }}>
+        <p style={{ color: 'var(--ink-3)', fontSize: '0.95rem', margin: 0 }}>
           No municipal wards found matching your search filter.
         </p>
       </div>
@@ -22,7 +22,7 @@ export function WardTable({ wards }: Props) {
     <div className="jantax-table-wrapper">
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
         <thead>
-          <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0', textAlign: 'left', color: '#475569', fontWeight: 700 }}>
+          <tr style={{ background: 'var(--surface-2)', borderBottom: '2px solid var(--border)', textAlign: 'left', color: 'var(--ink-2)', fontWeight: 700 }}>
             <th style={{ padding: '0.85rem 1rem' }}>Ward & Corporation</th>
             <th style={{ padding: '0.85rem 1rem' }}>Cleanliness Score</th>
             <th style={{ padding: '0.85rem 1rem' }}>Elected Councillor</th>
@@ -40,21 +40,21 @@ export function WardTable({ wards }: Props) {
               <tr
                 key={w.id}
                 style={{
-                  borderBottom: '1px solid #f1f5f9',
+                  borderBottom: '1px solid var(--border)',
                   transition: 'background 0.15s ease',
                 }}
               >
                 <td style={{ padding: '1rem', maxWidth: 280 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.2rem' }}>
-                    <span style={{ background: '#0f2d59', color: '#ffffff', fontSize: '0.72rem', fontWeight: 800, padding: '0.15rem 0.5rem', borderRadius: 4 }}>
+                    <span style={{ background: 'var(--brand)', color: 'var(--on-solid)', fontSize: '0.72rem', fontWeight: 800, padding: '0.15rem 0.5rem', borderRadius: 4 }}>
                       WARD #{w.wardNumber}
                     </span>
-                    <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>{w.zone}</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--ink-3)', fontWeight: 600 }}>{w.zone}</span>
                   </div>
-                  <div style={{ fontWeight: 700, color: '#0f2d59', lineHeight: 1.3 }}>
+                  <div style={{ fontWeight: 700, color: 'var(--ink)', lineHeight: 1.3 }}>
                     {w.wardName}
                   </div>
-                  <div style={{ fontSize: '0.72rem', color: '#f97316', marginTop: '0.15rem' }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--accent-ink)', marginTop: '0.15rem' }}>
                     {w.corporationName} • PIN {w.pinCode}
                   </div>
                 </td>
@@ -66,37 +66,37 @@ export function WardTable({ wards }: Props) {
                   >
                     {w.cleanlinessScore} / 100
                   </span>
-                  <div style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '0.2rem' }}>
-                    {w.services.doorToDoorGarbage ? '✓ Daily Collection' : '⚠ Irregular'}
+                  <div style={{ fontSize: '0.68rem', color: 'var(--ink-3)', marginTop: '0.2rem' }}>
+                    {w.services.doorToDoorGarbage ? '✓ Daily Collection' : 'Irregular'}
                   </div>
                 </td>
 
                 <td style={{ padding: '1rem', maxWidth: 180 }}>
-                  <div style={{ fontWeight: 700, color: '#0f2d59', fontSize: '0.82rem' }}>
+                  <div style={{ fontWeight: 700, color: 'var(--ink)', fontSize: '0.82rem' }}>
                     {w.councillor.name}
                   </div>
-                  <div style={{ fontSize: '0.72rem', color: '#64748b' }}>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)' }}>
                     {w.councillor.party}
                   </div>
-                  <a href={`tel:${w.councillor.phone}`} style={{ fontSize: '0.72rem', color: '#2563eb', textDecoration: 'none', fontWeight: 600 }}>
+                  <a href={`tel:${w.councillor.phone}`} style={{ fontSize: '0.72rem', color: 'var(--brand-ink)', textDecoration: 'none', fontWeight: 600 }}>
                     {w.councillor.phone}
                   </a>
                 </td>
 
                 <td style={{ padding: '1rem', maxWidth: 180 }}>
-                  <div style={{ fontWeight: 700, color: '#0f2d59', fontSize: '0.82rem' }}>
+                  <div style={{ fontWeight: 700, color: 'var(--ink)', fontSize: '0.82rem' }}>
                     {w.sanitaryInspector.name}
                   </div>
-                  <a href={`tel:${w.sanitaryInspector.phone}`} style={{ fontSize: '0.72rem', color: '#16a34a', textDecoration: 'none', fontWeight: 600 }}>
+                  <a href={`tel:${w.sanitaryInspector.phone}`} style={{ fontSize: '0.72rem', color: 'var(--good)', textDecoration: 'none', fontWeight: 600 }}>
                     {w.sanitaryInspector.phone}
                   </a>
                 </td>
 
                 <td style={{ padding: '1rem', whiteSpace: 'nowrap' }}>
-                  <div style={{ fontWeight: 800, color: w.avgResolutionHours <= 30 ? '#10b981' : '#f59e0b' }}>
+                  <div style={{ fontWeight: 800, color: w.avgResolutionHours <= 30 ? 'var(--good)' : 'var(--warn)' }}>
                     ~{w.avgResolutionHours} Hours
                   </div>
-                  <div style={{ fontSize: '0.68rem', color: '#64748b' }}>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>
                     {w.slaCompliancePercent}% within SLA
                   </div>
                 </td>
@@ -108,8 +108,8 @@ export function WardTable({ wards }: Props) {
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '0.2rem',
-                      background: '#0f2d59',
-                      color: '#ffffff',
+                      background: 'var(--brand)',
+                      color: 'var(--on-solid)',
                       padding: '0.35rem 0.75rem',
                       borderRadius: 8,
                       fontSize: '0.75rem',

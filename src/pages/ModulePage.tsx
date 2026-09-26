@@ -1,115 +1,72 @@
-import React from 'react';
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { SchoolModulePage } from './SchoolModulePage';
-import { InfraApp } from '../modules/infra/InfraApp';
-import { HospitalDashboard } from '../modules/hospital/components/HospitalDashboard';
-import { ReraDashboard } from '../modules/rera/components/ReraDashboard';
-import ContractorApp from '../modules/contractor/ContractorApp';
-import { RationDashboard } from '../modules/ration/components/RationDashboard';
-import { CpgramsDashboard } from '../modules/grievance/components/CpgramsDashboard';
-import { CourtsDirectoryPage } from '../modules/courts/pages/CourtsDirectoryPage';
-import { RtiDirectoryPage } from '../modules/rti/pages/RtiDirectoryPage';
-import { MpladsDirectoryPage } from '../modules/mplads/pages/MpladsDirectoryPage';
-import { NagarDirectoryPage } from '../modules/nagar/pages/NagarDirectoryPage';
-import { PollutionDirectoryPage } from '../modules/pollution/pages/PollutionDirectoryPage';
-import { MonitoringDashboardPage } from '../modules/monitoring/pages/MonitoringDashboardPage';
-import { AndhbhaktDash } from '../modules/andhbhakt/components/AndhbhaktDash';
-import { UtilityDashboard } from '../modules/utility/components/UtilityDashboard';
-import { LandDashboard } from '../modules/land/components/LandDashboard';
-import { ArrowLeft } from 'lucide-react';
+import { Navigate, useParams, useSearchParams } from 'react-router-dom';
+import { lazy, Suspense, type ComponentType } from 'react';
+import { ModuleFrame } from './ModuleFrame';
+import { NotFoundPage } from './NotFoundPage';
+import { Breadcrumbs, canonicalModuleId } from '../ui';
+import { OfficialRecords } from '../ui/OfficialRecords';
+
+function screen<T extends Record<string, unknown>>(loader: () => Promise<T>, name: keyof T) {
+  return lazy(() => loader().then((m) => ({ default: m[name] as unknown as ComponentType })));
+}
+
+/** Each module is its own chunk so opening one module does not download all eighteen. */
+const SCREENS: Record<string, ComponentType> = {
+  infra: screen(() => import('../modules/infra/InfraApp'), 'InfraApp'),
+  hospital: screen(() => import('../modules/hospital/components/HospitalDashboard'), 'HospitalDashboard'),
+  rera: screen(() => import('../modules/rera/components/ReraDashboard'), 'ReraDashboard'),
+  contractor: screen(() => import('../modules/contractor/ContractorApp'), 'default'),
+  ration: screen(() => import('../modules/ration/components/RationDashboard'), 'RationDashboard'),
+  grievance: screen(() => import('../modules/grievance/components/CpgramsDashboard'), 'CpgramsDashboard'),
+  courts: screen(() => import('../modules/courts/pages/CourtsDirectoryPage'), 'CourtsDirectoryPage'),
+  rti: screen(() => import('../modules/rti/pages/RtiDirectoryPage'), 'RtiDirectoryPage'),
+  mplads: screen(() => import('../modules/mplads/pages/MpladsDirectoryPage'), 'MpladsDirectoryPage'),
+  nagar: screen(() => import('../modules/nagar/pages/NagarDirectoryPage'), 'NagarDirectoryPage'),
+  pollution: screen(() => import('../modules/pollution/pages/PollutionDirectoryPage'), 'PollutionDirectoryPage'),
+  monitoring: screen(() => import('../modules/monitoring/pages/MonitoringDashboardPage'), 'MonitoringDashboardPage'),
+  andhbhakt: screen(() => import('../modules/andhbhakt/components/AndhbhaktDash'), 'AndhbhaktDash'),
+  utility: screen(() => import('../modules/utility/components/UtilityDashboard'), 'UtilityDashboard'),
+  land: screen(() => import('../modules/land/components/LandDashboard'), 'LandDashboard'),
+  budget: screen(() => import('../modules/budget/components/BudgetDashboard'), 'BudgetDashboard'),
+  election: screen(() => import('../modules/election/components/ElectionDashboard'), 'ElectionDashboard'),
+  booth: screen(() => import('../modules/booth/pages/BoothDirectoryPage'), 'BoothDirectoryPage'),
+};
+
+function ScreenLoading() {
+  return (
+    <div className="stack" aria-busy="true">
+      <span className="skeleton" style={{ height: 72 }} />
+      <span className="skeleton" style={{ height: 96 }} />
+      <span className="skeleton" style={{ height: 240 }} />
+    </div>
+  );
+}
 
 export function ModulePage() {
-  const { moduleId } = useParams<{ moduleId: string }>();
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const { moduleId = '' } = useParams<{ moduleId: string }>();
+  const [params] = useSearchParams();
+  const id = canonicalModuleId(moduleId);
 
-  const id = (moduleId || '').toLowerCase();
-
-  switch (id) {
-    case 'school':
-    case 'schools':
-      return <SchoolModulePage />;
-
-    case 'infra':
-    case 'projects':
-    case 'roads':
-      return <InfraApp />;
-
-    case 'hospital':
-    case 'healthcare':
-    case 'health':
-      return <HospitalDashboard />;
-
-    case 'rera':
-    case 'housing':
-      return <ReraDashboard />;
-
-    case 'contractor':
-    case 'contractors':
-      return <ContractorApp />;
-
-    case 'ration':
-    case 'pds':
-      return <RationDashboard />;
-
-    case 'grievance':
-    case 'cpgrams':
-      return <CpgramsDashboard />;
-
-    case 'courts':
-    case 'court':
-      return <CourtsDirectoryPage />;
-
-    case 'rti':
-      return <RtiDirectoryPage />;
-
-    case 'mplads':
-    case 'mp':
-      return <MpladsDirectoryPage />;
-
-    case 'nagar':
-    case 'ward':
-    case 'municipality':
-      return <NagarDirectoryPage />;
-
-    case 'pollution':
-    case 'air':
-    case 'aqi':
-      return <PollutionDirectoryPage />;
-
-    case 'monitoring':
-      return <MonitoringDashboardPage />;
-
-    case 'andhbhakt':
-    case 'claims':
-      return <AndhbhaktDash />;
-
-    case 'utility':
-    case 'power':
-    case 'water':
-      return <UtilityDashboard />;
-
-    case 'land':
-      return <LandDashboard />;
-
-    default:
-      return (
-        <div className="container" style={{ padding: '3rem 1.25rem', textAlign: 'center' }}>
-          <h2 style={{ fontSize: '1.4rem', color: 'var(--color-primary)', marginBottom: '0.75rem' }}>
-            Module "{moduleId}"
-          </h2>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-            This observatory is being connected to live central and state databases.
-          </p>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => navigate('/')}
-          >
-            <ArrowLeft size={16} />
-            <span>Back to Home</span>
-          </button>
-        </div>
-      );
+  if (id === 'school') {
+    // Schools have their own section; old /module/school links land on the directory or the profile.
+    const schoolId = params.get('id') || params.get('schoolId');
+    if (schoolId) return <Navigate to={`/schools/${encodeURIComponent(schoolId)}`} replace />;
+    const pin = params.get('pin');
+    return <Navigate to={pin ? `/schools?pin=${pin}` : '/schools'} replace />;
   }
+
+  const Screen = SCREENS[id];
+  if (!Screen) return <NotFoundPage />;
+  if (id !== moduleId) {
+    const qs = params.toString();
+    return <Navigate to={`/module/${id}${qs ? `?${qs}` : ''}`} replace />;
+  }
+
+  return (
+    <ModuleFrame moduleId={id}>
+      <OfficialRecords moduleId={id} />
+      <Suspense fallback={<ScreenLoading />}>
+        <Screen />
+      </Suspense>
+    </ModuleFrame>
+  );
 }

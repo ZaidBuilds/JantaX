@@ -84,7 +84,7 @@ export function CategoryOverviewCard({
             >
               <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                 {m.status === 'stale' && (
-                  <AlertTriangle size={10} style={{ color: '#f97316' }} />
+                  <AlertTriangle size={10} style={{ color: 'var(--accent-ink)' }} />
                 )}
                 {m.name}
               </span>
@@ -92,7 +92,7 @@ export function CategoryOverviewCard({
                 {m.value}
                 {m.unit && <span style={{ opacity: 0.5, fontSize: '0.9em' }}>{m.unit}</span>}
                 {m.status === 'stale' && (
-                  <Clock size={10} style={{ color: '#f97316' }} />
+                  <Clock size={10} style={{ color: 'var(--accent-ink)' }} />
                 )}
               </strong>
             </div>
@@ -104,9 +104,9 @@ export function CategoryOverviewCard({
         <div
           style={{
             fontSize: '0.7rem',
-            color: '#94a3b8',
+            color: 'var(--ink-4)',
             padding: '0.5rem 0.75rem',
-            background: '#f8fafc',
+            background: 'var(--surface-2)',
             borderRadius: 6,
             marginBottom: '0.75rem',
           }}

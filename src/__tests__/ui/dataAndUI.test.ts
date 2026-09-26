@@ -25,11 +25,14 @@ describe('Data Integrity & UI/Accessibility Verification Tests', () => {
     });
   });
 
-  it('should check data freshness sync statuses and report health', () => {
+  it('never reports ingested records or a sync time for a source that is not connected', () => {
     const syncItems = getSyncStatuses();
     expect(syncItems.length).toBeGreaterThan(0);
-    syncItems.forEach((s) => {
-      expect(s.syncHealthPct).toBeGreaterThan(90);
-    });
+    syncItems
+      .filter((s) => s.status !== 'Connected')
+      .forEach((s) => {
+        expect(s.totalRecordsIngested).toBe(0);
+        expect(s.lastSuccessfulSync).not.toMatch(/\d{4}-\d{2}-\d{2}/);
+      });
   });
 });

@@ -1,0 +1,23 @@
+# JantaX data API: Express + Prisma + the sync scheduler. Build context is the repo root.
+#   docker build -f Dockerfile.api -t jantax-api .
+#   docker run -p 4000:4000 -e DATABASE_URL=... -e JWT_SECRET=... -e DATA_GOV_IN_API_KEY=... jantax-api
+FROM node:20-slim
+RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
+COPY prisma ./prisma
+RUN npx prisma generate
+
+COPY tsconfig.json ./
+COPY server ./server
+COPY data/templates ./data/templates
+
+ENV NODE_ENV=production \
+    PORT=4000 \
+    RAW_DATA_DIR=/app/data/raw
+EXPOSE 4000
+
+# Apply pending migrations, then serve. The scheduler starts with the server (SYNC_SCHEDULE, on by default in production).
+CMD ["sh", "-c", "npx prisma migrate deploy && npx tsx server/src/index.ts"]

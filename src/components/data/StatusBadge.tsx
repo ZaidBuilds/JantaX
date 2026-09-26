@@ -18,7 +18,7 @@ export function StatusBadge({ status, statusHi, type }: StatusBadgeProps) {
 
   return (
     <span className={`status-badge ${badgeType}`}>
-      {statusHi ? `${statusHi} — ${status}` : status}
+      {statusHi ? `${statusHi} · ${status}` : status}
     </span>
   );
 }

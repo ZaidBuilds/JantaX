@@ -20,8 +20,8 @@ export function generateMockContractorDataset(pincode: string = '560034'): {
     'Meerut Builders & Infrastructure Ltd',
     'Chaudhary Road Builders',
     'M/S Tomar Solar Power Solutions',
-    'Larsen & Toubro Construction',
-    'HCC & BEML JV',
+    'Sample Contractor A Construction',
+    'Sample Contractor E & F JV',
     'Sardar Medical Const. Corp.',
   ];
 

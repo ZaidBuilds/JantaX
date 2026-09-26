@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
+import { useParams, useLocation, Link } from 'react-router-dom';
 import { getReportById } from '../services/reportingService';
 import type { CitizenReport } from '../types/citizenReport';
 import { ReportStatus } from '../components/ReportStatus';
 import { OfficialActionLayer } from '../components/OfficialActionLayer';
-import { ArrowLeft, FileText, Send, Share2, AlertCircle } from 'lucide-react';
+import { FileText, Send, Share2, AlertCircle } from 'lucide-react';
+import { Breadcrumbs, EmptyState, reportForDisplay } from '../../../ui';
+
+const load = (id: string) => {
+  const r = getReportById(id);
+  return r ? reportForDisplay(r) : undefined;
+};
 
 interface ReportDetailPageProps {
   activeTab?: 'report' | 'action';
@@ -12,15 +18,14 @@ interface ReportDetailPageProps {
 
 export function ReportDetailPage({ activeTab: initialTab }: ReportDetailPageProps) {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const location = useLocation();
 
-  const [report, setReport] = useState<CitizenReport | undefined>(() => id ? getReportById(id) : undefined);
+  const [report, setReport] = useState<CitizenReport | undefined>(() => (id ? load(id) : undefined));
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (id) {
-      setReport(getReportById(id));
+      setReport(load(id));
     }
   }, [id]);
 
@@ -30,14 +35,16 @@ export function ReportDetailPage({ activeTab: initialTab }: ReportDetailPageProp
 
   if (!report) {
     return (
-      <div style={{ padding: '4rem 1.5rem', textAlign: 'center', maxWidth: 600, margin: '0 auto' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#0f172a' }}>Report Not Found</h2>
-        <p style={{ color: '#64748b', margin: '0.5rem 0 1.5rem' }}>
-          The requested report ID "{id}" was not found in the database.
-        </p>
-        <Link to="/reports" style={{ padding: '0.65rem 1.25rem', borderRadius: 10, background: 'var(--gradient-accent)', color: '#ffffff', fontWeight: 700, textDecoration: 'none' }}>
-          Return to Reports Directory
-        </Link>
+      <div className="page page-narrow">
+        <Breadcrumbs items={[{ label: 'Citizen reports', to: '/reports' }, { label: 'Not found' }]} />
+        <div className="card">
+          <EmptyState
+            icon={AlertCircle}
+            title="We could not find that report"
+            text={`No report with the reference "${id}" exists, or it was removed after review.`}
+            action={<Link to="/reports" className="btn btn-primary">Back to all reports</Link>}
+          />
+        </div>
       </div>
     );
   }
@@ -51,32 +58,34 @@ export function ReportDetailPage({ activeTab: initialTab }: ReportDetailPageProp
   };
 
   return (
-    <div style={{ padding: '1.75rem 0', maxWidth: 1050, margin: '0 auto' }}>
-      {/* Back Navigation & Actions Bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-        <button onClick={() => navigate('/reports')} style={{ background: 'none', border: 'none', color: '#2563eb', fontWeight: 700, fontSize: '0.86rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', padding: 0 }}>
-          <ArrowLeft size={16} /> Back to Reports Directory
-        </button>
+    <div className="page">
+      <Breadcrumbs items={[{ label: 'Citizen reports', to: '/reports' }, { label: report.title }]} />
+      <header className="page-header">
+        <div className="page-header-main">
+          <h1 className="page-title" style={{ fontSize: 'clamp(1.5rem, 1.2rem + 1vw, 2rem)' }}>{report.title}</h1>
+          <p className="page-lede">
+            {report.category} · PIN {report.location.pinCode} · {report.location.landmark}, {report.location.district}
+          </p>
+        </div>
+        <div className="page-actions">
+          <button type="button" onClick={handleShare} className="btn btn-secondary">
+            <Share2 size={16} aria-hidden="true" /> {copied ? 'Link copied' : 'Share'}
+          </button>
+        </div>
+      </header>
 
-        <button onClick={handleShare} style={{ background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: 8, padding: '0.4rem 0.75rem', fontSize: '0.78rem', fontWeight: 700, color: '#334155', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-          <Share2 size={13} /> {copied ? 'Link Copied!' : 'Share Report'}
-        </button>
-      </div>
-
-      {/* Main Tabs Navigation */}
-      <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '2px solid #e2e8f0', marginBottom: '1.5rem' }}>
-        <Link to={`/reports/${report.id}`} style={{ padding: '0.65rem 1.15rem', borderBottom: activeTab === 'report' ? '3px solid #f97316' : '3px solid transparent', color: activeTab === 'report' ? '#f97316' : '#64748b', fontWeight: activeTab === 'report' ? 800 : 600, fontSize: '0.9rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-          <FileText size={16} /> Citizen Report & Moderation
+      <nav className="tabs" aria-label="Report sections" style={{ marginBottom: 'var(--s-6)' }}>
+        <Link to={`/reports/${report.id}`} className={`tab${activeTab === 'report' ? ' is-active' : ''}`} aria-current={activeTab === 'report' ? 'page' : undefined}>
+          <FileText size={16} aria-hidden="true" /> Report and moderation
         </Link>
-
-        <Link to={`/reports/${report.id}/action`} style={{ padding: '0.65rem 1.15rem', borderBottom: activeTab === 'action' ? '3px solid #f97316' : '3px solid transparent', color: activeTab === 'action' ? '#f97316' : '#64748b', fontWeight: activeTab === 'action' ? 800 : 600, fontSize: '0.9rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-          <Send size={16} /> Official Action & CPGRAMS Layer
+        <Link to={`/reports/${report.id}/action`} className={`tab${activeTab === 'action' ? ' is-active' : ''}`} aria-current={activeTab === 'action' ? 'page' : undefined}>
+          <Send size={16} aria-hidden="true" /> Official action
         </Link>
-      </div>
+      </nav>
 
       {/* Tab 1: Citizen Report & Moderation */}
       {activeTab === 'report' && (
-        <ReportStatus report={report} onUpdate={() => setReport(getReportById(report.id))} />
+        <ReportStatus report={report} onUpdate={() => setReport(load(report.id))} />
       )}
 
       {/* Tab 2: Official Action & Tracking Layer */}
