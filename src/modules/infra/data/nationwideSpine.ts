@@ -20,7 +20,10 @@ const LAST_NAMES: Record<string, string[]> = {
   Central: ['चौहान', 'शुक्ला', 'बघेल', 'दुबे', 'पाण्डेय', 'सक्सेना', 'दीक्षित', 'द्विवेदी', 'मिश्रा', 'यादव'],
 };
 
-const VILLAGE_PREFIXES = ['रामपुर', 'कल्याणपुर', 'गोपालपुर', 'हरिपुर', 'शिवपुर', 'मोहनपुर', 'कृष्णपुर', 'अंबेडकर नगर', 'गांधी नगर', 'सुभाष नगर'];
+const VILLAGE_PREFIXES: [string, string][] = [
+  ['Rampur', 'रामपुर'], ['Kalyanpur', 'कल्याणपुर'], ['Gopalpur', 'गोपालपुर'], ['Haripur', 'हरिपुर'], ['Shivpur', 'शिवपुर'],
+  ['Mohanpur', 'मोहनपुर'], ['Krishnapur', 'कृष्णपुर'], ['Ambedkar Nagar', 'अंबेडकर नगर'], ['Gandhi Nagar', 'गांधी नगर'], ['Subhash Nagar', 'सुभाष नगर'],
+];
 const SCHEMES = [
   { name: '15th Finance Commission Tied Grant', nameHi: '15वां वित्त आयोग बंधा हुआ अनुदान' },
   { name: 'Swachh Bharat Mission (Grameen) Sanitation Fund', nameHi: 'स्वच्छ भारत मिशन (ग्रामीण) स्वच्छता कोष' },
@@ -133,7 +136,7 @@ export function getSpineDataForPincode(pinCode: string): SpineData {
   const gpSeed = pinCode + '-gp';
   const gpName = makeName(gpSeed);
   const gpVillageIdx = getDeterministicIndex(gpSeed + 'village', VILLAGE_PREFIXES.length);
-  const gpVillage = VILLAGE_PREFIXES[gpVillageIdx];
+  const [gpVillage, gpVillageHi] = VILLAGE_PREFIXES[gpVillageIdx];
   const gp: Representative = {
     id: `rep-gp-${pinCode}`,
     name: gpName.nameEn,
@@ -141,7 +144,7 @@ export function getSpineDataForPincode(pinCode: string): SpineData {
     level: 'village',
     party: 'IND',
     constituencyName: `${gpVillage} Gram Panchayat`,
-    constituencyNameHi: `${gpVillage} ग्राम पंचायत`,
+    constituencyNameHi: `${gpVillageHi} ग्राम पंचायत`,
     pinCodes: [pinCode],
   };
 

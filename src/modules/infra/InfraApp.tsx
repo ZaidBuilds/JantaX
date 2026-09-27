@@ -91,7 +91,7 @@ export function InfraApp() {
         "state": "Uttar Pradesh",
         "district": "Gautam Buddha Nagar",
         "leadContractor": "DMRC Contract JV",
-        "responsibleOfficer": "Shri Vikas Kumar",
+        "responsibleOfficer": "Executive engineer (sample)",
         "responsibleOfficerDesignation": "Managing Director, DMRC",
         "status": "Construction",
         "statusHindi": "निर्माण कार्य चालू है",

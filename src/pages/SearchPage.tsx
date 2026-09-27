@@ -31,6 +31,7 @@ import { api, type SearchResponse, type SearchResult, type AutocompleteSuggestio
 import { isValidIndianPincode } from '../core/utils/pinResolver';
 import { Badge, Breadcrumbs, EmptyState, ModuleIcon, toneForStatus, useDismiss } from '../ui';
 import { searchTopics } from '../core/services/topicSearch';
+import { t } from '../i18n';
 
 const TYPES: Record<string, { label: string; icon: LucideIcon; tone: string }> = {
   location: { label: 'Areas', icon: MapPin, tone: 'var(--accent)' },
@@ -392,7 +393,7 @@ export function SearchPage() {
               <p className="small" style={{ color: 'var(--ink-2)' }}>
                 {loading ? 'Searching…' : (
                   <>
-                    <strong className="num">{total}</strong> {total === 1 ? 'result' : 'results'} for <strong>“{q}”</strong>
+                    <span className="strong">{t(total === 1 ? '{n} result for “{q}”' : '{n} results for “{q}”', { n: total, q })}</span>
                   </>
                 )}
               </p>

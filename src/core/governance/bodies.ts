@@ -144,7 +144,7 @@ export const BODIES: Record<string, Body> = {
     level: 'state',
     name: { en: 'Member of the Legislative Council (MLC)', hi: 'विधान परिषद सदस्य (MLC)' },
     about: { en: 'Only six states have a Legislative Council. MLCs are chosen by MLAs, local bodies, graduates and teachers, or nominated.', hi: 'केवल छह राज्यों में विधान परिषद है। MLC को विधायक, स्थानीय निकाय, स्नातक और शिक्षक चुनते हैं, या उन्हें मनोनीत किया जाता है।' },
-    elected: { title: { en: 'MLC', hi: 'MLC' }, how: { en: 'Indirectly elected or nominated, for 6 years', hi: 'अप्रत्यक्ष चुनाव या मनोनयन, 6 साल के लिए' } },
+    elected: { title: { en: 'MLC', hi: 'विधान परिषद सदस्य' }, how: { en: 'Indirectly elected or nominated, for 6 years', hi: 'अप्रत्यक्ष चुनाव या मनोनयन, 6 साल के लिए' } },
     handles: [{ en: 'Reviews state laws', hi: 'राज्य के कानूनों की समीक्षा' }],
     basis: { en: 'Article 169', hi: 'अनुच्छेद 169' },
   },

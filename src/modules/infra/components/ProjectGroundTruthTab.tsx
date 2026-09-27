@@ -292,7 +292,7 @@ export const ProjectGroundTruthTab: React.FC<ProjectGroundTruthTabProps> = ({
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Ankit Sharma"
+                  placeholder="Leave blank to stay anonymous"
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
                   style={{ width: '100%', padding: '0.55rem 0.75rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.85rem' }}

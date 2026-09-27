@@ -1,7 +1,7 @@
 import { getSyncStatuses } from '../services/transparencyService';
 import { TransparencyLayout } from '../components/TransparencyLayout';
 import { Badge, Stat } from '../../../ui';
-import { STATE_TONE, STATUS_TONE } from './SourcesPage';
+import { moduleLabel, STATE_TONE, STATUS_TONE } from './SourcesPage';
 import { formatWhen, isConnected, STATE_LABEL, useCatalog } from '../../../core/services/officialData';
 
 const SCHEDULE: Record<string, string> = { hourly: 'Hourly', daily: 'Daily', weekly: 'Weekly', monthly: 'Monthly', quarterly: 'Quarterly', annual: 'Yearly', event: 'On import' };
@@ -43,7 +43,7 @@ export function DataFreshnessPage() {
                 <tr key={r.id}>
                   <td>
                     <div className="strong">{r.title}</div>
-                    <div className="tiny muted">{r.publisher}{r.module ? ` · ${r.module}` : ''}</div>
+                    <div className="tiny muted">{r.publisher}{r.module ? ` · ${moduleLabel(r.module)}` : ''}</div>
                     {r.lastError && <div className="tiny text-warn" style={{ marginTop: 2 }}>Last attempt failed: {r.lastError.slice(0, 160)}</div>}
                   </td>
                   <td className="small" style={{ color: 'var(--ink-2)' }}>

@@ -22,6 +22,8 @@ const routes = [
   '/module/pollution?pin=110001',
   '/module/contractor?pin=110001',
   '/module/mplads?pin=110001',
+  '/governance?pin=110001',
+  '/governance?pin=302001&type=village',
 ];
 
 type Violation = { id: string; impact: string | null; help: string; nodes: { target: string[]; failureSummary?: string }[] };

@@ -1,5 +1,5 @@
-import { createContext, Fragment, useContext, useLayoutEffect, useState, type ReactNode } from 'react';
-import { pick, setLang, t, type Lang } from '../../i18n';
+import { createContext, Fragment, useContext, useEffect, useLayoutEffect, useState, type ReactNode } from 'react';
+import { hindiReady, loadHindi, pick, setLang, t, type Lang } from '../../i18n';
 import { startTranslator, stopTranslator } from '../../i18n/domTranslator';
 
 export type LanguageCode = Lang;
@@ -47,6 +47,20 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setLang(initial);
     return initial;
   });
+  // Hindi pages wait for the dictionary chunk, so they never show English first.
+  const [ready, setReady] = useState(() => language === 'en' || hindiReady());
+  useEffect(() => {
+    if (language === 'en' || hindiReady()) return setReady(true);
+    setReady(false);
+    let live = true;
+    loadHindi().then(
+      () => live && setReady(true),
+      () => live && setReady(true),
+    );
+    return () => {
+      live = false;
+    };
+  }, [language]);
 
   const setLanguage = (next: LanguageCode) => {
     setLang(next);
@@ -61,17 +75,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   // Runs after the fresh tree is committed and before paint, so Hindi pages never flash English.
   useLayoutEffect(() => {
     document.documentElement.lang = language;
-    if (language === 'hi') startTranslator();
+    if (language === 'hi' && ready) startTranslator();
     else stopTranslator();
     return stopTranslator;
-  }, [language]);
+  }, [language, ready]);
 
   const languageInfo = SUPPORTED_LANGUAGES.find((l) => l.code === language) ?? SUPPORTED_LANGUAGES[0];
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, languageInfo, t, tr: pick }}>
       {/* Re-mount the page on a switch so every string, including ones read from constants, renders afresh. */}
-      <Fragment key={language}>{children}</Fragment>
+      {ready && <Fragment key={language}>{children}</Fragment>}
     </LanguageContext.Provider>
   );
 }

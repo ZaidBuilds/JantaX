@@ -45,7 +45,7 @@ export function NagarDashboard() {
       responsiblePerson: 'Ward Engineer / Health Officer',
       responsibleOrg: 'Municipal Corporation',
       sourceUrl: 'https://swachhsurvekshan.org',
-      moduleNameHindi: 'M10 - नगर स्कोरबोर्ड (City Municipal Scorecard)',
+      moduleNameHindi: 'M10 - नगर स्कोरबोर्ड',
     });
   };
 

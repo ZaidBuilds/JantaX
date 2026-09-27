@@ -47,7 +47,7 @@ export function PollutionDashboard() {
       responsiblePerson: 'Regional Environment Officer',
       responsibleOrg: 'State Pollution Control Board',
       sourceUrl: 'https://cpcb.nic.in',
-      moduleNameHindi: 'M13 - प्रदूषण नक्शा (Pollution Notice Overlay)',
+      moduleNameHindi: 'M13 - प्रदूषण नक्शा',
     });
   };
 

@@ -224,7 +224,7 @@ export function SpineDashboard() {
                   </span>
                 </div>
                 <div style={{ fontSize: 'var(--text-xs)', marginTop: '0.25rem', color: 'var(--ink-3)' }}>
-                  {rep.constituencyName} · level: {rep.level}
+                  {pick(rep.constituencyName, rep.constituencyNameHi)}
                 </div>
               </div>
             ))}

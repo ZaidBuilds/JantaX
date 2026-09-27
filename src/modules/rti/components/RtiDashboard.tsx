@@ -42,7 +42,7 @@ export function RtiDashboard() {
       responsiblePerson: 'Public Information Officer (PIO)',
       responsibleOrg: 'State Information Commission',
       sourceUrl: 'https://rtionline.gov.in',
-      moduleNameHindi: 'M8 - RTI ट्रैकर (RTI Delay Tracker)',
+      moduleNameHindi: 'M8 - RTI ट्रैकर',
     });
   };
 

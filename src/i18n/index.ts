@@ -9,7 +9,22 @@
  * Code that builds text outside the page (document titles, alerts, share text) or that holds both
  * languages in data (nameHi fields) uses t() and pick() directly.
  */
-import { HI, HI_PATTERNS } from './hi';
+type Dict = { HI: Record<string, string>; HI_KEEP: Set<string>; HI_PATTERNS: [RegExp, string | ((m: RegExpMatchArray) => string)][] };
+
+/** The Hindi dictionary is a separate chunk, fetched only when someone picks Hindi. */
+let dict: Dict | null = null;
+let loading: Promise<void> | null = null;
+export function loadHindi(): Promise<void> {
+  if (dict) return Promise.resolve();
+  loading ??= import('./hi').then((m) => {
+    dict = { HI: m.HI, HI_KEEP: m.HI_KEEP, HI_PATTERNS: m.HI_PATTERNS };
+  });
+  return loading;
+}
+export const hindiReady = () => dict !== null;
+
+const DEVANAGARI = /[\u0900-\u097F]/g;
+const LATIN_LETTER = /[A-Za-z]/g;
 
 export type Lang = 'en' | 'hi';
 
@@ -45,15 +60,21 @@ function fill(template: string, values: string[]) {
  */
 export function lookupHindi(english: string): string | null {
   const key = english.replace(/\s+/g, ' ').trim();
-  if (!key) return null;
+  if (!key || !dict) return null;
+  const { HI, HI_KEEP, HI_PATTERNS } = dict;
+  // Already Hindi (a record's Hindi name, with an acronym or two in it): leave it.
+  if ((key.match(DEVANAGARI)?.length ?? 0) >= (key.match(LATIN_LETTER)?.length ?? 0)) return key;
   const exact = HI[key];
   if (exact !== undefined) return exact;
   const numbers = key.match(NUMBER);
   if (numbers) {
     let i = 0;
-    const shape = HI[key.replace(NUMBER, () => `{${i++}}`)];
+    const shapeKey = key.replace(NUMBER, () => `{${i++}}`);
+    const shape = HI[shapeKey];
     if (shape !== undefined) return fill(shape, numbers);
+    if (HI_KEEP.has(shapeKey)) return key;
   }
+  if (HI_KEEP.has(key)) return key;
   for (const [re, to] of HI_PATTERNS) {
     const m = key.match(re);
     if (m) return typeof to === 'string' ? key.replace(re, to) : to(m);

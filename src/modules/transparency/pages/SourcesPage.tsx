@@ -2,10 +2,26 @@ import { useMemo, useState } from 'react';
 import { ExternalLink, Search, SearchX } from 'lucide-react';
 import { getStoredGovtSources } from '../services/transparencyService';
 import { TransparencyLayout } from '../components/TransparencyLayout';
-import { Badge, EmptyState } from '../../../ui';
+import { Badge, EmptyState, getModule } from '../../../ui';
 import type { Tone } from '../../../ui/Badge';
 import type { SourceStatus } from '../types/transparency';
 import { formatWhen, STATE_LABEL, useCatalog, type Catalog, type DatasetState } from '../../../core/services/officialData';
+
+/** How finely a dataset is published, in words. */
+export const LEVEL_LABEL: Record<string, string> = {
+  national: 'National figures',
+  state: 'By state',
+  district: 'By district',
+  pincode: 'By PIN code',
+  point: 'By exact location',
+};
+
+/** A module's name for display; the PIN directory is shared by every module. */
+export function moduleLabel(id: string | null | undefined): string {
+  if (!id) return '';
+  if (id === 'geography') return 'Places and PIN codes';
+  return getModule(id)?.shortName ?? id;
+}
 
 export const STATUS_TONE: Record<SourceStatus, Tone> = { Connected: 'good', 'Connector ready': 'info', 'Not connected': 'neutral' };
 export const STATE_TONE: Record<DatasetState, Tone> = { live: 'good', stale: 'warn', failing: 'bad', 'needs-setting': 'neutral', 'needs-file': 'neutral', ready: 'info' };
@@ -36,7 +52,7 @@ function LiveCatalog({ catalog }: { catalog: Catalog }) {
               <tr key={d.id}>
                 <td>
                   <a className="strong" href={d.sourceUrl} target="_blank" rel="noreferrer">{d.title}</a>
-                  <div className="tiny muted">{d.publisher} · {d.level} level</div>
+                  <div className="tiny muted">{d.publisher} · {LEVEL_LABEL[d.level] ?? d.level}</div>
                   {d.missing && (
                     <details className="tiny" style={{ marginTop: 4 }}>
                       <summary className="muted" style={{ cursor: 'pointer' }}>What's needed to connect it</summary>
@@ -44,7 +60,7 @@ function LiveCatalog({ catalog }: { catalog: Catalog }) {
                     </details>
                   )}
                 </td>
-                <td className="small">{d.module}</td>
+                <td className="small">{moduleLabel(d.module)}</td>
                 <td className="small">{ACCESS[d.access]}</td>
                 <td className="tiny">{d.licenseUrl ? <a href={d.licenseUrl} target="_blank" rel="noreferrer">{d.license}</a> : d.license}</td>
                 <td>
