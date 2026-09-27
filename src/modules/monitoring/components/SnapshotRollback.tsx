@@ -50,7 +50,7 @@ export const SnapshotRollback: React.FC<SnapshotRollbackProps> = ({
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', marginBottom: '0.2rem' }}>
                   {snap.isCurrentActive && (
-                    <span style={{ background: 'var(--good-soft)', color: 'var(--good)', fontSize: '0.74rem', fontWeight: 800, padding: '0.15rem 0.55rem', borderRadius: 4, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                    <span style={{ background: 'var(--good-soft)', color: 'var(--good)', fontSize: 'var(--text-xs)', fontWeight: 800, padding: '0.15rem 0.55rem', borderRadius: 4, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
                       <CheckCircle2 size={12} /> Active Live Version
                     </span>
                   )}
@@ -90,7 +90,7 @@ export const SnapshotRollback: React.FC<SnapshotRollbackProps> = ({
               {snap.notes}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface-2)', padding: '0.5rem 0.75rem', borderRadius: 8, fontSize: '0.74rem', color: 'var(--ink-3)', fontFamily: 'monospace' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface-2)', padding: '0.5rem 0.75rem', borderRadius: 8, fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontFamily: 'monospace' }}>
               <span>Records: <strong>{snap.recordCount.toLocaleString()}</strong></span>
               <span>SHA-256: {snap.sha256Hash.substring(0, 20)}...</span>
             </div>

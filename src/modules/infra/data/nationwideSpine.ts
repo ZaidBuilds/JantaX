@@ -64,15 +64,17 @@ export function getSpineDataForPincode(pinCode: string): SpineData {
   const lastNames = LAST_NAMES[region] || LAST_NAMES.North;
 
   // Helper to generate a deterministic name
+  // Sample officials are named by role, never with invented personal names that could match real people.
+  const ROLE_LABELS: Record<string, [string, string]> = {
+    mp: ['Member of Parliament (sample)', 'सांसद (नमूना)'],
+    mla: ['MLA (sample)', 'विधायक (नमूना)'],
+    zp: ['Zila panchayat chair (sample)', 'ज़िला पंचायत अध्यक्ष (नमूना)'],
+    bp: ['Block pramukh (sample)', 'ब्लॉक प्रमुख (नमूना)'],
+    gp: ['Gram pradhan (sample)', 'ग्राम प्रधान (नमूना)'],
+  };
   const makeName = (seed: string) => {
-    const fnIdx = getDeterministicIndex(seed + 'first', firstNames.length);
-    const lnIdx = getDeterministicIndex(seed + 'last', lastNames.length);
-    const fn = firstNames[fnIdx];
-    const ln = lastNames[lnIdx];
-    return {
-      nameHi: `श्री ${fn} ${ln}`,
-      nameEn: `Shri ${fn} ${ln}`, // Simplified english fallback
-    };
+    const [nameEn, nameHi] = ROLE_LABELS[seed.split('-').pop() ?? ''] ?? ['Official (sample)', 'अधिकारी (नमूना)'];
+    return { nameHi, nameEn };
   };
 
   // 1. Generate Representatives
@@ -83,7 +85,7 @@ export function getSpineDataForPincode(pinCode: string): SpineData {
     name: mpName.nameEn,
     nameHi: mpName.nameHi,
     level: 'union',
-    party: getDeterministicIndex(mpSeed + 'party', 2) === 0 ? 'BJP' : 'INC',
+    party: 'Sample party',
     constituencyName: `${loc.district} Lok Sabha`,
     constituencyNameHi: `${loc.district} लोकसभा निर्वाचन क्षेत्र`,
     pinCodes: [pinCode],
@@ -96,7 +98,7 @@ export function getSpineDataForPincode(pinCode: string): SpineData {
     name: mlaName.nameEn,
     nameHi: mlaName.nameHi,
     level: 'state',
-    party: getDeterministicIndex(mlaSeed + 'party', 3) === 0 ? 'BJP' : getDeterministicIndex(mlaSeed + 'party', 3) === 1 ? 'INC' : 'Regional',
+    party: 'Sample party',
     constituencyName: `${loc.district} Assembly`,
     constituencyNameHi: `${loc.district} विधानसभा निर्वाचन क्षेत्र`,
     pinCodes: [pinCode],
@@ -109,7 +111,7 @@ export function getSpineDataForPincode(pinCode: string): SpineData {
     name: zpName.nameEn,
     nameHi: zpName.nameHi,
     level: 'district',
-    party: 'BJP',
+    party: 'Sample party',
     constituencyName: `${loc.district} Zilla Parishad`,
     constituencyNameHi: `${loc.district} जिला पंचायत`,
     pinCodes: [pinCode],

@@ -57,7 +57,7 @@ export const GovtResponseTracker: React.FC<{ reports: ReportItem[] }> = React.me
             })}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--ink-3)', flexWrap: 'wrap', gap: '0.4rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-xs)', color: 'var(--ink-3)', flexWrap: 'wrap', gap: '0.4rem' }}>
             <span>{report.pincode} · {report.module}</span>
             <span>Filed→Resolved: <strong style={{ color: 'var(--bad)' }}>{delayDays} days</strong></span>
             <span>{originalKept ? 'Original kept (never deleted)' : ''}</span>

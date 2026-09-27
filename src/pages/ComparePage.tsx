@@ -293,10 +293,10 @@ export function ComparePage() {
         lede="Put areas or schools next to each other on the same public measures. Every column uses the same sources and the same date."
       />
       <div className="segmented" role="tablist" aria-label="What to compare" style={{ marginBottom: 'var(--s-6)' }}>
-        <button type="button" role="tab" aria-selected={type === 'areas'} aria-pressed={type === 'areas'} onClick={() => setParams({ type: 'areas' })}>
+        <button type="button" role="tab" aria-selected={type === 'areas'} onClick={() => setParams({ type: 'areas' })}>
           <MapPin size={14} aria-hidden="true" /> Areas
         </button>
-        <button type="button" role="tab" aria-selected={type === 'schools'} aria-pressed={type === 'schools'} onClick={() => setParams({ type: 'schools' })}>
+        <button type="button" role="tab" aria-selected={type === 'schools'} onClick={() => setParams({ type: 'schools' })}>
           <GraduationCap size={14} aria-hidden="true" /> Schools
         </button>
       </div>

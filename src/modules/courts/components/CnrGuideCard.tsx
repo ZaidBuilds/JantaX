@@ -9,9 +9,9 @@ export function CnrGuideCard() {
     <div className="jantax-card" style={{ padding: '1.75rem', marginBottom: '1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
         <div>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: '0 0 0.3rem' }}>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: '0 0 0.3rem' }}>
             How to Track Your Case via 16-Digit CNR Number on eCourts
-          </h3>
+          </h2>
           <p style={{ fontSize: '0.85rem', color: 'var(--ink-3)', margin: 0 }}>
             Every pending district court case in India has a unique CNR number allowing instant tracking of daily order sheets and cause lists.
           </p>
@@ -69,16 +69,16 @@ export function CnrGuideCard() {
               >
                 {s.stepNumber}
               </div>
-              <h4 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
+              <h3 style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
                 {s.title}
-              </h4>
+              </h3>
             </div>
 
             <p style={{ fontSize: '0.82rem', color: 'var(--ink-2)', lineHeight: 1.45, marginBottom: '0.6rem' }}>
               {s.description}
             </p>
 
-            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, padding: '0.4rem 0.6rem', fontSize: '0.72rem', color: 'var(--brand-ink)', fontWeight: 600 }}>
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, padding: '0.4rem 0.6rem', fontSize: 'var(--text-xs)', color: 'var(--brand-ink)', fontWeight: 600 }}>
               {s.example}
             </div>
           </div>

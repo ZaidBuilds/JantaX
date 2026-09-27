@@ -22,7 +22,7 @@ export const ChangeDetectionCard: React.FC<ChangeDetectionCardProps> = ({
     badgeBg = 'var(--bad-soft)';
   } else if (alert.status === 'Pending Review') {
     badgeColor = 'var(--warn)';
-    badgeBg = '#fffbebf';
+    badgeBg = 'var(--warn-soft)';
   }
 
   return (
@@ -53,7 +53,7 @@ export const ChangeDetectionCard: React.FC<ChangeDetectionCardProps> = ({
         </div>
 
         <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border-strong)', borderRadius: 12, padding: '0.6rem 1rem', textAlign: 'right' }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Confidence Score</div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Confidence Score</div>
           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: v.confidenceScore < 90 ? 'var(--bad)' : 'var(--good)' }}>
             {v.confidenceScore}%
           </div>
@@ -71,24 +71,24 @@ export const ChangeDetectionCard: React.FC<ChangeDetectionCardProps> = ({
         marginBottom: '1rem'
       }}>
         <div>
-          <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Records Processed</div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Records Processed</div>
           <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--ink)' }}>{v.totalRecordsProcessed.toLocaleString()}</div>
         </div>
 
         <div>
-          <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Changed Records</div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Changed Records</div>
           <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--brand-ink)' }}>{v.changedRecordsCount.toLocaleString()}</div>
         </div>
 
         <div>
-          <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Rejected Records</div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Rejected Records</div>
           <div style={{ fontSize: '0.95rem', fontWeight: 800, color: v.rejectedRecordsCount > 0 ? 'var(--bad)' : 'var(--good)' }}>
             {v.rejectedRecordsCount.toLocaleString()}
           </div>
         </div>
 
         <div>
-          <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Schema Anomalies</div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Schema Anomalies</div>
           <div style={{ fontSize: '0.95rem', fontWeight: 800, color: v.schemaAnomaliesCount > 0 ? 'var(--bad)' : 'var(--good)' }}>
             {v.schemaAnomaliesCount}
           </div>

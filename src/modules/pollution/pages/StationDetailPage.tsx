@@ -34,7 +34,7 @@ export function StationDetailPage() {
       <div style={{ marginBottom: '1rem' }}>
         <Link
           to="/pollution"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
+          style={{ display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
         >
           <ArrowLeft size={16} /> Back to Air Quality Directory
         </Link>
@@ -67,7 +67,7 @@ export function StationDetailPage() {
           </div>
 
           <div style={{ textAlign: 'right', minWidth: 160 }}>
-            <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', textTransform: 'uppercase', fontWeight: 700 }}>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', textTransform: 'uppercase', fontWeight: 700 }}>
               Live Status
             </div>
             <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--good)', marginTop: '0.2rem' }}>

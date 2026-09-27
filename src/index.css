@@ -104,7 +104,7 @@ hr { border-top: 1px solid var(--border); }
   border-radius: var(--r-md);
 }
 :where(textarea:not([class])) { padding: 8px 10px; }
-input[type='checkbox'], input[type='radio'] { accent-color: var(--brand); }
+input[type='checkbox'], input[type='radio'] { accent-color: var(--brand); width: 18px; height: 18px; flex-shrink: 0; }
 
 .skip-link {
   position: absolute;
@@ -406,5 +406,5 @@ input[type='checkbox'], input[type='radio'] { accent-color: var(--brand); }
 /* Leaflet sits under our overlays and follows the theme */
 .leaflet-container { font-family: var(--font-sans); background: var(--surface-3); z-index: 0; }
 .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-md); }
-.leaflet-control-attribution { font-size: 10px; }
+.leaflet-control-attribution { font-size: 12px; }
 :root[data-theme='dark'] .leaflet-tile-pane { filter: brightness(0.72) invert(1) contrast(0.9) hue-rotate(200deg) saturate(0.35) brightness(0.9); }

@@ -51,7 +51,7 @@ export function RtiTable({ authorities }: Props) {
                   <div style={{ fontSize: '0.75rem', color: 'var(--ink-3)', marginTop: '0.15rem' }}>
                     {a.parentMinistry}
                   </div>
-                  <span style={{ fontSize: '0.7rem', color: 'var(--brand-ink)', fontWeight: 600 }}>
+                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--brand-ink)', fontWeight: 600 }}>
                     {a.governmentLevel}
                   </span>
                 </td>
@@ -60,7 +60,7 @@ export function RtiTable({ authorities }: Props) {
                   <div style={{ fontWeight: 800, color: isCompliant ? 'var(--good)' : 'var(--bad)', fontSize: '0.95rem' }}>
                     {a.avgResponseDays} Days
                   </div>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
                     Statutory limit: 30 days
                   </div>
                 </td>
@@ -69,7 +69,7 @@ export function RtiTable({ authorities }: Props) {
                   <div style={{ fontWeight: 700, color: a.disposedWithin30DaysPercent >= 85 ? 'var(--good)' : 'var(--warn)' }}>
                     {a.disposedWithin30DaysPercent}%
                   </div>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
                     {a.totalRequestsReceivedAnnual.toLocaleString('en-IN')} annual RTIs
                   </div>
                 </td>
@@ -87,7 +87,7 @@ export function RtiTable({ authorities }: Props) {
                   <div style={{ fontWeight: 700, color: 'var(--ink)', fontSize: '0.8rem' }}>
                     {a.cpio.name}
                   </div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)' }}>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
                     {a.cpio.designation}
                   </div>
                 </td>

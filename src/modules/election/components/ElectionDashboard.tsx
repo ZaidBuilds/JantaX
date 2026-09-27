@@ -33,8 +33,8 @@ export function ElectionDashboard() {
     <div className="stack" style={{ gap: 'var(--s-6)' }}>
       <ModulePinBar pin={pin} loc={loc} onChange={setPin} />
       <div className="segmented" role="tablist" aria-label="Election module views">
-        <button type="button" role="tab" aria-selected={tab === 'spend'} aria-pressed={tab === 'spend'} onClick={() => setTab('spend')}>Campaign spending</button>
-        <button type="button" role="tab" aria-selected={tab === 'exam'} aria-pressed={tab === 'exam'} onClick={() => setTab('exam')}>Recruitment exam delays</button>
+        <button type="button" role="tab" aria-selected={tab === 'spend'} onClick={() => setTab('spend')}>Campaign spending</button>
+        <button type="button" role="tab" aria-selected={tab === 'exam'} onClick={() => setTab('exam')}>Recruitment exam delays</button>
       </div>
 
       {tab === 'spend' ? (

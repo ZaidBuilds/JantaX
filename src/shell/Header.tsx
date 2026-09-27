@@ -76,7 +76,7 @@ function HeaderSearch({ onDone }: { onDone?: () => void }) {
   };
 
   return (
-    <form role="search" onSubmit={submit} className="header-search">
+    <form role="search" aria-label="Site search" onSubmit={submit} className="header-search">
       <Search size={16} aria-hidden="true" />
       <input
         ref={ref}
@@ -263,7 +263,7 @@ function MobileDrawer({ onClose }: { onClose: () => void }) {
           </Link>
           <div className="field">
             <label className="label" htmlFor="drawer-lang">Language</label>
-            <select id="drawer-lang" className="select" value={language} onChange={(e) => setLanguage(e.target.value as LanguageCode)}>
+            <select aria-label="Language" id="drawer-lang" className="select" value={language} onChange={(e) => setLanguage(e.target.value as LanguageCode)}>
               {SUPPORTED_LANGUAGES.map((l) => (
                 <option key={l.code} value={l.code}>
                   {l.labelLocal} ({l.label})

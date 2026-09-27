@@ -57,27 +57,14 @@ export const StateMap: React.FC<StateMapProps> = ({
 
   return (
     <div className="glass-card" style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', justifyContent: 'between', alignItems: 'center', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
         <div>
-          <h3 style={{ fontSize: '1.25rem', color: 'var(--text-primary)' }}>Geographic Project Hotspots</h3>
-          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Click states to filter regional development parameters</p>
+          <h3 style={{ fontSize: '1.25rem', color: 'var(--text-primary)' }}>Projects by state</h3>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Pick a state to see only its projects.</p>
         </div>
         {selectedState && (
-          <button 
-            onClick={() => onSelectState("")}
-            style={{
-              padding: '0.35rem 0.75rem',
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid var(--border-color)',
-              borderRadius: '6px',
-              color: 'var(--color-primary)',
-              fontSize: '0.75rem',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-          >
-            Clear Filter
+          <button type="button" className="btn btn-ghost btn-sm" onClick={() => onSelectState("")}>
+            Show all states
           </button>
         )}
       </div>
@@ -98,33 +85,36 @@ export const StateMap: React.FC<StateMapProps> = ({
           const isSelected = selectedState === node.name;
           
           // Determine styling based on project status in state
+          // Tile colour follows the state's projects: amber for delays, green when all done, brand otherwise.
           let borderStyle = '1px solid var(--border-color)';
-          let bgStyle = 'rgba(18, 20, 28, 0.4)';
+          let bgStyle = 'var(--surface)';
           let glowClass = '';
-          
+
           if (metrics.count > 0) {
             if (metrics.hasDelayed) {
-              borderStyle = '1px solid var(--status-delayed)';
-              bgStyle = 'rgba(245, 158, 11, 0.06)';
+              borderStyle = '1px solid var(--warn-line)';
+              bgStyle = 'var(--warn-soft)';
             } else if (metrics.allCompleted) {
-              borderStyle = '1px solid var(--status-completed)';
-              bgStyle = 'rgba(16, 185, 129, 0.06)';
+              borderStyle = '1px solid var(--good-line)';
+              bgStyle = 'var(--good-soft)';
             } else {
-              borderStyle = '1px solid var(--color-primary)';
-              bgStyle = 'rgba(0, 242, 254, 0.06)';
+              borderStyle = '1px solid var(--brand-line)';
+              bgStyle = 'var(--brand-soft)';
             }
           }
-          
+
           if (isSelected) {
-            borderStyle = `2px solid ${metrics.hasDelayed ? 'var(--status-delayed)' : 'var(--color-primary)'}`;
-            bgStyle = metrics.hasDelayed ? 'rgba(245, 158, 11, 0.2)' : 'rgba(0, 242, 254, 0.15)';
+            borderStyle = '2px solid var(--brand)';
+            bgStyle = 'var(--brand)';
             glowClass = 'selected-glow';
           }
 
           return (
             <button
               key={node.id}
+              type="button"
               onClick={() => onSelectState(node.name)}
+              aria-pressed={isSelected}
               className={glowClass}
               style={{
                 gridRow: node.row,
@@ -154,11 +144,11 @@ export const StateMap: React.FC<StateMapProps> = ({
               
               {metrics.count > 0 && (
                 <span style={{ 
-                  fontSize: '0.65rem', 
+                  fontSize: 'var(--text-xs)', 
                   fontWeight: 600, 
-                  color: isSelected ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  color: isSelected ? 'var(--on-solid)' : 'var(--text-secondary)',
                   marginTop: '0.1rem',
-                  background: 'rgba(0,0,0,0.3)',
+                  background: isSelected ? 'color-mix(in srgb, var(--on-solid) 18%, transparent)' : 'var(--surface-3)',
                   padding: '1px 4px',
                   borderRadius: '4px'
                 }}>
@@ -181,20 +171,20 @@ export const StateMap: React.FC<StateMapProps> = ({
         flexWrap: 'wrap'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', border: '1px solid var(--border-color)' }}></span>
-          No Projects
+          <span style={{ width: 12, height: 12, borderRadius: 3, background: 'var(--surface)', border: '1px solid var(--border-strong)' }} aria-hidden="true"></span>
+          No projects
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--status-completed)' }}></span>
+          <span style={{ width: 12, height: 12, borderRadius: 3, background: 'var(--good-soft)', border: '1px solid var(--good)' }} aria-hidden="true"></span>
           Completed
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-primary)' }}></span>
+          <span style={{ width: 12, height: 12, borderRadius: 3, background: 'var(--brand-soft)', border: '1px solid var(--brand-ink)' }} aria-hidden="true"></span>
           Active
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--status-delayed)' }}></span>
-          Has Delays
+          <span style={{ width: 12, height: 12, borderRadius: 3, background: 'var(--warn-soft)', border: '1px solid var(--warn)' }} aria-hidden="true"></span>
+          Has delays
         </div>
       </div>
     </div>

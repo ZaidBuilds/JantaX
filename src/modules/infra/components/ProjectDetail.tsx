@@ -183,13 +183,13 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
       {/* Multilingual Title, PIN Code, Contractor & responsible officer */}
       <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--brand-ink)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             {sector} Sector • {implementingAgency}
           </span>
           <span style={{ 
             fontSize: '0.95rem', 
             fontWeight: 800, 
-            color: 'var(--color-primary)',
+            color: 'var(--brand-ink)',
             background: 'rgba(37, 99, 235, 0.08)',
             padding: '4px 12px',
             borderRadius: '4px'
@@ -238,22 +238,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
 
         {/* WhatsApp Share Button */}
         <div style={{ display: 'flex', justifyContent: 'end', marginTop: '0.5rem' }}>
-          <button
-            onClick={handleWhatsAppShare}
-            style={{
-              padding: '0.5rem 1.25rem',
-              background: '#25D366',
-              border: 'none',
-              borderRadius: '6px',
-              color: 'var(--on-solid)',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.35rem',
-              fontSize: '0.85rem'
-            }}
-          >
+          <button type="button" className="btn btn-whatsapp" onClick={handleWhatsAppShare}>
             WhatsApp पर शेयर करें (Share Report)
           </button>
         </div>
@@ -307,7 +292,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
               </div>
               <div>
                 <span style={{ color: 'var(--text-secondary)' }}>Actual Expenditure</span>
-                <p style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-primary)', marginTop: '0.2rem' }}>₹{expenditureToDate} Cr</p>
+                <p style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--brand-ink)', marginTop: '0.2rem' }}>₹{expenditureToDate} Cr</p>
               </div>
             </div>
           </div>
@@ -321,7 +306,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
                   <span style={{ fontWeight: 500 }}>Land Acquisition Status</span>
-                  <span style={{ color: 'var(--color-primary)', fontWeight: 700 }}>{clearances.landAcquisition}% Complete</span>
+                  <span style={{ color: 'var(--brand-ink)', fontWeight: 700 }}>{clearances.landAcquisition}% Complete</span>
                 </div>
                 <div style={{ height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
                   <div style={{ height: '100%', width: `${clearances.landAcquisition}%`, background: 'var(--color-primary)', borderRadius: '4px' }}></div>
@@ -431,7 +416,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.25rem' }}>
                   <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>सरकारी दावा (Official Claim)</span>
-                  <span style={{ fontWeight: 800, color: 'var(--color-primary)' }}>{progressPhysical}% Complete</span>
+                  <span style={{ fontWeight: 800, color: 'var(--brand-ink)' }}>{progressPhysical}% Complete</span>
                 </div>
                 <div style={{ height: '8px', background: 'rgba(15,23,42,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
                   <div style={{ height: '100%', width: `${progressPhysical}%`, background: 'var(--color-primary)', borderRadius: '4px' }}></div>
@@ -517,7 +502,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
                 >
                   <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}></span>
                   <strong>क्लिक करें या फोटो ड्रॉप करें (Click to Drop Photo)</strong>
-                  <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                  <span style={{ display: 'block', fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
                     {mockPhotoName ? `Selected: ${mockPhotoName}` : "Locked PHC, broken tracks, rusting rods..."}
                   </span>
                 </div>
@@ -538,7 +523,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
                     <label style={{ fontWeight: 500 }}>जमीनी प्रगति का अनुमान (Estimate Progress)</label>
-                    <span style={{ color: 'var(--color-primary)', fontWeight: 700 }}>{ratingValue}%</span>
+                    <span style={{ color: 'var(--brand-ink)', fontWeight: 700 }}>{ratingValue}%</span>
                   </div>
                   <input 
                     type="range" 
@@ -612,7 +597,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
                     </div>
 
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                      Estimated Progress: <strong style={{ color: 'var(--color-primary)' }}>{report.ratingValue}%</strong>
+                      Estimated Progress: <strong style={{ color: 'var(--brand-ink)' }}>{report.ratingValue}%</strong>
                     </div>
 
                     <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.4', fontStyle: 'italic' }}>
@@ -627,7 +612,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
                         background: 'rgba(239, 68, 68, 0.08)',
                         border: '1px solid rgba(239,68,68,0.15)',
                         borderRadius: '6px',
-                        fontSize: '0.7rem',
+                        fontSize: 'var(--text-xs)',
                         color: 'var(--status-critical)',
                         display: 'flex',
                         alignItems: 'center',
@@ -646,7 +631,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
                           borderRadius: '4px',
                           padding: '2px 8px',
                           color: 'var(--text-secondary)',
-                          fontSize: '0.7rem',
+                          fontSize: 'var(--text-xs)',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',

@@ -225,7 +225,7 @@ export const MOCK_CORRECTIONS_LOG: CorrectionRequest[] = [
   {
     id: 'corr-001',
     requestType: 'Official Data Challenge',
-    submitterName: 'Shri R.K. Mehta (Legal Counsel)',
+    submitterName: 'Legal counsel (sample)',
     organization: 'Sample Contractor A (heavy infrastructure)',
     email: 'legal.infra@example.com',
     entityId: 'cont-sample-a',

@@ -70,7 +70,7 @@ export function ProjectsSearchPage() {
         return { bg: 'var(--good-soft)', border: 'var(--good-line)', color: 'var(--good)', icon: <CheckCircle2 size={13} /> };
       case 'Extended':
       case 'Delayed':
-        return { bg: '#fffbebf', border: 'var(--warn-line)', color: 'var(--warn)', icon: <Clock size={13} /> };
+        return { bg: 'var(--warn-soft)', border: 'var(--warn-line)', color: 'var(--warn)', icon: <Clock size={13} /> };
       case 'Incomplete':
         return { bg: 'var(--bad-soft)', border: 'var(--bad-line)', color: 'var(--bad)', icon: <Clock size={13} /> };
       case 'Under Review':
@@ -125,6 +125,7 @@ export function ProjectsSearchPage() {
                 fontWeight: 600,
                 cursor: 'pointer',
                 display: 'inline-flex',
+                minHeight: 32,
                 alignItems: 'center',
                 gap: '0.25rem'
               }}
@@ -183,7 +184,7 @@ export function ProjectsSearchPage() {
             <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               State / UT
             </label>
-            <select
+            <select aria-label="State / UT"
               value={state}
               onChange={(e) => setState(e.target.value)}
               style={{
@@ -207,7 +208,7 @@ export function ProjectsSearchPage() {
             <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               Infrastructure Sector
             </label>
-            <select
+            <select aria-label="Infrastructure Sector"
               value={sector}
               onChange={(e) => setSector(e.target.value)}
               style={{
@@ -231,7 +232,7 @@ export function ProjectsSearchPage() {
             <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               Status (Neutral Categories)
             </label>
-            <select
+            <select aria-label="Status"
               value={status}
               onChange={(e) => setStatus(e.target.value)}
               style={{
@@ -255,7 +256,7 @@ export function ProjectsSearchPage() {
             <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               Lead Contractor
             </label>
-            <select
+            <select aria-label="Lead Contractor"
               value={contractor}
               onChange={(e) => setContractor(e.target.value)}
               style={{
@@ -279,7 +280,7 @@ export function ProjectsSearchPage() {
             <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               Implementing Authority
             </label>
-            <select
+            <select aria-label="Implementing Authority"
               value={authority}
               onChange={(e) => setAuthority(e.target.value)}
               style={{
@@ -303,7 +304,7 @@ export function ProjectsSearchPage() {
             <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
               Sort Results By
             </label>
-            <select
+            <select aria-label="Sort Results By"
               value={sortBy}
               onChange={(e: any) => setSortBy(e.target.value)}
               style={{
@@ -448,7 +449,7 @@ export function ProjectsSearchPage() {
                           border: '1px solid var(--border)',
                           borderRadius: 8,
                           padding: '0.35rem 0.6rem',
-                          fontSize: '0.72rem',
+                          fontSize: 'var(--text-xs)',
                           color: 'var(--ink)',
                           fontWeight: 700,
                           textDecoration: 'none',
@@ -472,15 +473,15 @@ export function ProjectsSearchPage() {
                       marginBottom: '0.85rem'
                     }}>
                       <div>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Contractor</div>
+                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Contractor</div>
                         <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--ink)' }}>{proj.leadContractor}</div>
                       </div>
                       <div>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Implementing Authority</div>
+                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Implementing Authority</div>
                         <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--ink)' }}>{proj.implementingAgency}</div>
                       </div>
                       <div>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Budget (Sanctioned → Anticipated)</div>
+                        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Budget (Sanctioned → Anticipated)</div>
                         <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--ink)' }}>₹{origCr} Cr → ₹{antCr} Cr</div>
                       </div>
                     </div>

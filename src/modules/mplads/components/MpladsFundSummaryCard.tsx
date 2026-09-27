@@ -42,43 +42,43 @@ export function MpladsFundSummaryCard({ fund, houseTitle = '5-Year MPLADS Quota'
       {/* 4-Stat Metric Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             Govt Released
           </span>
           <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.25rem' }}>
             ₹{fund.releasedByGovtCr.toFixed(2)} Cr
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Of ₹{fund.entitledAmountCr} Cr Entitled</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Of ₹{fund.entitledAmountCr} Cr Entitled</span>
         </div>
 
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             Sanctioned Works
           </span>
           <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--brand-ink)', marginTop: '0.25rem' }}>
             ₹{fund.sanctionedWorksCr.toFixed(2)} Cr
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>District Collector Approved</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>District Collector Approved</span>
         </div>
 
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             Actual Spent
           </span>
           <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--good)', marginTop: '0.25rem' }}>
             ₹{fund.expenditureReportedCr.toFixed(2)} Cr
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>UCs (Util Certs) Submitted</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>UCs (Util Certs) Submitted</span>
         </div>
 
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             Unspent Balance
           </span>
           <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--warn)', marginTop: '0.25rem' }}>
             ₹{fund.unspentBalanceCr.toFixed(2)} Cr
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Available for Sanction</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Available for Sanction</span>
         </div>
       </div>
 

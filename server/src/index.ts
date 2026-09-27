@@ -43,30 +43,29 @@ app.use((req, _res, next) => {
   next();
 });
 
-// Simple in-memory rate limit: 120 req / 15m per IP (anon), 1000 auth
-const _rateMap = new Map();
+// In-memory rate limit per IP. Reads are generous: one page view makes several API calls, and many Indian
+// mobile users share a single public IP (carrier NAT). Writes (reports, sign-ups, imports) stay strict.
+const RATE_WINDOW_MS = 5 * 60 * 1000;
+const READ_LIMIT = Number(process.env.RATE_LIMIT_READS) || 1500;
+const WRITE_LIMIT = Number(process.env.RATE_LIMIT_WRITES) || 60;
+const _rateMap = new Map<string, { count: number; reset: number }>();
 app.use((req, res, next) => {
+  if (req.path === '/health' || req.method === 'OPTIONS') return next();
   const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip || 'local';
-  const key = 'rl:' + ip;
+  const write = !['GET', 'HEAD'].includes(req.method);
+  const key = `${write ? 'w' : 'r'}:${ip}`;
   const now = Date.now();
-  const windowMs = 15 * 60 * 1000;
-  const max = req.headers.authorization ? 1000 : 120;
   let entry = _rateMap.get(key);
-  if (!entry || now > entry.reset) {
-    entry = { count: 0, reset: now + windowMs };
-  }
+  if (!entry || now > entry.reset) entry = { count: 0, reset: now + RATE_WINDOW_MS };
   entry.count += 1;
   _rateMap.set(key, entry);
+  const max = (write ? WRITE_LIMIT : READ_LIMIT) * (req.headers.authorization ? 5 : 1);
   if (entry.count > max) {
-    return res.status(429).json({ error: 'Too many requests - slow down' });
+    res.setHeader('Retry-After', String(Math.ceil((entry.reset - now) / 1000)));
+    return res.status(429).json({ error: 'Too many requests. Please wait a moment and try again.' });
   }
-  // cleanup occasionally
   if (_rateMap.size > 5000) {
-    for (const [k, v] of _rateMap.entries()) {
-      if (now > v.reset) {
-        _rateMap.delete(k);
-      }
-    }
+    for (const [k, v] of _rateMap.entries()) if (now > v.reset) _rateMap.delete(k);
   }
   next();
 });

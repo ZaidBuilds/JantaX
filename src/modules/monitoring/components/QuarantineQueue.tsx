@@ -15,7 +15,7 @@ export const QuarantineQueue: React.FC<QuarantineQueueProps> = ({
   return (
     <div style={{ display: 'grid', gap: '1.25rem' }}>
       <div style={{
-        background: '#fffbebf',
+        background: 'var(--warn-soft)',
         border: '1px solid var(--warn-line)',
         borderRadius: 14,
         padding: '1rem 1.25rem',

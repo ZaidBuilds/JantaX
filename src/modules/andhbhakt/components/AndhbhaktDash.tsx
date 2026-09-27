@@ -125,7 +125,7 @@ export function AndhbhaktDash() {
         </form>
         <div className="field">
           <label className="label" htmlFor="cm-state">State</label>
-          <select id="cm-state" className="select" value={stateCode} onChange={(e) => update({ state: e.target.value, pin: '' })}>
+          <select aria-label="State" id="cm-state" className="select" value={stateCode} onChange={(e) => update({ state: e.target.value, pin: '' })}>
             <option value="">All states</option>
             {states.map((s) => (
               <option key={s.code} value={s.code}>{s.name}</option>
@@ -230,7 +230,7 @@ export function AndhbhaktDash() {
             </div>
             <div className="field">
               <label className="label" htmlFor="drop-cat">Topic</label>
-              <select id="drop-cat" className="select" value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}>
+              <select aria-label="Topic" id="drop-cat" className="select" value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}>
                 {CATEGORIES.map((c) => (
                   <option key={c.key} value={c.key}>{c.label}</option>
                 ))}

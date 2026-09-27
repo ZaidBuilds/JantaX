@@ -141,7 +141,7 @@ export function PollutionDirectoryPage() {
           {/* Filters */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap', minWidth: 0, maxWidth: '100%' }}>
-              <select
+              <select aria-label="AQI Categories"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value as AqiCategory | 'All')}
                 style={{ padding: '0.45rem 0.85rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.82rem', background: 'var(--surface)', color: 'var(--ink)' }}
@@ -155,7 +155,7 @@ export function PollutionDirectoryPage() {
                 <option value="Severe">Severe (401-450)</option>
               </select>
 
-              <select
+              <select aria-label="Pollutants"
                 value={selectedPollutant}
                 onChange={(e) => setSelectedPollutant(e.target.value as PollutantType | 'All')}
                 style={{ padding: '0.45rem 0.85rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.82rem', background: 'var(--surface)', color: 'var(--ink)' }}

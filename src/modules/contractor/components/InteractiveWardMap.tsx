@@ -86,7 +86,7 @@ export const InteractiveWardMap: React.FC<InteractiveWardMapProps> = ({
           {/* Ward Switcher */}
           <div className="flex items-center gap-2 self-start lg:self-end">
             <span className="text-xs font-bold opacity-60">Ward:</span>
-            <select
+            <select aria-label="Ward"
               value={selectedWardId}
               onChange={(e) => {
                 setSelectedWardId(e.target.value);
@@ -119,7 +119,7 @@ export const InteractiveWardMap: React.FC<InteractiveWardMapProps> = ({
           </div>
 
           <div>
-            <select
+            <select aria-label="Road Statuses"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
               className="w-full bg-surface-2 border rounded-[10px] border-line px-3 py-2 text-xs font-bold text-ink focus:outline-none focus:bg-surface cursor-pointer"

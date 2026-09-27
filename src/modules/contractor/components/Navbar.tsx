@@ -119,14 +119,14 @@ export function Navbar({
           </button>
         </div>
       </div>
-      <nav className="tabs" aria-label="Contractor ledger sections">
+      <div className="tabs" role="tablist" aria-label="Contractor ledger sections">
         {tabs.map(({ id, label, icon: Icon }) => (
           <button key={id} type="button" className={`tab${activeTab === id ? ' is-active' : ''}`} aria-selected={activeTab === id} role="tab" onClick={() => setActiveTab(id)}>
             <Icon size={15} aria-hidden="true" />
             {label}
           </button>
         ))}
-      </nav>
+      </div>
     </div>
   );
 }

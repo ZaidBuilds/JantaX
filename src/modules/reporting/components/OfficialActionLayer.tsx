@@ -80,7 +80,7 @@ export const OfficialActionLayer: React.FC<OfficialActionLayerProps> = ({ report
               background: 'var(--warn-soft)',
               border: '1px solid var(--warn-line)',
               color: 'var(--warn)',
-              fontSize: '0.74rem',
+              fontSize: 'var(--text-xs)',
               fontWeight: 800,
               padding: '0.2rem 0.65rem',
               borderRadius: '9999px',
@@ -175,22 +175,22 @@ export const OfficialActionLayer: React.FC<OfficialActionLayerProps> = ({ report
             {/* Metadata Bar */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.85rem', background: 'var(--surface-2)', padding: '1rem', borderRadius: 12 }}>
               <div>
-                <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', fontWeight: 600 }}>Official System</div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Official System</div>
                 <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--ink)' }}>{tracking.official_system}</div>
               </div>
 
               <div>
-                <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', fontWeight: 600 }}>Reference Number</div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Reference Number</div>
                 <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--brand-ink)' }}>{tracking.reference_number}</div>
               </div>
 
               <div>
-                <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', fontWeight: 600 }}>Submission Time</div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Submission Time</div>
                 <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--ink)' }}>{tracking.submission_time}</div>
               </div>
 
               <div>
-                <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', fontWeight: 600 }}>Official Status</div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Official Status</div>
                 <div style={{ fontSize: '0.95rem', fontWeight: 800, color: tracking.status === 'Disposed / Resolved' ? 'var(--good)' : 'var(--warn)' }}>
                   {tracking.status}
                 </div>
@@ -213,7 +213,7 @@ export const OfficialActionLayer: React.FC<OfficialActionLayerProps> = ({ report
                         </div>
                       </div>
                       {resp.sourcePdfUrl && (
-                        <a href={resp.sourcePdfUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.74rem', color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+                        <a href={resp.sourcePdfUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 'var(--text-xs)', color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.2rem' }}>
                           Official Disposal PDF <ExternalLink size={11} />
                         </a>
                       )}

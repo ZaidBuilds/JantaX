@@ -31,7 +31,7 @@ export function MpladsProjectDetailPage() {
       <div style={{ marginBottom: '1rem' }}>
         <Link
           to={`/mplads/representatives/${work.representativeId}`}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
+          style={{ display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
         >
           <ArrowLeft size={16} /> Back to {work.representativeName}'s Fund Portfolio
         </Link>
@@ -58,7 +58,7 @@ export function MpladsProjectDetailPage() {
           </div>
 
           <div style={{ textAlign: 'right', minWidth: 140 }}>
-            <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', textTransform: 'uppercase', fontWeight: 700 }}>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', textTransform: 'uppercase', fontWeight: 700 }}>
               Sanctioned Cost
             </div>
             <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--ink)' }}>
@@ -73,7 +73,7 @@ export function MpladsProjectDetailPage() {
         {/* Key Attributes Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', background: 'var(--surface-2)', padding: '1.25rem', borderRadius: 14, border: '1px solid var(--border)', marginBottom: '1.5rem' }}>
           <div>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Recommended By</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Recommended By</span>
             <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--ink)', marginTop: '0.2rem' }}>
               <Link to={`/mplads/representatives/${work.representativeId}`} style={{ color: 'var(--brand-ink)', textDecoration: 'none' }}>
                 {work.representativeName}
@@ -82,21 +82,21 @@ export function MpladsProjectDetailPage() {
           </div>
 
           <div>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Executing Agency</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Executing Agency</span>
             <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--ink)', marginTop: '0.2rem' }}>
               {work.executingAgency}
             </div>
           </div>
 
           <div>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Location & PIN</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Location & PIN</span>
             <div style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--ink)', marginTop: '0.2rem' }}>
               {work.locationName} (PIN {work.pinCode})
             </div>
           </div>
 
           <div>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Sanction Order No.</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Sanction Order No.</span>
             <div style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-2)', marginTop: '0.2rem' }}>
               {work.sanctionOrderNumber}
             </div>

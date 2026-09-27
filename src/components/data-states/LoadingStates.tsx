@@ -17,7 +17,7 @@ export function LoadingOverlay({
       <Loader2
         size={fullScreen ? 40 : 28}
         className="text-primary animate-spin"
-        style={{ color: 'var(--color-primary)' }}
+        style={{ color: 'var(--brand-ink)' }}
       />
       <p
         style={{
@@ -43,8 +43,8 @@ export function LoadingOverlay({
   if (fullScreen) {
     return (
       <div
-        className={`fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50 ${className}`}
-        style={{ background: 'rgba(255,255,255,0.9)' }}
+        className={`fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 ${className}`}
+        style={{ background: 'color-mix(in srgb, var(--canvas) 90%, transparent)' }}
       >
         {content}
       </div>
@@ -65,7 +65,7 @@ export function Spinner({ size = 'md', className = '' }: SpinnerProps) {
     <Loader2
       size={sizeMap[size]}
       className={`animate-spin ${className}`}
-      style={{ color: 'var(--color-primary)' }}
+      style={{ color: 'var(--brand-ink)' }}
     />
   );
 }
@@ -89,7 +89,7 @@ export function RetryLoading({
         <Loader2
           size={36}
           className="animate-spin"
-          style={{ color: 'var(--color-primary)' }}
+          style={{ color: 'var(--brand-ink)' }}
         />
       </div>
       <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{message}</p>

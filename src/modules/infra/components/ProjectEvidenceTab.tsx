@@ -63,7 +63,7 @@ export const ProjectEvidenceTab: React.FC<ProjectEvidenceTabProps> = ({ project 
                       <span style={{
                         background: 'var(--brand-soft)',
                         color: 'var(--brand-ink)',
-                        fontSize: '0.74rem',
+                        fontSize: 'var(--text-xs)',
                         fontWeight: 700,
                         padding: '0.18rem 0.6rem',
                         borderRadius: 6

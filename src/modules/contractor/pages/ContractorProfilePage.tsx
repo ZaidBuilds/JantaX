@@ -190,7 +190,7 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
             padding: '0.85rem 1.25rem',
             textAlign: 'right'
           }}>
-            <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
               Transparent Performance Score
             </div>
             <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.1rem' }}>
@@ -280,7 +280,7 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
               <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.2rem' }}>
                 ₹{pi.totalAwardedValueCr.toLocaleString()} Cr
               </div>
-              <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)' }}>Across {pi.totalContractsCount} projects</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Across {pi.totalContractsCount} projects</div>
             </div>
 
             <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 14, border: '1px solid var(--border)' }}>
@@ -288,7 +288,7 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
               <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--good)', marginTop: '0.2rem' }}>
                 {pi.completionRatePct}%
               </div>
-              <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)' }}>Handed over & commissioned</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Handed over & commissioned</div>
             </div>
 
             <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 14, border: '1px solid var(--border)' }}>
@@ -296,7 +296,7 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
               <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--brand-ink)', marginTop: '0.2rem' }}>
                 {pi.onTimeDeliveryRatePct}%
               </div>
-              <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)' }}>Completed without timeline extension</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Completed without timeline extension</div>
             </div>
 
             <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 14, border: '1px solid var(--border)' }}>
@@ -304,7 +304,7 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
               <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--warn)', marginTop: '0.2rem' }}>
                 {pi.averageExtensionMonths} Months
               </div>
-              <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)' }}>Across active & completed works</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Across active & completed works</div>
             </div>
           </div>
         </div>
@@ -398,7 +398,7 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
             ) : (
               <div style={{ display: 'grid', gap: '0.85rem' }}>
                 {contractor.penalties.map((pen) => (
-                  <div key={pen.id} style={{ background: '#fffbebf', border: '1px solid var(--warn-line)', borderRadius: 12, padding: '1rem' }}>
+                  <div key={pen.id} style={{ background: 'var(--warn-soft)', border: '1px solid var(--warn-line)', borderRadius: 12, padding: '1rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.5rem' }}>
                       <div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--warn)', fontWeight: 800 }}>
@@ -415,7 +415,7 @@ export function ContractorProfilePage({ initialTab }: ContractorProfilePageProps
                     <div style={{ fontSize: '0.84rem', color: 'var(--ink-2)', marginTop: '0.5rem', lineHeight: 1.45 }}>
                       <strong>Documented Reason (Neutral):</strong> {pen.reasonNeutral}
                     </div>
-                    <a href={pen.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.76rem', color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem', marginTop: '0.5rem' }}>
+                    <a href={pen.sourceUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '0.76rem', color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.2rem', marginTop: '0.5rem' }}>
                       Official Penalty Gazette Entry ({pen.sourceTitle}) <ExternalLink size={11} />
                     </a>
                   </div>

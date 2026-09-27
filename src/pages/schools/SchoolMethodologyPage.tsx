@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ExternalLink, ChevronDown, ChevronUp, AlertTriangle, Info, CheckCircle2 } from 'lucide-react';
-import { SourceBadge } from '../../components/UI/SourceBadge';
+import { TierBadge } from '../../components/UI/SourceBadge';
 
 const SCORING_VERSION = 'v2.0-2026-08';
 
@@ -73,10 +73,10 @@ export function SchoolMethodologyPage() {
     <div className="container" style={{ padding: '2rem 1.25rem', maxWidth: 900 }}>
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', margin: 0 }}>School Health Score · Methodology</h2>
-          <span style={{ fontFamily: 'monospace', background: 'var(--surface-2)', border: '1px solid var(--border)', padding: '2px 7px', borderRadius: 4, fontSize: '0.72rem' }}>{SCORING_VERSION}</span>
+          <h2 style={{ fontSize: '1.5rem', color: 'var(--brand-ink)', margin: 0 }}>School Health Score · Methodology</h2>
+          <span style={{ fontFamily: 'monospace', background: 'var(--surface-2)', border: '1px solid var(--border)', padding: '2px 7px', borderRadius: 4, fontSize: 'var(--text-xs)' }}>{SCORING_VERSION}</span>
         </div>
-        <p style={{ fontSize: '0.85rem', opacity: 0.7 }}>
+        <p style={{ fontSize: '0.85rem', color: 'var(--ink-3)' }}>
           Transparent explanation of how JantaX calculates school health scores. No black boxes.
         </p>
       </div>
@@ -114,10 +114,10 @@ export function SchoolMethodologyPage() {
             >
               <div>
                 <span style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{dim.label}</span>
-                {dim.labelHi && <span style={{ fontSize: '0.82rem', opacity: 0.5, marginLeft: '0.5rem' }}>{dim.labelHi}</span>}
+                {dim.labelHi && <span style={{ fontSize: '0.82rem', color: 'var(--ink-3)', marginLeft: '0.5rem' }}>{dim.labelHi}</span>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '0.72rem', opacity: 0.5 }}>Confidence: {dim.confidence}</span>
+                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Confidence: {dim.confidence}</span>
                 {expandedDim === dim.id ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
               </div>
             </button>
@@ -125,14 +125,14 @@ export function SchoolMethodologyPage() {
             {expandedDim === dim.id && (
               <div style={{ padding: '0 1.25rem 1.25rem', borderTop: '1px solid var(--border)' }}>
                 <div style={{ marginTop: '1rem' }}>
-                  <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Formula</div>
+                  <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Formula</div>
                   <code style={{ fontSize: '0.85rem', background: 'var(--surface-2)', padding: '0.5rem 0.75rem', borderRadius: 8, display: 'block', border: '1px solid var(--border)', fontFamily: 'monospace' }}>
                     {dim.formula}
                   </code>
                 </div>
 
                 <div style={{ marginTop: '1rem' }}>
-                  <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Inputs & Weights</div>
+                  <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Inputs & Weights</div>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
                     <thead>
                       <tr style={{ color: 'var(--ink-3)', borderBottom: '1px solid var(--border)' }}>
@@ -145,7 +145,7 @@ export function SchoolMethodologyPage() {
                       {dim.inputs.map((inp, i) => (
                         <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
                           <td style={{ padding: '0.4rem 0.5rem', fontWeight: 600 }}>{inp.name}</td>
-                          <td style={{ padding: '0.4rem 0.5rem', fontSize: '0.75rem', opacity: 0.7 }}>{inp.source}</td>
+                          <td style={{ padding: '0.4rem 0.5rem', fontSize: '0.75rem', color: 'var(--ink-3)' }}>{inp.source}</td>
                           <td style={{ padding: '0.4rem 0.5rem', textAlign: 'center', fontWeight: 700, color: 'var(--brand-ink)' }}>{inp.weight}</td>
                         </tr>
                       ))}
@@ -154,14 +154,14 @@ export function SchoolMethodologyPage() {
                 </div>
 
                 <div style={{ marginTop: '1rem' }}>
-                  <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Status Thresholds</div>
+                  <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Status Thresholds</div>
                   <div style={{ display: 'grid', gap: '0.4rem' }}>
                     {dim.statusThresholds.map((t, i) => (
                       <div key={i} style={{ display: 'flex', gap: '0.75rem', fontSize: '0.82rem' }}>
                         <span style={{ fontWeight: 800, minWidth: 120, color: t.status === 'Stable' ? 'var(--good)' : t.status === 'Watch' ? 'var(--warn)' : t.status === 'Needs Attention' ? 'var(--accent-ink)' : 'var(--bad)' }}>
                           {t.status}
                         </span>
-                        <span style={{ opacity: 0.7 }}>{t.description}</span>
+                        <span style={{ color: 'var(--ink-3)' }}>{t.description}</span>
                       </div>
                     ))}
                   </div>
@@ -209,9 +209,12 @@ export function SchoolMethodologyPage() {
             { name: 'Citizen Check-ins', type: 'C' as const, desc: 'GPS-tagged observations submitted by citizens through JantaX app. Voluntary, not statistically representative.' },
             { name: 'MDM Portal', type: 'B' as const, desc: 'Mid-day meal serving records. Self-reported by schools. Covers meal uptake and feeding days.' },
           ].map(src => (
-            <div key={src.name} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start', padding: '0.75rem', background: 'var(--surface-2)', borderRadius: 8 }}>
-              <SourceBadge sourceType={src.type} sourceName={src.name} />
-              <p style={{ fontSize: '0.82rem', opacity: 0.7, margin: 0 }}>{src.desc}</p>
+            <div key={src.name} style={{ padding: '0.75rem', background: 'var(--surface-2)', borderRadius: 8 }}>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
+                <strong style={{ fontSize: '0.88rem', color: 'var(--ink)' }}>{src.name}</strong>
+                <TierBadge tier={src.type} />
+              </div>
+              <p style={{ fontSize: '0.82rem', color: 'var(--ink-3)', margin: 0 }}>{src.desc}</p>
             </div>
           ))}
         </div>
@@ -219,7 +222,7 @@ export function SchoolMethodologyPage() {
 
       <div className="glass-card" style={{ padding: '1.25rem', borderLeft: '4px solid var(--border-strong)' }}>
         <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Versioning</h3>
-        <p style={{ fontSize: '0.82rem', opacity: 0.7, margin: 0 }}>
+        <p style={{ fontSize: '0.82rem', color: 'var(--ink-3)', margin: 0 }}>
           This methodology version is <code style={{ background: 'var(--surface-3)', padding: '1px 4px', borderRadius: 3 }}>{SCORING_VERSION}</code>.
           Scores are recalculated whenever underlying data changes. Methodology changes are documented here with prior versions archived.
           Schools are never re-scored retroactively with new methodology · a new version creates new scores while preserving old ones.

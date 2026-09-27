@@ -9,6 +9,7 @@ import { Header } from './shell/Header';
 import { Footer } from './shell/Footer';
 import { StatusBanner } from './shell/StatusBanner';
 import { ScrollToTop } from './shell/ScrollToTop';
+import { ScrollableRegions } from './shell/ScrollableRegions';
 import { ToastProvider } from './ui/Toast';
 import { ModuleFrame } from './pages/ModuleFrame';
 import { canonicalModuleId, moduleHref } from './ui/modules';
@@ -200,6 +201,7 @@ function AppRoutes() {
       <Route path="/reports/:id" element={<ReportDetailPage />} />
       <Route path="/reports/:id/action" element={<ReportDetailPage />} />
       <Route path="/report-issue" element={<CitizenReportingPage />} />
+      <Route path="/report" element={<Navigate to="/report-issue" replace />} />
       <Route path="/evidence/submitted" element={<Navigate to="/reports" replace />} />
 
       {/* Transparency */}
@@ -234,6 +236,7 @@ export function App() {
             <DataStateProvider>
               <ToastProvider>
                 <ScrollToTop />
+                <ScrollableRegions />
                 <div className="app">
                   <Header />
                   <StatusBanner />

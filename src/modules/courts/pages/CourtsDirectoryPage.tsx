@@ -116,7 +116,7 @@ export function CourtsDirectoryPage() {
           {/* Filters */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <select
+              <select aria-label="Court Types"
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value as CourtType | 'All')}
                 style={{ padding: '0.45rem 0.85rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.82rem', background: 'var(--surface)', color: 'var(--ink)' }}

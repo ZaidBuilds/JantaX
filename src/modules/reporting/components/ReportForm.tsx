@@ -58,7 +58,7 @@ export function ReportForm() {
   const handleFinalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const { report, duplicate } = createCitizenReport({
-      title: title || `${category} Defect Report at PIN ${pinCode}`,
+      title: title || `${category} problem at PIN ${pinCode}`,
       category,
       description,
       pinCode,
@@ -78,284 +78,187 @@ export function ReportForm() {
     setStep(6); // Confirmation Step
   };
 
+  // Validate when the person presses Next, name what is missing and move focus to it.
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const goNext = (from: number) => {
+    const e: Record<string, string> = {};
+    if (from === 1) {
+      if (!/^[1-9]\d{5}$/.test(pinCode)) e.pin = 'Enter a six-digit PIN code, for example 110001.';
+      if (landmark.trim().length < 3) e.landmark = 'Add a landmark so the office can find the spot.';
+    }
+    if (from === 3 && description.trim().length < 20) e.description = 'Describe what you saw in at least 20 characters.';
+    setErrors(e);
+    const first = Object.keys(e)[0];
+    if (first) {
+      document.getElementById(`report-${first}`)?.focus();
+      return;
+    }
+    setStep(from + 1);
+  };
+  const fieldProps = (key: string) => ({
+    id: `report-${key}`,
+    'aria-invalid': errors[key] ? true : undefined,
+    'aria-describedby': errors[key] ? `report-${key}-error` : undefined,
+  });
+  const fieldError = (key: string) =>
+    errors[key] ? (
+      <span id={`report-${key}-error`} className="error-text" role="alert">
+        <AlertTriangle size={12} aria-hidden="true" style={{ verticalAlign: '-2px', marginRight: 4 }} />
+        {errors[key]}
+      </span>
+    ) : null;
+
+  const STEPS = ['Location', 'Category', 'Description', 'Evidence', 'Review', 'Status'];
+  const stepTitle = (icon: React.ReactNode, text: string) => (
+    <h2 className="report-step-title">
+      {icon}
+      {text}
+    </h2>
+  );
+  const nav = (back: number | null, next: React.ReactNode) => (
+    <div className="report-step-nav">
+      {back ? (
+        <button type="button" className="btn btn-secondary" onClick={() => setStep(back)}>
+          <ArrowLeft size={16} aria-hidden="true" /> Back
+        </button>
+      ) : (
+        <span />
+      )}
+      {next}
+    </div>
+  );
+
   return (
-    <div style={{ background: 'var(--surface)', borderRadius: 20, border: '1px solid var(--border)', padding: '2rem', boxShadow: '0 4px 20px rgba(15,23,42,0.04)' }}>
-      {/* Wizard Progress Bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem', overflowX: 'auto' }}>
-        {[
-          { num: 1, label: 'Location' },
-          { num: 2, label: 'Category' },
-          { num: 3, label: 'Description' },
-          { num: 4, label: 'Evidence' },
-          { num: 5, label: 'Review' },
-          { num: 6, label: 'Status' }
-        ].map((s) => (
-          <div key={s.num} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', whiteSpace: 'nowrap' }}>
-            <div style={{
-              width: 28,
-              height: 28,
-              borderRadius: '50%',
-              background: step === s.num ? 'var(--accent-solid)' : step > s.num ? 'var(--good-solid)' : 'var(--surface-3)',
-              color: step >= s.num ? 'var(--on-solid)' : 'var(--ink-3)',
-              fontWeight: 800,
-              fontSize: '0.8rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              {step > s.num ? '✓' : s.num}
-            </div>
-            <span style={{ fontSize: '0.82rem', fontWeight: step === s.num ? 700 : 500, color: step === s.num ? 'var(--ink)' : 'var(--ink-3)' }}>
-              {s.label}
-            </span>
-          </div>
-        ))}
-      </div>
+    <div className="card report-wizard">
+      <ol className="report-steps" aria-label="Report progress">
+        {STEPS.map((label, i) => {
+          const n = i + 1;
+          const state = step === n ? 'current' : step > n ? 'done' : 'todo';
+          return (
+            <li key={label} className={`report-step is-${state}`} aria-current={step === n ? 'step' : undefined}>
+              <span className="report-step-dot" aria-hidden="true">{step > n ? <CheckCircle2 size={16} /> : n}</span>
+              <span className="report-step-label">{label}</span>
+            </li>
+          );
+        })}
+      </ol>
 
-      {/* STEP 1: Select Location */}
       {step === 1 && (
-        <div style={{ display: 'grid', gap: '1.25rem' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <MapPin size={20} style={{ color: 'var(--accent-ink)' }} /> Step 1: Select Defect Location
-          </h3>
-
-          <div>
-            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
-              Pincode *
-            </label>
-            <input
-              type="text"
-              placeholder="6-digit Indian PIN code"
-              value={pinCode}
-              onChange={(e) => handlePinChange(e.target.value)}
-              style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid var(--border-strong)', fontSize: '0.9rem' }}
-            />
+        <div className="stack">
+          {stepTitle(<MapPin size={20} aria-hidden="true" />, 'Where is the problem?')}
+          <div className="field">
+            <label className="label" htmlFor="report-pin">PIN code</label>
+            <input {...fieldProps('pin')} className="input num" inputMode="numeric" maxLength={6} autoComplete="postal-code" placeholder="110001" value={pinCode} onChange={(e) => handlePinChange(e.target.value.replace(/\D/g, ''))} />
+            {fieldError('pin')}
           </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
-              Landmark / Specific Location *
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. Near Mayur Vihar Exit Ramp, Main Road Junction..."
-              value={landmark}
-              onChange={(e) => setLandmark(e.target.value)}
-              style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid var(--border-strong)', fontSize: '0.9rem' }}
-            />
+          <div className="field">
+            <label className="label" htmlFor="report-landmark">Landmark or exact spot</label>
+            <input {...fieldProps('landmark')} className="input" placeholder="e.g. Near the Mayur Vihar exit ramp" value={landmark} onChange={(e) => setLandmark(e.target.value)} />
+            {fieldError('landmark') ?? <span className="hint">Something the office can find: a junction, building or shop.</span>}
           </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>District</label>
-              <input type="text" value={district} onChange={(e) => setDistrict(e.target.value)} style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid var(--border-strong)', fontSize: '0.9rem' }} />
+          <div className="report-grid-2">
+            <div className="field">
+              <label className="label" htmlFor="report-district">District</label>
+              <input id="report-district" className="input" value={district} onChange={(e) => setDistrict(e.target.value)} />
             </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>State</label>
-              <input type="text" value={state} onChange={(e) => setState(e.target.value)} style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid var(--border-strong)', fontSize: '0.9rem' }} />
+            <div className="field">
+              <label className="label" htmlFor="report-state">State</label>
+              <input id="report-state" className="input" value={state} onChange={(e) => setState(e.target.value)} />
             </div>
           </div>
-
-          <button
-            type="button"
-            onClick={() => setStep(2)}
-            disabled={!pinCode || !landmark}
-            style={{
-              padding: '0.75rem 1.5rem',
-              borderRadius: 10,
-              background: 'var(--brand)',
-              color: 'var(--on-solid)',
-              fontWeight: 700,
-              fontSize: '0.88rem',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              justifySelf: 'end',
-              marginTop: '1rem',
-              opacity: (!pinCode || !landmark) ? 0.6 : 1
-            }}
-          >
-            Next: Select Category <ArrowRight size={16} />
-          </button>
+          <span className="hint">District and state fill in from the PIN code. Change them if they are wrong.</span>
+          {nav(null, (
+            <button type="button" className="btn btn-primary" onClick={() => goNext(1)}>
+              Next: choose a category <ArrowRight size={16} aria-hidden="true" />
+            </button>
+          ))}
         </div>
       )}
 
-      {/* STEP 2: Select Category */}
       {step === 2 && (
-        <div style={{ display: 'grid', gap: '1.25rem' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <Layers size={20} style={{ color: 'var(--brand-ink)' }} /> Step 2: Select Defect Category
-          </h3>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
+        <div className="stack">
+          {stepTitle(<Layers size={20} aria-hidden="true" />, 'What kind of problem is it?')}
+          <div className="report-choices" role="group" aria-label="Category">
             {categories.map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setCategory(cat)}
-                style={{
-                  padding: '1.1rem 1rem',
-                  borderRadius: 12,
-                  border: category === cat ? '2px solid var(--accent)' : '1px solid var(--border)',
-                  background: category === cat ? 'var(--accent-soft)' : 'var(--surface)',
-                  color: category === cat ? 'var(--accent-ink)' : 'var(--ink)',
-                  fontWeight: category === cat ? 800 : 600,
-                  fontSize: '0.95rem',
-                  cursor: 'pointer',
-                  textAlign: 'left'
-                }}
-              >
+              <button key={cat} type="button" className="report-choice" aria-pressed={category === cat} onClick={() => setCategory(cat)}>
+                {category === cat && <CheckCircle2 size={16} aria-hidden="true" />}
                 {cat}
               </button>
             ))}
           </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
-            <button type="button" onClick={() => setStep(1)} style={{ padding: '0.65rem 1.25rem', borderRadius: 10, background: 'var(--surface-3)', border: '1px solid var(--border-strong)', fontWeight: 700, cursor: 'pointer' }}>
-              <ArrowLeft size={14} /> Back
+          {nav(1, (
+            <button type="button" className="btn btn-primary" onClick={() => setStep(3)}>
+              Next: describe it <ArrowRight size={16} aria-hidden="true" />
             </button>
-            <button type="button" onClick={() => setStep(3)} style={{ padding: '0.75rem 1.5rem', borderRadius: 10, background: 'var(--brand)', color: 'var(--on-solid)', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-              Next: Describe Issue <ArrowRight size={16} />
-            </button>
-          </div>
+          ))}
         </div>
       )}
 
-      {/* STEP 3: Describe Issue */}
       {step === 3 && (
-        <div style={{ display: 'grid', gap: '1.25rem' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <FileText size={20} style={{ color: 'var(--good)' }} /> Step 3: Describe Issue & Impact
-          </h3>
-
-          <div>
-            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
-              Issue Headline / Short Title *
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. Deep Pothole Cluster near Flyover Exit..."
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid var(--border-strong)', fontSize: '0.9rem' }}
-            />
+        <div className="stack">
+          {stepTitle(<FileText size={20} aria-hidden="true" />, 'What did you see?')}
+          <div className="field">
+            <label className="label" htmlFor="report-title">Short title <span className="muted">(optional)</span></label>
+            <input id="report-title" className="input" placeholder="e.g. Deep potholes near the flyover exit" value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.35rem' }}>
-              Detailed Description & Ground Impact *
-            </label>
-            <textarea
-              rows={4}
-              placeholder="Describe physical defect condition, safety hazards to commuters or students..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              style={{ width: '100%', padding: '0.65rem 0.85rem', borderRadius: 10, border: '1px solid var(--border-strong)', fontSize: '0.9rem', outline: 'none' }}
-            />
+          <div className="field">
+            <label className="label" htmlFor="report-description">Description</label>
+            <textarea {...fieldProps('description')} className="textarea" rows={5} placeholder="What is wrong, since when, and who is affected (commuters, students, patients)?" value={description} onChange={(e) => setDescription(e.target.value)} />
+            {fieldError('description') ?? <span className="hint">{description.trim().length < 20 ? `${20 - description.trim().length} more characters needed` : 'Looks good.'}</span>}
           </div>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
-            <button type="button" onClick={() => setStep(2)} style={{ padding: '0.65rem 1.25rem', borderRadius: 10, background: 'var(--surface-3)', border: '1px solid var(--border-strong)', fontWeight: 700, cursor: 'pointer' }}>
-              <ArrowLeft size={14} /> Back
+          {nav(2, (
+            <button type="button" className="btn btn-primary" onClick={() => goNext(3)}>
+              Next: add evidence <ArrowRight size={16} aria-hidden="true" />
             </button>
-            <button type="button" onClick={() => setStep(4)} disabled={!description.trim()} style={{ padding: '0.75rem 1.5rem', borderRadius: 10, background: 'var(--brand)', color: 'var(--on-solid)', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', opacity: !description.trim() ? 0.6 : 1 }}>
-              Next: Upload Evidence <ArrowRight size={16} />
-            </button>
-          </div>
+          ))}
         </div>
       )}
 
-      {/* STEP 4: Upload Evidence */}
       {step === 4 && (
-        <div style={{ display: 'grid', gap: '1.25rem' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: 0, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <Camera size={20} style={{ color: 'var(--viz-4)' }} /> Step 4: Upload Media Evidence
-          </h3>
-
+        <div className="stack">
+          {stepTitle(<Camera size={20} aria-hidden="true" />, 'Add a photo or video')}
           <EvidenceUploader files={evidenceFiles} onChange={(f) => setEvidenceFiles(f)} />
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
-            <button type="button" onClick={() => setStep(3)} style={{ padding: '0.65rem 1.25rem', borderRadius: 10, background: 'var(--surface-3)', border: '1px solid var(--border-strong)', fontWeight: 700, cursor: 'pointer' }}>
-              <ArrowLeft size={14} /> Back
+          {nav(3, (
+            <button type="button" className="btn btn-primary" onClick={() => setStep(5)}>
+              Next: review <ArrowRight size={16} aria-hidden="true" />
             </button>
-            <button type="button" onClick={() => setStep(5)} style={{ padding: '0.75rem 1.5rem', borderRadius: 10, background: 'var(--brand)', color: 'var(--on-solid)', fontWeight: 700, border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}>
-              Next: Review & Submit <ArrowRight size={16} />
-            </button>
-          </div>
+          ))}
         </div>
       )}
 
-      {/* STEP 5: Review & Anonymity Settings */}
       {step === 5 && (
-        <div style={{ display: 'grid', gap: '1.25rem' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
-            Step 5: Review & Anonymity Selection
-          </h3>
-
-          <div style={{ background: 'var(--surface-2)', padding: '1.25rem', borderRadius: 14, border: '1px solid var(--border)' }}>
-            <div style={{ fontSize: '0.86rem', fontWeight: 700, color: 'var(--ink)', marginBottom: '0.75rem' }}>
-              Choose Reporter Identity Privacy:
-            </div>
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <button
-                type="button"
-                onClick={() => setIsAnonymous(true)}
-                style={{
-                  flex: 1,
-                  padding: '1rem',
-                  borderRadius: 12,
-                  border: isAnonymous ? '2px solid var(--brand-ink)' : '1px solid var(--border-strong)',
-                  background: isAnonymous ? 'var(--brand-soft)' : 'var(--surface)',
-                  fontWeight: 700,
-                  fontSize: '0.88rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}
-              >
-                <EyeOff size={18} style={{ color: 'var(--brand-ink)' }} /> Anonymous Submission (Recommended)
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setIsAnonymous(false)}
-                style={{
-                  flex: 1,
-                  padding: '1rem',
-                  borderRadius: 12,
-                  border: !isAnonymous ? '2px solid var(--brand-ink)' : '1px solid var(--border-strong)',
-                  background: !isAnonymous ? 'var(--brand-soft)' : 'var(--surface)',
-                  fontWeight: 700,
-                  fontSize: '0.88rem',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem'
-                }}
-              >
-                <UserCheck size={18} style={{ color: 'var(--brand-ink)' }} /> Public Auditor Profile
-              </button>
-            </div>
-
-            {!isAnonymous && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem', marginTop: '1rem' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.3rem' }}>Your Name</label>
-                  <input type="text" value={reporterName} onChange={(e) => setReporterName(e.target.value)} placeholder="Full Name" style={{ width: '100%', padding: '0.55rem 0.75rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.85rem' }} />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.3rem' }}>Email / Phone</label>
-                  <input type="text" value={reporterContact} onChange={(e) => setReporterContact(e.target.value)} placeholder="Email or Phone" style={{ width: '100%', padding: '0.55rem 0.75rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.85rem' }} />
-                </div>
-              </div>
-            )}
+        <div className="stack">
+          {stepTitle(<Send size={20} aria-hidden="true" />, 'Review and choose how you appear')}
+          <div className="report-choices report-choices-2" role="group" aria-label="Who can see your name">
+            <button type="button" className="report-choice" aria-pressed={isAnonymous} onClick={() => setIsAnonymous(true)}>
+              <EyeOff size={18} aria-hidden="true" />
+              <span>
+                <strong>Anonymous</strong>
+                <span className="hint" style={{ display: 'block' }}>Recommended. Your name is never shown.</span>
+              </span>
+            </button>
+            <button type="button" className="report-choice" aria-pressed={!isAnonymous} onClick={() => setIsAnonymous(false)}>
+              <UserCheck size={18} aria-hidden="true" />
+              <span>
+                <strong>Show my name</strong>
+                <span className="hint" style={{ display: 'block' }}>Moderators can contact you for details.</span>
+              </span>
+            </button>
           </div>
-
+          {!isAnonymous && (
+            <div className="report-grid-2">
+              <div className="field">
+                <label className="label" htmlFor="report-name">Your name</label>
+                <input id="report-name" className="input" autoComplete="name" value={reporterName} onChange={(e) => setReporterName(e.target.value)} />
+              </div>
+              <div className="field">
+                <label className="label" htmlFor="report-contact">Email or phone</label>
+                <input id="report-contact" className="input" autoComplete="email" value={reporterContact} onChange={(e) => setReporterContact(e.target.value)} />
+              </div>
+            </div>
+          )}
           <ReportPreview
-            title={title || `${category} Defect Report at PIN ${pinCode}`}
+            title={title || `${category} problem at PIN ${pinCode}`}
             category={category}
             description={description}
             pinCode={pinCode}
@@ -367,54 +270,35 @@ export function ReportForm() {
             reporterContact={reporterContact}
             evidenceFiles={evidenceFiles}
           />
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
-            <button type="button" onClick={() => setStep(4)} style={{ padding: '0.65rem 1.25rem', borderRadius: 10, background: 'var(--surface-3)', border: '1px solid var(--border-strong)', fontWeight: 700, cursor: 'pointer' }}>
-              <ArrowLeft size={14} /> Back
+          {nav(4, (
+            <button type="button" className="btn btn-primary" onClick={handleFinalSubmit}>
+              <Send size={16} aria-hidden="true" /> Submit report
             </button>
-            <button type="button" onClick={handleFinalSubmit} style={{ padding: '0.75rem 1.75rem', borderRadius: 10, background: 'var(--brand)', color: 'var(--on-solid)', fontWeight: 800, border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', boxShadow: '0 4px 14px rgba(249,115,22,0.35)' }}>
-              <Send size={16} /> Confirm & Submit Report
-            </button>
-          </div>
+          ))}
         </div>
       )}
 
-      {/* STEP 6: Confirmation & Moderation Pipeline */}
       {step === 6 && createdReport && (
-        <div style={{ display: 'grid', gap: '1.25rem', textAlign: 'center', padding: '1rem 0' }}>
-          <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--good-soft)', color: 'var(--good)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto', fontSize: '2rem' }}>
-            <CheckCircle2 size={36} />
-          </div>
-
-          <h3 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
-            Report Submitted Successfully!
-          </h3>
-
-          <p style={{ fontSize: '0.92rem', color: 'var(--ink-2)', maxWidth: 600, margin: '0 auto', lineHeight: 1.55 }}>
-            Report Reference ID: <strong>{createdReport.id}</strong>. Your evidence has entered the automated moderation pipeline.
+        <div className="stack report-done">
+          <span className="report-done-icon" aria-hidden="true"><CheckCircle2 size={36} /></span>
+          <h2 className="report-step-title" style={{ justifyContent: 'center' }}>Report submitted</h2>
+          <p className="muted">
+            Reference <strong className="num" style={{ color: 'var(--ink)' }}>{createdReport.id}</strong>. A moderator checks every report before it is published.
           </p>
-
           {duplicateWarning && (
-            <div style={{ background: '#fffbebf', border: '1px solid var(--warn-line)', borderRadius: 12, padding: '1rem', color: 'var(--warn)', fontSize: '0.86rem', textAlign: 'left', maxWidth: 650, margin: '0 auto' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: 800, marginBottom: '0.3rem' }}>
-                <AlertTriangle size={16} /> Similar Existing Report Detected!
-              </div>
-              A similar issue report (ID: <strong>{duplicateWarning.id}</strong>) is already recorded for PIN {pinCode}. Your report has been merged as supplementary evidence to increase civic impact.
+            <div className="callout callout-warn" style={{ textAlign: 'left' }}>
+              <AlertTriangle size={16} aria-hidden="true" />
+              <span>
+                A similar report (<strong>{duplicateWarning.id}</strong>) already exists for PIN {pinCode}. Yours has been added to it as more evidence.
+              </span>
             </div>
           )}
-
-          <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', marginTop: '1rem' }}>
-            <button
-              onClick={() => navigate(`/reports/${createdReport.id}`)}
-              style={{ padding: '0.75rem 1.5rem', borderRadius: 10, background: 'var(--brand)', color: 'var(--on-solid)', fontWeight: 700, border: 'none', cursor: 'pointer' }}
-            >
-              View Report & Moderation Status
+          <div className="cluster" style={{ justifyContent: 'center' }}>
+            <button type="button" className="btn btn-primary" onClick={() => navigate(`/reports/${createdReport.id}`)}>
+              View your report
             </button>
-            <button
-              onClick={() => navigate(`/reports/${createdReport.id}/action`)}
-              style={{ padding: '0.75rem 1.5rem', borderRadius: 10, background: 'var(--brand)', color: 'var(--on-solid)', fontWeight: 700, border: 'none', cursor: 'pointer' }}
-            >
-              Take Official Action (CPGRAMS / State Portal)
+            <button type="button" className="btn btn-secondary" onClick={() => navigate(`/reports/${createdReport.id}/action`)}>
+              File with CPGRAMS or the state portal
             </button>
           </div>
         </div>

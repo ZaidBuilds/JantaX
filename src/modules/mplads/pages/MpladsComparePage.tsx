@@ -18,7 +18,7 @@ export function MpladsComparePage() {
       <div style={{ marginBottom: '1rem' }}>
         <Link
           to="/mplads"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
+          style={{ display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
         >
           <ArrowLeft size={16} /> Back to MPLADS Directory
         </Link>
@@ -38,7 +38,7 @@ export function MpladsComparePage() {
             <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--ink-2)', display: 'block', marginBottom: '0.4rem' }}>
               Select Representative 1
             </label>
-            <select
+            <select aria-label="Select Representative 1"
               value={rep1Id}
               onChange={(e) => setRep1Id(e.target.value)}
               style={{ width: '100%', padding: '0.6rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.88rem' }}
@@ -55,7 +55,7 @@ export function MpladsComparePage() {
             <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--ink-2)', display: 'block', marginBottom: '0.4rem' }}>
               Select Representative 2
             </label>
-            <select
+            <select aria-label="Select Representative 2"
               value={rep2Id}
               onChange={(e) => setRep2Id(e.target.value)}
               style={{ width: '100%', padding: '0.6rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.88rem' }}

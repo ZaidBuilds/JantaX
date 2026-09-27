@@ -58,7 +58,7 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
             style={{
               background: 'var(--accent-solid)',
               color: 'var(--on-solid)',
-              fontSize: '0.72rem',
+              fontSize: 'var(--text-xs)',
               fontWeight: 900,
               padding: '0.2rem 0.6rem',
               borderRadius: 6,
@@ -82,7 +82,7 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
               border: 'none',
               padding: '0.25rem 0.6rem',
               borderRadius: 6,
-              fontSize: '0.72rem',
+              fontSize: 'var(--text-xs)',
               fontWeight: 800,
               cursor: 'pointer',
             }}
@@ -97,7 +97,7 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
               border: 'none',
               padding: '0.25rem 0.6rem',
               borderRadius: 6,
-              fontSize: '0.72rem',
+              fontSize: 'var(--text-xs)',
               fontWeight: 800,
               cursor: 'pointer',
             }}
@@ -130,7 +130,7 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
                 border: '1px solid var(--border-strong)',
                 padding: '0.35rem 0.75rem',
                 borderRadius: 999,
-                fontSize: '0.74rem',
+                fontSize: 'var(--text-xs)',
                 fontWeight: 700,
                 cursor: 'pointer',
               }}
@@ -145,7 +145,7 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
       <div style={{ padding: '1.5rem' }}>
         {/* Noun Tag */}
         <div style={{ marginBottom: '1rem' }}>
-          <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--ink-3)', textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 'var(--text-xs)', fontWeight: 800, color: 'var(--ink-3)', textTransform: 'uppercase' }}>
             {isHindi ? 'चिह्नित जवाबदेह निकाय (Named Entity)' : 'Accountable Named Entity'}
           </span>
           <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ink)', margin: '0.15rem 0 0' }}>
@@ -217,7 +217,7 @@ export function WhatsAppJuxtapositionCard({ pinCode, locality, lens, onSelectLen
               padding: '0.15rem 0.5rem',
               borderRadius: 4,
               fontWeight: 700,
-              fontSize: '0.7rem',
+              fontSize: 'var(--text-xs)',
             }}
           >
             {lens.confidenceBadge}

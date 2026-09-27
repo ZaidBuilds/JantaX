@@ -111,7 +111,7 @@ export const MOCK_OFFICIAL_TRACKING: Record<string, OfficialTrackingRecord> = {
       {
         id: 'resp-001-1',
         responseDate: '2026-08-23 11:00 IST',
-        officerName: 'Shri R.K. Sharma',
+        officerName: 'Nodal officer (sample 1)',
         officerDesignation: 'Executive Engineer, PWD Zone 2 Delhi',
         department: 'Public Works Department, GNCTD',
         responseText: 'Grievance assigned to Maintenance Division 4. Site inspection team dispatched to inspect asphalt cavity at Mayur Vihar ramp.',
@@ -136,7 +136,7 @@ export const MOCK_OFFICIAL_TRACKING: Record<string, OfficialTrackingRecord> = {
       {
         id: 'resp-002-1',
         responseDate: '2026-08-21 16:30 IST',
-        officerName: 'Dr. Akhilesh Mohan',
+        officerName: 'Nodal officer (sample 2)',
         officerDesignation: 'Chief Medical Officer (CMO) Meerut',
         department: 'Department of Health & Family Welfare UP',
         responseText: 'Show-cause notice issued to Medical Officer in-charge. PHC OPD timings strictly enforced with biometric attendance.',

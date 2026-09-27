@@ -96,19 +96,19 @@ export function ContractorsDirectoryPage() {
         <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 16, border: '1px solid var(--border)' }}>
           <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>Tracked Contractors</div>
           <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.2rem' }}>{stats.totalCount}</div>
-          <div style={{ fontSize: '0.74rem', color: 'var(--ink-4)' }}>Class 1 & Special Class</div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Class 1 & Special Class</div>
         </div>
 
         <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 16, border: '1px solid var(--border)' }}>
           <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>Total Contracts Value</div>
           <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--good)', marginTop: '0.2rem' }}>₹{stats.totalValueCr} Cr</div>
-          <div style={{ fontSize: '0.74rem', color: 'var(--ink-4)' }}>Awarded Value Cumulative</div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Awarded Value Cumulative</div>
         </div>
 
         <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 16, border: '1px solid var(--border)' }}>
           <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>Average Performance Score</div>
           <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--brand-ink)', marginTop: '0.2rem' }}>{stats.avgScore}%</div>
-          <div style={{ fontSize: '0.74rem', color: 'var(--ink-4)' }}>Transparent Index</div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Transparent Index</div>
         </div>
 
         <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 16, border: '1px solid var(--border)' }}>
@@ -116,7 +116,7 @@ export function ContractorsDirectoryPage() {
           <div style={{ fontSize: '1.75rem', fontWeight: 800, color: stats.debarmentsCount > 0 ? 'var(--bad)' : 'var(--good)', marginTop: '0.2rem' }}>
             {stats.debarmentsCount}
           </div>
-          <div style={{ fontSize: '0.74rem', color: 'var(--ink-4)' }}>Competent Authority Orders</div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Competent Authority Orders</div>
         </div>
       </div>
 
@@ -177,18 +177,9 @@ export function ContractorsDirectoryPage() {
                   </span>
                 </div>
 
-                <h3
-                  onClick={() => navigate(`/contractors/${c.id}`)}
-                  style={{
-                    fontSize: '1.3rem',
-                    fontWeight: 800,
-                    color: 'var(--ink)',
-                    cursor: 'pointer',
-                    margin: 0
-                  }}
-                >
-                  {c.companyName}
-                </h3>
+                <h2 style={{ fontSize: '1.3rem', fontWeight: 800, margin: 0 }}>
+                  <Link to={`/contractors/${c.id}`} className="title-link">{c.companyName}</Link>
+                </h2>
                 <div style={{ fontSize: '0.85rem', color: 'var(--ink-3)', marginTop: '0.2rem' }}>
                   Headquarters: {c.headquarters} · Directors: {c.directors.join(', ')}
                 </div>
@@ -202,7 +193,7 @@ export function ContractorsDirectoryPage() {
                 padding: '0.65rem 1rem',
                 textAlign: 'right'
               }}>
-                <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
                   Performance Score
                 </div>
                 <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.1rem' }}>
@@ -222,28 +213,28 @@ export function ContractorsDirectoryPage() {
               marginBottom: '1rem'
             }}>
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Total Awarded Value</div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Total Awarded Value</div>
                 <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--ink)' }}>
                   ₹{c.performanceIndicators.totalAwardedValueCr.toLocaleString()} Cr ({c.performanceIndicators.totalContractsCount} Projects)
                 </div>
               </div>
 
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Completion Rate</div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Completion Rate</div>
                 <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--good)' }}>
                   {c.performanceIndicators.completionRatePct}% Completed
                 </div>
               </div>
 
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Avg Extension Duration</div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Avg Extension Duration</div>
                 <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--warn)' }}>
                   {c.performanceIndicators.averageExtensionMonths} Months
                 </div>
               </div>
 
               <div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 600 }}>Documented Penalties</div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Documented Penalties</div>
                 <div style={{ fontSize: '0.92rem', fontWeight: 800, color: c.penalties.length > 0 ? 'var(--bad)' : 'var(--good)' }}>
                   {c.penalties.length} Order(s)
                 </div>

@@ -45,7 +45,7 @@ export const ReportPreview: React.FC<ReportPreviewProps> = ({
           background: isAnonymous ? 'var(--brand-soft)' : 'var(--surface-2)',
           border: '1px solid var(--border-strong)',
           color: isAnonymous ? 'var(--brand-ink)' : 'var(--ink-2)',
-          fontSize: '0.74rem',
+          fontSize: 'var(--text-xs)',
           fontWeight: 700,
           padding: '0.2rem 0.6rem',
           borderRadius: '9999px',

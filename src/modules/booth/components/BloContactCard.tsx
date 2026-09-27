@@ -21,7 +21,7 @@ export function BloContactCard({ blo, stationNumber, buildingName }: Props) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.3rem' }}>
-            <span style={{ background: 'var(--brand-soft)', color: 'var(--brand-ink)', fontSize: '0.72rem', fontWeight: 800, padding: '0.2rem 0.6rem', borderRadius: 6 }}>
+            <span style={{ background: 'var(--brand-soft)', color: 'var(--brand-ink)', fontSize: 'var(--text-xs)', fontWeight: 800, padding: '0.2rem 0.6rem', borderRadius: 6 }}>
               OFFICIAL DESIGNATED BLO
             </span>
             {stationNumber && (
@@ -63,17 +63,17 @@ export function BloContactCard({ blo, stationNumber, buildingName }: Props) {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', background: 'var(--surface-3)', padding: '1rem', borderRadius: 10, fontSize: '0.78rem' }}>
         <div>
-          <span style={{ color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.68rem' }}>Department</span>
+          <span style={{ color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase', fontSize: 'var(--text-xs)' }}>Department</span>
           <div style={{ color: 'var(--ink)', fontWeight: 600, marginTop: '0.15rem' }}>{blo.parentDepartment}</div>
         </div>
 
         <div>
-          <span style={{ color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.68rem' }}>Assigned Office</span>
+          <span style={{ color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase', fontSize: 'var(--text-xs)' }}>Assigned Office</span>
           <div style={{ color: 'var(--ink)', fontWeight: 600, marginTop: '0.15rem' }}>{blo.officeLocation}</div>
         </div>
 
         <div>
-          <span style={{ color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.68rem' }}>Appointment Date</span>
+          <span style={{ color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase', fontSize: 'var(--text-xs)' }}>Appointment Date</span>
           <div style={{ color: 'var(--ink)', fontWeight: 600, marginTop: '0.15rem' }}>{blo.appointedDate}</div>
         </div>
       </div>

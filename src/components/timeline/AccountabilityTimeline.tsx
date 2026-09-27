@@ -39,10 +39,10 @@ export function AccountabilityTimeline({ events }: AccountabilityTimelineProps) 
               boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
             }}></div>
             
-            <div style={{ fontSize: '0.72rem', opacity: 0.5, fontWeight: 700 }}>
+            <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--ink-3)' }}>
               {e.date} · {e.actor}
             </div>
-            <h4 style={{ fontSize: '0.95rem', margin: '0.15rem 0', fontWeight: 700, color: 'var(--color-primary)' }}>{e.title}</h4>
+            <h4 style={{ fontSize: '0.95rem', margin: '0.15rem 0', fontWeight: 700, color: 'var(--brand-ink)' }}>{e.title}</h4>
             <p style={{ fontSize: '0.8rem', opacity: 0.8, margin: 0, lineHeight: 1.4 }}>{e.desc}</p>
           </div>
         );

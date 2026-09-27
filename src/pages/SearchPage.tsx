@@ -23,12 +23,14 @@ import {
   Hospital,
   Wheat,
   MessageSquareWarning,
+  ArrowRight,
   Database,
   type LucideIcon,
 } from 'lucide-react';
 import { api, type SearchResponse, type SearchResult, type AutocompleteSuggestion } from '../core/services/api';
 import { isValidIndianPincode } from '../core/utils/pinResolver';
-import { Badge, Breadcrumbs, EmptyState, toneForStatus, useDismiss } from '../ui';
+import { Badge, Breadcrumbs, EmptyState, ModuleIcon, toneForStatus, useDismiss } from '../ui';
+import { searchTopics } from '../core/services/topicSearch';
 
 const TYPES: Record<string, { label: string; icon: LucideIcon; tone: string }> = {
   location: { label: 'Areas', icon: MapPin, tone: 'var(--accent)' },
@@ -159,6 +161,7 @@ export function SearchPage() {
   const closeSuggest = useCallback(() => setSuggestOpen(false), []);
   useDismiss(boxRef, suggestOpen, closeSuggest);
 
+  const topics = useMemo(() => searchTopics(q), [q]);
   useEffect(() => setDraft(q), [q]);
 
   useEffect(() => {
@@ -265,7 +268,7 @@ export function SearchPage() {
       </form>
       <div className="field">
         <label className="label" htmlFor="filter-state">State</label>
-        <select id="filter-state" className="select" value={state} onChange={(e) => setParam({ state: e.target.value })}>
+        <select aria-label="State" id="filter-state" className="select" value={state} onChange={(e) => setParam({ state: e.target.value })}>
           <option value="">All states</option>
           {['Delhi', 'Uttar Pradesh', 'Maharashtra', 'Karnataka', 'Tamil Nadu', 'West Bengal', 'Bihar', 'Telangana', 'Gujarat', 'Rajasthan', 'Kerala'].map((s) => (
             <option key={s} value={s}>{s}</option>
@@ -286,7 +289,7 @@ export function SearchPage() {
       <h1 className="page-title" style={{ marginBottom: 'var(--s-5)' }}>Search public records</h1>
 
       <div ref={boxRef} style={{ position: 'relative', maxWidth: 760 }}>
-        <form role="search" onSubmit={submit} className="search-field">
+        <form role="search" aria-label="Search records" onSubmit={submit} className="search-field">
           <Search size={20} aria-hidden="true" />
           <input
             type="search"
@@ -299,8 +302,10 @@ export function SearchPage() {
             onFocus={() => setSuggestOpen(true)}
             placeholder="School, project, contractor, court, ward or PIN"
             aria-label="Search public records"
+            role="combobox"
             aria-autocomplete="list"
-            aria-controls="search-suggest"
+            aria-controls={suggestOpen && suggestions.length > 0 ? 'search-suggest' : undefined}
+            aria-expanded={suggestOpen && suggestions.length > 0}
             autoFocus={!q}
           />
           {draft && (
@@ -403,6 +408,25 @@ export function SearchPage() {
             </div>
             {filtersOpen && <div className="card card-pad show-filters-panel" style={{ marginBottom: 'var(--s-4)' }}>{Filters}</div>}
 
+            {topics.length > 0 && (
+              <section className="card" style={{ marginBottom: 'var(--s-4)' }} aria-labelledby="topics-h">
+                <div className="card-head">
+                  <h2 id="topics-h" className="card-title" style={{ fontSize: 'var(--text-md)' }}>Pages and modules</h2>
+                </div>
+                <div className="list">
+                  {topics.map((t) => (
+                    <Link key={t.id} to={t.to} className="list-row">
+                      {t.module ? <ModuleIcon id={t.module} size="sm" /> : <span className="topic-icon" aria-hidden="true"><ArrowRight size={14} /></span>}
+                      <span style={{ flex: 1, minWidth: 0 }}>
+                        <span className="strong" style={{ display: 'block', color: 'var(--ink)' }}>{t.title}</span>
+                        <span className="small muted">{t.text}</span>
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+
             <div className="card">
               {loading && !data ? (
                 <div className="list">
@@ -425,8 +449,8 @@ export function SearchPage() {
               ) : (
                 <EmptyState
                   icon={SearchX}
-                  title={`Nothing found for “${q}”`}
-                  text="Check the spelling, search a district or PIN code instead, or remove filters."
+                  title={topics.length ? `No individual records match “${q}” yet` : `Nothing found for “${q}”`}
+                  text={topics.length ? 'Records appear here as official datasets are connected. The pages above cover this topic.' : 'Check the spelling, search a district or PIN code instead, or remove filters.'}
                   action={
                     <div className="cluster" style={{ justifyContent: 'center' }}>
                       {activeFilters.length > 0 && (

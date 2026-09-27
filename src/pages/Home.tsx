@@ -165,7 +165,7 @@ export function Home() {
               Schools, clinics, roads, ration shops and courts. Official data beside what citizens found on the ground.
             </p>
 
-            <form role="search" onSubmit={submit} className="home-search" noValidate>
+            <form role="search" aria-label="Find records for a place" onSubmit={submit} className="home-search" noValidate>
               <div className="search-field">
                 <Search size={20} aria-hidden="true" />
                 <input

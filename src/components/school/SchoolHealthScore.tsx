@@ -161,7 +161,7 @@ function CompositeScoreCard({
             </svg>
             <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               <span style={{ fontSize: '1.6rem', fontWeight: 900, color: config.color, lineHeight: 1 }}>{score}</span>
-              <span style={{ fontSize: '0.6rem', color: 'var(--ink-3)', fontWeight: 600 }}>/100</span>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>/100</span>
             </div>
           </div>
           <div>
@@ -169,16 +169,16 @@ function CompositeScoreCard({
               <Icon size={18} style={{ color: config.color }} />
               <span style={{ fontWeight: 800, fontSize: '1.05rem', color: config.color }}>{config.label}</span>
             </div>
-            <p style={{ fontSize: '0.78rem', opacity: 0.7, margin: 0, maxWidth: 400 }}>
+            <p style={{ fontSize: '0.78rem', margin: 0, maxWidth: 400, color: 'var(--ink-3)' }}>
               Composite of Infrastructure, Staffing, Attendance, Meals, Learning, and Safety dimensions.
               Requires minimum 5 reports across 3 days.
             </p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-              <span style={{ fontFamily: 'monospace', background: 'var(--surface-2)', border: '1px solid var(--border)', padding: '1px 5px', borderRadius: 4, fontSize: '0.68rem' }}>
+              <span style={{ fontFamily: 'monospace', background: 'var(--surface-2)', border: '1px solid var(--border)', padding: '1px 5px', borderRadius: 4, fontSize: 'var(--text-xs)' }}>
                 {version}
               </span>
               {methodologyUrl && (
-                <Link to={methodologyUrl} style={{ fontSize: '0.72rem', color: 'var(--brand-ink)', fontWeight: 600 }}>
+                <Link to={methodologyUrl} style={{ fontSize: 'var(--text-xs)', color: 'var(--brand-ink)', fontWeight: 600 }}>
                   Methodology
                 </Link>
               )}
@@ -220,13 +220,13 @@ function DimensionCard({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
           <div>
             <h4 style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>{dim.label}</h4>
-            {dim.labelHi && <span style={{ fontSize: '0.75rem', opacity: 0.5 }}>{dim.labelHi}</span>}
+            {dim.labelHi && <span style={{ fontSize: '0.75rem', color: 'var(--ink-3)' }}>{dim.labelHi}</span>}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexShrink: 0 }}>
             <span
               onClick={() => onStatusClick?.(dim.id)}
               style={{
-                fontSize: '0.65rem',
+                fontSize: 'var(--text-xs)',
                 fontWeight: 700,
                 padding: '2px 7px',
                 borderRadius: 999,
@@ -248,7 +248,7 @@ function DimensionCard({
           </div>
         </div>
 
-        <p style={{ fontSize: '0.72rem', opacity: 0.6, margin: '0 0 0.75rem' }}>{dim.description}</p>
+        <p style={{ fontSize: 'var(--text-xs)', margin: '0 0 0.75rem', color: 'var(--ink-3)' }}>{dim.description}</p>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{ flex: 1 }}>
@@ -266,17 +266,17 @@ function DimensionCard({
           </div>
           <span style={{ fontSize: '1rem', fontWeight: 900, color: hasScore ? config.color : 'var(--ink-4)', minWidth: 48, textAlign: 'right' }}>
             {dim.score !== null ? `${dim.score}` : '-'}
-            {dim.unit && dim.score !== null && <span style={{ fontSize: '0.7em', opacity: 0.6 }}>{dim.unit}</span>}
+            {dim.unit && dim.score !== null && <span style={{ fontSize: '0.7em', color: 'var(--ink-3)' }}>{dim.unit}</span>}
           </span>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.6rem', flexWrap: 'wrap' }}>
           <SourceBadge sourceType={dim.source.type} sourceName={dim.source.name} />
-          <span style={{ fontSize: '0.62rem', opacity: 0.5 }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
             Calc: {new Date(dim.lastCalculation).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
           </span>
           {dim.confidence !== 'high' && (
-            <span style={{ fontSize: '0.62rem', color: dim.confidence === 'low' ? 'var(--bad)' : 'var(--warn)' }}>
+            <span style={{ fontSize: 'var(--text-xs)', color: dim.confidence === 'low' ? 'var(--bad)' : 'var(--warn)' }}>
               {dim.confidence === 'low' ? 'Low confidence' : '◐ Medium confidence'}
             </span>
           )}
@@ -287,15 +287,15 @@ function DimensionCard({
         <div style={{ padding: '0 1rem 1rem', borderTop: '1px solid var(--border)', marginTop: 0 }}>
           <div style={{ display: 'grid', gap: '0.75rem', marginTop: '0.75rem' }}>
             <div>
-              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Formula</div>
+              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Formula</div>
               <code style={{ fontSize: '0.78rem', background: 'var(--surface-2)', padding: '0.4rem 0.6rem', borderRadius: 6, display: 'block', border: '1px solid var(--border)' }}>
                 {dim.formula}
               </code>
             </div>
 
             <div>
-              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Inputs & Weights</div>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.74rem' }}>
+              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Inputs & Weights</div>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-xs)' }}>
                 <thead>
                   <tr style={{ color: 'var(--ink-3)', borderBottom: '1px solid var(--border)' }}>
                     <th style={{ textAlign: 'left', padding: '0.3rem 0.4rem', fontWeight: 600 }}>Input</th>
@@ -310,7 +310,7 @@ function DimensionCard({
                       <td style={{ padding: '0.35rem 0.4rem', fontWeight: 600 }}>{input.name}</td>
                       <td style={{ padding: '0.35rem 0.4rem', textAlign: 'center', fontWeight: 700 }}>{input.value}</td>
                       <td style={{ padding: '0.35rem 0.4rem', textAlign: 'center', color: 'var(--ink-3)' }}>{input.weight}</td>
-                      <td style={{ padding: '0.35rem 0.4rem', fontSize: '0.68rem', opacity: 0.6 }}>{input.source}</td>
+                      <td style={{ padding: '0.35rem 0.4rem', fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>{input.source}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -318,10 +318,10 @@ function DimensionCard({
             </div>
 
             <div>
-              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--ink-3)', marginBottom: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
                 <AlertTriangle size={12} /> Limitations
               </div>
-              <p style={{ fontSize: '0.74rem', opacity: 0.7, margin: 0, lineHeight: 1.5 }}>{dim.limitations}</p>
+              <p style={{ fontSize: 'var(--text-xs)', margin: 0, lineHeight: 1.5, color: 'var(--ink-3)' }}>{dim.limitations}</p>
             </div>
           </div>
         </div>

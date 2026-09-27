@@ -51,11 +51,11 @@ export function MpladsProjectTable({ works, showRepresentative = false }: Props)
                   <div style={{ fontWeight: 700, color: 'var(--ink)', marginBottom: '0.2rem', lineHeight: 1.35 }}>
                     {w.workTitle}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.72rem', color: 'var(--ink-3)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
                     <MapPin size={12} style={{ color: 'var(--accent-ink)' }} />
                     <span>PIN {w.pinCode} • {w.district}</span>
                   </div>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--ink-4)', marginTop: '0.2rem' }}>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)', marginTop: '0.2rem' }}>
                     Order: {w.sanctionOrderNumber}
                   </div>
                 </td>
@@ -67,7 +67,7 @@ export function MpladsProjectTable({ works, showRepresentative = false }: Props)
                       color: 'var(--ink-2)',
                       padding: '0.2rem 0.5rem',
                       borderRadius: 6,
-                      fontSize: '0.72rem',
+                      fontSize: 'var(--text-xs)',
                       fontWeight: 700,
                       whiteSpace: 'nowrap',
                     }}
@@ -89,7 +89,7 @@ export function MpladsProjectTable({ works, showRepresentative = false }: Props)
 
                 <td style={{ padding: '1rem', whiteSpace: 'nowrap' }}>
                   <div style={{ fontWeight: 800, color: 'var(--ink)' }}>₹{w.sanctionCostLakhs.toFixed(1)} L</div>
-                  <div style={{ fontSize: '0.7rem', color: 'var(--ink-3)' }}>Spent: ₹{w.spentAmountLakhs.toFixed(1)} L</div>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Spent: ₹{w.spentAmountLakhs.toFixed(1)} L</div>
                 </td>
 
                 <td style={{ padding: '1rem', fontSize: '0.78rem', color: 'var(--ink-2)', maxWidth: 160 }}>
@@ -123,13 +123,13 @@ export function MpladsProjectTable({ works, showRepresentative = false }: Props)
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '0.68rem',
+                        fontSize: 'var(--text-xs)',
                         fontWeight: 800,
                       }}
                     >
                       {w.groundTruthScore}
                     </div>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--ink-3)' }}>/100</span>
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>/100</span>
                   </div>
                 </td>
 

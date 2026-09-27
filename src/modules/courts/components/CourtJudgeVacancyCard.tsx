@@ -42,33 +42,33 @@ export function CourtJudgeVacancyCard({ sanctioned, working, vacant, vacancyPerc
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             Sanctioned Strength
           </span>
           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.25rem' }}>
             {sanctioned} Judges
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Authorized Courtrooms</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Authorized Courtrooms</span>
         </div>
 
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             Working Judges
           </span>
           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--good)', marginTop: '0.25rem' }}>
             {working} Presiding
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Active Hearing Benches</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Active Hearing Benches</span>
         </div>
 
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             Vacant Benches
           </span>
           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: isHighVacancy ? 'var(--bad)' : 'var(--warn)', marginTop: '0.25rem' }}>
             {vacant} Vacancies
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Awaiting Collegium/PSC</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Awaiting Collegium/PSC</span>
         </div>
       </div>
 

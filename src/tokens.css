@@ -23,7 +23,7 @@
   --ink: #0c1424;
   --ink-2: #384357;
   --ink-3: #5a6679;
-  --ink-4: #8a94a6;
+  --ink-4: #626c7f; /* 4.5:1 on every light surface; placeholders and small print */
   --on-solid: #ffffff;
 
   /* Brand: navy spine + saffron accent */
@@ -56,7 +56,7 @@
   --warn-solid: #a95f06;
   --bad-solid: #b3261e;
   --info-solid: #1f55c0;
-  --accent-solid: #c9540a;
+  --accent-solid: #b84c08;
   --surface-inverse: #121a2b;
 
   /* Categorical data colours (charts, map layers, module marks) */
@@ -65,7 +65,7 @@
   --viz-3: #12774a;
   --viz-4: #7440b5;
   --viz-5: #bf2f52;
-  --viz-6: #0d7a84;
+  --viz-6: #0b7079;
   --viz-7: #8a6a00;
   --viz-8: #52607a;
 
@@ -138,7 +138,7 @@
   --ink: #e8ecf3;
   --ink-2: #b9c2d1;
   --ink-3: #8f9aae;
-  --ink-4: #667188;
+  --ink-4: #8591a7;
   --on-solid: #ffffff;
 
   --brand: #3563d8;
@@ -168,7 +168,7 @@
   --warn-solid: #b06a0c;
   --bad-solid: #c2392f;
   --info-solid: #2c62d0;
-  --accent-solid: #d4600f;
+  --accent-solid: #b8540f;
   --surface-inverse: #1c2638;
 
   --viz-1: #7fa2ff;
@@ -185,6 +185,10 @@
   --shadow-md: 0 10px 28px -12px rgb(0 0 0 / 0.6), 0 2px 6px rgb(0 0 0 / 0.3);
   --shadow-lg: 0 24px 48px -16px rgb(0 0 0 / 0.7);
 }
+
+/* AQI categories outside the status palette (CPCB bands). Text-safe on light and dark surfaces. */
+:root { --aqi-satisfactory: #4d7c0f; --aqi-severe-plus: #7f1d1d; }
+:root[data-theme='dark'] { --aqi-satisfactory: #a3d65c; --aqi-severe-plus: #ff9a9a; }
 
 /* Illustration palette for the "Your area" scene (src/ui/AreaScene.tsx): day in light mode, night in dark. */
 :root {

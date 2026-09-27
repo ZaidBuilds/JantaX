@@ -47,7 +47,7 @@ export function CourtStageBottleneckCard({ stages }: Props) {
                   <span style={{ fontWeight: 800, color: isCritical ? 'var(--bad)' : 'var(--brand-ink)', fontSize: '0.9rem' }}>
                     {stage.percentage}% of Backlog
                   </span>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)' }}>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
                     {stage.caseCount.toLocaleString('en-IN')} cases
                   </div>
                 </div>
@@ -63,7 +63,7 @@ export function CourtStageBottleneckCard({ stages }: Props) {
                     }}
                   />
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', fontSize: '0.7rem', color: 'var(--ink-2)', whiteSpace: 'nowrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', fontSize: 'var(--text-xs)', color: 'var(--ink-2)', whiteSpace: 'nowrap' }}>
                   <Clock size={12} />
                   <span>Avg ~{stage.avgMonths} months at this stage</span>
                 </div>

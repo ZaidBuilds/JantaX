@@ -132,10 +132,10 @@ export function InfraApp() {
   return (
     <div className="stack" style={{ gap: 'var(--s-6)' }}>
       <div className="segmented" role="tablist" aria-label="Public works views">
-        <button type="button" role="tab" aria-selected={activeSpineView === 'national'} aria-pressed={activeSpineView === 'national'} onClick={() => setActiveSpineView('national')}>
+        <button type="button" role="tab" aria-selected={activeSpineView === 'national'} onClick={() => setActiveSpineView('national')}>
           Projects and progress
         </button>
-        <button type="button" role="tab" aria-selected={activeSpineView === 'spine'} aria-pressed={activeSpineView === 'spine'} onClick={() => setActiveSpineView('spine')}>
+        <button type="button" role="tab" aria-selected={activeSpineView === 'spine'} onClick={() => setActiveSpineView('spine')}>
           Who is accountable, MP to gram panchayat
         </button>
       </div>

@@ -44,12 +44,12 @@ export function CpgramsDashboard() {
     <div className="stack" style={{ gap: 'var(--s-6)' }}>
       <div className="spread" style={{ flexWrap: 'wrap' }}>
         <div className="segmented" role="tablist" aria-label="Rank by">
-          <button type="button" role="tab" aria-selected={tab === 'ministry'} aria-pressed={tab === 'ministry'} onClick={() => setTab('ministry')}>Union ministries</button>
-          <button type="button" role="tab" aria-selected={tab === 'state'} aria-pressed={tab === 'state'} onClick={() => setTab('state')}>State governments</button>
+          <button type="button" role="tab" aria-selected={tab === 'ministry'} onClick={() => setTab('ministry')}>Union ministries</button>
+          <button type="button" role="tab" aria-selected={tab === 'state'} onClick={() => setTab('state')}>State governments</button>
         </div>
         <div className="cluster">
           <label htmlFor="griev-sort" className="small muted">Sort by</label>
-          <select id="griev-sort" className="select select-sm" style={{ width: 'auto' }} value={sort} onChange={(e) => setSort(e.target.value as SortKey)}>
+          <select aria-label="Sort by" id="griev-sort" className="select select-sm" style={{ width: 'auto' }} value={sort} onChange={(e) => setSort(e.target.value as SortKey)}>
             <option value="avgDisposalDays">Slowest to resolve</option>
             <option value="backlogOver30Days">Largest 30-day backlog</option>
             <option value="resolvedPct">Lowest resolution rate</option>

@@ -75,7 +75,7 @@ export function ProjectsDirectoryPage() {
         return { bg: 'var(--good-soft)', border: 'var(--good-line)', color: 'var(--good)', icon: <CheckCircle2 size={13} /> };
       case 'Extended':
       case 'Delayed':
-        return { bg: '#fffbebf', border: 'var(--warn-line)', color: 'var(--warn)', icon: <Clock size={13} /> };
+        return { bg: 'var(--warn-soft)', border: 'var(--warn-line)', color: 'var(--warn)', icon: <Clock size={13} /> };
       case 'Incomplete':
         return { bg: 'var(--bad-soft)', border: 'var(--bad-line)', color: 'var(--bad)', icon: <Clock size={13} /> };
       case 'Under Review':
@@ -329,7 +329,7 @@ export function ProjectsDirectoryPage() {
                       <span style={{
                         background: 'var(--surface-3)',
                         color: 'var(--ink-2)',
-                        fontSize: '0.74rem',
+                        fontSize: 'var(--text-xs)',
                         fontWeight: 600,
                         padding: '0.2rem 0.6rem',
                         borderRadius: 6

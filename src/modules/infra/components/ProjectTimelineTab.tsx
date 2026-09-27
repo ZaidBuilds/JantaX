@@ -23,7 +23,7 @@ export const ProjectTimelineTab: React.FC<ProjectTimelineTabProps> = ({ project 
         return { bg: 'var(--good-soft)', border: 'var(--good-line)', color: 'var(--good)', icon: <CheckCircle2 size={13} /> };
       case 'Extended':
       case 'Delayed':
-        return { bg: '#fffbebf', border: 'var(--warn-line)', color: 'var(--warn)', icon: <Clock size={13} /> };
+        return { bg: 'var(--warn-soft)', border: 'var(--warn-line)', color: 'var(--warn)', icon: <Clock size={13} /> };
       case 'Incomplete':
         return { bg: 'var(--bad-soft)', border: 'var(--bad-line)', color: 'var(--bad)', icon: <Clock size={13} /> };
       case 'Under Review':
@@ -92,7 +92,7 @@ export const ProjectTimelineTab: React.FC<ProjectTimelineTabProps> = ({ project 
                 <div
                   key={ext.id}
                   style={{
-                    background: '#fffbebf',
+                    background: 'var(--warn-soft)',
                     border: '1px solid var(--warn-line)',
                     borderRadius: 10,
                     padding: '0.75rem 1rem',
@@ -107,7 +107,7 @@ export const ProjectTimelineTab: React.FC<ProjectTimelineTabProps> = ({ project 
                       href={ext.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
+                      style={{ color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.2rem' }}
                     >
                       {ext.sourceTitle} <ExternalLink size={12} />
                     </a>
@@ -173,7 +173,7 @@ export const ProjectTimelineTab: React.FC<ProjectTimelineTabProps> = ({ project 
                       background: badgeStyle.bg,
                       border: `1px solid ${badgeStyle.border}`,
                       color: badgeStyle.color,
-                      fontSize: '0.74rem',
+                      fontSize: 'var(--text-xs)',
                       fontWeight: 700,
                       padding: '0.2rem 0.6rem',
                       borderRadius: '9999px',
@@ -206,7 +206,7 @@ export const ProjectTimelineTab: React.FC<ProjectTimelineTabProps> = ({ project 
                       href={event.source.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
+                      style={{ color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.2rem' }}
                     >
                       {event.source.title} ({event.source.publisher}) <ExternalLink size={11} />
                     </a>

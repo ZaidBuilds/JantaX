@@ -32,7 +32,7 @@ export function WardDetailPage() {
       <div style={{ marginBottom: '1rem' }}>
         <Link
           to="/nagar"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
+          style={{ display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
         >
           <ArrowLeft size={16} /> Back to Municipal Directory
         </Link>
@@ -65,7 +65,7 @@ export function WardDetailPage() {
           </div>
 
           <div style={{ textAlign: 'right', minWidth: 160 }}>
-            <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', textTransform: 'uppercase', fontWeight: 700 }}>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', textTransform: 'uppercase', fontWeight: 700 }}>
               Cleanliness Score
             </div>
             <div style={{ fontSize: '2rem', fontWeight: 800, color: ward.cleanlinessScore >= 80 ? 'var(--good)' : 'var(--warn)' }}>
@@ -80,35 +80,35 @@ export function WardDetailPage() {
         {/* 4 Quick Service Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', background: 'var(--surface-2)', padding: '1.25rem', borderRadius: 14, border: '1px solid var(--border)', marginBottom: '1.5rem' }}>
           <div>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Door-to-Door Garbage</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Door-to-Door Garbage</span>
             <div style={{ fontSize: '1.2rem', fontWeight: 800, color: ward.services.doorToDoorGarbage ? 'var(--good)' : 'var(--bad)', marginTop: '0.2rem' }}>
               {ward.services.doorToDoorGarbage ? 'Active 100%' : 'Irregular'}
             </div>
-            <span style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>{ward.services.sweepingFrequency}</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>{ward.services.sweepingFrequency}</span>
           </div>
 
           <div>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Streetlight Working %</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Streetlight Working %</span>
             <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.2rem' }}>
               {ward.services.streetlightCoveragePercent}%
             </div>
-            <span style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>Coverage</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Coverage</span>
           </div>
 
           <div>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Avg 311 Resolution</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Avg 311 Resolution</span>
             <div style={{ fontSize: '1.2rem', fontWeight: 800, color: ward.avgResolutionHours <= 30 ? 'var(--good)' : 'var(--warn)', marginTop: '0.2rem' }}>
               ~{ward.avgResolutionHours} Hours
             </div>
-            <span style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>Statutory SLA: 48h</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Statutory SLA: 48h</span>
           </div>
 
           <div>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Resolved Complaints</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Resolved Complaints</span>
             <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--brand-ink)', marginTop: '0.2rem' }}>
               {ward.resolvedComplaintsAnnual.toLocaleString('en-IN')}
             </div>
-            <span style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>{ward.openComplaints} currently open</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>{ward.openComplaints} currently open</span>
           </div>
         </div>
 

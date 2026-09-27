@@ -16,7 +16,7 @@ export const MOCK_INFRA_PROJECTS: InfraProject[] = [
     ministry: 'Public Works Department (PWD), Government of NCT Delhi',
     implementingAgency: 'Delhi PWD Infrastructure Division 1',
     sanctioningBody: 'Cabinet Committee on Expenditure, GNCTD',
-    responsibleOfficer: 'Shri R.K. Sharma',
+    responsibleOfficer: 'Executive engineer (sample 1)',
     responsibleOfficerDesignation: 'Executive Engineer, PWD Zone 2',
     leadContractor: 'M/s Sample Contractor A Infrastructure',
     contractorDetails: {
@@ -248,7 +248,7 @@ export const MOCK_INFRA_PROJECTS: InfraProject[] = [
     ministry: 'Ministry of Rural Development, Government of India / UPPWD',
     implementingAgency: 'UP Public Works Department (Rural Roads Division Meerut)',
     sanctioningBody: 'State Level Standing Committee (SLSC), PMGSY UP',
-    responsibleOfficer: 'Shri A.K. Chaudhary',
+    responsibleOfficer: 'Executive engineer (sample 2)',
     responsibleOfficerDesignation: 'Executive Engineer, UPPWD Meerut Division',
     leadContractor: 'M/s Chaudhary Road Builders & Sons',
     contractorDetails: {
@@ -427,7 +427,7 @@ export const MOCK_INFRA_PROJECTS: InfraProject[] = [
     ministry: 'Ministry of Housing and Urban Affairs (MoHUA) & Govt of Karnataka',
     implementingAgency: 'Bangalore Metro Rail Corporation Limited (BMRCL)',
     sanctioningBody: 'Union Cabinet & Government of Karnataka Joint Board',
-    responsibleOfficer: 'Shri Anjum Parwez',
+    responsibleOfficer: 'Executive engineer (sample 3)',
     responsibleOfficerDesignation: 'Managing Director, BMRCL',
     leadContractor: 'M/s Sample Contractor B - Sample Contractor C Joint Venture',
     contractorDetails: {
@@ -618,7 +618,7 @@ export const MOCK_INFRA_PROJECTS: InfraProject[] = [
     ministry: 'Brihanmumbai Municipal Corporation (BMC) / Govt of Maharashtra',
     implementingAgency: 'BMC Coastal Road Project Department',
     sanctioningBody: 'MCGM Standing Committee & Maharashtra State Coastal Zone Management Authority',
-    responsibleOfficer: 'Shri Bhushan Gagrani',
+    responsibleOfficer: 'Executive engineer (sample 4)',
     responsibleOfficerDesignation: 'Municipal Commissioner, BMC',
     leadContractor: 'M/s Sample Contractor A Limited',
     contractorDetails: {
@@ -808,7 +808,7 @@ export const MOCK_INFRA_PROJECTS: InfraProject[] = [
     ministry: 'Ministry of Jal Shakti, Department of Water Resources, Govt of India',
     implementingAgency: 'UP Jal Nigam (Urban) & National Mission for Clean Ganga (NMCG)',
     sanctioningBody: 'Empowered Steering Committee, Namami Gange',
-    responsibleOfficer: 'Shri S.K. Srivastava',
+    responsibleOfficer: 'Executive engineer (sample 5)',
     responsibleOfficerDesignation: 'Project Manager, UP Jal Nigam Ganga Pollution Control Unit',
     leadContractor: 'M/s Sample Water Works D Limited',
     contractorDetails: {

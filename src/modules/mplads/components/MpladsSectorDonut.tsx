@@ -46,7 +46,7 @@ export function MpladsSectorDonut({ sectors }: Props) {
                 <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink)' }}>{s.sector}</span>
                 <span style={{ fontSize: '0.75rem', fontWeight: 800, color }}>{pct}%</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--ink-3)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
                 <span>₹{s.amountLakhs.toFixed(1)} Lakhs</span>
                 <span>{s.count} works</span>
               </div>

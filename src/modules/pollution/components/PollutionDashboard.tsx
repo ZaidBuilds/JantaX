@@ -53,7 +53,7 @@ export function PollutionDashboard() {
 
   return (
     <div className="module-dashboard">
-      <div className="glass-card dash-header-card" style={{ borderLeftColor: '#65a30d' }}>
+      <div className="glass-card dash-header-card" style={{ borderLeftColor: 'var(--aqi-satisfactory)' }}>
         <h2>प्रदूषण नक्शा (Pollution Notice Overlay)</h2>
         <p>
           केंद्रीय प्रदूषण नियंत्रण बोर्ड (CPCB) वायु सूचकांक एवं राज्य बोर्डों द्वारा जारी औद्योगिक बंदी और कारण बताओ नोटिसों का स्थानीय संकलन।

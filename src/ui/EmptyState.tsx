@@ -6,9 +6,12 @@ interface EmptyStateProps {
   title: ReactNode;
   text?: ReactNode;
   action?: ReactNode;
+  /** Render the title as a heading, e.g. 'h1' when the empty state is the whole page. */
+  heading?: 'h1' | 'h2' | 'h3';
 }
 
-export function EmptyState({ icon: Icon, title, text, action }: EmptyStateProps) {
+export function EmptyState({ icon: Icon, title, text, action, heading }: EmptyStateProps) {
+  const Title = heading ?? 'div';
   return (
     <div className="empty">
       {Icon && (
@@ -16,7 +19,7 @@ export function EmptyState({ icon: Icon, title, text, action }: EmptyStateProps)
           <Icon size={22} />
         </span>
       )}
-      <div className="empty-title">{title}</div>
+      <Title className="empty-title">{title}</Title>
       {text && <p className="empty-text">{text}</p>}
       {action && <div style={{ marginTop: 'var(--s-3)' }}>{action}</div>}
     </div>

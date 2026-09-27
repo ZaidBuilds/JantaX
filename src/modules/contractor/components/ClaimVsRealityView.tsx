@@ -196,9 +196,9 @@ export const ClaimVsRealityView: React.FC<ClaimVsRealityViewProps> = ({
           {selectedPincode && (
             <button
               onClick={() => onSelectPincode('')}
-              className="text-xs text-bad underline hover:opacity-80 ml-2 cursor-pointer font-bold"
+              className="text-xs text-bad underline hover:opacity-80 ml-2 cursor-pointer font-bold min-h-[32px] px-1"
             >
-              Clear Filter ({selectedPincode})
+              Show all PINs (clear {selectedPincode})
             </button>
           )}
         </div>
@@ -249,7 +249,7 @@ export const ClaimVsRealityView: React.FC<ClaimVsRealityViewProps> = ({
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-warn font-bold">
+                  <span className="text-xs text-white font-bold">
                     Sanctioned: {wo.claimVsReality.sanctionedCostFormatted}
                   </span>
                   <button
@@ -301,7 +301,7 @@ export const ClaimVsRealityView: React.FC<ClaimVsRealityViewProps> = ({
                     </span>
                     <button
                       onClick={() => contractor && onSelectContractor(contractor)}
-                      className="font-bold text-ink text-left hover:text-bad underline decoration-1 mt-0.5 block cursor-pointer"
+                      className="font-bold text-ink text-left hover:text-bad underline decoration-1 mt-0.5 block cursor-pointer min-h-[32px]"
                     >
                       {wo.contractorName}
                     </button>
@@ -435,7 +435,7 @@ export const ClaimVsRealityView: React.FC<ClaimVsRealityViewProps> = ({
                     href={wo.claimVsReality.sourcePortalUrl} 
                     target="_blank" 
                     rel="noreferrer"
-                    className="text-ink hover:text-bad font-bold flex items-center gap-1 underline decoration-1"
+                    className="text-ink hover:text-bad font-bold flex items-center gap-1 underline decoration-1 min-h-[32px]"
                   >
                     <span>Raw e-Procurement Record</span>
                     <ExternalLink className="w-3 h-3" />

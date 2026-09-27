@@ -107,7 +107,7 @@ export const ReportStatus: React.FC<ReportStatusProps> = ({ report, onUpdate }) 
               {report.evidence.map((ev) => (
                 <div key={ev.id} style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid var(--border-strong)', height: 130, position: 'relative' }}>
                   <img src={ev.url} alt={ev.fileName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <span style={{ position: 'absolute', bottom: '0.35rem', left: '0.35rem', background: 'rgba(15,23,42,0.8)', color: 'var(--on-solid)', fontSize: '0.68rem', padding: '2px 6px', borderRadius: 4 }}>
+                  <span style={{ position: 'absolute', bottom: '0.35rem', left: '0.35rem', background: 'rgba(15,23,42,0.8)', color: 'var(--on-solid)', fontSize: 'var(--text-xs)', padding: '2px 6px', borderRadius: 4 }}>
                     {ev.fileName}
                   </span>
                 </div>
@@ -173,7 +173,7 @@ export const ReportStatus: React.FC<ReportStatusProps> = ({ report, onUpdate }) 
               <form onSubmit={handleAbuseSubmit} style={{ display: 'grid', gap: '1rem' }}>
                 <div>
                   <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.3rem' }}>Reason</label>
-                  <select value={abuseReason} onChange={(e) => setAbuseReason(e.target.value)} style={{ width: '100%', padding: '0.55rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.85rem' }}>
+                  <select aria-label="Reason" value={abuseReason} onChange={(e) => setAbuseReason(e.target.value)} style={{ width: '100%', padding: '0.55rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.85rem' }}>
                     <option value="Inaccurate Location">Inaccurate Location / PIN</option>
                     <option value="Fake or Manipulated Photo">Fake or Manipulated Photo Evidence</option>
                     <option value="Spam / Commercial Promotion">Spam or Commercial Promotion</option>

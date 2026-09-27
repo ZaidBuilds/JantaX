@@ -83,7 +83,7 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
         return { bg: 'var(--good-soft)', border: 'var(--good-line)', color: 'var(--good)', icon: <CheckCircle2 size={14} /> };
       case 'Extended':
       case 'Delayed':
-        return { bg: '#fffbebf', border: 'var(--warn-line)', color: 'var(--warn)', icon: <Clock size={14} /> };
+        return { bg: 'var(--warn-soft)', border: 'var(--warn-line)', color: 'var(--warn)', icon: <Clock size={14} /> };
       case 'Incomplete':
         return { bg: 'var(--bad-soft)', border: 'var(--bad-line)', color: 'var(--bad)', icon: <Clock size={14} /> };
       case 'Under Review':
@@ -259,28 +259,28 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
           border: '1px solid var(--border)'
         }}>
           <div>
-            <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', fontWeight: 600 }}>Sanctioned Budget</div>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Sanctioned Budget</div>
             <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.1rem' }}>
               ₹{(project.budgetOriginalLakhs / 100).toFixed(1)} Cr
             </div>
           </div>
 
           <div>
-            <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', fontWeight: 600 }}>Anticipated Budget</div>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Anticipated Budget</div>
             <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--accent-ink)', marginTop: '0.1rem' }}>
               ₹{(project.budgetAnticipatedLakhs / 100).toFixed(1)} Cr
             </div>
           </div>
 
           <div>
-            <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', fontWeight: 600 }}>Physical Progress</div>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Physical Progress</div>
             <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--good)', marginTop: '0.1rem' }}>
               {project.progressPhysical}%
             </div>
           </div>
 
           <div>
-            <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', fontWeight: 600 }}>Lead Contractor</div>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>Lead Contractor</div>
             <div style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--ink)', marginTop: '0.1rem' }}>
               {project.leadContractor}
             </div>

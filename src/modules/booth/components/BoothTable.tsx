@@ -52,7 +52,7 @@ export function BoothTable({ booths }: Props) {
                 <div style={{ fontSize: '0.75rem', color: 'var(--ink-3)', marginTop: '0.15rem' }}>
                   {b.roomNumber}
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.72rem', color: 'var(--accent-ink)', marginTop: '0.2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: 'var(--text-xs)', color: 'var(--accent-ink)', marginTop: '0.2rem' }}>
                   <MapPin size={11} />
                   <span>PIN {b.pinCode} • {b.address}</span>
                 </div>
@@ -60,30 +60,30 @@ export function BoothTable({ booths }: Props) {
 
               <td style={{ padding: '1rem', fontSize: '0.78rem', color: 'var(--ink-2)' }}>
                 <div style={{ fontWeight: 700 }}>{b.assemblyConstituency}</div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--ink-3)' }}>{b.parliamentaryConstituency}</div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>{b.parliamentaryConstituency}</div>
               </td>
 
               <td style={{ padding: '1rem', whiteSpace: 'nowrap' }}>
                 <div style={{ fontWeight: 800, color: 'var(--ink)' }}>{b.totalElectors}</div>
-                <div style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
                   {b.maleElectors}M / {b.femaleElectors}F
                 </div>
               </td>
 
               <td style={{ padding: '1rem' }}>
                 <div style={{ fontWeight: 700, color: 'var(--ink)' }}>{b.blo.name}</div>
-                <div style={{ fontSize: '0.72rem', color: 'var(--brand-ink)', fontWeight: 600 }}>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--brand-ink)', fontWeight: 600 }}>
                   {b.blo.contactPhone}
                 </div>
               </td>
 
               <td style={{ padding: '1rem', whiteSpace: 'nowrap' }}>
                 {b.facilities.wheelchairRamp ? (
-                  <span className="jantax-badge-good" style={{ fontSize: '0.72rem', fontWeight: 700, padding: '0.15rem 0.5rem' }}>
+                  <span className="jantax-badge-good" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, padding: '0.15rem 0.5rem' }}>
                     ✓ Ramp
                   </span>
                 ) : (
-                  <span className="jantax-badge-warn" style={{ fontSize: '0.72rem', fontWeight: 700, padding: '0.15rem 0.5rem' }}>
+                  <span className="jantax-badge-warn" style={{ fontSize: 'var(--text-xs)', fontWeight: 700, padding: '0.15rem 0.5rem' }}>
                     No Ramp
                   </span>
                 )}

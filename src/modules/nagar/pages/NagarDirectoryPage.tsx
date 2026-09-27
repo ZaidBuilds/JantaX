@@ -115,7 +115,7 @@ export function NagarDirectoryPage() {
           {/* Filters */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-              <select
+              <select aria-label="Municipal Corporations"
                 value={selectedCorp}
                 onChange={(e) => setSelectedCorp(e.target.value)}
                 style={{ padding: '0.45rem 0.85rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.82rem', background: 'var(--surface)', color: 'var(--ink)' }}

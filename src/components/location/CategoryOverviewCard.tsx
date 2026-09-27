@@ -90,7 +90,7 @@ export function CategoryOverviewCard({
               </span>
               <strong style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                 {m.value}
-                {m.unit && <span style={{ opacity: 0.5, fontSize: '0.9em' }}>{m.unit}</span>}
+                {m.unit && <span style={{ fontSize: '0.9em', color: 'var(--ink-3)' }}>{m.unit}</span>}
                 {m.status === 'stale' && (
                   <Clock size={10} style={{ color: 'var(--accent-ink)' }} />
                 )}
@@ -103,7 +103,7 @@ export function CategoryOverviewCard({
       {!isLoading && unavailableMetrics.length > 0 && (
         <div
           style={{
-            fontSize: '0.7rem',
+            fontSize: 'var(--text-xs)',
             color: 'var(--ink-4)',
             padding: '0.5rem 0.75rem',
             background: 'var(--surface-2)',
@@ -114,7 +114,7 @@ export function CategoryOverviewCard({
           <div style={{ fontWeight: 600, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
             <AlertTriangle size={10} /> Not available from current sources
           </div>
-          <div style={{ opacity: 0.7 }}>
+          <div style={{ color: 'var(--ink-3)' }}>
             {unavailableMetrics.map((m, i) => (
               <span key={i}>
                 {m.name}
@@ -135,8 +135,8 @@ export function CategoryOverviewCard({
         <button
           onClick={category.onViewDetails}
           style={{
-            fontSize: '0.72rem',
-            color: 'var(--color-primary)',
+            fontSize: 'var(--text-xs)',
+            color: 'var(--brand-ink)',
             fontWeight: 700,
             background: 'none',
             border: 'none',
@@ -166,7 +166,7 @@ interface QuickLinksCardProps {
 export function QuickLinksCard({ links, onNavigate }: QuickLinksCardProps) {
   return (
     <div className="glass-card" style={{ padding: '1.25rem' }}>
-      <h3 style={{ fontSize: '0.95rem', marginBottom: '0.75rem', color: 'var(--color-primary)' }}>
+      <h3 style={{ fontSize: '0.95rem', marginBottom: '0.75rem', color: 'var(--brand-ink)' }}>
         Quick Links
       </h3>
       <div style={{ display: 'grid', gap: '0.75rem', fontSize: '0.85rem', fontWeight: 600 }}>
@@ -189,7 +189,7 @@ export function QuickLinksCard({ links, onNavigate }: QuickLinksCardProps) {
               {link.icon}
               {link.label}
             </span>
-            <span style={{ fontSize: '0.7rem', opacity: 0.5 }}>→</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>→</span>
           </div>
         ))}
       </div>

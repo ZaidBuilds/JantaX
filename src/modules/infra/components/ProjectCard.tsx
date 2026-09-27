@@ -106,7 +106,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
         position: 'relative',
         overflow: 'hidden',
         border: isDiscrepancy ? '1.5px solid var(--status-critical)' : '1px solid var(--border-color)',
-        background: isDiscrepancy ? 'rgba(239, 68, 68, 0.01)' : 'var(--bg-card)'
+        background: 'var(--bg-card)'
       }}
     >
       {/* Top Header: PIN Code & Sector */}
@@ -116,10 +116,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
           <span style={{ 
             fontSize: '0.95rem', 
             fontWeight: 800, 
-            color: 'var(--color-primary)',
+            color: 'var(--brand-ink)',
             fontFamily: 'var(--font-heading)',
             letterSpacing: '0.05em',
-            background: 'rgba(37, 99, 235, 0.08)',
+            background: 'var(--brand-soft)',
             padding: '2px 8px',
             borderRadius: '4px'
           }}>
@@ -148,7 +148,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
         <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>
           मराठी: {nameRegional}
         </div>
-        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>
+        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginTop: '0.25rem', display: 'block' }}>
           {district}, {state}
         </span>
       </div>
@@ -156,7 +156,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
       {/* Accountability Section (Contractor & Officer Nouns) */}
       <div style={{ 
         padding: '0.65rem', 
-        background: 'rgba(15, 23, 42, 0.02)', 
+        background: 'var(--surface-2)', 
         borderRadius: '8px', 
         border: '1px solid var(--border-color)',
         fontSize: '0.75rem',
@@ -180,7 +180,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
         display: 'grid', 
         gridTemplateColumns: '1fr 1fr', 
         gap: '0.65rem',
-        background: 'rgba(255,255,255,0.5)',
+        background: 'var(--surface-2)',
         padding: '0.65rem',
         borderRadius: '8px',
         border: '1px solid var(--border-color)'
@@ -190,20 +190,21 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
           display: 'flex', 
           flexDirection: 'column', 
           gap: '0.25rem',
+          minWidth: 0,
           borderRight: '1px solid var(--border-color)',
           paddingRight: '0.5rem'
         }}>
-          <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>सरकारी दावा (Claim)</span>
+          <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>सरकारी दावा (Claim)</span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.2rem' }}>
-            <span style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-primary)' }}>{progressPhysical}%</span>
-            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>काम (Work)</span>
+            <span style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--brand-ink)' }}>{progressPhysical}%</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>काम (Work)</span>
           </div>
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)' }}>लागत: ₹{budgetAnticipated} Cr</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>लागत: ₹{budgetAnticipated} Cr</span>
         </div>
 
         {/* Right Column: Ground Reality */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', paddingLeft: '0.25rem' }}>
-          <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>जमीनी हकीकत (Reality)</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', paddingLeft: '0.25rem', minWidth: 0 }}>
+          <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>जमीनी हकीकत (Reality)</span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.2rem' }}>
             <span style={{ 
               fontSize: '1.25rem', 
@@ -212,10 +213,10 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
             }}>
               {citizenConsensus !== null ? `${citizenConsensus}%` : "नदारद"}
             </span>
-            <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>सहमति (Consensus)</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>सहमति (Consensus)</span>
           </div>
           <span style={{ 
-            fontSize: '0.7rem', 
+            fontSize: 'var(--text-xs)', 
             color: 'var(--text-secondary)',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -229,9 +230,9 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
       {/* Discrepancy warning indicator */}
       {isDiscrepancy && (
         <div style={{ 
-          fontSize: '0.7rem', 
-          background: 'rgba(239, 68, 68, 0.08)', 
-          border: '1px solid rgba(239, 68, 68, 0.15)',
+          fontSize: 'var(--text-xs)', 
+          background: 'var(--bad-soft)', 
+          border: '1px solid var(--bad-line)',
           borderRadius: '4px',
           padding: '4px 8px',
           color: 'var(--status-critical)',
@@ -260,25 +261,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project, onSelect }) =
           <span style={{ color: 'var(--text-muted)' }}>On original budget</span>
         )}
 
-        <button
-          onClick={handleWhatsAppShare}
-          style={{
-            padding: '4px 10px',
-            background: '#25D366', // Official WhatsApp green
-            border: 'none',
-            borderRadius: '4px',
-            color: 'var(--on-solid)',
-            fontWeight: 700,
-            fontSize: '0.7rem',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.25rem',
-            transition: 'opacity 0.2s'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
-          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-        >
+        <button type="button" className="btn-whatsapp" onClick={handleWhatsAppShare}>
           WhatsApp शेयर
         </button>
       </div>

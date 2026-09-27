@@ -139,7 +139,7 @@ export const CitizenActionGenerator: React.FC<CitizenActionGeneratorProps> = ({
             <label className="text-xs font-bold text-ink block mb-1.5">
               Target Contractor:
             </label>
-            <select
+            <select aria-label="Target Contractor"
               value={selectedContractorId}
               onChange={(e) => setSelectedContractorId(e.target.value)}
               className="w-full bg-surface-2 border rounded-[10px] border-line px-3 py-2 text-xs font-bold text-ink focus:outline-none cursor-pointer"

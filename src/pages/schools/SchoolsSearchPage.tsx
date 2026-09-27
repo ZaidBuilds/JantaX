@@ -56,8 +56,8 @@ export function SchoolsSearchPage() {
   return (
     <div className="container" style={{ padding: '2rem 1.25rem' }}>
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
-        <h2 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', marginBottom: '0.25rem' }}>Search Schools</h2>
-        <p style={{ fontSize: '0.85rem', opacity: 0.7, marginBottom: '1.5rem' }}>Search by school name, UDISE code, or PIN code</p>
+        <h2 style={{ fontSize: '1.5rem', color: 'var(--brand-ink)', marginBottom: '0.25rem' }}>Search Schools</h2>
+        <p style={{ fontSize: '0.85rem', marginBottom: '1.5rem', color: 'var(--ink-3)' }}>Search by school name, UDISE code, or PIN code</p>
 
         <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
           <div style={{ flex: 1, position: 'relative', minWidth: 200 }}>
@@ -95,7 +95,7 @@ export function SchoolsSearchPage() {
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap', padding: '1rem', background: 'var(--surface-2)', borderRadius: 10 }}>
             <div>
               <label style={{ fontSize: '0.75rem', fontWeight: 700, display: 'block', marginBottom: '0.35rem' }}>School Level</label>
-              <select value={level} onChange={e => setLevel(e.target.value)} className="form-input" style={{ fontSize: '0.82rem' }}>
+              <select aria-label="School Level" value={level} onChange={e => setLevel(e.target.value)} className="form-input" style={{ fontSize: '0.82rem' }}>
                 <option value="all">All Levels</option>
                 <option value="Primary">Primary</option>
                 <option value="Upper Primary">Upper Primary</option>
@@ -105,7 +105,7 @@ export function SchoolsSearchPage() {
             </div>
             <div>
               <label style={{ fontSize: '0.75rem', fontWeight: 700, display: 'block', marginBottom: '0.35rem' }}>Management</label>
-              <select value={management} onChange={e => setManagement(e.target.value)} className="form-input" style={{ fontSize: '0.82rem' }}>
+              <select aria-label="Management" value={management} onChange={e => setManagement(e.target.value)} className="form-input" style={{ fontSize: '0.82rem' }}>
                 <option value="all">All</option>
                 <option value="Government">Government</option>
                 <option value="Aided">Aided</option>
@@ -130,13 +130,13 @@ export function SchoolsSearchPage() {
           <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
             <GraduationCap size={40} style={{ opacity: 0.2, marginBottom: '0.75rem' }} />
             <h3 style={{ fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '0.4rem' }}>No schools found</h3>
-            <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>Try a different search term or PIN code.</p>
+            <p style={{ fontSize: '0.85rem', color: 'var(--ink-3)' }}>Try a different search term or PIN code.</p>
           </div>
         )}
 
         {!loading && filtered.length > 0 && (
           <>
-            <div style={{ marginBottom: '0.75rem', fontSize: '0.8rem', opacity: 0.6 }}>
+            <div style={{ marginBottom: '0.75rem', fontSize: '0.8rem', color: 'var(--ink-3)' }}>
               {filtered.length} school{filtered.length !== 1 ? 's' : ''} found
             </div>
             <div style={{ display: 'grid', gap: '0.75rem' }}>
@@ -181,22 +181,22 @@ function SchoolSearchResultCard({ school }: { school: SchoolRecord }) {
         <div style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-primary)', marginBottom: '0.2rem' }}>
           {school.titleHindi || school.titleEnglish}
         </div>
-        <div style={{ fontSize: '0.75rem', opacity: 0.6, display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+        <div style={{ fontSize: '0.75rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap', color: 'var(--ink-3)' }}>
           <span><MapPin size={11} style={{ verticalAlign: '-1px' }} /> {school.location.district}, {school.location.pinCode}</span>
           <span>· UDISE: {school.udiseCode}</span>
           <span>· {school.schoolLevel}</span>
         </div>
         <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.4rem', flexWrap: 'wrap' }}>
           {school.managementType !== 'Government' && (
-            <span style={{ fontSize: '0.65rem', padding: '2px 6px', borderRadius: 4, background: 'var(--brand-soft)', color: 'var(--viz-4)', fontWeight: 600 }}>{school.managementType}</span>
+            <span style={{ fontSize: 'var(--text-xs)', padding: '2px 6px', borderRadius: 4, background: 'var(--brand-soft)', color: 'var(--viz-4)', fontWeight: 600 }}>{school.managementType}</span>
           )}
           {school.groundTruthScore > 0 && (
-            <span style={{ fontSize: '0.65rem', padding: '2px 6px', borderRadius: 4, background: `${scoreColor}15`, color: scoreColor, fontWeight: 700 }}>
+            <span style={{ fontSize: 'var(--text-xs)', padding: '2px 6px', borderRadius: 4, background: `color-mix(in srgb, ${scoreColor} 8%, transparent)`, color: scoreColor, fontWeight: 700 }}>
               Ground: {school.groundTruthScore}/100
             </span>
           )}
           {school.totalCheckIns > 0 && (
-            <span style={{ fontSize: '0.65rem', padding: '2px 6px', borderRadius: 4, background: 'var(--surface-2)', color: 'var(--ink-3)', fontWeight: 600 }}>
+            <span style={{ fontSize: 'var(--text-xs)', padding: '2px 6px', borderRadius: 4, background: 'var(--surface-2)', color: 'var(--ink-3)', fontWeight: 600 }}>
               {school.totalCheckIns} check-ins
             </span>
           )}

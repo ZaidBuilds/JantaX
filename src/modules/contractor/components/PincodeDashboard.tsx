@@ -398,7 +398,7 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
 
         {/* Scraped CAG Audit Findings */}
         {currentPinRecord.cagAuditNotes.length > 0 && (
-          <div className="mt-4 pt-3 border-t border-line bg-warn-soft/50 p-3 border rounded-[10px] border-amber-200">
+          <div className="mt-4 p-3 border rounded-[10px] bg-[var(--warn-soft)] border-[var(--warn-line)]">
             <span className="text-xs font-bold text-warn flex items-center gap-1.5 mb-1.5">
               <Landmark className="w-4 h-4 text-warn" />
               <span>Scraped CAG & Statutory Audit Findings in PIN {currentPinRecord.pincode}:</span>
@@ -424,7 +424,7 @@ export const PincodeDashboard: React.FC<PincodeDashboardProps> = ({
           </h3>
           <button
             onClick={() => onNavigateToTab('claim-reality')}
-            className="text-xs font-bold text-bad hover:underline flex items-center gap-1 cursor-pointer"
+            className="text-xs font-bold text-bad hover:underline flex items-center gap-1 cursor-pointer min-h-[32px]"
           >
             <span>View All Claim vs Reality Audits</span>
             <ArrowRight className="w-3.5 h-3.5" />

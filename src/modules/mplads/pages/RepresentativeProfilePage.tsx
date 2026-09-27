@@ -6,6 +6,8 @@ import { MpladsSectorDonut } from '../components/MpladsSectorDonut';
 import { MpladsProjectTable } from '../components/MpladsProjectTable';
 import { TransparencyDisclaimer } from '../../transparency/components/TransparencyDisclaimer';
 import { ArrowLeft, MapPin, Building2, Calendar, FileText, CheckCircle2, AlertCircle, Share2, ExternalLink, IndianRupee } from 'lucide-react';
+import { Avatar } from '../../../ui/Avatar';
+import { Badge } from '../../../ui';
 
 export function RepresentativeProfilePage() {
   const { id } = useParams<{ id: string }>();
@@ -35,7 +37,7 @@ export function RepresentativeProfilePage() {
       <div style={{ marginBottom: '1rem' }}>
         <Link
           to="/mplads"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
+          style={{ display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
         >
           <ArrowLeft size={16} /> Back to MPLADS Directory
         </Link>
@@ -44,20 +46,14 @@ export function RepresentativeProfilePage() {
       {/* Profile Header Card */}
       <div className="jantax-card" style={{ padding: '2rem', marginBottom: '1.5rem' }}>
         <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
-          <img
-            src={rep.photoUrl}
-            alt={rep.name}
-            style={{ width: 96, height: 96, borderRadius: 20, objectFit: 'cover', border: '3px solid var(--border)' }}
-          />
+          <Avatar name={rep.name} size={96} />
 
           <div style={{ flex: 1, minWidth: 280 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem' }}>
               <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--brand-ink)', background: 'var(--brand-soft)', padding: '0.2rem 0.6rem', borderRadius: 6 }}>
                 {rep.house}
               </span>
-              <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--on-solid)', background: rep.partyColor, padding: '0.2rem 0.6rem', borderRadius: 6 }}>
-                {rep.party}
-              </span>
+              <Badge>{rep.party}</Badge>
               <span style={{ fontSize: '0.78rem', color: 'var(--ink-3)' }}>
                 Tenure: {rep.termStart} to {rep.termEnd}
               </span>

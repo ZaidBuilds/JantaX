@@ -76,7 +76,7 @@ export function generateMockContractorDataset(pincode: string = '560034'): {
       contractorName: c.name,
       contractorDirectors: c.directors,
       executiveEngineer: { name: 'Er. Rajesh Kumar', designation: 'Executive Engineer', department: 'BBMP South Road Infra', signedCertificateDate: '2024-06-10' },
-      electedRepresentative: { name: 'Shri Ramesh', role: 'Corporator', constituency: `Ward ${150+i}` },
+      electedRepresentative: { name: 'Ward councillor (sample)', role: 'Corporator', constituency: `Ward ${150+i}` },
       sanctionedAmountLakhs: sanctioned,
       awardedDate: '2024-02-15',
       completionDate: '2024-08-15',

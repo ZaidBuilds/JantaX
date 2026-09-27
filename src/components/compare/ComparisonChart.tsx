@@ -26,9 +26,9 @@ export function ComparisonChart({ rows, entityNames, metricId }: ComparisonChart
 
         return (
           <div key={row.id} className="glass-card" style={{ padding: '1.25rem' }}>
-            <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-primary)', marginBottom: '1rem' }}>
+            <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--brand-ink)', marginBottom: '1rem' }}>
               {row.category}
-              {row.categoryHi && <span style={{ opacity: 0.5, fontWeight: 400, marginLeft: '0.4rem' }}>{row.categoryHi}</span>}
+              {row.categoryHi && <span style={{ color: 'var(--ink-3)', fontWeight: 400, marginLeft: '0.4rem' }}>{row.categoryHi}</span>}
             </h4>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
@@ -45,7 +45,7 @@ export function ComparisonChart({ rows, entityNames, metricId }: ComparisonChart
                       </span>
                       <span style={{ fontSize: '0.8rem', fontWeight: 800, color: metric.color || 'var(--color-primary)' }}>
                         {metric.value ?? '-'}
-                        {metric.unit && <span style={{ opacity: 0.6, fontSize: '0.7em' }}>{metric.unit}</span>}
+                        {metric.unit && <span style={{ color: 'var(--ink-3)', fontSize: '0.85em' }}>{metric.unit}</span>}
                       </span>
                     </div>
                     <div style={{ height: 8, background: 'var(--surface-3)', borderRadius: 999, overflow: 'hidden' }}>
@@ -65,7 +65,7 @@ export function ComparisonChart({ rows, entityNames, metricId }: ComparisonChart
             </div>
 
             {row.metrics[0]?.source && (
-              <p style={{ fontSize: '0.65rem', opacity: 0.5, marginTop: '0.75rem' }}>
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', marginTop: '0.75rem' }}>
                 Source: {row.metrics[0].source?.name}
               </p>
             )}
@@ -97,7 +97,7 @@ export function ComparisonRadar({ labels, datasets }: ComparisonRadarProps) {
 
   return (
     <div className="glass-card" style={{ padding: '1.25rem' }}>
-      <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-primary)', marginBottom: '1rem' }}>Comparative Overview</h4>
+      <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--brand-ink)', marginBottom: '1rem' }}>Comparative Overview</h4>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {labels.map((label, labelIdx) => {
@@ -118,7 +118,7 @@ export function ComparisonRadar({ labels, datasets }: ComparisonRadarProps) {
                       <div
                         style={{
                           width: '100%',
-                          background: `${dataset.color}20`,
+                          background: `color-mix(in srgb, ${dataset.color} 13%, transparent)`,
                           borderRadius: 6,
                           overflow: 'hidden',
                           position: 'relative',
@@ -135,12 +135,12 @@ export function ComparisonRadar({ labels, datasets }: ComparisonRadarProps) {
                             justifyContent: 'center',
                           }}
                         >
-                          <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--on-solid)' }}>
+                          <span style={{ fontSize: 'var(--text-xs)', fontWeight: 800, color: 'var(--on-solid)' }}>
                             {val}
                           </span>
                         </div>
                       </div>
-                      <span style={{ fontSize: '0.6rem', opacity: 0.5, textAlign: 'center', maxWidth: 60, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <span style={{ fontSize: 'var(--text-xs)', textAlign: 'center', maxWidth: 60, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--ink-3)' }}>
                         {dataset.label}
                       </span>
                     </div>

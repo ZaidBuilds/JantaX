@@ -92,7 +92,7 @@ export function SpineDashboard() {
         <h3 style={{ fontSize: '1.1rem', marginBottom: '0.75rem' }}>
           अखिल भारतीय ५-स्तरीय जवाबदेही खोज (Nationwide 5-Level Spine Search)
         </h3>
-        <p style={{ fontSize: '0.8rem', opacity: 0.7, marginBottom: '1rem' }}>
+        <p style={{ fontSize: '0.8rem', marginBottom: '1rem', color: 'var(--ink-3)' }}>
           भारत के किसी भी कोने का ६-अंकीय पिन कोड दर्ज करें। यह प्रणाली उस स्थान के सांसद (MP), विधायक (MLA), जिला परिषद, ब्लॉक पंचायत और ग्राम पंचायत के कोष, कार्यों और ठेकेदारों की श्रृंखला को प्रदर्शित करेगी।
         </p>
         <form onSubmit={handlePinSearch} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -160,7 +160,7 @@ export function SpineDashboard() {
                 borderRadius: '8px',
                 border: '1px solid',
                 borderColor: selectedLevel === level ? 'var(--color-primary)' : 'var(--border-color)',
-                background: selectedLevel === level ? 'var(--color-primary)' : 'rgba(255,255,255,0.03)',
+                background: selectedLevel === level ? 'var(--color-primary)' : 'var(--surface)',
                 color: selectedLevel === level ? 'white' : 'inherit',
                 fontSize: '0.75rem',
                 fontWeight: 600,
@@ -205,17 +205,17 @@ export function SpineDashboard() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>{rep.nameHi}</span>
                   <span style={{
-                    fontSize: '0.6rem',
+                    fontSize: 'var(--text-xs)',
                     padding: '2px 6px',
                     borderRadius: '10px',
-                    background: rep.party === 'BJP' ? '#FF993333' : '#0066CC33',
-                    color: rep.party === 'BJP' ? '#FF9933' : '#0066CC',
+                    background: 'var(--surface-3)',
+                    color: 'var(--ink-2)',
                     fontWeight: 700,
                   }}>
                     {rep.party}
                   </span>
                 </div>
-                <div style={{ fontSize: '0.7rem', opacity: 0.6, marginTop: '0.25rem' }}>
+                <div style={{ fontSize: 'var(--text-xs)', marginTop: '0.25rem', color: 'var(--ink-3)' }}>
                   {rep.constituencyName} · level: {rep.level}
                 </div>
               </div>
@@ -229,7 +229,7 @@ export function SpineDashboard() {
             
             {/* Representative Card */}
             <div className="glass-card" style={{ padding: '1.5rem', borderLeft: '4px solid var(--color-primary)' }}>
-              <div style={{ fontSize: '0.75rem', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--ink-3)' }}>
                 REPRESENTATIVE PROFILE · {activeRep.level.toUpperCase()} LEVEL
               </div>
               <h2 style={{ fontSize: '1.4rem', margin: '0.25rem 0' }}>{activeRep.nameHi} ({activeRep.name})</h2>
@@ -239,7 +239,7 @@ export function SpineDashboard() {
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.75rem' }}>
                 {activeRep.pinCodes.map(pin => (
                   <span key={pin} style={{
-                    fontSize: '0.65rem',
+                    fontSize: 'var(--text-xs)',
                     padding: '2px 8px',
                     borderRadius: '4px',
                     background: 'rgba(255,255,255,0.06)',
@@ -258,22 +258,22 @@ export function SpineDashboard() {
                 <div key={fund.id} className="glass-card" style={{ padding: '1.25rem', borderLeft: '4px solid var(--good)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
                     <div>
-                      <div style={{ fontSize: '0.65rem', opacity: 0.6, fontWeight: 700, color: 'var(--good)', textTransform: 'uppercase' }}>
+                      <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--ink-3)', textTransform: 'uppercase' }}>
                         Sanctioned Fund
                       </div>
                       <h3 style={{ fontSize: '1.05rem', margin: '0.1rem 0' }}>{fund.schemeNameHi}</h3>
-                      <div style={{ fontSize: '0.75rem', opacity: 0.6 }}>{fund.schemeName} · FY: {fund.financialYear}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--ink-3)' }}>{fund.schemeName} · FY: {fund.financialYear}</div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--good)' }}>
                         ₹{fund.amountSanctionedCr} Cr
                       </div>
-                      <div style={{ fontSize: '0.6rem', opacity: 0.5 }}>Sanctioned Limit</div>
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Sanctioned Limit</div>
                     </div>
                   </div>
 
                   {/* Projects List under this Fund */}
-                  <h4 style={{ fontSize: '0.8rem', opacity: 0.7, marginBottom: '0.75rem', textTransform: 'uppercase' }}>
+                  <h4 style={{ fontSize: '0.8rem', marginBottom: '0.75rem', textTransform: 'uppercase', color: 'var(--ink-3)' }}>
                     Projects Sanctioned ({fundProjects.length})
                   </h4>
 
@@ -292,10 +292,10 @@ export function SpineDashboard() {
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <div>
                               <h5 style={{ fontSize: '0.9rem', margin: 0 }}>{proj.workNameHi}</h5>
-                              <div style={{ fontSize: '0.75rem', opacity: 0.6, marginTop: '0.1rem' }}>{proj.workName}</div>
+                              <div style={{ fontSize: '0.75rem', marginTop: '0.1rem', color: 'var(--ink-3)' }}>{proj.workName}</div>
                             </div>
                             <span style={{
-                              fontSize: '0.7rem',
+                              fontSize: 'var(--text-xs)',
                               padding: '2px 8px',
                               borderRadius: '20px',
                               background: proj.status === 'completed' ? 'var(--status-completed-bg)' : proj.status === 'stalled' ? 'var(--status-critical-bg)' : 'var(--status-construction-bg)',
@@ -310,7 +310,7 @@ export function SpineDashboard() {
                             
                             {/* Claim vs Reality Split */}
                             <div style={{ background: 'rgba(59, 130, 246, 0.04)', padding: '0.5rem', borderRadius: '6px', borderLeft: '3px solid var(--brand-ink)' }}>
-                              <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'var(--brand-ink)', textTransform: 'uppercase' }}>
+                              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--brand-ink)', textTransform: 'uppercase' }}>
                                 Govt Claim
                               </div>
                               <div style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>
@@ -319,10 +319,10 @@ export function SpineDashboard() {
                             </div>
 
                             <div style={{ background: 'rgba(239, 68, 68, 0.04)', padding: '0.5rem', borderRadius: '6px', borderLeft: '3px solid var(--bad)' }}>
-                              <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'var(--bad)', textTransform: 'uppercase' }}>
+                              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--bad)', textTransform: 'uppercase' }}>
                                 Reality (जमीनी हकीकत)
                               </div>
-                              <div style={{ fontSize: '0.75rem', marginTop: '0.25rem', color: '#fca5a5' }}>
+                              <div style={{ fontSize: '0.75rem', marginTop: '0.25rem', color: 'var(--bad)' }}>
                                 {proj.realityTextHi || 'No reports logged.'}
                               </div>
                             </div>
@@ -335,13 +335,13 @@ export function SpineDashboard() {
                               marginTop: '0.75rem',
                               paddingTop: '0.75rem',
                               borderTop: '1px dashed rgba(255,255,255,0.06)',
-                              fontSize: '0.72rem',
+                              fontSize: 'var(--text-xs)',
                             }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
                                 <div>
                                   Contractor: <strong>{contractor.nameHi}</strong>
                                   <br />
-                                  <span style={{ opacity: 0.5 }}>{contractor.registrationNumber} · Past Projects: {contractor.pastProjectsCount}</span>
+                                  <span style={{ color: 'var(--ink-3)' }}>{contractor.registrationNumber} · Past Projects: {contractor.pastProjectsCount}</span>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                   Payment Status: <strong style={{ color: contractor.paymentStatus === 'paid' ? 'var(--good)' : 'var(--warn)' }}>{contractor.paymentStatus.toUpperCase()}</strong>
@@ -358,7 +358,7 @@ export function SpineDashboard() {
                                   borderLeft: '3px solid var(--warn)',
                                 }}>
                                   <span style={{ fontWeight: 600, color: 'var(--warn)' }}>Cross-Panchayat Contractor Alert:</span>
-                                  <div style={{ opacity: 0.8, fontSize: '0.68rem', marginTop: '0.15rem' }}>
+                                  <div style={{ opacity: 0.8, fontSize: 'var(--text-xs)', marginTop: '0.15rem' }}>
                                     This contractor is also awarded projects elsewhere:
                                     <ul style={{ paddingLeft: '1rem', marginTop: '0.1rem' }}>
                                       {crossRefs.map((ref: any, idx: number) => (
@@ -373,19 +373,7 @@ export function SpineDashboard() {
 
                           {/* Action Bar */}
                           <div style={{ marginTop: '0.75rem', display: 'flex', justifyContent: 'flex-end' }}>
-                            <button
-                              onClick={() => handleShareWhatsApp(activeRep.nameHi, fund, proj, contractor)}
-                              style={{
-                                padding: '0.4rem 0.8rem',
-                                background: '#25d366',
-                                border: 'none',
-                                borderRadius: '6px',
-                                color: 'white',
-                                fontWeight: 700,
-                                fontSize: '0.7rem',
-                                cursor: 'pointer',
-                              }}
-                            >
+                            <button type="button" className="btn btn-sm btn-whatsapp" onClick={() => handleShareWhatsApp(activeRep.nameHi, fund, proj, contractor)}>
                               Share Chain on WhatsApp
                             </button>
                           </div>

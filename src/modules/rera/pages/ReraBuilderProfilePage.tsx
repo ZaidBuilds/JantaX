@@ -28,7 +28,7 @@ export function ReraBuilderProfilePage({ initialTab }: ReraBuilderProfilePagePro
     return (
       <div style={{ padding: '4rem 1.5rem', textAlign: 'center', maxWidth: 600, margin: '0 auto' }}>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--ink)' }}>Builder Profile Not Found</h2>
-        <Link to="/rera" style={{ padding: '0.65rem 1.25rem', borderRadius: 10, background: 'var(--viz-6)', color: 'var(--on-solid)', fontWeight: 700, textDecoration: 'none' }}>
+        <Link to="/rera" style={{ padding: '0.65rem 1.25rem', borderRadius: 10, background: 'var(--brand)', color: 'var(--on-solid)', fontWeight: 700, textDecoration: 'none' }}>
           Return to RERA Directory
         </Link>
       </div>
@@ -46,14 +46,14 @@ export function ReraBuilderProfilePage({ initialTab }: ReraBuilderProfilePagePro
   return (
     <div>
       {/* Legal Disclaimer */}
-      <div style={{ background: '#fffbebf', border: '1px solid var(--warn-line)', borderRadius: 12, padding: '0.75rem 1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.84rem', color: 'var(--warn)' }}>
+      <div style={{ background: 'var(--warn-soft)', border: '1px solid var(--warn-line)', borderRadius: 12, padding: '0.75rem 1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.84rem', color: 'var(--warn)' }}>
         <Scale size={18} style={{ flexShrink: 0 }} />
         <div><strong>Legal Disclaimer:</strong> JantaX is an independent public data transparency platform aggregating official state RERA records. JantaX does not provide legal advice. Never declare a builder fraudulent unless an official competent source establishes that fact.</div>
       </div>
 
       {/* Back Bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-        <button onClick={() => navigate('/rera')} style={{ background: 'none', border: 'none', color: 'var(--viz-6)', fontWeight: 700, fontSize: '0.86rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', padding: 0 }}>
+        <button onClick={() => navigate('/rera')} style={{ background: 'none', border: 'none', color: 'var(--brand-ink)', fontWeight: 700, fontSize: '0.86rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', padding: 0 }}>
           <ArrowLeft size={16} /> Back to RERA Directory
         </button>
 
@@ -77,11 +77,11 @@ export function ReraBuilderProfilePage({ initialTab }: ReraBuilderProfilePagePro
             </div>
           </div>
 
-          <div style={{ background: 'var(--info-soft)', border: '1px solid #a5f3fc', borderRadius: 14, padding: '0.85rem 1.25rem', textAlign: 'right' }}>
-            <div style={{ fontSize: '0.74rem', color: 'var(--viz-6)', fontWeight: 700, textTransform: 'uppercase' }}>
+          <div style={{ background: 'var(--info-soft)', border: '1px solid var(--info-line)', borderRadius: 14, padding: '0.85rem 1.25rem', textAlign: 'right' }}>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--brand-ink)', fontWeight: 700, textTransform: 'uppercase' }}>
               Track Record Score
             </div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--viz-6)', marginTop: '0.1rem' }}>
+            <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--brand-ink)', marginTop: '0.1rem' }}>
               {builder.trackRecordScore}%
             </div>
           </div>
@@ -90,10 +90,10 @@ export function ReraBuilderProfilePage({ initialTab }: ReraBuilderProfilePagePro
 
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '2px solid var(--border)', marginBottom: '1.5rem' }}>
-        <Link to={`/rera/builders/${builder.id}`} style={{ padding: '0.65rem 1.15rem', borderBottom: activeTab === 'overview' ? '3px solid var(--viz-6)' : '3px solid transparent', color: activeTab === 'overview' ? 'var(--viz-6)' : 'var(--ink-3)', fontWeight: activeTab === 'overview' ? 800 : 600, fontSize: '0.88rem', textDecoration: 'none' }}>
+        <Link to={`/rera/builders/${builder.id}`} style={{ padding: '0.65rem 1.15rem', borderBottom: activeTab === 'overview' ? '3px solid var(--brand-ink)' : '3px solid transparent', color: activeTab === 'overview' ? 'var(--viz-6)' : 'var(--ink-3)', fontWeight: activeTab === 'overview' ? 800 : 600, fontSize: '0.88rem', textDecoration: 'none' }}>
           Promoter Profile
         </Link>
-        <Link to={`/rera/builders/${builder.id}/track-record`} style={{ padding: '0.65rem 1.15rem', borderBottom: activeTab === 'track-record' ? '3px solid var(--viz-6)' : '3px solid transparent', color: activeTab === 'track-record' ? 'var(--viz-6)' : 'var(--ink-3)', fontWeight: activeTab === 'track-record' ? 800 : 600, fontSize: '0.88rem', textDecoration: 'none' }}>
+        <Link to={`/rera/builders/${builder.id}/track-record`} style={{ padding: '0.65rem 1.15rem', borderBottom: activeTab === 'track-record' ? '3px solid var(--brand-ink)' : '3px solid transparent', color: activeTab === 'track-record' ? 'var(--viz-6)' : 'var(--ink-3)', fontWeight: activeTab === 'track-record' ? 800 : 600, fontSize: '0.88rem', textDecoration: 'none' }}>
           Delivery Track Record ({builder.projects.length} Projects)
         </Link>
       </div>
@@ -132,7 +132,7 @@ export function ReraBuilderProfilePage({ initialTab }: ReraBuilderProfilePagePro
                     <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>{p.projectName}</h4>
                     <div style={{ fontSize: '0.8rem', color: 'var(--ink-3)' }}>Reg #{p.reraRegistrationNumber} · {p.locationName}</div>
                   </div>
-                  <Link to={`/rera/projects/${p.id}`} style={{ fontSize: '0.78rem', color: 'var(--viz-6)', fontWeight: 700, textDecoration: 'none' }}>
+                  <Link to={`/rera/projects/${p.id}`} style={{ fontSize: '0.78rem', color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none' }}>
                     View Project →
                   </Link>
                 </div>

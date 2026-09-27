@@ -19,9 +19,9 @@ export function RtiDraftGenerator() {
     <div className="jantax-card" style={{ padding: '1.75rem', marginBottom: '1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
         <div>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: '0 0 0.3rem' }}>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: '0 0 0.3rem' }}>
             Statutory RTI Application & First Appeal Generator
-          </h3>
+          </h2>
           <p style={{ fontSize: '0.85rem', color: 'var(--ink-3)', margin: 0 }}>
             Generate legally compliant application drafts under Section 6(1), Section 19(1) First Appeal, or 48-Hour Life & Liberty provisos.
           </p>
@@ -87,6 +87,7 @@ export function RtiDraftGenerator() {
       {/* Textarea */}
       <div style={{ position: 'relative', marginBottom: '1.25rem' }}>
         <textarea
+          aria-label="Generated RTI application text"
           readOnly
           value={activeTemplate.templateText}
           rows={12}

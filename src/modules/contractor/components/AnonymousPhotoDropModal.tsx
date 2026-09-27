@@ -222,7 +222,7 @@ export const AnonymousPhotoDropModal: React.FC<AnonymousPhotoDropModalProps> = (
                 <Landmark className="w-3 h-3 text-ink" />
                 <span>1. {getTranslation(language, 'selectState')}:</span>
               </label>
-              <select
+              <select aria-label="State"
                 value={selectedStateId}
                 onChange={(e) => handleStateChange(e.target.value)}
                 className="w-full bg-surface border rounded-[10px] border-line px-2.5 py-1.5 text-xs font-bold text-ink"
@@ -240,7 +240,7 @@ export const AnonymousPhotoDropModal: React.FC<AnonymousPhotoDropModalProps> = (
                 <Building2 className="w-3 h-3 text-bad" />
                 <span>2. {getTranslation(language, 'selectCity')}:</span>
               </label>
-              <select
+              <select aria-label="City"
                 value={selectedCityId}
                 onChange={(e) => handleCityChange(e.target.value)}
                 className="w-full bg-surface border rounded-[10px] border-line px-2.5 py-1.5 text-xs font-bold text-ink"
@@ -289,7 +289,7 @@ export const AnonymousPhotoDropModal: React.FC<AnonymousPhotoDropModalProps> = (
             <label className="block text-xs font-bold text-ink-3 mb-1">
               Defect Category:
             </label>
-            <select
+            <select aria-label="Defect Category"
               value={defectType}
               onChange={(e) => setDefectType(e.target.value as DefectType)}
               className="w-full bg-surface border rounded-[10px] border-line px-3 py-2 text-xs text-ink"

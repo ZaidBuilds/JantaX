@@ -148,7 +148,7 @@ export function SchoolsDirectory() {
         </div>
         <div className="field">
           <label className="label" htmlFor="schools-sort">Sort by</label>
-          <select id="schools-sort" className="select" value={sort} onChange={(e) => setParam('sort', e.target.value === 'score-desc' ? '' : e.target.value)}>
+          <select aria-label="Sort by" id="schools-sort" className="select" value={sort} onChange={(e) => setParam('sort', e.target.value === 'score-desc' ? '' : e.target.value)}>
             <option value="score-desc">Ground truth, highest first</option>
             <option value="score-asc">Ground truth, lowest first</option>
             <option value="ptr">Most pupils per teacher</option>

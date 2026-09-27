@@ -48,9 +48,9 @@ Yours faithfully,
     <div className="jantax-card" style={{ padding: '1.75rem', marginBottom: '1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.25rem' }}>
         <div>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: '0 0 0.3rem' }}>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: '0 0 0.3rem' }}>
             Structured Municipal 311 Complaint Generator
-          </h3>
+          </h2>
           <p style={{ fontSize: '0.85rem', color: 'var(--ink-3)', margin: 0 }}>
             Generate legally compliant civic grievance drafts citing official Citizen Charter statutory SLA hours (12h - 48h).
           </p>
@@ -115,6 +115,7 @@ Yours faithfully,
       {/* Textarea */}
       <div style={{ position: 'relative', marginBottom: '1.25rem' }}>
         <textarea
+          aria-label="Generated complaint text"
           readOnly
           value={generatedText}
           rows={11}
