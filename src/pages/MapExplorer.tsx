@@ -261,7 +261,7 @@ export function MapExplorer() {
                 >
                   <span className="layer-swatch" style={{ background: LAYERS[e.layer].color, marginTop: 6 }} aria-hidden="true" />
                   <span style={{ flex: 1, minWidth: 0 }}>
-                    <span className="strong clamp-2" style={{ display: 'block' }}>{e.title}</span>
+                    <span className="strong clamp-2" style={{ display: 'block' }} translate="no">{pick(e.title, e.titleHi)}</span>
                     <span className="tiny muted truncate" style={{ display: 'block' }}>{LAYERS[e.layer].label} · {e.subtitle}</span>
                   </span>
                   {e.metricValue && <span className="tiny num muted" style={{ whiteSpace: 'nowrap' }}>{e.metricValue}</span>}
@@ -291,7 +291,7 @@ export function MapExplorer() {
               eventHandlers={{ click: () => setSelected(e) }}
             >
               <Popup>
-                <strong>{e.title}</strong>
+                <strong translate="no">{pick(e.title, e.titleHi)}</strong>
                 <br />
                 <span style={{ fontSize: 12 }}>{e.subtitle}</span>
               </Popup>
@@ -307,7 +307,7 @@ export function MapExplorer() {
         </button>
 
         {selected && (
-          <div className="card map-selection" role="dialog" aria-label={selected.title}>
+          <div className="card map-selection" role="dialog" aria-label={pick(selected.title, selected.titleHi)}>
             <div className="card-body stack-sm">
               <div className="spread" style={{ alignItems: 'flex-start' }}>
                 <span className="tiny strong" style={{ color: LAYERS[selected.layer].color }}>{LAYERS[selected.layer].label}</span>

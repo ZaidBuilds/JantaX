@@ -273,8 +273,7 @@ export function PinDashboard({ choose = false }: { choose?: boolean }) {
                     <Link key={r.id} to={recordHref(r)} className="list-row">
                       <ModuleIcon id={r.moduleId} size="sm" />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div className="strong truncate">{r.titleEnglish}</div>
-                        <div className="tiny muted truncate" lang="hi">{r.titleHindi}</div>
+                        <div className="strong truncate" translate="no">{pick(r.titleEnglish, r.titleHindi)}</div>
                       </div>
                       <Badge tone={toneForStatus(r.status)} className="hide-mobile">{r.status}</Badge>
                       <span className={`score text-${toneForScore(r.groundTruthScore)}`} style={{ minWidth: 48, justifyContent: 'flex-end' }}>

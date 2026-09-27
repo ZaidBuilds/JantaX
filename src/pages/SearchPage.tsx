@@ -31,7 +31,7 @@ import { api, type SearchResponse, type SearchResult, type AutocompleteSuggestio
 import { isValidIndianPincode } from '../core/utils/pinResolver';
 import { Badge, Breadcrumbs, EmptyState, ModuleIcon, toneForStatus, useDismiss } from '../ui';
 import { searchTopics } from '../core/services/topicSearch';
-import { t } from '../i18n';
+import { pick, t } from '../i18n';
 
 const TYPES: Record<string, { label: string; icon: LucideIcon; tone: string }> = {
   location: { label: 'Areas', icon: MapPin, tone: 'var(--accent)' },
@@ -117,14 +117,17 @@ function ResultRow({ r }: { r: SearchResult }) {
     <Link to={hrefFor(r)} className="list-row search-result">
       <TypeIcon type={r.type} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div className="search-result-title">{r.title}</div>
+        <div className="search-result-title" translate="no">{pick(r.title, meta.hindi)}</div>
         <div className="small" style={{ color: 'var(--ink-2)', marginTop: 2 }}>{r.description}</div>
         <div className="source-row" style={{ marginTop: 6 }}>
           <span>{t.label}</span>
           {r.location && (
             <span>
-              PIN {r.location.pincode} · {r.location.district}
-              {r.location.state && r.location.state !== r.location.district ? `, ${r.location.state}` : ''}
+              PIN {r.location.pincode} ·{' '}
+              <span translate="no">
+                {r.location.district}
+                {r.location.state && r.location.state !== r.location.district ? `, ${r.location.state}` : ''}
+              </span>
             </span>
           )}
           <span>Source: {r.source.name}</span>

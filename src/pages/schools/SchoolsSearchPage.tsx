@@ -4,6 +4,7 @@ import { api } from '../../core/services/api';
 import type { SchoolRecord } from '../../modules/school/types';
 import { Search, MapPin, GraduationCap, Filter, Download, Plus, AlertTriangle, X } from 'lucide-react';
 import { SkeletonCard } from '../../components/data-states';
+import { pick } from '../../i18n';
 
 export function SchoolsSearchPage() {
   const [searchParams] = useSearchParams();
@@ -179,7 +180,7 @@ function SchoolSearchResultCard({ school }: { school: SchoolRecord }) {
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-primary)', marginBottom: '0.2rem' }}>
-          {school.titleHindi || school.titleEnglish}
+          {pick(school.titleEnglish || school.titleHindi, school.titleHindi)}
         </div>
         <div style={{ fontSize: '0.75rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap', color: 'var(--ink-3)' }}>
           <span><MapPin size={11} style={{ verticalAlign: '-1px' }} /> {school.location.district}, {school.location.pinCode}</span>

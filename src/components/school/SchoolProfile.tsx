@@ -33,7 +33,10 @@ import {
 } from 'lucide-react';
 import { normalizeSchool } from '../../modules/school/normalize';
 import { Breadcrumbs, EmptyState } from '../../ui';
-import { locale } from '../../i18n';
+import { locale, pick } from '../../i18n';
+
+/** A school's name in the chosen language (records from UDISE+ may only have English). */
+const nameOf = (s: SchoolRecord) => pick(s.titleEnglish || s.titleHindi, s.titleHindi);
 
 const TAB_MAP: Record<string, string> = {
   overview: 'overview',
@@ -277,7 +280,7 @@ export function SchoolProfile({ schoolId: propId }: Props) {
 
   const handleShare = async () => {
     if (!school) return;
-    const text = `${school.titleHindi} · PIN ${school.location.pinCode} | Ground Truth: ${school.groundTruthScore}/100 | ${window.location.href}`;
+    const text = `${nameOf(school)} · PIN ${school.location.pinCode} | Ground Truth: ${school.groundTruthScore}/100 | ${window.location.href}`;
     try { await navigator.clipboard.writeText(text); } catch {}
     setShowShareToast(true);
     setTimeout(() => setShowShareToast(false), 2000);
@@ -313,7 +316,7 @@ export function SchoolProfile({ schoolId: propId }: Props) {
 
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '1rem 1.25rem 0' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem' }}>
-          <Breadcrumbs items={[{ label: 'Schools', to: '/schools' }, { label: school.titleEnglish || school.titleHindi }]} />
+          <Breadcrumbs items={[{ label: 'Schools', to: '/schools' }, { label: nameOf(school) }]} />
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button onClick={() => setFollowing(v => !v)} style={{ padding: '0.45rem 0.9rem', borderRadius: 8, border: '1px solid var(--border)', background: following ? 'var(--good-soft)' : 'var(--surface)', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
               <Heart size={14} fill={following ? '#ef4444' : 'none'} style={{ color: following ? 'var(--bad)' : 'inherit' }} />
@@ -331,7 +334,7 @@ export function SchoolProfile({ schoolId: propId }: Props) {
 
       {showCheckIn && (
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem' }}>
-          <QuickCheckIn pincode={school.location.pinCode} schoolId={school.id} schoolName={school.titleHindi} onClose={() => setShowCheckIn(false)} />
+          <QuickCheckIn pincode={school.location.pinCode} schoolId={school.id} schoolName={nameOf(school)} onClose={() => setShowCheckIn(false)} />
         </div>
       )}
 
@@ -393,7 +396,7 @@ function SchoolHeaderCard({ school, composite, conf }: { school: SchoolRecord; c
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <h1 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>{school.titleEnglish || school.titleHindi}</h1>
+          <h1 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }} translate="no">{nameOf(school)}</h1>
           {school.groundTruthScore >= 70 && <span style={{ fontSize: 'var(--text-xs)', background: 'var(--good-soft)', color: 'var(--good)', padding: '2px 7px', borderRadius: 999, fontWeight: 800, border: '1px solid var(--good-line)' }}>● Verified</span>}
         </div>
         <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', marginTop: '0.25rem', display: 'flex', gap: '0.35rem', alignItems: 'center' }}>

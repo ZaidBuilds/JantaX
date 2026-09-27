@@ -25,6 +25,7 @@ export const hindiReady = () => dict !== null;
 
 const DEVANAGARI = /[\u0900-\u097F]/g;
 const LATIN_LETTER = /[A-Za-z]/g;
+const HAS_LATIN = /[A-Za-z]/;
 
 export type Lang = 'en' | 'hi';
 
@@ -78,6 +79,11 @@ export function lookupHindi(english: string): string | null {
   for (const [re, to] of HI_PATTERNS) {
     const m = key.match(re);
     if (m) return typeof to === 'string' ? key.replace(re, to) : to(m);
+  }
+  // "Secondary · Government · UDISE 0701" is several labels on one line: translate each.
+  if (key.includes(' · ')) {
+    const parts = key.split(' · ').map((p) => (HAS_LATIN.test(p) ? lookupHindi(p) : p));
+    if (parts.every((p) => p !== null)) return parts.join(' · ');
   }
   return null;
 }

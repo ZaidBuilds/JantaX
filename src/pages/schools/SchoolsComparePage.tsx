@@ -8,6 +8,7 @@ import { ComparisonTable } from '../../components/compare/ComparisonTable';
 import type { ComparisonData, ComparisonEntity } from '../../components/compare/types';
 import { SchoolHealthScore, getStatusFromScore } from '../../components/school/SchoolHealthScore';
 import { SCORING_VERSION } from '../../core/utils/scoring';
+import { pick } from '../../i18n';
 
 export function SchoolsComparePage() {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ export function SchoolsComparePage() {
         metrics: entities.map(e => ({
           id: `${e.id}-name`,
           label: 'Name',
-          value: schoolRecords[e.id]?.titleEnglish || schoolRecords[e.id]?.titleHindi || '-',
+          value: pick(schoolRecords[e.id]?.titleEnglish || schoolRecords[e.id]?.titleHindi || '-', schoolRecords[e.id]?.titleHindi),
           status: 'available' as const,
         })),
       },
