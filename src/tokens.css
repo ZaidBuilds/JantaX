@@ -186,6 +186,60 @@
   --shadow-lg: 0 24px 48px -16px rgb(0 0 0 / 0.7);
 }
 
+/* Illustration palette for the "Your area" scene (src/ui/AreaScene.tsx): day in light mode, night in dark. */
+:root {
+  --scene-sky-top: #dce8f7;
+  --scene-sky-bottom: #fbf2e6;
+  --scene-sun: #f7c66b;
+  --scene-far: #cdd8e7;
+  --scene-far-2: #b4c3d8;
+  --scene-snow: #ffffff;
+  --scene-sea: #a7c9e6;
+  --scene-leaf: #5c9c75;
+  --scene-leaf-2: #7db791;
+  --scene-trunk: #8a6a4f;
+  --scene-kerb: #dde3eb;
+  --scene-road: #b9c2cf;
+  --scene-lane: #f6f8fb;
+  --scene-wall: #f7f0e3;
+  --scene-post-red: #c62f2a;
+  --scene-door: #45567a;
+  --scene-window: #cfe0f3;
+  --scene-pole: #8793a6;
+  --scene-lamp: #fbe3a4;
+  --scene-glow-opacity: 0;
+  --scene-auto-green: #2f8a5a;
+  --scene-auto-yellow: #f2c53d;
+  --scene-auto-dark: #26324a;
+  --scene-tyre: #1f2533;
+}
+:root[data-theme='dark'] {
+  --scene-sky-top: #0c1630;
+  --scene-sky-bottom: #1c2446;
+  --scene-sun: #e4e9f2;
+  --scene-far: #1b2944;
+  --scene-far-2: #26375c;
+  --scene-snow: #c9d3e3;
+  --scene-sea: #1b3452;
+  --scene-leaf: #2d664a;
+  --scene-leaf-2: #3a7a59;
+  --scene-trunk: #5b4634;
+  --scene-kerb: #2a3550;
+  --scene-road: #1a2234;
+  --scene-lane: #3a4763;
+  --scene-wall: #2b3754;
+  --scene-post-red: #cf4a40;
+  --scene-door: #111a2c;
+  --scene-window: #f5c96a;
+  --scene-pole: #5b6780;
+  --scene-lamp: #ffd98a;
+  --scene-glow-opacity: 0.55;
+  --scene-auto-green: #2c7a50;
+  --scene-auto-yellow: #d8ad36;
+  --scene-auto-dark: #0b111d;
+  --scene-tyre: #070b13;
+}
+
 /* Legacy aliases: older modules read these names. */
 :root {
   --bg-primary: var(--canvas);

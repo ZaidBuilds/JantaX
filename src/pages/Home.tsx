@@ -20,6 +20,7 @@ import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver'
 import { getBottleneckLensesForPin } from '../core/services/bottleneckService';
 import { getStoredReports } from '../modules/reporting/services/reportingService';
 import { Badge, ClaimReality, ModuleIcon, MODULE_GROUPS, getModule, moduleHref, reportForDisplay, toneForStatus } from '../ui';
+import { AreaScene } from '../ui/AreaScene';
 
 const POPULAR = [
   { pin: '110001', city: 'New Delhi' },
@@ -53,6 +54,7 @@ function AreaPreview({ pin }: { pin: string }) {
 
   return (
     <div className="card area-preview">
+      <AreaScene pin={pin} state={loc.state} district={loc.district} />
       <div className="card-body">
         <div className="spread">
           <div>
