@@ -13,6 +13,14 @@ interface MonitoringDashboardPageProps {
   initialTab?: 'all' | 'quarantine' | 'snapshots';
 }
 
+const CATEGORY_FILTERS = [
+  { id: 'all', label: 'All' },
+  { id: 'new_school_records', label: 'School records' },
+  { id: 'new_tenders', label: 'Tenders' },
+  { id: 'new_rera_orders', label: 'RERA orders' },
+  { id: 'new_documents', label: 'Documents' },
+];
+
 export function MonitoringDashboardPage({ initialTab }: MonitoringDashboardPageProps) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -66,7 +74,7 @@ export function MonitoringDashboardPage({ initialTab }: MonitoringDashboardPageP
             textDecoration: 'none'
           }}
         >
-          All System Alerts ({alerts.length})
+          All alerts ({alerts.length})
         </Link>
 
         <Link
@@ -83,7 +91,7 @@ export function MonitoringDashboardPage({ initialTab }: MonitoringDashboardPageP
             gap: '0.35rem'
           }}
         >
-          <ShieldAlert size={16} /> Human Review Quarantine Queue ({quarantinedAlerts.length})
+          <ShieldAlert size={16} /> Waiting for review ({quarantinedAlerts.length})
         </Link>
 
         <Link
@@ -100,7 +108,7 @@ export function MonitoringDashboardPage({ initialTab }: MonitoringDashboardPageP
             gap: '0.35rem'
           }}
         >
-          <RotateCcw size={16} /> Dataset Snapshots & Rollback
+          <RotateCcw size={16} /> Snapshots and rollback
         </Link>
       </div>
 
@@ -108,24 +116,10 @@ export function MonitoringDashboardPage({ initialTab }: MonitoringDashboardPageP
       {activeTab === 'all' && (
         <div style={{ display: 'grid', gap: '1.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-3)' }}>Filter Category:</span>
-            {['all', 'new_school_records', 'new_tenders', 'new_rera_orders', 'new_documents'].map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setSelectedCategory(cat)}
-                style={{
-                  padding: '0.35rem 0.85rem',
-                  borderRadius: '9999px',
-                  border: selectedCategory === cat ? '1px solid var(--border-strong)' : '1px solid var(--border-strong)',
-                  background: selectedCategory === cat ? 'var(--surface-inverse)' : 'var(--surface)',
-                  color: selectedCategory === cat ? 'var(--on-solid)' : 'var(--ink-2)',
-                  fontWeight: 700,
-                  fontSize: '0.78rem',
-                  cursor: 'pointer'
-                }}
-              >
-                {cat}
+            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-3)' }}>Show:</span>
+            {CATEGORY_FILTERS.map(({ id, label }) => (
+              <button key={id} type="button" className="chip" aria-pressed={selectedCategory === id} onClick={() => setSelectedCategory(id)}>
+                {label}
               </button>
             ))}
           </div>
