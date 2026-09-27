@@ -4,6 +4,7 @@ import { getActiveGrapStage, getGrapRules } from '../services/pollutionService';
 import { GrapStatusCard } from '../components/GrapStatusCard';
 import { TransparencyDisclaimer } from '../../transparency/components/TransparencyDisclaimer';
 import { ArrowLeft, ShieldAlert, FileText, ExternalLink } from 'lucide-react';
+import { pick } from '../../../i18n';
 
 export function GrapGuidePage() {
   const activeGrap = getActiveGrapStage();
@@ -50,7 +51,7 @@ export function GrapGuidePage() {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
                   <span style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ink)' }}>
-                    {stage.stageName} ({stage.stageNameHi})
+                    {pick(stage.stageName, stage.stageNameHi)}
                   </span>
                   <span style={{ background: 'var(--brand)', color: 'var(--on-solid)', fontSize: '0.75rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: 4 }}>
                     {stage.aqiThreshold}

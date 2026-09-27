@@ -2,6 +2,7 @@ import React from 'react';
 import { MapPin, Clock, AlertTriangle, Minus, CheckCircle } from 'lucide-react';
 import { SourceBadge } from '../UI/SourceBadge';
 import { DataFreshnessBadge } from '../data-states';
+import { locale } from '../../i18n';
 
 export interface MetricData {
   label: string;
@@ -383,7 +384,7 @@ export function AboutLocationCard({
   const formatDate = (d: Date | string | null | undefined) => {
     if (!d) return '-';
     const date = typeof d === 'string' ? new Date(d) : d;
-    return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    return date.toLocaleDateString(locale(), { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
   const infoRows = [

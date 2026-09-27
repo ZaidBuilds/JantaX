@@ -191,7 +191,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               {/* Text Search */}
               <input 
                 type="text" 
-                placeholder="पिन कोड या नाम / PIN or Name..." 
+                placeholder="PIN or Name..." 
                 className="form-input" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}

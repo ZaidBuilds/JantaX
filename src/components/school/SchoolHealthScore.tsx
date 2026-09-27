@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AlertTriangle, CheckCircle2, Eye, EyeOff, Info, ChevronDown, ChevronUp } from 'lucide-react';
 import { SourceBadge } from '../UI/SourceBadge';
+import { locale, pick } from '../../i18n';
 
 export type ScoreStatus = 'stable' | 'watch' | 'needs_attention' | 'critical';
 
@@ -219,8 +220,7 @@ function DimensionCard({
       <div style={{ padding: '1rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
           <div>
-            <h4 style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>{dim.label}</h4>
-            {dim.labelHi && <span style={{ fontSize: '0.75rem', color: 'var(--ink-3)' }}>{dim.labelHi}</span>}
+            <h4 style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>{pick(dim.label, dim.labelHi)}</h4>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexShrink: 0 }}>
             <span
@@ -273,7 +273,7 @@ function DimensionCard({
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.6rem', flexWrap: 'wrap' }}>
           <SourceBadge sourceType={dim.source.type} sourceName={dim.source.name} />
           <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
-            Calc: {new Date(dim.lastCalculation).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+            Calc: {new Date(dim.lastCalculation).toLocaleDateString(locale(), { day: 'numeric', month: 'short' })}
           </span>
           {dim.confidence !== 'high' && (
             <span style={{ fontSize: 'var(--text-xs)', color: dim.confidence === 'low' ? 'var(--bad)' : 'var(--warn)' }}>

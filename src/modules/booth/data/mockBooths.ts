@@ -178,7 +178,7 @@ export const MOCK_POLLING_BOOTHS: PollingBooth[] = [
 export const VOTER_FORMS_GUIDE: VoterFormGuideItem[] = [
   {
     formType: 'Form 6',
-    title: 'New Voter Registration (पहला वोटर कार्ड)',
+    title: 'New Voter Registration',
     titleHi: 'नया मतदाता पंजीकरण',
     purpose: 'Application for inclusion of name in the electoral roll for first-time citizens or newly eligible voters turning 18.',
     purposeHi: '18 वर्ष की आयु पूरी करने वाले नए मतदाताओं के लिए नाम जोड़ने हेतु आवेदन।',
@@ -192,7 +192,7 @@ export const VOTER_FORMS_GUIDE: VoterFormGuideItem[] = [
   },
   {
     formType: 'Form 7',
-    title: 'Objection to Proposed Inclusion / Deletion (वोटर लिस्ट से नाम हटाना)',
+    title: 'Objection to Proposed Inclusion / Deletion',
     titleHi: 'नाम हटाने अथवा आपत्ति दर्ज करने हेतु',
     purpose: 'Application for objecting to the proposed inclusion or seeking deletion of a name due to death, permanent shifting, or duplication.',
     purposeHi: 'मृत्यु, स्थायी स्थानांतरण अथवा गलत प्रविष्टि होने पर नाम हटाने हेतु आवेदन।',
@@ -206,7 +206,7 @@ export const VOTER_FORMS_GUIDE: VoterFormGuideItem[] = [
   },
   {
     formType: 'Form 8',
-    title: 'Correction of Entries / Shifting of Residence (वोटर कार्ड संशोधन / पता बदलना)',
+    title: 'Correction of Entries / Shifting of Residence',
     titleHi: 'नाम, पता या फोटो में संशोधन एवं स्थानांतरण',
     purpose: 'Application for correction in Name, Age, Gender, Relative Name, Photo, Mobile Number, or Shifting of Residence within/outside constituency.',
     purposeHi: 'वोटर आईडी में नाम, जन्मतिथि, पता अथवा मोबाइल नंबर ठीक करने के लिए।',
@@ -220,7 +220,7 @@ export const VOTER_FORMS_GUIDE: VoterFormGuideItem[] = [
   },
   {
     formType: 'Form 6A',
-    title: 'Overseas Elector Registration (प्रवासी भारतीय मतदाता)',
+    title: 'Overseas Elector Registration',
     titleHi: 'अनिवासी भारतीय (NRI) मतदाता पंजीकरण',
     purpose: 'Application for inclusion of name in the electoral roll by an Overseas (NRI) Indian Citizen.',
     purposeHi: 'विदेश में रहने वाले भारतीय नागरिकों के लिए मतदान सूची में नाम दर्ज कराना।',

@@ -1,3 +1,4 @@
+import { getLang } from '../i18n';
 /**
  * A drawn neighbourhood for the "Your area" card: a post office with the chosen PIN on its signboard,
  * an India Post pillar box, a CNG auto-rickshaw and a streetlight. The backdrop follows the place
@@ -79,6 +80,7 @@ function Backdrop({ kind }: { kind: Landscape }) {
 
 export function AreaScene({ pin, state, district, className = '' }: { pin: string; state: string; district: string; className?: string }) {
   const kind = landscapeFor(state, district);
+  const hindi = getLang() === 'hi';
   return (
     <svg className={`area-scene ${className}`.trim()} viewBox="0 20 400 120" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
       <defs>
@@ -106,8 +108,11 @@ export function AreaScene({ pin, state, district, className = '' }: { pin: strin
         <rect x="26" y="60" width="140" height="41" fill="var(--scene-wall)" />
         <rect x="22" y="54" width="148" height="8" rx="1.5" fill="var(--scene-post-red)" />
         <rect x="50" y="64" width="92" height="19" rx="2" fill="var(--scene-post-red)" />
-        <text x="96" y="72.5" textAnchor="middle" fontSize="7" fontWeight="700" fill="#fff" fontFamily="var(--font-sans)">डाकघर</text>
-        <text x="96" y="80" textAnchor="middle" fontSize="5.6" fontWeight="700" letterSpacing="0.6" fill="#fff" fontFamily="var(--font-sans)">POST OFFICE</text>
+        {hindi ? (
+          <text x="96" y="77.5" textAnchor="middle" fontSize="9" fontWeight="700" fill="#fff" fontFamily="var(--font-sans)">डाकघर</text>
+        ) : (
+          <text x="96" y="76.5" textAnchor="middle" fontSize="7" fontWeight="700" letterSpacing="0.6" fill="#fff" fontFamily="var(--font-sans)">POST OFFICE</text>
+        )}
         <rect x="36" y="87" width="16" height="10" rx="1" fill="var(--scene-window)" />
         <rect x="140" y="87" width="16" height="10" rx="1" fill="var(--scene-window)" />
         <path d="M44 87 V97 M148 87 V97" stroke="var(--scene-wall)" strokeWidth="1" />
@@ -119,7 +124,7 @@ export function AreaScene({ pin, state, district, className = '' }: { pin: strin
       <g>
         <rect x="197" y="84" width="2" height="17" fill="var(--scene-pole)" />
         <rect x="176" y="68" width="44" height="18" rx="2.5" fill="var(--surface)" stroke="var(--scene-pole)" strokeWidth="1" />
-        <text x="198" y="75" textAnchor="middle" fontSize="4.8" fontWeight="600" letterSpacing="0.8" fill="var(--ink-3)" fontFamily="var(--font-sans)">PIN</text>
+        <text x="198" y="75" textAnchor="middle" fontSize="4.8" fontWeight="600" letterSpacing="0.8" fill="var(--ink-3)" fontFamily="var(--font-sans)">{hindi ? 'पिन' : 'PIN'}</text>
         <text x="198" y="83" textAnchor="middle" fontSize="8" fontWeight="700" fill="var(--brand-ink)" fontFamily="var(--font-display)" style={{ fontVariantNumeric: 'tabular-nums' }}>{pin}</text>
       </g>
 

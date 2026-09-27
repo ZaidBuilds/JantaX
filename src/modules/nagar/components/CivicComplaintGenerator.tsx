@@ -26,7 +26,7 @@ Subject: Urgent Civic Grievance regarding ${selectedCat.name} (Statutory SLA: ${
 Respected Sir/Madam,
 I am lodging this formal civic complaint regarding an acute civic defect in Ward #${wardNumber}:
 
-1. Issue Category: ${selectedCat.name} (${selectedCat.nameHi})
+1. Issue Category: ${selectedCat.name}
 2. Exact Location: ${streetAddress || '[Enter Landmark / Street Name / House No.]'}, Ward #${wardNumber}, PIN ${pinCode}
 3. Nature of Problem: ${selectedCat.description}
 4. Statutory Resolution SLA: Under the Citizen Charter of ${corporationName}, this category carries a mandatory resolution window of ${selectedCat.statutorySlaHours} hours.

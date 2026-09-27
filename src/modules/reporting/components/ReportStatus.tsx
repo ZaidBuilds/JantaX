@@ -3,6 +3,7 @@ import type { CitizenReport } from '../types/citizenReport';
 import { reportAbuse } from '../services/reportingService';
 import { ModerationStatus } from './ModerationStatus';
 import { MapPin, ThumbsUp, Flag, EyeOff, UserCheck, Calendar, AlertTriangle, ShieldCheck, Share2 } from 'lucide-react';
+import { locale } from '../../../i18n';
 
 interface ReportStatusProps {
   report: CitizenReport;
@@ -68,7 +69,7 @@ export const ReportStatus: React.FC<ReportStatusProps> = ({ report, onUpdate }) 
             </h1>
 
             <div style={{ fontSize: '0.82rem', color: 'var(--ink-3)', fontWeight: 500 }}>
-              Reported on {new Date(report.createdAt).toLocaleDateString()} · {report.isAnonymous ? 'Anonymous Citizen Report' : `Reporter: ${report.reporterName || 'Public Auditor'}`}
+              Reported on {new Date(report.createdAt).toLocaleDateString(locale())} · {report.isAnonymous ? 'Anonymous Citizen Report' : `Reporter: ${report.reporterName || 'Public Auditor'}`}
             </div>
           </div>
 

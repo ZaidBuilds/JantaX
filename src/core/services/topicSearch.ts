@@ -12,6 +12,7 @@ export interface TopicHit {
 /** Tool pages people look for by task rather than by module. */
 const PAGES: (TopicHit & { keywords: string })[] = [
   { id: 'report', title: 'Report an issue', text: 'File a photo report about a road, school, clinic, water supply or ward service.', to: '/report-issue', keywords: 'report complaint photo pothole issue problem file' },
+  { id: 'governance', title: 'Who runs your area', text: 'Every level of government for your PIN code, from the Centre to your ward or village, and who fixes what.', to: '/governance', keywords: 'government governance mp mla sarpanch pradhan mukhiya pramukh block zila panchayat parishad mayor councillor parshad corporator ward nagar nigam palika municipal mcd pwd bdo collector dm district magistrate tehsildar jal board discom electricity accountable responsible who' },
   { id: 'reports', title: 'Citizen reports', text: 'Reports filed by residents, after moderation.', to: '/reports', keywords: 'citizen reports complaints evidence ground truth' },
   { id: 'compare', title: 'Compare areas', text: 'Put PIN codes side by side on the same public measures.', to: '/compare', keywords: 'compare areas pin side by side' },
   { id: 'map', title: 'Map', text: 'Public records near a PIN code, on a map.', to: '/maps', keywords: 'map location near nearby' },

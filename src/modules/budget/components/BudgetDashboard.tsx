@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
 import { Stat, SourceLine } from '../../../ui';
 import { ModulePinBar, SectionTitle, pct, pinSeed, useModulePin } from '../../shared/ModuleKit';
+import { pick } from '../../../i18n';
 
 const SECTORS = [
   { name: 'Roads and infrastructure', hi: 'अवसंरचना', share: 35, tone: 'var(--viz-2)' },
@@ -87,8 +88,7 @@ export function BudgetDashboard() {
                       <div className="cluster" style={{ flexWrap: 'nowrap' }}>
                         <span className="layer-swatch" style={{ background: r.tone }} aria-hidden="true" />
                         <span>
-                          <span className="strong">{r.name}</span>
-                          <span className="tiny muted" lang="hi" style={{ display: 'block' }}>{r.hi}</span>
+                          <span className="strong">{pick(r.name, r.hi)}</span>
                         </span>
                       </div>
                     </td>

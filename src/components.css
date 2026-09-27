@@ -1445,3 +1445,93 @@ a.search-result:hover .search-result-title { color: var(--brand-ink); }
 /* Source badges carry long publisher names; keep them to one line and let them shrink with an ellipsis. */
 .badge-source { max-width: 100%; min-width: 0; }
 .badge-source .badge-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+
+/* ============================================================
+   India tile map
+   ============================================================ */
+.india-map { margin: 0; container-type: inline-size; }
+.india-map-grid { display: grid; gap: 6px; }
+.india-map-tile {
+  aspect-ratio: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--r-md, 8px);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.1;
+  overflow: hidden;
+  transition: border-color 120ms ease, transform 120ms ease;
+}
+button.india-map-tile { cursor: pointer; }
+button.india-map-tile:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+button.india-map-tile:focus-visible { outline: 2px solid var(--focus, var(--brand-ink)); outline-offset: 2px; }
+.india-map-tile.is-ut { border-style: dashed; }
+.india-map-code { font-weight: 700; font-size: 13px; white-space: nowrap; }
+.india-map-value { font-size: 12px; font-weight: 700; padding: 0 5px; border-radius: 999px; background: var(--surface-3); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.tone-brand.india-map-tile { background: var(--brand-soft); border-color: var(--brand-line); }
+.tone-good.india-map-tile { background: var(--good-soft); border-color: var(--good-line); }
+.tone-warn.india-map-tile { background: var(--warn-soft); border-color: var(--warn-line); }
+.tone-bad.india-map-tile { background: var(--bad-soft); border-color: var(--bad-line); }
+.india-map-tile.is-selected { background: var(--brand); border-color: var(--brand); color: var(--on-solid); }
+.india-map-tile.is-selected .india-map-value { background: color-mix(in srgb, var(--on-solid) 20%, transparent); color: var(--on-solid); }
+.india-map-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s-2) var(--s-4); margin-top: var(--s-4); font-size: var(--text-sm); color: var(--ink-2); }
+.india-map-key { display: inline-flex; align-items: center; gap: 6px; }
+.india-map-swatch { width: 14px; height: 14px; border-radius: 4px; border: 1px solid var(--border-strong); background: var(--surface); }
+.india-map-swatch.tone-brand { background: var(--brand-soft); border-color: var(--brand-ink); }
+.india-map-swatch.tone-good { background: var(--good-soft); border-color: var(--good); }
+.india-map-swatch.tone-warn { background: var(--warn-soft); border-color: var(--warn); }
+.india-map-swatch.tone-bad { background: var(--bad-soft); border-color: var(--bad); }
+.india-map-swatch.is-ut { border-style: dashed; }
+.india-map-note { margin: var(--s-2) 0 0; text-align: center; font-size: var(--text-xs); color: var(--ink-3); }
+@container (max-width: 380px) {
+  .india-map-grid { gap: 4px; }
+  .india-map-code { font-size: 12px; letter-spacing: -0.02em; }
+  .india-map-value { padding: 0 3px; }
+}
+
+/* ============================================================
+   Who runs your area
+   ============================================================ */
+.gov-layout { display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); gap: var(--s-6); align-items: start; }
+.gov-controls { position: sticky; top: calc(var(--header-h, 64px) + var(--s-4)); }
+.gov-fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.gov-segmented { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+.gov-segmented button { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; height: auto; min-height: 48px; padding: 8px 10px; text-align: left; }
+.gov-map-toggle { margin-top: var(--s-4); border-top: 1px solid var(--border); padding-top: var(--s-3); }
+.gov-map-toggle > summary { cursor: pointer; font-weight: 600; font-size: var(--text-sm); color: var(--brand-ink); min-height: 32px; display: flex; align-items: center; }
+.gov-map-toggle[open] > summary { margin-bottom: var(--s-3); }
+.gov-chain { list-style: none; margin: 0; padding: 0; position: relative; }
+.gov-chain::before { content: ''; position: absolute; left: 11px; top: 8px; bottom: 8px; width: 2px; background: var(--border); }
+.gov-level { position: relative; padding-left: 36px; margin-bottom: var(--s-6); }
+.gov-level::before { content: ''; position: absolute; left: 4px; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: var(--surface); border: 3px solid var(--brand-ink); }
+.gov-level-local::before, .gov-level-ward::before { border-color: var(--accent); }
+.gov-level-title { display: flex; align-items: center; gap: 8px; font-size: var(--text-md); margin: 0 0 var(--s-3); }
+.gov-bodies { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--s-3); }
+.gov-body { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: var(--s-4); display: flex; flex-direction: column; gap: var(--s-2); }
+.gov-body-name { font-size: var(--text-md); margin: 0; }
+.gov-body-about { margin: 0; font-size: var(--text-sm); color: var(--ink-2); }
+.gov-roles { margin: 0; display: grid; gap: 6px; font-size: var(--text-sm); }
+.gov-roles dt { display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-xs); font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
+.gov-roles dd { margin: 0; }
+.gov-handles { margin: 0; padding-left: 1.1em; list-style: disc; font-size: var(--text-sm); color: var(--ink-2); display: grid; gap: 2px; }
+.gov-body-foot { margin-top: auto; display: flex; flex-direction: column; gap: 4px; padding-top: var(--s-2); border-top: 1px solid var(--border); }
+.gov-contact { display: inline-flex; align-items: center; gap: 6px; font-size: var(--text-sm); color: var(--brand-ink); min-height: 24px; }
+span.gov-contact { color: var(--ink-2); }
+.gov-fix { margin-top: 0; }
+.gov-issue-chips { margin: var(--s-4) 0; }
+.gov-route { border: 1px solid var(--brand-line); background: var(--brand-soft); border-radius: var(--r-lg); padding: var(--s-4); }
+.gov-route-body { display: flex; flex-direction: column; gap: 2px; margin-bottom: var(--s-3); }
+.gov-route-body strong { font-size: var(--text-md); }
+.gov-steps { margin: 0 0 var(--s-3); padding-left: 1.4em; display: grid; gap: var(--s-2); font-size: var(--text-sm); }
+.gov-step-label { display: block; font-size: var(--text-xs); font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; }
+@media (max-width: 900px) {
+  .gov-layout { grid-template-columns: 1fr; }
+  .gov-controls { position: static; }
+}

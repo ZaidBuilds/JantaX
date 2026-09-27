@@ -1,7 +1,13 @@
+import { Link } from 'react-router-dom';
 import React, { useState, useMemo } from 'react';
 import { getSpineDataForPincode } from '../data/nationwideSpine';
 import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
 import { resolvePincode } from '../../../core/utils/pinResolver';
+import { pick } from '../../../i18n';
+import { findState } from '../../../core/geo/indiaStates';
+import { localNamesFor } from '../../../core/governance/chain';
+
+const STATUS_LABEL = { planned: 'Planned', 'in-progress': 'In progress', completed: 'Completed', stalled: 'Stalled' } as const;
 
 export function SpineDashboard() {
   const { share } = useWhatsAppShare();
@@ -13,6 +19,7 @@ export function SpineDashboard() {
 
   // Resolve Location details
   const resolvedLoc = useMemo(() => resolvePincode(currentPin), [currentPin]);
+  const localNames = localNamesFor(findState(resolvedLoc.state)?.code);
 
   // Load dynamic dataset based on the current active PIN code
   const { representatives, funds, projects, contractors } = useMemo(() => {
@@ -65,10 +72,10 @@ export function SpineDashboard() {
       titleEnglish: proj.workName,
       claimLabel: `₹${proj.sanctionedCostLakhs} Lakhs Allocated`,
       claimLabelHindi: `₹${proj.sanctionedCostLakhs} लाख स्वीकृत`,
-      realityLabel: proj.statusHi,
+      realityLabel: proj.realityTextEn ?? STATUS_LABEL[proj.status as keyof typeof STATUS_LABEL],
       realityLabelHindi: proj.realityTextHi || proj.statusHi,
       responsiblePerson: repName,
-      responsibleOrg: fund.schemeNameHi,
+      responsibleOrg: pick(fund.schemeName, fund.schemeNameHi),
       sourceUrl: 'https://egramswaraj.gov.in',
       moduleNameHindi: `Project 777 (जवाबदेही पिन: ${currentPin})`,
     });
@@ -80,7 +87,7 @@ export function SpineDashboard() {
       setCurrentPin(pinInput);
       setSelectedRepId(null);
     } else {
-      alert('कृपया एक सही ६-अंकीय भारतीय पिन कोड दर्ज करें। (Please enter a valid 6-digit Indian PIN code.)');
+      alert('Please enter a valid 6-digit Indian PIN code.');
     }
   };
 
@@ -90,16 +97,17 @@ export function SpineDashboard() {
       {/* Nationwide PIN Search Form */}
       <div className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
         <h3 style={{ fontSize: '1.1rem', marginBottom: '0.75rem' }}>
-          अखिल भारतीय ५-स्तरीय जवाबदेही खोज (Nationwide 5-Level Spine Search)
+          Follow the money by PIN code
         </h3>
         <p style={{ fontSize: '0.8rem', marginBottom: '1rem', color: 'var(--ink-3)' }}>
-          भारत के किसी भी कोने का ६-अंकीय पिन कोड दर्ज करें। यह प्रणाली उस स्थान के सांसद (MP), विधायक (MLA), जिला परिषद, ब्लॉक पंचायत और ग्राम पंचायत के कोष, कार्यों और ठेकेदारों की श्रृंखला को प्रदर्शित करेगी।
+          Enter any 6-digit PIN code in India to see funds, works and contractors at each level: MP, MLA, zila parishad, block and gram panchayat. Sample data.{' '}
+          <Link to={`/governance?pin=${currentPin}`}>See every level of government for this PIN</Link>
         </p>
         <form onSubmit={handlePinSearch} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <input
             type="text"
             maxLength={6}
-            placeholder="पिन कोड दर्ज करें (उदा. 560001, 400001, 250001)..."
+            placeholder="Enter a PIN code, e.g. 560001"
             value={pinInput}
             onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ''))}
             style={{
@@ -125,7 +133,7 @@ export function SpineDashboard() {
               fontSize: '0.85rem',
             }}
           >
-            खोजें (Search)
+            Search
           </button>
         </form>
         {resolvedLoc.isValid && (
@@ -145,7 +153,7 @@ export function SpineDashboard() {
       {/* Level Selection Tabs */}
       <div className="glass-card" style={{ padding: '1rem', marginBottom: '1.5rem' }}>
         <h3 style={{ fontSize: '0.85rem', marginBottom: '0.75rem', opacity: 0.8 }}>
-          ५-स्तरीय जवाबदेही श्रृंखला (Select Level of Governance)
+          Select Level of Governance
         </h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
           {(['all', 'union', 'state', 'district', 'block', 'village'] as const).map(level => (
@@ -168,12 +176,12 @@ export function SpineDashboard() {
                 textTransform: 'uppercase',
               }}
             >
-              {level === 'all' && 'सभी स्तर (All)'}
-              {level === 'union' && 'सांसद (MP)'}
-              {level === 'state' && 'विधायक (MLA)'}
-              {level === 'district' && 'जिला परिषद (Zilla Parishad)'}
-              {level === 'block' && 'ब्लॉक समिति (Block Samiti)'}
-              {level === 'village' && 'ग्राम पंचायत (Gram Panchayat)'}
+              {level === 'all' && 'All'}
+              {level === 'union' && 'MP'}
+              {level === 'state' && 'MLA'}
+              {level === 'district' && pick(localNames.district?.name.en ?? 'District panchayat', localNames.district?.name.hi)}
+              {level === 'block' && pick(localNames.block?.name.en ?? 'Block panchayat', localNames.block?.name.hi)}
+              {level === 'village' && pick(localNames.village?.name.en ?? 'Gram panchayat', localNames.village?.name.hi)}
             </button>
           ))}
         </div>
@@ -203,7 +211,7 @@ export function SpineDashboard() {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>{rep.nameHi}</span>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>{pick(rep.name, rep.nameHi)}</span>
                   <span style={{
                     fontSize: 'var(--text-xs)',
                     padding: '2px 6px',
@@ -232,9 +240,9 @@ export function SpineDashboard() {
               <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--ink-3)' }}>
                 REPRESENTATIVE PROFILE · {activeRep.level.toUpperCase()} LEVEL
               </div>
-              <h2 style={{ fontSize: '1.4rem', margin: '0.25rem 0' }}>{activeRep.nameHi} ({activeRep.name})</h2>
+              <h2 style={{ fontSize: '1.4rem', margin: '0.25rem 0' }}>{pick(activeRep.name, activeRep.nameHi)}</h2>
               <p style={{ fontSize: '0.85rem', opacity: 0.8 }}>
-                Jurisdiction: <strong>{activeRep.constituencyNameHi}</strong>
+                Jurisdiction: <strong>{pick(activeRep.constituencyName, activeRep.constituencyNameHi)}</strong>
               </p>
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.75rem' }}>
                 {activeRep.pinCodes.map(pin => (
@@ -261,7 +269,7 @@ export function SpineDashboard() {
                       <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--ink-3)', textTransform: 'uppercase' }}>
                         Sanctioned Fund
                       </div>
-                      <h3 style={{ fontSize: '1.05rem', margin: '0.1rem 0' }}>{fund.schemeNameHi}</h3>
+                      <h3 style={{ fontSize: '1.05rem', margin: '0.1rem 0' }}>{pick(fund.schemeName, fund.schemeNameHi)}</h3>
                       <div style={{ fontSize: '0.75rem', color: 'var(--ink-3)' }}>{fund.schemeName} · FY: {fund.financialYear}</div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
@@ -291,7 +299,7 @@ export function SpineDashboard() {
                         }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <div>
-                              <h5 style={{ fontSize: '0.9rem', margin: 0 }}>{proj.workNameHi}</h5>
+                              <h5 style={{ fontSize: '0.9rem', margin: 0 }}>{pick(proj.workName, proj.workNameHi)}</h5>
                               <div style={{ fontSize: '0.75rem', marginTop: '0.1rem', color: 'var(--ink-3)' }}>{proj.workName}</div>
                             </div>
                             <span style={{
@@ -302,7 +310,7 @@ export function SpineDashboard() {
                               color: proj.status === 'completed' ? 'var(--status-completed)' : proj.status === 'stalled' ? 'var(--status-critical)' : 'var(--status-construction)',
                               fontWeight: 700,
                             }}>
-                              {proj.statusHi}
+                              {pick(STATUS_LABEL[proj.status], proj.statusHi)}
                             </span>
                           </div>
 
@@ -320,10 +328,10 @@ export function SpineDashboard() {
 
                             <div style={{ background: 'rgba(239, 68, 68, 0.04)', padding: '0.5rem', borderRadius: '6px', borderLeft: '3px solid var(--bad)' }}>
                               <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--bad)', textTransform: 'uppercase' }}>
-                                Reality (जमीनी हकीकत)
+                                Reality
                               </div>
                               <div style={{ fontSize: '0.75rem', marginTop: '0.25rem', color: 'var(--bad)' }}>
-                                {proj.realityTextHi || 'No reports logged.'}
+                                {pick(proj.realityTextEn ?? 'No reports logged yet.', proj.realityTextHi)}
                               </div>
                             </div>
 
@@ -339,7 +347,7 @@ export function SpineDashboard() {
                             }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
                                 <div>
-                                  Contractor: <strong>{contractor.nameHi}</strong>
+                                  Contractor: <strong>{pick(contractor.name, contractor.nameHi)}</strong>
                                   <br />
                                   <span style={{ color: 'var(--ink-3)' }}>{contractor.registrationNumber} · Past Projects: {contractor.pastProjectsCount}</span>
                                 </div>
@@ -373,7 +381,7 @@ export function SpineDashboard() {
 
                           {/* Action Bar */}
                           <div style={{ marginTop: '0.75rem', display: 'flex', justifyContent: 'flex-end' }}>
-                            <button type="button" className="btn btn-sm btn-whatsapp" onClick={() => handleShareWhatsApp(activeRep.nameHi, fund, proj, contractor)}>
+                            <button type="button" className="btn btn-sm btn-whatsapp" onClick={() => handleShareWhatsApp(pick(activeRep.name, activeRep.nameHi), fund, proj, contractor)}>
                               Share Chain on WhatsApp
                             </button>
                           </div>

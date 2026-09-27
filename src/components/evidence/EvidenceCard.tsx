@@ -2,6 +2,7 @@ import React from 'react';
 import { ConfidenceBadge } from './ConfidenceBadge';
 import { VerificationBadge } from './VerificationBadge';
 import { SourceBadge } from './SourceBadge';
+import { locale } from '../../i18n';
 
 interface EvidenceCardProps {
   evidence: {
@@ -25,7 +26,7 @@ interface EvidenceCardProps {
 
 export function EvidenceCard({ evidence }: EvidenceCardProps) {
   // Format dates
-  const observedDate = new Date(evidence.observedAt).toLocaleDateString(undefined, {
+  const observedDate = new Date(evidence.observedAt).toLocaleDateString(locale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

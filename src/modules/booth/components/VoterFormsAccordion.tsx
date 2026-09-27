@@ -1,6 +1,7 @@
 import React from 'react';
 import { getVoterFormGuides } from '../services/boothService';
 import { FileText, ExternalLink, CheckCircle2, ChevronRight } from 'lucide-react';
+import { pick } from '../../../i18n';
 
 export function VoterFormsAccordion() {
   const guides = getVoterFormGuides();
@@ -34,11 +35,11 @@ export function VoterFormsAccordion() {
                     {g.formType}
                   </span>
                   <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
-                    {g.title}
+                    {pick(g.title, g.titleHi)}
                   </h3>
                 </div>
                 <div style={{ fontSize: '0.82rem', color: 'var(--ink-2)', fontWeight: 600 }}>
-                  {g.purpose}
+                  {pick(g.purpose, g.purposeHi)}
                 </div>
               </div>
 

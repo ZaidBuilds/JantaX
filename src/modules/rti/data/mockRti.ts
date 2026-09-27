@@ -218,7 +218,7 @@ Yours faithfully,
   },
   {
     applicationType: 'First Appeal (Section 19(1))',
-    title: 'First Appeal under Section 19(1) (प्रथम अपील)',
+    title: 'First Appeal under Section 19(1)',
     titleHi: 'धारा 19(1) के तहत प्रथम अपील (सूचना न मिलने या गलत मिलने पर)',
     statutoryTimeline: '30 Days (Maximum 45 days with recorded reasons)',
     feeRule: 'Zero Fee for First Appeal in most Union Ministries.',

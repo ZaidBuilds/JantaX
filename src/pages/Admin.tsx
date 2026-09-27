@@ -3,6 +3,7 @@ import { Lock, RefreshCw, ShieldCheck, Inbox } from 'lucide-react';
 import { apiUrl } from '../core/services/api';
 import { checkCurrentUserPermission } from '../modules/security/services/rbacService';
 import { Badge, EmptyState, PageHeader, useToast } from '../ui';
+import { locale } from '../i18n';
 
 interface QueueItem { id: string; title: string; pincodeCode: string; status: string }
 interface SyncSource { sourceId: string; sourceName: string; status: string; lastSuccessfulSync?: string; stale?: boolean }
@@ -107,7 +108,7 @@ export function AdminPage() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div className="strong truncate">{s.sourceName}</div>
                       <div className="tiny muted">
-                        {s.status} · last success {s.lastSuccessfulSync ? new Date(s.lastSuccessfulSync).toLocaleDateString('en-IN') : 'never'}
+                        {s.status} · last success {s.lastSuccessfulSync ? new Date(s.lastSuccessfulSync).toLocaleDateString(locale()) : 'never'}
                       </div>
                     </div>
                     {s.stale && <Badge tone="warn">Stale</Badge>}

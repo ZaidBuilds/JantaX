@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import { normalizeSchool } from '../../modules/school/normalize';
 import { Breadcrumbs, EmptyState } from '../../ui';
+import { locale } from '../../i18n';
 
 const TAB_MAP: Record<string, string> = {
   overview: 'overview',
@@ -646,7 +647,7 @@ function GroundTruthTab({ school }: { school: SchoolRecord }) {
           {[
             { label: 'Ground Score', value: `${school.groundTruthScore}/100` },
             { label: 'Check-in Count', value: school.totalCheckIns },
-            { label: 'Last Check-in', value: school.lastCheckInDate ? new Date(school.lastCheckInDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '-' },
+            { label: 'Last Check-in', value: school.lastCheckInDate ? new Date(school.lastCheckInDate).toLocaleDateString(locale(), { day: 'numeric', month: 'short' }) : '-' },
             { label: 'Confidence', value: school.confidenceLevel },
           ].map(item => (
             <div key={item.label} style={{ background: 'var(--warn-soft)', borderRadius: 8, padding: '0.6rem 0.75rem' }}>
@@ -689,7 +690,7 @@ function TimelineTab({ school }: { school: SchoolRecord }) {
           <div key={i} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
             <div style={{ width: 8, height: 8, borderRadius: '50%', background: e.type === 'official' ? 'var(--brand)' : 'var(--viz-4)', marginTop: 6, flexShrink: 0 }} />
             <div>
-              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>{new Date(e.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>{new Date(e.date).toLocaleDateString(locale(), { day: 'numeric', month: 'short', year: 'numeric' })}</div>
               <div style={{ fontSize: '0.82rem', fontWeight: 600 }}>{e.event}</div>
             </div>
           </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import { ExternalLink, AlertTriangle, CheckCircle, Clock, Info } from 'lucide-react';
 import { ComparisonData, ComparisonEntity, ComparisonMetric, getEntityTypeLabel } from './types';
 import { SourceBadge } from '../UI/SourceBadge';
+import { locale, pick } from '../../i18n';
 
 interface ComparisonTableProps {
   data: ComparisonData;
@@ -83,13 +84,10 @@ export function ComparisonTable({ data, onEntityClick, showSourceDisclosure = tr
           {rows.map((row, rowIdx) => (
             <tr
               key={row.id}
-              style={{ borderBottom: '1px solid var(--border)', background: rowIdx % 2 === 0 ? 'transparent' : '#fafbfc' }}
+              style={{ borderBottom: '1px solid var(--border)', background: rowIdx % 2 === 0 ? 'transparent' : 'var(--surface-2)' }}
             >
-              <td style={{ padding: '0.85rem 1rem', position: 'sticky', left: 0, background: rowIdx % 2 === 0 ? 'var(--surface)' : '#fafbfc', zIndex: 1 }}>
-                <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>{row.category}</div>
-                {row.categoryHi && (
-                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>{row.categoryHi}</div>
-                )}
+              <td style={{ padding: '0.85rem 1rem', position: 'sticky', left: 0, background: rowIdx % 2 === 0 ? 'var(--surface)' : 'var(--surface-2)', zIndex: 1 }}>
+                <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>{pick(row.category, row.categoryHi)}</div>
               </td>
               {row.metrics.map((metric, colIdx) => (
                 <td
@@ -190,7 +188,7 @@ function formatFreshness(date: Date | string | null | undefined): string {
   if (hours < 24) return `${Math.floor(hours)}h ago`;
   const days = Math.floor(hours / 24);
   if (days < 30) return `${days}d ago`;
-  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  return d.toLocaleDateString(locale(), { day: 'numeric', month: 'short' });
 }
 
 interface SourceDisclosureProps {

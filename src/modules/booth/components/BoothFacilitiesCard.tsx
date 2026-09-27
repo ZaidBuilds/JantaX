@@ -8,12 +8,12 @@ interface Props {
 
 export function BoothFacilitiesCard({ facilities }: Props) {
   const items = [
-    { label: 'Wheelchair Ramp (दिव्यांग रैंप)', available: facilities.wheelchairRamp, icon: Accessibility },
-    { label: 'Drinking Water (पेयजल व्यवस्था)', available: facilities.drinkingWater, icon: Droplets },
-    { label: 'Separate Male/Female Toilets (शौचालय)', available: facilities.separateToilets, icon: Users },
-    { label: 'Ground Floor Access (भूतल कक्ष)', available: facilities.groundFloor, icon: ShieldCheck },
-    { label: 'Braille Signage & EVM Strips (ब्रेल लिपि)', available: facilities.brailleSignage, icon: Eye },
-    { label: 'Shaded Waiting Area (छायादार प्रतीक्षा स्थल)', available: facilities.shadedWaitingArea, icon: Sun },
+    { label: 'Wheelchair Ramp', available: facilities.wheelchairRamp, icon: Accessibility },
+    { label: 'Drinking Water', available: facilities.drinkingWater, icon: Droplets },
+    { label: 'Separate Male/Female Toilets', available: facilities.separateToilets, icon: Users },
+    { label: 'Ground Floor Access', available: facilities.groundFloor, icon: ShieldCheck },
+    { label: 'Braille Signage & EVM Strips', available: facilities.brailleSignage, icon: Eye },
+    { label: 'Shaded Waiting Area', available: facilities.shadedWaitingArea, icon: Sun },
   ];
 
   return (

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { searchProjects } from '../services/projectService';
 import type { NeutralStatus } from '../types/projectInfra';
+import { pick } from '../../../i18n';
 
 export function ProjectsSearchPage() {
   const navigate = useNavigate();
@@ -433,11 +434,8 @@ export function ProjectsSearchPage() {
                             margin: 0
                           }}
                         >
-                          {proj.nameEnglish}
+                          {pick(proj.nameEnglish, proj.nameHindi)}
                         </h3>
-                        <div style={{ fontSize: '0.85rem', color: 'var(--ink-3)', marginTop: '0.15rem' }}>
-                          {proj.nameHindi}
-                        </div>
                       </div>
 
                       <a

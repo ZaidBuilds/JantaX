@@ -5,6 +5,7 @@ import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
 import { getUpdatedGrievances } from '../../../core/utils/autoUpdater';
 import { SourceLine, Stat } from '../../../ui';
 import { SectionTitle, pct } from '../../shared/ModuleKit';
+import { pick } from '../../../i18n';
 
 type Row = {
   id: string;
@@ -83,10 +84,8 @@ export function CpgramsDashboard() {
                   <tr key={r.id}>
                     <td className="num muted">{i + 1}</td>
                     <td>
-                      <div className="strong">{r.name}</div>
-                      <div className="tiny muted">
-                        <span lang="hi">{r.nameHi}</span> · Most complaints: {r.worst}
-                      </div>
+                      <div className="strong">{pick(r.name, r.nameHi)}</div>
+                      <div className="tiny muted">Most complaints: {r.worst}</div>
                     </td>
                     <td className="num" style={{ textAlign: 'right' }}>{r.totalGrievances.toLocaleString('en-IN')}</td>
                     <td className={`num ${resolved < 75 ? 'text-bad' : ''}`} style={{ textAlign: 'right' }}>{resolved}%</td>

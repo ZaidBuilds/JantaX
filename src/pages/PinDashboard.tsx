@@ -16,7 +16,7 @@ import {
   AlertTriangle,
   ChevronRight,
   FileSearch,
- FlaskConical } from 'lucide-react';
+ FlaskConical, Landmark } from 'lucide-react';
 import { api, type ApiRecord, type PincodeInfo } from '../core/services/api';
 import { usePin } from '../core/context/PinContext';
 import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver';
@@ -42,6 +42,7 @@ import {
   useShare,
   useToast,
 } from '../ui';
+import { locale, pick } from '../i18n';
 
 const COUNT_TILES = [
   { key: 'schools', label: 'Government schools', icon: GraduationCap, module: 'school' },
@@ -223,14 +224,14 @@ export function PinDashboard({ choose = false }: { choose?: boolean }) {
                   <div className="card-body stack-sm">
                     <div className="spread" style={{ alignItems: 'flex-start' }}>
                       <div style={{ minWidth: 0 }}>
-                        <h3 className="card-title">{lens.title}</h3>
+                        <h3 className="card-title">{pick(lens.title, lens.titleHi)}</h3>
                         <p className="card-sub">{tidy(lens.noun)}</p>
                       </div>
                       <Badge tone={severityTone(lens.severity)}>{severityLabel(lens.severity)}</Badge>
                     </div>
                     <ClaimReality
-                      claim={<p className="small" style={{ color: 'var(--ink)' }}>{lens.officialClaim}</p>}
-                      reality={<p className="small" style={{ color: 'var(--ink)' }}>{lens.auditReality}</p>}
+                      claim={<p className="small" style={{ color: 'var(--ink)' }}>{pick(lens.officialClaim, lens.officialClaimHi)}</p>}
+                      reality={<p className="small" style={{ color: 'var(--ink)' }}>{pick(lens.auditReality, lens.auditRealityHi)}</p>}
                     />
                   </div>
                   <div className="card-foot">
@@ -313,7 +314,7 @@ export function PinDashboard({ choose = false }: { choose?: boolean }) {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div className="strong clamp-2">{r.title}</div>
                         <div className="tiny muted">
-                          {r.category} · PIN {r.location.pinCode} · {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                          {r.category} · PIN {r.location.pinCode} · {new Date(r.createdAt).toLocaleDateString(locale(), { day: 'numeric', month: 'short' })}
                         </div>
                       </div>
                       <Badge tone={toneForStatus(r.moderationState)} className="hide-mobile">{r.moderationState}</Badge>
@@ -352,6 +353,15 @@ export function PinDashboard({ choose = false }: { choose?: boolean }) {
           )}
 
           <PostOfficesCard pin={pin} />
+
+          <Link to={`/governance?pin=${pin}`} className="card card-pad list-row" style={{ alignItems: 'flex-start', gap: 'var(--s-3)' }}>
+            <Landmark size={20} aria-hidden="true" style={{ color: 'var(--brand-ink)', flexShrink: 0, marginTop: 2 }} />
+            <span style={{ flex: 1 }}>
+              <span className="strong" style={{ display: 'block', color: 'var(--ink)' }}>Who runs this area</span>
+              <span className="small muted">Every level from the Centre to the ward or village, and who to approach for a problem.</span>
+            </span>
+            <ChevronRight size={16} className="muted" aria-hidden="true" />
+          </Link>
 
           <div className="card card-pad">
             <div className="strong" style={{ marginBottom: 'var(--s-3)' }}>Switch area</div>

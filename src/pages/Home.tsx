@@ -21,6 +21,7 @@ import { getBottleneckLensesForPin } from '../core/services/bottleneckService';
 import { getStoredReports } from '../modules/reporting/services/reportingService';
 import { Badge, ClaimReality, ModuleIcon, MODULE_GROUPS, getModule, moduleHref, reportForDisplay, toneForStatus } from '../ui';
 import { AreaScene } from '../ui/AreaScene';
+import { pick } from '../i18n';
 
 const POPULAR = [
   { pin: '110001', city: 'New Delhi' },
@@ -81,12 +82,12 @@ function AreaPreview({ pin }: { pin: string }) {
         {lens && (
           <div className="stack-sm" style={{ marginTop: 'var(--s-4)' }}>
             <div className="spread">
-              <span className="small strong">{lens.title}</span>
+              <span className="small strong">{pick(lens.title, lens.titleHi)}</span>
               <Badge tone={lens.severity === 'CRITICAL' ? 'bad' : 'warn'}>{lens.severity === 'CRITICAL' ? 'Needs attention' : 'Watch'}</Badge>
             </div>
             <ClaimReality
-              claim={<p className="tiny" style={{ color: 'var(--ink)' }}>{lens.officialClaim}</p>}
-              reality={<p className="tiny" style={{ color: 'var(--ink)' }}>{lens.auditReality}</p>}
+              claim={<p className="tiny" style={{ color: 'var(--ink)' }}>{pick(lens.officialClaim, lens.officialClaimHi)}</p>}
+              reality={<p className="tiny" style={{ color: 'var(--ink)' }}>{pick(lens.auditReality, lens.auditRealityHi)}</p>}
             />
           </div>
         )}

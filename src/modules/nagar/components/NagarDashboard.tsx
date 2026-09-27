@@ -25,10 +25,10 @@ export function NagarDashboard() {
       openDrainage: 'Severe water logging reported in commercial markets',
       waterSupplyHours: '1.5 Hours daily (SLA Claim: 6 Hours)',
       complianceChecklist: [
-        { item: 'Trade License / व्यापार लाइसेंस (नगर निगम)', status: 'Required' },
-        { item: 'FSSAI Food License / खाद्य सुरक्षा प्रमाण पत्र', status: 'Required for eateries' },
-        { item: 'Shops & Establishment Registration / गुमास्ता लाइसेंस', status: 'Required for all shops' },
-        { item: 'Fire NOC / अग्निशमन अनापत्ति प्रमाण पत्र', status: 'Required for commercial > 50 sq.m' },
+        { item: 'Trade licence (municipal corporation)', status: 'Required' },
+        { item: 'FSSAI Food License', status: 'Required for eateries' },
+        { item: 'Shops & Establishment Registration', status: 'Required for all shops' },
+        { item: 'Fire NOC', status: 'Required for commercial > 50 sq.m' },
       ]
     };
   }, [currentPin]);
@@ -52,9 +52,9 @@ export function NagarDashboard() {
   return (
     <div className="module-dashboard">
       <div className="glass-card dash-header-card" style={{ borderLeftColor: 'var(--viz-4)' }}>
-        <h2>नगर स्कोरबोर्ड (City Municipal Scorecard & Compliance)</h2>
+        <h2>City services scorecard</h2>
         <p>
-          नगरपालिका द्वारा घोषित स्वच्छता और जलापूर्ति के वादे बनाम ज़मीनी वार्ड स्तर की हकीकत और व्यापारिक अनुपालन नियम (Compliance Checklist)।
+          What the municipal body promised on sanitation and water supply, set against what wards report, plus the licences a small business needs.
         </p>
       </div>
 
@@ -67,10 +67,10 @@ export function NagarDashboard() {
             maxLength={6}
             value={pinInput}
             onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ''))}
-            placeholder="पिन कोड दर्ज करें..."
+            placeholder="Enter a PIN code"
           />
           <button onClick={() => { setCurrentPin(pinInput); setSearchParams({ pin: pinInput }); }} className="dash-search-btn">
-            खोजें
+            Search
           </button>
         </div>
         {loc.isValid && (
@@ -87,13 +87,13 @@ export function NagarDashboard() {
           <h3 style={{ fontSize: '1.05rem', marginBottom: '1rem', color: 'var(--viz-4)' }}>Ward Service Scorecard</h3>
           <div style={{ display: 'grid', gap: '0.75rem', fontSize: '0.85rem' }}>
             <div className="stat-box">
-              <strong>कचरा संग्रहण (Garbage):</strong> {municipalScore.garbageScore}
+              <strong>Garbage:</strong> {municipalScore.garbageScore}
             </div>
             <div className="stat-box">
-              <strong>पानी की आपूर्ति (Water):</strong> {municipalScore.waterSupplyHours}
+              <strong>Water:</strong> {municipalScore.waterSupplyHours}
             </div>
             <div style={{ padding: '0.5rem 0.75rem', background: 'var(--status-critical-bg)', borderRadius: '6px', borderLeft: '3px solid var(--status-critical)' }}>
-              <strong>जल निकासी (Drains):</strong> {municipalScore.openDrainage}
+              <strong>Drains:</strong> {municipalScore.openDrainage}
             </div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
@@ -105,7 +105,7 @@ export function NagarDashboard() {
 
         {/* Small business compliance */}
         <div className="glass-card" style={{ padding: '1.25rem' }}>
-          <h3 style={{ fontSize: '1.05rem', marginBottom: '1rem', color: 'var(--status-completed)' }}>MSME Compliance Maze (व्यापारिक अनुपालन)</h3>
+          <h3 style={{ fontSize: '1.05rem', marginBottom: '1rem', color: 'var(--status-completed)' }}>MSME Compliance Maze</h3>
           <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.8rem' }}>
             {municipalScore.complianceChecklist.map((c, idx) => (
               <div key={idx} className="stat-box" style={{ display: 'flex', justifyContent: 'space-between' }}>

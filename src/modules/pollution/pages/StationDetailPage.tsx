@@ -6,6 +6,7 @@ import { GrapStatusCard } from '../components/GrapStatusCard';
 import { PollutionReportGenerator } from '../components/PollutionReportGenerator';
 import { TransparencyDisclaimer } from '../../transparency/components/TransparencyDisclaimer';
 import { ArrowLeft, MapPin, Activity, ShieldAlert, Flame, ExternalLink, AlertTriangle } from 'lucide-react';
+import { pick } from '../../../i18n';
 
 export function StationDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -54,11 +55,8 @@ export function StationDetailPage() {
             </div>
 
             <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--ink)', fontFamily: 'var(--font-heading)', margin: '0 0 0.3rem', lineHeight: 1.3 }}>
-              {station.stationName}
+              {pick(station.stationName, station.stationNameHi)}
             </h1>
-            <div style={{ fontSize: '0.95rem', color: 'var(--ink-3)', marginBottom: '0.4rem' }}>
-              {station.stationNameHi}
-            </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', color: 'var(--ink-2)' }}>
               <MapPin size={15} style={{ color: 'var(--accent-ink)' }} />

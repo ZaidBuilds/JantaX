@@ -1,6 +1,7 @@
 import React from 'react';
 import { Shield, Users, BarChart3, CheckCircle2, AlertTriangle, Info } from 'lucide-react';
 import { SourceBadge } from '../UI/SourceBadge';
+import { locale, pick } from '../../i18n';
 
 export type DataSourceType = 'official' | 'community' | 'independent' | 'verified';
 
@@ -113,8 +114,7 @@ export function DataSourceSection({
       </div>
       <div style={{ padding: '1rem' }}>
         <div style={{ marginBottom: '0.5rem' }}>
-          <span style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{title}</span>
-          {titleHi && <span style={{ fontSize: '0.82rem', marginLeft: '0.4rem', color: 'var(--ink-3)' }}>{titleHi}</span>}
+          <span style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{pick(title, titleHi)}</span>
         </div>
         {methodologyNote && (
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.35rem', marginTop: '0.5rem', fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
@@ -161,7 +161,7 @@ export function ConfidenceBadge({ confidence, showLabel = true }: ConfidenceBadg
 function formatDate(dateStr: string): string {
   try {
     const d = new Date(dateStr);
-    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    return d.toLocaleDateString(locale(), { day: 'numeric', month: 'short', year: 'numeric' });
   } catch {
     return dateStr;
   }
@@ -195,8 +195,7 @@ export function DataComparisonRow({
   return (
     <tr style={{ borderBottom: '1px solid var(--border)' }}>
       <td style={{ padding: '0.75rem 0.5rem', fontWeight: 600, fontSize: '0.82rem' }}>
-        <div>{label}</div>
-        {labelHi && <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>{labelHi}</div>}
+        <div>{pick(label, labelHi)}</div>
       </td>
       {[
         { val: officialValue, type: 'official' as DataSourceType },

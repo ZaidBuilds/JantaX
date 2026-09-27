@@ -6,6 +6,7 @@ import { SpineDashboard } from './components/SpineDashboard';
 import { useSearchParams } from 'react-router-dom';
 import { SourceBadge } from '../../components/UI/SourceBadge';
 import { resolvePincode } from '../../core/utils/pinResolver';
+import { locale } from '../../i18n';
 
 export function InfraApp() {
   const { projects, addCitizenReport, upvoteReport, resetDB, importProjects } = useLocalDB();
@@ -44,7 +45,7 @@ export function InfraApp() {
 
     setTimeout(() => {
       resetDB();
-      setSyncTime(new Date().toLocaleTimeString() + " (Live Sync)");
+      setSyncTime(new Date().toLocaleTimeString(locale()) + " (Live Sync)");
       setSyncMessage("Done! Synced 15 active projects. Dashboard updated.");
       setIsSyncing(false);
     }, 1500);
@@ -136,7 +137,7 @@ export function InfraApp() {
           Projects and progress
         </button>
         <button type="button" role="tab" aria-selected={activeSpineView === 'spine'} onClick={() => setActiveSpineView('spine')}>
-          Who is accountable, MP to gram panchayat
+          Money trail, MP to gram panchayat
         </button>
       </div>
 

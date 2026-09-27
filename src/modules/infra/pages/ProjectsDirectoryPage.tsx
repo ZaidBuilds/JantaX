@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { getStoredProjects } from '../services/projectService';
 import type { InfraProject, NeutralStatus } from '../types/projectInfra';
+import { pick } from '../../../i18n';
 
 export function ProjectsDirectoryPage() {
   const navigate = useNavigate();
@@ -361,11 +362,8 @@ export function ProjectsDirectoryPage() {
                         margin: 0
                       }}
                     >
-                      {proj.nameEnglish}
+                      {pick(proj.nameEnglish, proj.nameHindi)}
                     </h2>
-                    <div style={{ fontSize: '0.9rem', color: 'var(--ink-3)', marginTop: '0.2rem', fontWeight: 500 }}>
-                      {proj.nameHindi}
-                    </div>
                   </div>
 
                   {/* Original Source Link */}

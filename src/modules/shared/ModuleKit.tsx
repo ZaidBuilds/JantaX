@@ -4,6 +4,7 @@ import { MapPin, Share2, Flag, User } from 'lucide-react';
 import { usePin } from '../../core/context/PinContext';
 import { isValidIndianPincode, resolvePincode, type ResolvedLocation } from '../../core/utils/pinResolver';
 import { Badge, ClaimReality, SourceLine, type Tone } from '../../ui';
+import { getLang } from '../../i18n';
 
 /**
  * Shared building blocks for module dashboards so every module reads the same:
@@ -111,8 +112,7 @@ export function EvidenceCard(p: EvidenceCardProps) {
       <div className="card-body stack">
         <header className="spread" style={{ alignItems: 'flex-start' }}>
           <div style={{ minWidth: 0 }}>
-            <h3 className="card-title">{p.title}</h3>
-            {p.hindi && <p className="small muted" lang="hi">{p.hindi}</p>}
+            <h3 className="card-title">{getLang() === 'hi' && p.hindi ? p.hindi : p.title}</h3>
             {p.meta && <p className="tiny muted" style={{ marginTop: 4 }}>{p.meta}</p>}
           </div>
           {p.status && <Badge tone={p.status.tone}>{p.status.label}</Badge>}

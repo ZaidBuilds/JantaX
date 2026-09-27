@@ -6,6 +6,7 @@ import { WardOfficerCard } from '../components/WardOfficerCard';
 import { CivicComplaintGenerator } from '../components/CivicComplaintGenerator';
 import { TransparencyDisclaimer } from '../../transparency/components/TransparencyDisclaimer';
 import { ArrowLeft, MapPin, Building2, Phone, ExternalLink, ShieldCheck, Trash2, CheckCircle2, Clock } from 'lucide-react';
+import { pick } from '../../../i18n';
 
 export function WardDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -52,11 +53,8 @@ export function WardDetailPage() {
             </div>
 
             <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--ink)', fontFamily: 'var(--font-heading)', margin: '0 0 0.3rem', lineHeight: 1.3 }}>
-              {ward.wardName}
+              {pick(ward.wardName, ward.wardNameHi)}
             </h1>
-            <div style={{ fontSize: '0.95rem', color: 'var(--ink-3)', marginBottom: '0.4rem' }}>
-              {ward.wardNameHi}
-            </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', color: 'var(--ink-2)' }}>
               <MapPin size={15} style={{ color: 'var(--accent-ink)' }} />

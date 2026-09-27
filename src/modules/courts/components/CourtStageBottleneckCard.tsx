@@ -1,6 +1,7 @@
 import React from 'react';
 import type { StageBottleneck } from '../types/courts';
 import { Clock, AlertCircle } from 'lucide-react';
+import { pick } from '../../../i18n';
 
 interface Props {
   stages: StageBottleneck[];
@@ -36,10 +37,7 @@ export function CourtStageBottleneckCard({ stages }: Props) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <div>
                   <div style={{ fontWeight: 700, color: 'var(--ink)', fontSize: '0.88rem' }}>
-                    {stage.stage}
-                  </div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--ink-3)' }}>
-                    {stage.stageHi}
+                    {pick(stage.stage, stage.stageHi)}
                   </div>
                 </div>
 

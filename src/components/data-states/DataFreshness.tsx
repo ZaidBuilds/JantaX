@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle, Clock, Database, WifiOff, Info } from 'lucide-react';
+import { locale } from '../../i18n';
 
 interface DataFreshnessBadgeProps {
   lastUpdated: string | Date;
@@ -179,7 +180,7 @@ export function SourceUnavailable({
         </p>
         {failedAtDate && (
           <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
-            Failed at {failedAtDate.toLocaleTimeString()}
+            Failed at {failedAtDate.toLocaleTimeString(locale())}
           </p>
         )}
       </div>
@@ -291,7 +292,7 @@ export function VerificationPending({
       </p>
       {submittedAt && (
         <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
-          · Submitted {typeof submittedAt === 'string' ? submittedAt : submittedAt.toLocaleDateString()}
+          · Submitted {typeof submittedAt === 'string' ? submittedAt : submittedAt.toLocaleDateString(locale())}
         </span>
       )}
     </div>

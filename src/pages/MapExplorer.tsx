@@ -12,6 +12,7 @@ import { getAllBooths } from '../modules/booth/services/boothService';
 import { getAllCourts } from '../modules/courts/services/courtsService';
 import { MOCK_CITIZEN_REPORTS } from '../modules/reporting/data/mockReports';
 import { Badge, EmptyState, toneForStatus, decodeEntities } from '../ui';
+import { pick } from '../i18n';
 
 type Layer = 'school' | 'infra' | 'mplads' | 'booth' | 'court' | 'issue';
 
@@ -314,8 +315,7 @@ export function MapExplorer() {
                   <X size={15} aria-hidden="true" />
                 </button>
               </div>
-              <div className="card-title" style={{ fontSize: 'var(--text-md)' }}>{selected.title}</div>
-              {selected.titleHi && <div className="tiny muted" lang="hi">{selected.titleHi}</div>}
+              <div className="card-title" style={{ fontSize: 'var(--text-md)' }}>{pick(selected.title, selected.titleHi)}</div>
               <div className="small muted">{selected.subtitle}</div>
               <div className="spread">
                 <Badge tone={toneForStatus(selected.status)}>{selected.status}</Badge>

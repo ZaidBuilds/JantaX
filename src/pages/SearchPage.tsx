@@ -117,7 +117,6 @@ function ResultRow({ r }: { r: SearchResult }) {
       <TypeIcon type={r.type} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div className="search-result-title">{r.title}</div>
-        {meta?.hindi && <div className="tiny muted truncate" lang="hi">{meta.hindi}</div>}
         <div className="small" style={{ color: 'var(--ink-2)', marginTop: 2 }}>{r.description}</div>
         <div className="source-row" style={{ marginTop: 6 }}>
           <span>{t.label}</span>

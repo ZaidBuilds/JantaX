@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ExternalLink, ChevronDown, ChevronUp, AlertTriangle, Info, CheckCircle2 } from 'lucide-react';
 import { TierBadge } from '../../components/UI/SourceBadge';
+import { pick } from '../../i18n';
 
 const SCORING_VERSION = 'v2.0-2026-08';
 
@@ -113,8 +114,7 @@ export function SchoolMethodologyPage() {
               style={{ width: '100%', padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left' }}
             >
               <div>
-                <span style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{dim.label}</span>
-                {dim.labelHi && <span style={{ fontSize: '0.82rem', color: 'var(--ink-3)', marginLeft: '0.5rem' }}>{dim.labelHi}</span>}
+                <span style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{pick(dim.label, dim.labelHi)}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Confidence: {dim.confidence}</span>

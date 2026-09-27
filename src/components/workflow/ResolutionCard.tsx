@@ -1,4 +1,5 @@
 import React from 'react';
+import { locale } from '../../i18n';
 
 interface ResolutionCardProps {
   resolution: {
@@ -49,7 +50,7 @@ export function ResolutionCard({ resolution }: ResolutionCardProps) {
           </div>
         </div>
         <div className="mt-2 text-xs text-gray-500">
-          Created: {new Date(resolution.createdAt).toLocaleDateString()}
+          Created: {new Date(resolution.createdAt).toLocaleDateString(locale())}
         </div>
       </div>
       <div className="px-4 py-3 border-t border-gray-200 flex justify-end space-x-2">

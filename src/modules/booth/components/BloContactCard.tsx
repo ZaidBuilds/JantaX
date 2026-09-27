@@ -1,6 +1,7 @@
 import React from 'react';
 import type { BoothLevelOfficer } from '../types/booth';
 import { UserCheck, Phone, Building2, ShieldCheck, Calendar, MapPin } from 'lucide-react';
+import { pick } from '../../../i18n';
 
 interface Props {
   blo: BoothLevelOfficer;
@@ -32,7 +33,7 @@ export function BloContactCard({ blo, stationNumber, buildingName }: Props) {
           </div>
 
           <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--ink)', margin: '0 0 0.2rem' }}>
-            {blo.name} <span style={{ fontSize: '0.95rem', color: 'var(--ink-3)', fontWeight: 600 }}>({blo.nameHi})</span>
+            {pick(blo.name, blo.nameHi)}
           </h3>
 
           <div style={{ fontSize: '0.82rem', color: 'var(--ink-2)', fontWeight: 600 }}>

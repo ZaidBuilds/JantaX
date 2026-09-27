@@ -4,10 +4,10 @@ import { deriveLifecycle, STAGE_ORDER, type ReportItem, type GovtStage } from '.
 
 function stageLabel(s: GovtStage): string {
   switch (s) {
-    case 'SUBMITTED': return 'दर्ज (Submitted)';
-    case 'ACKNOWLEDGED': return 'स्वीकृत (Acknowledged)';
-    case 'ACTION': return 'कार्रवाई (Action Taken)';
-    case 'VERIFIED': return 'सत्यापित (Verified)';
+    case 'SUBMITTED': return 'Submitted';
+    case 'ACKNOWLEDGED': return 'Acknowledged';
+    case 'ACTION': return 'Action Taken';
+    case 'VERIFIED': return 'Verified';
   }
 }
 

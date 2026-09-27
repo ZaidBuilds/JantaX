@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { getRtiTemplates } from '../services/rtiService';
 import { FileText, Copy, Check, ExternalLink, ShieldCheck, Clock, AlertCircle } from 'lucide-react';
+import { pick } from '../../../i18n';
 
 export function RtiDraftGenerator() {
   const templates = getRtiTemplates();
@@ -67,7 +68,7 @@ export function RtiDraftGenerator() {
               cursor: 'pointer',
             }}
           >
-            {tpl.title}
+            {pick(tpl.title, tpl.titleHi)}
           </button>
         ))}
       </div>

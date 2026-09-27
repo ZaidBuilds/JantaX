@@ -23,6 +23,7 @@ import {
   Building2,
   Share2
 } from 'lucide-react';
+import { pick } from '../../../i18n';
 
 interface ProjectDetailPageProps {
   initialTab?: 'overview' | 'timeline' | 'financials' | 'evidence' | 'ground-truth';
@@ -240,13 +241,10 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
           color: 'var(--ink)',
           fontFamily: 'var(--font-heading)',
           lineHeight: 1.3,
-          margin: '0.3rem 0 0.2rem'
+          margin: '0.3rem 0 1.25rem'
         }}>
-          {project.nameEnglish}
+          {pick(project.nameEnglish, project.nameHindi)}
         </h1>
-        <div style={{ fontSize: '1rem', color: 'var(--ink-3)', fontWeight: 500, marginBottom: '1.25rem' }}>
-          {project.nameHindi}
-        </div>
 
         {/* Quick Highlights Strip */}
         <div style={{

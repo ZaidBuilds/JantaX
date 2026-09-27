@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { getWorkById } from '../services/mpladsService';
 import { TransparencyDisclaimer } from '../../transparency/components/TransparencyDisclaimer';
 import { ArrowLeft, MapPin, CheckCircle2, Clock, ShieldCheck, FileText, AlertTriangle, ExternalLink, Share2, Send } from 'lucide-react';
+import { pick } from '../../../i18n';
 
 export function MpladsProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -50,11 +51,8 @@ export function MpladsProjectDetailPage() {
               </span>
             </div>
             <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--ink)', fontFamily: 'var(--font-heading)', margin: '0 0 0.4rem', lineHeight: 1.35 }}>
-              {work.workTitle}
+              {pick(work.workTitle, work.workTitleHi)}
             </h1>
-            <div style={{ fontSize: '0.92rem', color: 'var(--ink-3)', marginBottom: '0.5rem' }}>
-              {work.workTitleHi}
-            </div>
           </div>
 
           <div style={{ textAlign: 'right', minWidth: 140 }}>

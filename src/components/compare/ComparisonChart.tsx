@@ -1,5 +1,6 @@
 import React from 'react';
 import { ComparisonRow, ComparisonMetric } from './types';
+import { pick } from '../../i18n';
 
 interface ComparisonChartProps {
   rows: ComparisonRow[];
@@ -27,8 +28,7 @@ export function ComparisonChart({ rows, entityNames, metricId }: ComparisonChart
         return (
           <div key={row.id} className="glass-card" style={{ padding: '1.25rem' }}>
             <h4 style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--brand-ink)', marginBottom: '1rem' }}>
-              {row.category}
-              {row.categoryHi && <span style={{ color: 'var(--ink-3)', fontWeight: 400, marginLeft: '0.4rem' }}>{row.categoryHi}</span>}
+              {pick(row.category, row.categoryHi)}
             </h4>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>

@@ -12,6 +12,7 @@ import {
   User
 } from 'lucide-react';
 import { addCitizenReportToProject, upvoteCitizenReport } from '../services/projectService';
+import { locale } from '../../../i18n';
 
 interface ProjectGroundTruthTabProps {
   project: InfraProject;
@@ -208,7 +209,7 @@ export const ProjectGroundTruthTab: React.FC<ProjectGroundTruthTabProps> = ({
                     <div>
                       <span style={{ fontSize: '0.86rem', fontWeight: 700, color: 'var(--ink)' }}>{report.userName}</span>
                       <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', marginLeft: '0.5rem' }}>
-                        {new Date(report.timestamp).toLocaleDateString()}
+                        {new Date(report.timestamp).toLocaleDateString(locale())}
                       </span>
                     </div>
                   </div>
