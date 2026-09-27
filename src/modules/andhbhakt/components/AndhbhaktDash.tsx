@@ -7,6 +7,7 @@ import { resolvePincode, isValidIndianPincode } from '../../../core/utils/pinRes
 import { api } from '../../../core/services/api';
 import { Badge, EmptyState, Stat, useToast } from '../../../ui';
 import { EvidenceCard, SectionTitle } from '../../shared/ModuleKit';
+import { formatDate, pick } from '../../../i18n';
 
 const CATEGORIES = [
   { key: 'school', label: 'Schools', hi: 'स्कूल', icon: Building2 },
@@ -169,13 +170,13 @@ export function AndhbhaktDash() {
               key={`${c.stateCode}-${c.pincode}-${i}`}
               title={c.claimTextEn}
               hindi={c.claimTextHi}
-              meta={`${c.claimedBy}, ${c.claimedByDesignation} · ${c.claimOccasion} · ${c.claimDate} · ${c.district}`}
+              meta={`${pick(c.claimedByDesignation, c.claimedByDesignationHi)} · ${pick(c.claimOccasion, c.claimOccasionHi)} · ${formatDate(c.claimDate)} · ${pick(c.district, c.districtHi)}`}
               status={c.verified ? { label: 'Marked verified', tone: 'good' } : { label: 'Unverified', tone: 'warn' }}
               claimLabel="Public statement"
               realityLabel="Audit or field finding"
               claim={
                 <div className="stack-sm">
-                  <span className="stat-value" style={{ fontSize: 'var(--text-lg)' }}>{c.claimNumber}</span>
+                  <span className="stat-value" style={{ fontSize: 'var(--text-lg)' }}>{pick(c.claimNumber, c.claimNumberHi)}</span>
                   {c.sourceUrl && (
                     <a href={c.sourceUrl} target="_blank" rel="noreferrer" className="small">
                       Statement ({c.sourceType}) <ExternalLink size={11} style={{ display: 'inline' }} aria-hidden="true" />
@@ -185,11 +186,11 @@ export function AndhbhaktDash() {
               }
               reality={
                 <div className="stack-sm">
-                  <span className="stat-value" style={{ fontSize: 'var(--text-lg)' }}>{c.realityNumber}</span>
-                  <p className="small" style={{ color: 'var(--ink)' }}>{c.realityTextEn}</p>
+                  <span className="stat-value" style={{ fontSize: 'var(--text-lg)' }}>{pick(c.realityNumber, c.realityNumberHi)}</span>
+                  <p className="small" style={{ color: 'var(--ink)' }}>{pick(c.realityTextEn, c.realityTextHi)}</p>
                 </div>
               }
-              responsible={c.officerName ? `${c.officerName}, ${c.officerDesignation} (${c.officerDept})` : undefined}
+              responsible={c.officerName ? `${pick(c.officerName, c.officerNameHi)}, ${pick(c.officerDesignation, c.officerDesignationHi)} (${pick(c.officerDept, c.officerDeptHi)})` : undefined}
               source={{ name: c.verificationSource || 'Pending verification', updated: c.realityDate }}
               recordRef={`cm-claim-${c.stateCode}-${c.pincode}-${i}`}
               onShare={() =>
@@ -198,9 +199,9 @@ export function AndhbhaktDash() {
                   titleHindi: c.claimTextHi,
                   titleEnglish: c.claimTextEn,
                   claimLabel: c.claimNumber,
-                  claimLabelHindi: c.claimNumber,
+                  claimLabelHindi: c.claimNumberHi,
                   realityLabel: c.realityNumber,
-                  realityLabelHindi: c.realityNumber,
+                  realityLabelHindi: c.realityNumberHi,
                   responsiblePerson: c.officerName || c.contractorName || 'Not recorded',
                   responsibleOrg: c.officerDept || c.contractorFirm || 'Not recorded',
                   sourceUrl: c.sourceUrl,

@@ -61,7 +61,7 @@ export function SpineDashboard() {
     const matchingContractors = contractors.filter(c => c.name === contractorName && c.projectId !== currentProjectId);
     return matchingContractors.map(c => {
       const proj = projects.find(p => p.id === c.projectId);
-      return proj ? { projId: proj.id, name: proj.workName } : null;
+      return proj ? { projId: proj.id, name: proj.workName, nameHi: proj.workNameHi } : null;
     }).filter(Boolean);
   };
 
@@ -370,7 +370,7 @@ export function SpineDashboard() {
                                     This contractor is also awarded projects elsewhere:
                                     <ul style={{ paddingLeft: '1rem', marginTop: '0.1rem' }}>
                                       {crossRefs.map((ref: any, idx: number) => (
-                                        <li key={idx}>{ref.name}</li>
+                                        <li key={idx}>{pick(ref.name, ref.nameHi)}</li>
                                       ))}
                                     </ul>
                                   </div>

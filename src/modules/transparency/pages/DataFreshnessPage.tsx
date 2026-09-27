@@ -43,7 +43,7 @@ export function DataFreshnessPage() {
                 <tr key={r.id}>
                   <td>
                     <div className="strong">{r.title}</div>
-                    <div className="tiny muted">{r.publisher}{r.module ? ` · ${moduleLabel(r.module)}` : ''}</div>
+                    <div className="tiny muted">{r.publisher}{r.module && <>{' · '}{moduleLabel(r.module)}</>}</div>
                     {r.lastError && <div className="tiny text-warn" style={{ marginTop: 2 }}>Last attempt failed: {r.lastError.slice(0, 160)}</div>}
                   </td>
                   <td className="small" style={{ color: 'var(--ink-2)' }}>

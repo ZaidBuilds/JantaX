@@ -39,7 +39,8 @@ const PROJECT_TEMPLATES = [
   { en: 'Retrofitting of Toilets in Local Government Primary School', hi: 'स्थानीय सरकारी प्राथमिक विद्यालय में शौचालयों का नवीनीकरण', cost: 6 },
 ];
 
-const CONTRACTORS_POOL = ['शर्मा कंस्ट्रक्शंस', 'रॉयल बिल्डर्स', 'बालाजी इंफ्रास्ट्रक्चर', 'तोमर एंटरप्राइजेज', 'यूनिक बिल्डकॉन', 'चौधरी ब्रदर्स', 'पटेल रोडवर्कर्स'];
+// Placeholder labels, not firm names: real firms are only shown from sourced tender records.
+const CONTRACTORS_POOL: [string, string][] = ['A', 'B', 'C', 'D', 'E', 'F', 'G'].map((k) => [`Contractor (sample ${k})`, `ठेकेदार (नमूना ${k})`]);
 
 export interface SpineData {
   representatives: Representative[];
@@ -183,7 +184,7 @@ export function getSpineDataForPincode(pinCode: string): SpineData {
 
     // Deterministic contractor assignment (to create cross-referencing alerts!)
     const contIdx = getDeterministicIndex(pSeed + 'contractor', CONTRACTORS_POOL.length);
-    const contName = CONTRACTORS_POOL[contIdx];
+    const [contName, contNameHi] = CONTRACTORS_POOL[contIdx];
     const contId = `cont-${fund.id}`;
 
     projectsList.push({
@@ -202,7 +203,7 @@ export function getSpineDataForPincode(pinCode: string): SpineData {
       id: contId,
       projectId: projId,
       name: contName,
-      nameHi: contName,
+      nameHi: contNameHi,
       registrationNumber: `GSTIN: 09${pinCode}A1Z${fIdx}`,
       paymentStatus: getDeterministicIndex(pSeed + 'pay', 2) === 0 ? 'paid' : 'pending',
       pastProjectsCount: getDeterministicIndex(pSeed + 'past', 20) + 2,

@@ -64,6 +64,13 @@ function translateSentence(parent: Element): boolean {
   if (!LATIN.test(joined)) return true;
   const hindi = lookupHindi(joined);
   if (hindi === null) {
+    // A line put together from whole strings ("{publisher} · {coverage}") translates part by part,
+    // but only when every part has Hindi; otherwise the sentence is reported as missing.
+    const parts = originals.map((o) => (LATIN.test(o) ? lookupHindi(o) : o));
+    if (parts.every((p) => p !== null)) {
+      texts.forEach((n, i) => write(n, originals[i], parts[i] === originals[i] ? originals[i] : wrap(originals[i], parts[i]!)));
+      return true;
+    }
     note(joined);
     // Keep the English React wrote, in case an earlier render had been translated.
     texts.forEach((n, i) => write(n, originals[i], originals[i]));
