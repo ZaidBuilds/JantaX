@@ -82,6 +82,7 @@ export function Header() {
         { name: tr('Healthcare & Hospitals', 'अस्पताल व स्वास्थ्य केंद्र'), path: `/hospitals?pin=${selectedPin}`, icon: Hospital },
         { name: tr('Ration Shops (PDS)', 'राशन दुकानें'), path: `/ration?pin=${selectedPin}`, icon: Wheat },
         { name: tr('Air Quality (AQI)', 'वायु गुणवत्ता'), path: '/pollution', icon: Wind },
+        { name: tr('Food Safety & Hygiene (FSSAI)', 'खाद्य सुरक्षा एवं स्वच्छता'), path: `/fssai?pin=${selectedPin}`, icon: ShieldCheck },
       ],
     },
     {
@@ -98,6 +99,8 @@ export function Header() {
       title: tr('Rights & institutions', 'अधिकार एवं संस्थाएं'),
       items: [
         { name: tr('Representatives', 'जनप्रतिनिधि'), path: `/pin/${selectedPin}/people`, icon: Users },
+        { name: tr('Police & Zero-FIR', 'पुलिस थाना व जीरो एफआईआर'), path: `/police?pin=${selectedPin}`, icon: ShieldCheck },
+        { name: tr('PF & Pension (EPFO)', 'पीएफ व पेंशन निस्तारण'), path: `/epfo?pin=${selectedPin}`, icon: Landmark },
         { name: tr('Land Records (Bhulekh)', 'भूलेख व ज़मीन रजिस्ट्री'), path: `/land?pin=${selectedPin}`, icon: Landmark },
         { name: tr('Courts & Case Pendency', 'न्यायालय एवं केस स्टेटस'), path: `/courts`, icon: Scale },
         { name: tr('RTI Applications', 'सूचना का अधिकार (RTI)'), path: '/rti', icon: FileText },

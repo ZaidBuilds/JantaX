@@ -115,6 +115,11 @@ const UtilityDashboard = lazy(() => import('./modules/utility/components/Utility
 const ElectionDashboard = lazy(() => import('./modules/election/components/ElectionDashboard').then((m) => ({ default: m.ElectionDashboard })));
 const MonitoringDashboardPage = lazy(() => import('./modules/monitoring/pages/MonitoringDashboardPage').then((m) => ({ default: m.MonitoringDashboardPage })));
 
+// Police, EPFO & FSSAI (Modules 16, 18, 19)
+const PoliceDirectoryPage = lazy(() => import('./modules/police/pages/PoliceDirectoryPage').then((m) => ({ default: m.PoliceDirectoryPage })));
+const EpfoDirectoryPage = lazy(() => import('./modules/epfo/pages/EpfoDirectoryPage').then((m) => ({ default: m.EpfoDirectoryPage })));
+const FssaiDirectoryPage = lazy(() => import('./modules/fssai/pages/FssaiDirectoryPage').then((m) => ({ default: m.FssaiDirectoryPage })));
+
 function LoadingFallback() {
   return (
     <div
@@ -184,6 +189,9 @@ function AppContent() {
               <Route path="/pin/:pinCode/ration" element={<RationDirectoryPage />} />
               <Route path="/pin/:pinCode/pds" element={<RationDirectoryPage />} />
               <Route path="/pin/:pinCode/land" element={<LandDirectoryPage />} />
+              <Route path="/pin/:pinCode/police" element={<PoliceDirectoryPage />} />
+              <Route path="/pin/:pinCode/epfo" element={<EpfoDirectoryPage />} />
+              <Route path="/pin/:pinCode/fssai" element={<FssaiDirectoryPage />} />
               <Route path="/pin/:pinCode/works" element={<ProjectsDirectoryPage />} />
               <Route path="/pin/:pinCode/schemes" element={<SchemesPage />} />
               <Route path="/pin/:pinCode/budget" element={<BudgetLedgerPage />} />
@@ -214,6 +222,17 @@ function AppContent() {
               <Route path="/election" element={<ElectionDashboard />} />
               <Route path="/exam" element={<ElectionDashboard />} />
               <Route path="/exams" element={<ElectionDashboard />} />
+
+              {/* Police & Zero-FIR Guidance */}
+              <Route path="/police" element={<PoliceDirectoryPage />} />
+
+              {/* EPFO & Pension Settlement */}
+              <Route path="/epfo" element={<EpfoDirectoryPage />} />
+              <Route path="/pension" element={<EpfoDirectoryPage />} />
+
+              {/* FSSAI Food Hygiene & Inspections */}
+              <Route path="/fssai" element={<FssaiDirectoryPage />} />
+              <Route path="/food" element={<FssaiDirectoryPage />} />
 
               {/* Grievance & CPGRAMS */}
               <Route path="/grievance" element={<GrievanceObservatoryPage />} />

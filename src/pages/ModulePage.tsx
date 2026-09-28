@@ -18,6 +18,9 @@ import { LandDashboard } from '../modules/land/components/LandDashboard';
 import { ElectionDashboard } from '../modules/election/components/ElectionDashboard';
 import { BudgetDashboard } from '../modules/budget/components/BudgetDashboard';
 import { BoothDirectoryPage } from '../modules/booth/pages/BoothDirectoryPage';
+import { PoliceDirectoryPage } from '../modules/police/pages/PoliceDirectoryPage';
+import { EpfoDirectoryPage } from '../modules/epfo/pages/EpfoDirectoryPage';
+import { FssaiDirectoryPage } from '../modules/fssai/pages/FssaiDirectoryPage';
 import { ArrowLeft } from 'lucide-react';
 import { DataStatusBanner } from '../components/data/DataStatusBanner';
 
@@ -44,6 +47,9 @@ const CANONICAL_MODULE_ID: Record<string, string> = {
   election: 'election', exam: 'election', exams: 'election', candidate: 'election',
   budget: 'budget', finance: 'budget',
   booth: 'booth', voter: 'booth',
+  police: 'police', fir: 'police',
+  epfo: 'epfo', pension: 'epfo', pf: 'epfo',
+  fssai: 'fssai', food: 'fssai', hygiene: 'fssai',
 };
 
 export function ModulePage() {
@@ -142,6 +148,20 @@ function renderModule(id: string, navigate: ReturnType<typeof useNavigate>) {
     case 'booth':
     case 'voter':
       return <BoothDirectoryPage />;
+
+    case 'police':
+    case 'fir':
+      return <PoliceDirectoryPage />;
+
+    case 'epfo':
+    case 'pension':
+    case 'pf':
+      return <EpfoDirectoryPage />;
+
+    case 'fssai':
+    case 'food':
+    case 'hygiene':
+      return <FssaiDirectoryPage />;
 
     default:
       return (
