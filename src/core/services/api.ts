@@ -444,6 +444,9 @@ export interface SearchResult {
     pincode: string;
     state: string;
     district: string;
+    /** Only when the record publishes its own location; otherwise the result is placed as its PIN's area. */
+    lat?: number;
+    lng?: number;
   };
   metadata: Record<string, unknown>;
   score: number;

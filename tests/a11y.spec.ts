@@ -24,6 +24,9 @@ const routes = [
   '/module/mplads?pin=110001',
   '/governance?pin=110001',
   '/governance?pin=302001&type=village',
+  '/maps?pin=110001',
+  '/search?q=delhi',
+  '/pin/110001',
 ];
 
 type Violation = { id: string; impact: string | null; help: string; nodes: { target: string[]; failureSummary?: string }[] };

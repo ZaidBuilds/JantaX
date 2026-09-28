@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { t } from '../i18n';
 import { Mail } from 'lucide-react';
 import { usePinRecord, useDirectorySource } from '../core/services/pinDirectory';
 import { SourceLine } from './SourceLine';
@@ -42,10 +43,10 @@ export function PostOfficesCard({ pin }: { pin: string }) {
       <ul className="list">
         {shown.map((o) => (
           <li key={o.name} className="list-row" style={{ padding: '8px var(--s-5)' }}>
-            <span className="small" style={{ flex: 1, minWidth: 0, color: 'var(--ink)' }}>{o.name}</span>
+            <span className="small" style={{ flex: 1, minWidth: 0, color: 'var(--ink)' }} translate="no">{o.name}</span>
             <span className="tiny muted" style={{ whiteSpace: 'nowrap' }}>
               {TYPE_LABEL[o.type] ?? o.type}
-              {o.delivery ? ' · delivers' : ''}
+              {o.delivery && <span> · {t('delivers mail')}</span>}
             </span>
           </li>
         ))}

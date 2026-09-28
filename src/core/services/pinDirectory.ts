@@ -18,6 +18,8 @@ export interface PinRecord {
   state: string;
   lat: number | null;
   lng: number | null;
+  /** How far the post offices spread around lat/lng, in km; null when fewer than two have a location. */
+  radiusKm: number | null;
   offices: PostOfficeEntry[];
 }
 
@@ -32,7 +34,7 @@ export interface DirectorySource {
   via?: string;
 }
 
-export type RawPin = { d: string; s: string; c?: [number, number]; o: [string, string, number][] };
+export type RawPin = { d: string; s: string; c?: [number, number]; r?: number; o: [string, string, number][] };
 
 const base = () => `${(import.meta.env?.BASE_URL as string | undefined) ?? '/'}data/pins/`;
 const chunks = new Map<string, Record<string, RawPin> | null>();
@@ -49,6 +51,7 @@ function toRecord(pin: string, r: RawPin): PinRecord {
     state: r.s,
     lat: r.c?.[0] ?? null,
     lng: r.c?.[1] ?? null,
+    radiusKm: r.r ?? null,
     offices: r.o.map(([name, type, delivery]) => ({ name, type, delivery: delivery === 1 })),
   };
 }

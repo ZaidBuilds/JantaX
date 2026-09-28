@@ -17,6 +17,9 @@ const routes = [
   '/module/schools?pin=110001',
   '/sources',
   '/transparency/freshness',
+  '/maps?pin=110001',
+  '/search?q=delhi',
+  '/pin/250001',
   // Not-found states of detail pages.
   '/schools/nope',
   '/contractors/nope',
@@ -69,7 +72,8 @@ for (const path of routes) {
   test(`${path} is all Hindi in Hindi`, async ({ page }) => {
     await open(page, path, 'hi');
     await expect(page.locator('html')).toHaveAttribute('lang', 'hi');
-    await expect(page.locator('main#main h1').first()).toContainText(/[ऀ-ॿ]/);
+    // The heading can be a PIN and a place name, kept as published, so check the page as a whole.
+    await expect(page.locator('main#main')).toContainText(/[\u0900-\u097F]/);
     const untranslated = await page.evaluate(() => window.__jantaxI18n?.missing() ?? ['translator not loaded']);
     expect(untranslated, 'interface text with no Hindi').toEqual([]);
   });

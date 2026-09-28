@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Search,
@@ -32,6 +32,11 @@ import { isValidIndianPincode } from '../core/utils/pinResolver';
 import { Badge, Breadcrumbs, EmptyState, ModuleIcon, toneForStatus, useDismiss } from '../ui';
 import { searchTopics } from '../core/services/topicSearch';
 import { pick, t } from '../i18n';
+import type { SearchMapItem } from '../ui/SearchResultsMap';
+
+// Leaflet loads only when a search has results with a place to show.
+const SearchResultsMap = lazy(() => import('../ui/SearchResultsMap'));
+const MAP_PREF_KEY = 'jantax.searchMap';
 
 const TYPES: Record<string, { label: string; icon: LucideIcon; tone: string }> = {
   location: { label: 'Areas', icon: MapPin, tone: 'var(--accent)' },
@@ -111,14 +116,17 @@ function TypeIcon({ type }: { type: string }) {
 }
 
 function ResultRow({ r }: { r: SearchResult }) {
-  const meta = r.metadata as { status?: string; score?: number; hindi?: string };
+  const meta = r.metadata as { status?: string; score?: number; hindi?: string; descriptionHi?: string };
   const t = TYPES[r.type] || TYPES.source;
   return (
     <Link to={hrefFor(r)} className="list-row search-result">
       <TypeIcon type={r.type} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div className="search-result-title" translate="no">{pick(r.title, meta.hindi)}</div>
-        <div className="small" style={{ color: 'var(--ink-2)', marginTop: 2 }}>{r.description}</div>
+        {/* A Hindi description, where the record has one, keeps its own values (places, sectors) as published. */}
+        <div className="small" style={{ color: 'var(--ink-2)', marginTop: 2 }} translate={meta.descriptionHi ? 'no' : undefined}>
+          {pick(r.description, meta.descriptionHi)}
+        </div>
         <div className="source-row" style={{ marginTop: 6 }}>
           <span>{t.label}</span>
           {r.location && (
@@ -130,7 +138,9 @@ function ResultRow({ r }: { r: SearchResult }) {
               </span>
             </span>
           )}
-          <span>Source: {r.source.name}</span>
+          <span>
+            Source: <span translate="no">{r.source.name}</span>
+          </span>
         </div>
       </div>
       <div className="report-row-meta">
@@ -160,6 +170,23 @@ export function SearchPage() {
   const [suggestions, setSuggestions] = useState<AutocompleteSuggestion[]>([]);
   const [suggestOpen, setSuggestOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [showMap, setShowMap] = useState(() => {
+    try {
+      return localStorage.getItem(MAP_PREF_KEY) !== 'off';
+    } catch {
+      return true;
+    }
+  });
+  const toggleMap = () => {
+    setShowMap((on) => {
+      try {
+        localStorage.setItem(MAP_PREF_KEY, on ? 'off' : 'on');
+      } catch {
+        /* not remembered, but the toggle still applies */
+      }
+      return !on;
+    });
+  };
   const boxRef = useRef<HTMLDivElement>(null);
   const closeSuggest = useCallback(() => setSuggestOpen(false), []);
   useDismiss(boxRef, suggestOpen, closeSuggest);
@@ -233,6 +260,24 @@ export function SearchPage() {
   }, [data]);
 
   const total = data?.pagination.total ?? 0;
+  const mapItems = useMemo<SearchMapItem[]>(
+    () =>
+      (data?.results ?? []).flatMap((r) =>
+        r.location?.pincode
+          ? [{
+              key: `${r.type}-${r.id}`,
+              title: r.title,
+              titleHi: (r.metadata as { hindi?: string }).hindi,
+              typeLabel: (TYPES[r.type] || TYPES.source).label,
+              href: hrefFor(r),
+              pin: r.location.pincode,
+              lat: r.location.lat,
+              lng: r.location.lng,
+            }]
+          : [],
+      ),
+    [data],
+  );
   const totalPages = data?.pagination.totalPages ?? 1;
   const activeFilters = [type && (TYPES[type]?.label || type), pin && `PIN ${pin}`, state].filter(Boolean) as string[];
 
@@ -428,6 +473,24 @@ export function SearchPage() {
                   ))}
                 </div>
               </section>
+            )}
+
+            {mapItems.length > 0 && (
+              <div style={{ marginBottom: 'var(--s-4)' }}>
+                <div className="spread" style={{ marginBottom: 'var(--s-2)' }}>
+                  <h2 className="small strong" style={{ margin: 0 }}>On the map</h2>
+                  <button type="button" className="btn btn-ghost btn-sm" aria-expanded={showMap} aria-controls="search-map" onClick={toggleMap}>
+                    <MapPin size={14} aria-hidden="true" /> {showMap ? t('Hide map') : t('Show map')}
+                  </button>
+                </div>
+                {showMap && (
+                  <div id="search-map">
+                    <Suspense fallback={<div className="card skeleton search-map-canvas" />}>
+                      <SearchResultsMap items={mapItems} />
+                    </Suspense>
+                  </div>
+                )}
+              </div>
             )}
 
             <div className="card">

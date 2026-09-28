@@ -231,7 +231,10 @@ export function ProjectDetailPage({ initialTab }: ProjectDetailPageProps) {
             alignItems: 'center',
             gap: '0.25rem'
           }}>
-            <MapPin size={14} style={{ color: 'var(--accent-ink)' }} /> PIN {project.pinCode} · {project.locationName}, {project.district}, {project.state}
+            <MapPin size={14} style={{ color: 'var(--accent-ink)' }} /> PIN {project.pinCode} ·{' '}
+            <span translate="no">
+              {project.locationName}, {project.district}, {project.state}
+            </span>
           </span>
         </div>
 
