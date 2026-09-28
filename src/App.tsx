@@ -108,6 +108,13 @@ const GrievanceObservatoryPage = lazy(() => import('./modules/grievance/pages/Gr
 const BudgetLedgerPage = lazy(() => import('./modules/budget/pages/BudgetLedgerPage').then((m) => ({ default: m.BudgetLedgerPage })));
 const LocalityComparePage = lazy(() => import('./pages/LocalityComparePage').then((m) => ({ default: m.LocalityComparePage })));
 
+// Land, RTI Compare, Utility, Election & Monitoring
+const LandDirectoryPage = lazy(() => import('./modules/land/pages/LandDirectoryPage').then((m) => ({ default: m.LandDirectoryPage })));
+const RtiComparePage = lazy(() => import('./modules/rti/pages/RtiComparePage').then((m) => ({ default: m.RtiComparePage })));
+const UtilityDashboard = lazy(() => import('./modules/utility/components/UtilityDashboard').then((m) => ({ default: m.UtilityDashboard })));
+const ElectionDashboard = lazy(() => import('./modules/election/components/ElectionDashboard').then((m) => ({ default: m.ElectionDashboard })));
+const MonitoringDashboardPage = lazy(() => import('./modules/monitoring/pages/MonitoringDashboardPage').then((m) => ({ default: m.MonitoringDashboardPage })));
+
 function LoadingFallback() {
   return (
     <div
@@ -176,7 +183,7 @@ function AppContent() {
               <Route path="/pin/:pinCode/hospitals" element={<HospitalsDirectoryPage />} />
               <Route path="/pin/:pinCode/ration" element={<RationDirectoryPage />} />
               <Route path="/pin/:pinCode/pds" element={<RationDirectoryPage />} />
-              <Route path="/pin/:pinCode/land" element={<Navigate to="/pin" replace />} />
+              <Route path="/pin/:pinCode/land" element={<LandDirectoryPage />} />
               <Route path="/pin/:pinCode/works" element={<ProjectsDirectoryPage />} />
               <Route path="/pin/:pinCode/schemes" element={<SchemesPage />} />
               <Route path="/pin/:pinCode/budget" element={<BudgetLedgerPage />} />
@@ -191,9 +198,22 @@ function AppContent() {
               <Route path="/ration" element={<RationDirectoryPage />} />
               <Route path="/pds" element={<RationDirectoryPage />} />
 
-              {/* Land Redirects */}
-              <Route path="/land" element={<Navigate to="/" replace />} />
-              <Route path="/bhulekh" element={<Navigate to="/" replace />} />
+              {/* Land & Bhulekh Registry */}
+              <Route path="/land" element={<LandDirectoryPage />} />
+              <Route path="/bhulekh" element={<LandDirectoryPage />} />
+
+              {/* Public Representatives */}
+              <Route path="/representatives" element={<PeopleProfilePage />} />
+              <Route path="/people" element={<PeopleProfilePage />} />
+
+              {/* Power & Utility Outages */}
+              <Route path="/utility" element={<UtilityDashboard />} />
+              <Route path="/power" element={<UtilityDashboard />} />
+
+              {/* Election & Exam Accountability */}
+              <Route path="/election" element={<ElectionDashboard />} />
+              <Route path="/exam" element={<ElectionDashboard />} />
+              <Route path="/exams" element={<ElectionDashboard />} />
 
               {/* Grievance & CPGRAMS */}
               <Route path="/grievance" element={<GrievanceObservatoryPage />} />
@@ -246,6 +266,7 @@ function AppContent() {
               <Route path="/rti" element={<RtiDirectoryPage />} />
               <Route path="/rti/draft" element={<RtiDraftPage />} />
               <Route path="/rti/authority/:id" element={<AuthorityDetailPage />} />
+              <Route path="/rti/compare" element={<RtiComparePage />} />
 
               {/* Air Quality & Pollution */}
               <Route path="/pollution" element={<PollutionDirectoryPage />} />
@@ -302,6 +323,8 @@ function AppContent() {
               <Route path="/about" element={<AboutPage />} />
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/admin" element={<AdminPage />} />
+              <Route path="/monitoring" element={<MonitoringDashboardPage />} />
+              <Route path="/admin/monitoring" element={<MonitoringDashboardPage />} />
 
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />

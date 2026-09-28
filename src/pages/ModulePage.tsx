@@ -15,6 +15,9 @@ import { PollutionDirectoryPage } from '../modules/pollution/pages/PollutionDire
 import { MonitoringDashboardPage } from '../modules/monitoring/pages/MonitoringDashboardPage';
 import { UtilityDashboard } from '../modules/utility/components/UtilityDashboard';
 import { LandDashboard } from '../modules/land/components/LandDashboard';
+import { ElectionDashboard } from '../modules/election/components/ElectionDashboard';
+import { BudgetDashboard } from '../modules/budget/components/BudgetDashboard';
+import { BoothDirectoryPage } from '../modules/booth/pages/BoothDirectoryPage';
 import { ArrowLeft } from 'lucide-react';
 import { DataStatusBanner } from '../components/data/DataStatusBanner';
 
@@ -38,6 +41,9 @@ const CANONICAL_MODULE_ID: Record<string, string> = {
   pollution: 'pollution', air: 'pollution', aqi: 'pollution',
   utility: 'utility', power: 'utility', water: 'utility',
   land: 'land',
+  election: 'election', exam: 'election', exams: 'election', candidate: 'election',
+  budget: 'budget', finance: 'budget',
+  booth: 'booth', voter: 'booth',
 };
 
 export function ModulePage() {
@@ -122,6 +128,20 @@ function renderModule(id: string, navigate: ReturnType<typeof useNavigate>) {
 
     case 'land':
       return <LandDashboard />;
+
+    case 'election':
+    case 'exam':
+    case 'exams':
+    case 'candidate':
+      return <ElectionDashboard />;
+
+    case 'budget':
+    case 'finance':
+      return <BudgetDashboard />;
+
+    case 'booth':
+    case 'voter':
+      return <BoothDirectoryPage />;
 
     default:
       return (
