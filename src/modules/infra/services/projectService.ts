@@ -1,7 +1,8 @@
 import type { InfraProject, CitizenReport, NeutralStatus } from '../types/projectInfra';
 import { MOCK_INFRA_PROJECTS } from '../data/mockProjects';
 
-const STORAGE_KEY = 'jantax_infra_projects_v2';
+// Bumped when the sample projects change, so browsers drop their cached copy.
+const STORAGE_KEY = 'jantax_infra_projects_v3';
 
 export function getStoredProjects(): InfraProject[] {
   if (typeof window === 'undefined') return MOCK_INFRA_PROJECTS;

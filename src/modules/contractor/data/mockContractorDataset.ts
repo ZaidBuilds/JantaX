@@ -15,14 +15,14 @@ export function generateMockContractorDataset(pincode: string = '560034'): {
   const rnd = seededRand(hash);
 
   const contractorNames = [
-    'M/s Vanguard Infra Projects Pvt Ltd',
-    'Sri Balaji Roadworks & Const.',
-    'Meerut Builders & Infrastructure Ltd',
-    'Chaudhary Road Builders',
-    'M/S Tomar Solar Power Solutions',
+    'M/s Sample Contractor H',
+    'Sample Contractor J Roadworks',
+    'Sample Contractor K',
+    'Sample Contractor G',
+    'Sample Solar Contractor L',
     'Sample Contractor A Construction',
     'Sample Contractor E & F JV',
-    'Sardar Medical Const. Corp.',
+    'Sample Contractor M',
   ];
 
   const contractors: Contractor[] = contractorNames.map((name, i) => {

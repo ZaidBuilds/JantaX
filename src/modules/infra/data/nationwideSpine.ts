@@ -3,23 +3,6 @@ import { resolvePincode, getDeterministicIndex } from '../../../core/utils/pinRe
 import { representatives as meerutReps, funds as meerutFunds, projects as meerutProjs, contractors as meerutConts } from './meerutData';
 import { getUpdatedProjects } from '../../../core/utils/autoUpdater';
 
-// Regional name pools to maintain geographic credibility
-const FIRST_NAMES: Record<string, string[]> = {
-  North: ['राजेश', 'संजय', 'अमित', 'दिनेश', 'रमेश', 'सुनील', 'विजय', 'सतीश', 'राकेश', 'मनोज'],
-  South: ['वेंकटेश', 'सुब्रह्मण्यम', 'रंगराजन', 'मूर्ती', 'कृष्णप्पा', 'राघवन', 'बालन', 'शेखर', 'नायडू', 'रेड्डी'],
-  East: ['सुब्रत', 'तपन', 'अनिल', 'अजय', 'मनोज', 'प्रसन्न', 'तपस', 'देबाशीष', 'रंजीत', 'बिकास'],
-  West: ['अनिल', 'प्रमोद', 'संजय', 'विजय', 'राधाकृष्ण', 'यशवंत', 'दिलीप', 'बाळासाहेब', 'उद्धव', 'ज्ञानेश्वर'],
-  Central: ['रामगोपाल', 'शिवराज', 'कमलनाथ', 'दिग्विजय', 'अखिलेश', 'मायावती', 'मुलायम', 'भूपेश', 'रमन', 'अर्जुन'],
-};
-
-const LAST_NAMES: Record<string, string[]> = {
-  North: ['शर्मा', 'सिंह', 'तोमर', 'यादव', 'गुप्ता', 'तिवारी', 'वर्मा', 'खटीक', 'मिश्रा', 'चौधरी'],
-  South: ['रविचंद्रन', 'मल्लाप्पा', 'अय्यर', 'गौड़ा', 'रेड्डी', 'नायर', 'राजू', 'चंद्रशेखर', 'पिल्लई', 'सुब्रमण्यम'],
-  East: ['बनर्जी', 'घोष', 'सेन', 'झा', 'मजूमदार', 'सिन्हा', 'महतो', 'पात्रा', 'दास', 'उरांव'],
-  West: ['पाटील', 'देशमुख', 'फडणवीस', 'पाटिल', 'जोशी', 'शिंदे', 'सावंत', 'पटेल', 'शाह', 'मेहता'],
-  Central: ['चौहान', 'शुक्ला', 'बघेल', 'दुबे', 'पाण्डेय', 'सक्सेना', 'दीक्षित', 'द्विवेदी', 'मिश्रा', 'यादव'],
-};
-
 const VILLAGE_PREFIXES: [string, string][] = [
   ['Rampur', 'रामपुर'], ['Kalyanpur', 'कल्याणपुर'], ['Gopalpur', 'गोपालपुर'], ['Haripur', 'हरिपुर'], ['Shivpur', 'शिवपुर'],
   ['Mohanpur', 'मोहनपुर'], ['Krishnapur', 'कृष्णपुर'], ['Ambedkar Nagar', 'अंबेडकर नगर'], ['Gandhi Nagar', 'गांधी नगर'], ['Subhash Nagar', 'सुभाष नगर'],
@@ -62,10 +45,6 @@ export function getSpineDataForPincode(pinCode: string): SpineData {
 
   const loc = resolvePincode(pinCode);
   const region = loc.region;
-
-  // Derive regional pools
-  const firstNames = FIRST_NAMES[region] || FIRST_NAMES.North;
-  const lastNames = LAST_NAMES[region] || LAST_NAMES.North;
 
   // Helper to generate a deterministic name
   // Sample officials are named by role, never with invented personal names that could match real people.

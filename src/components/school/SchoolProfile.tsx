@@ -298,6 +298,7 @@ export function SchoolProfile({ schoolId: propId }: Props) {
       <div className="card" style={{ marginTop: 'var(--s-4)' }}>
         <EmptyState
           icon={GraduationCap}
+          heading="h1"
           title="We could not find that school"
           text={`No school with the reference "${schoolId}" is in our records. Search by name, PIN code or UDISE code instead.`}
           action={<Link to="/schools/search" className="btn btn-primary">Search schools</Link>}

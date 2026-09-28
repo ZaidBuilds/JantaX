@@ -67,7 +67,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 1)', contractorNameHi: 'ठेकेदार (नमूना 1)', contractorFirm: 'Sample firm A',
     officerName: 'Officer (sample 1)', officerNameHi: 'अधिकारी (नमूना 1)', officerDesignation: 'CMO, Lucknow', officerDesignationHi: 'CMO, लखनऊ', officerDept: 'Health Department', officerDeptHi: 'स्वास्थ्य विभाग',
     budgetAllocated: 245, budgetSpent: 38,
-    verified: true, verificationSource: 'CAG Report 2024, Para 3.7',
+    verified: true, verificationSource: 'Audit report (sample)',
   },
   {
     pincode: 272001, district: 'Basti', districtHi: 'बस्ती', stateCode: 'UP',
@@ -85,7 +85,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 2)', contractorNameHi: 'ठेकेदार (नमूना 2)', contractorFirm: 'Sample firm B',
     officerName: 'Officer (sample 2)', officerNameHi: 'अधिकारी (नमूना 2)', officerDesignation: 'Additional District Magistrate, Basti', officerDesignationHi: 'अपर जिलाधिकारी, बस्ती', officerDept: 'Public Works Department', officerDeptHi: 'लोक निर्माण विभाग',
     budgetAllocated: 520, budgetSpent: 210,
-    verified: true, verificationSource: 'RTI Response, Basti PWD',
+    verified: true, verificationSource: 'RTI reply (sample)',
   },
   {
     pincode: 226003, district: 'Lucknow', districtHi: 'लखनऊ', stateCode: 'UP',
@@ -103,7 +103,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 3)', contractorNameHi: 'ठेकेदार (नमूना 3)', contractorFirm: 'Sample firm C',
     officerName: 'Officer (sample 3)', officerNameHi: 'अधिकारी (नमूना 3)', officerDesignation: 'BEO, Lucknow', officerDesignationHi: 'BEO, लखनऊ', officerDept: 'Basic Education Department', officerDeptHi: 'बेसिक शिक्षा विभाग',
     budgetAllocated: 185, budgetSpent: 72,
-    verified: true, verificationSource: 'DISE Report 2023-24',
+    verified: true, verificationSource: 'School census data (sample)',
   },
   {
     pincode: 221001, district: 'Varanasi', districtHi: 'वाराणसी', stateCode: 'UP',
@@ -121,7 +121,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 4)', contractorNameHi: 'ठेकेदार (नमूना 4)', contractorFirm: '—',
     officerName: 'Officer (sample 4)', officerNameHi: 'अधिकारी (नमूना 4)', officerDesignation: 'DSO, Varanasi', officerDesignationHi: 'DSO, वाराणसी', officerDept: 'Food and Civil Supplies Department', officerDeptHi: 'खाद्य एवं रसद विभाग',
     budgetAllocated: 890, budgetSpent: 890,
-    verified: true, verificationSource: 'CAG Report 2024, PDS Audit',
+    verified: true, verificationSource: 'Audit report (sample)',
   },
   // === BIHAR ===
   {
@@ -140,7 +140,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 5)', contractorNameHi: 'ठेकेदार (नमूना 5)', contractorFirm: 'Sample firm D',
     officerName: 'Officer (sample 5)', officerNameHi: 'अधिकारी (नमूना 5)', officerDesignation: 'CS, Bihar Health', officerDesignationHi: 'CS, बिहार स्वास्थ्य', officerDept: 'Health Department, Bihar', officerDeptHi: 'स्वास्थ्य विभाग, बिहार',
     budgetAllocated: 15000, budgetSpent: 4200,
-    verified: true, verificationSource: 'CAG Bihar Report 2024',
+    verified: true, verificationSource: 'Audit report (sample)',
   },
   {
     pincode: 823001, district: 'Gaya', districtHi: 'गया', stateCode: 'BR',
@@ -158,7 +158,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 6)', contractorNameHi: 'ठेकेदार (नमूना 6)', contractorFirm: 'Sample firm E',
     officerName: 'Officer (sample 6)', officerNameHi: 'अधिकारी (नमूना 6)', officerDesignation: 'Executive Engineer, PHED', officerDesignationHi: 'कार्यपालक अभियंता, PHED', officerDept: 'Jal Shakti Department', officerDeptHi: 'जल शक्ति विभाग',
     budgetAllocated: 680, budgetSpent: 290,
-    verified: true, verificationSource: 'RTI Response, Gaya PHED',
+    verified: true, verificationSource: 'RTI reply (sample)',
   },
   {
     pincode: 846001, district: 'Darbhanga', districtHi: 'दरभंगा', stateCode: 'BR',
@@ -176,7 +176,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 7)', contractorNameHi: 'ठेकेदार (नमूना 7)', contractorFirm: 'Sample firm F',
     officerName: 'Officer (sample 7)', officerNameHi: 'अधिकारी (नमूना 7)', officerDesignation: 'District Road Construction Officer', officerDesignationHi: 'जिला पथ निर्माण अधिकारी', officerDept: 'Public Works Department, Bihar', officerDeptHi: 'लोक निर्माण विभाग, बिहार',
     budgetAllocated: 3200, budgetSpent: 1400,
-    verified: false, verificationSource: 'News Report, Dainik Jagran',
+    verified: false, verificationSource: 'News report (sample)',
   },
   // === MAHARASHTRA ===
   {
@@ -195,7 +195,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 8)', contractorNameHi: 'ठेकेदार (नमूना 8)', contractorFirm: 'Sample firm G',
     officerName: 'Officer (sample 8)', officerNameHi: 'अधिकारी (नमूना 8)', officerDesignation: 'ACS, Health, Maharashtra', officerDesignationHi: 'ACS, स्वास्थ्य, महाराष्ट्र', officerDept: 'Public Health Department', officerDeptHi: 'सार्वजनिक स्वास्थ्य विभाग',
     budgetAllocated: 2400, budgetSpent: 1800,
-    verified: true, verificationSource: 'CAG Maharashtra Report 2024',
+    verified: true, verificationSource: 'Audit report (sample)',
   },
   {
     pincode: 411001, district: 'Pune', districtHi: 'पुणे', stateCode: 'MH',
@@ -213,7 +213,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 9)', contractorNameHi: 'ठेकेदार (नमूना 9)', contractorFirm: 'Sample firm H',
     officerName: 'Officer (sample 9)', officerNameHi: 'अधिकारी (नमूना 9)', officerDesignation: 'MD, MSRDC', officerDesignationHi: 'एमडी, MSRDC', officerDept: 'MSRDC', officerDeptHi: 'MSRDC',
     budgetAllocated: 55000, budgetSpent: 82000,
-    verified: true, verificationSource: 'CAG Report, MSRDC Audit',
+    verified: true, verificationSource: 'Audit report (sample)',
   },
   // === TAMIL NADU ===
   {
@@ -232,7 +232,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 10)', contractorNameHi: 'ठेकेदार (नमूना 10)', contractorFirm: 'Sample firm I',
     officerName: 'Officer (sample 10)', officerNameHi: 'अधिकारी (नमूना 10)', officerDesignation: 'Collector, Chennai', officerDesignationHi: 'कलेक्टर, चेन्नई', officerDept: 'Cooperation Department, TN', officerDeptHi: 'सहकारिता विभाग, TN',
     budgetAllocated: 5200, budgetSpent: 5100,
-    verified: true, verificationSource: 'News Report, The Hindu',
+    verified: true, verificationSource: 'News report (sample)',
   },
   // === KARNATAKA ===
   {
@@ -251,7 +251,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 11)', contractorNameHi: 'ठेकेदार (नमूना 11)', contractorFirm: 'Sample firm J',
     officerName: 'Officer (sample 11)', officerNameHi: 'अधिकारी (नमूना 11)', officerDesignation: 'MD, BMTC', officerDesignationHi: 'एमडी, BMTC', officerDept: 'Transport Department, Karnataka', officerDeptHi: 'परिवहन विभाग, कर्नाटक',
     budgetAllocated: 3800, budgetSpent: 1200,
-    verified: false, verificationSource: 'News Report, Deccan Herald',
+    verified: false, verificationSource: 'News report (sample)',
   },
   // === WEST BENGAL ===
   {
@@ -270,7 +270,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 12)', contractorNameHi: 'ठेकेदार (नमूना 12)', contractorFirm: 'Sample firm K',
     officerName: 'Officer (sample 12)', officerNameHi: 'अधिकारी (नमूना 12)', officerDesignation: 'DM, Bardhaman', officerDesignationHi: 'DM, बर्धमान', officerDept: 'Women and Child Development, WB', officerDeptHi: 'महिला एवं बाल विकास, WB',
     budgetAllocated: 12800, budgetSpent: 7600,
-    verified: true, verificationSource: 'RTI Response, Burdwan DM Office',
+    verified: true, verificationSource: 'RTI reply (sample)',
   },
   {
     pincode: 721101, district: 'Paschim Medinipur', districtHi: 'पश्चिम मेदिनीपुर', stateCode: 'WB',
@@ -288,7 +288,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 13)', contractorNameHi: 'ठेकेदार (नमूना 13)', contractorFirm: '—',
     officerName: 'Officer (sample 13)', officerNameHi: 'अधिकारी (नमूना 13)', officerDesignation: 'SDO, Medinipur', officerDesignationHi: 'SDO, मेदिनीपुर', officerDept: 'Education Department, WB', officerDeptHi: 'शिक्षा विभाग, WB',
     budgetAllocated: 4500, budgetSpent: 2800,
-    verified: false, verificationSource: 'News Report, Anandabazar Patrika',
+    verified: false, verificationSource: 'News report (sample)',
   },
   // === MADHYA PRADESH ===
   {
@@ -307,7 +307,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 14)', contractorNameHi: 'ठेकेदार (नमूना 14)', contractorFirm: 'Sample firm L',
     officerName: 'Officer (sample 14)', officerNameHi: 'अधिकारी (नमूना 14)', officerDesignation: 'CE, PHED, Bhopal', officerDesignationHi: 'CE, PHED, भोपाल', officerDept: 'Water Department, MP', officerDeptHi: 'जल विभाग, MP',
     budgetAllocated: 4200, budgetSpent: 2600,
-    verified: true, verificationSource: 'CAG MP Report 2024',
+    verified: true, verificationSource: 'Audit report (sample)',
   },
   // === RAJASTHAN ===
   {
@@ -326,7 +326,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 15)', contractorNameHi: 'ठेकेदार (नमूना 15)', contractorFirm: 'Sample firm M',
     officerName: 'Officer (sample 15)', officerNameHi: 'अधिकारी (नमूना 15)', officerDesignation: 'DEO, Jaipur', officerDesignationHi: 'DEO, जयपुर', officerDept: 'Education Department, Rajasthan', officerDeptHi: 'शिक्षा विभाग, राजस्थान',
     budgetAllocated: 1500, budgetSpent: 480,
-    verified: true, verificationSource: 'DISE Report, Rajasthan',
+    verified: true, verificationSource: 'School census data (sample)',
   },
   // === JHARKHAND ===
   {
@@ -345,7 +345,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 16)', contractorNameHi: 'ठेकेदार (नमूना 16)', contractorFirm: 'Sample firm N',
     officerName: 'Officer (sample 16)', officerNameHi: 'अधिकारी (नमूना 16)', officerDesignation: 'SP, Khunti', officerDesignationHi: 'SP, खूंटी', officerDept: 'Police Department, Jharkhand', officerDeptHi: 'पुलिस विभाग, झारखंड',
     budgetAllocated: 890, budgetSpent: 340,
-    verified: false, verificationSource: 'NCRB Data 2024',
+    verified: false, verificationSource: 'Crime records data (sample)',
   },
   // === PUNJAB ===
   {
@@ -364,7 +364,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 17)', contractorNameHi: 'ठेकेदार (नमूना 17)', contractorFirm: 'Sample firm O',
     officerName: 'Officer (sample 17)', officerNameHi: 'अधिकारी (नमूना 17)', officerDesignation: 'Civil Surgeon, Ludhiana', officerDesignationHi: 'Civil Surgeon, लुधियाना', officerDept: 'Health Department, Punjab', officerDeptHi: 'स्वास्थ्य विभाग, पंजाब',
     budgetAllocated: 600, budgetSpent: 180,
-    verified: true, verificationSource: 'RTI Response, Punjab Health',
+    verified: true, verificationSource: 'RTI reply (sample)',
   },
   // === GUJARAT ===
   {
@@ -383,7 +383,7 @@ export const claims: ClaimData[] = [
     contractorName: 'Contractor (sample 18)', contractorNameHi: 'ठेकेदार (नमूना 18)', contractorFirm: 'Sample firm P',
     officerName: 'Officer (sample 18)', officerNameHi: 'अधिकारी (नमूना 18)', officerDesignation: 'CE, R&B, Kutch', officerDesignationHi: 'CE, R&B, कच्छ', officerDept: 'PWD, Gujarat', officerDeptHi: 'PWD, गुजरात',
     budgetAllocated: 25000, budgetSpent: 18000,
-    verified: true, verificationSource: 'CAG Gujarat Report 2024',
+    verified: true, verificationSource: 'Audit report (sample)',
   },
 ];
 

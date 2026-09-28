@@ -250,10 +250,10 @@ export const MOCK_INFRA_PROJECTS: InfraProject[] = [
     sanctioningBody: 'State Level Standing Committee (SLSC), PMGSY UP',
     responsibleOfficer: 'Executive engineer (sample 2)',
     responsibleOfficerDesignation: 'Executive Engineer, UPPWD Meerut Division',
-    leadContractor: 'M/s Chaudhary Road Builders & Sons',
+    leadContractor: 'M/s Sample Contractor G',
     contractorDetails: {
-      id: 'cont-chaudhary-builders',
-      name: 'M/s Chaudhary Road Builders & Sons',
+      id: 'cont-sample-g',
+      name: 'M/s Sample Contractor G',
       registrationNumber: 'UP-PWD-REG-2019-441',
       pastProjectsCount: 18,
       rating: 4.6
@@ -294,7 +294,7 @@ export const MOCK_INFRA_PROJECTS: InfraProject[] = [
         id: 'wo-meerut-01',
         workOrderNumber: 'WO/UPPWD/MRT/2022/672',
         issueDate: '2022-12-05',
-        awardedContractor: 'M/s Chaudhary Road Builders & Sons',
+        awardedContractor: 'M/s Sample Contractor G',
         awardedValueLakhs: 1390,
         signingAuthority: 'Superintending Engineer, UPPWD Meerut Circle',
         sourceUrl: 'https://uppwd.gov.in/orders/WO-UPPWD-MRT-2022-672',
@@ -352,7 +352,7 @@ export const MOCK_INFRA_PROJECTS: InfraProject[] = [
       {
         id: 'hist-mrt-02',
         date: '2022-12-05',
-        title: 'Work Order Issued to Chaudhary Road Builders',
+        title: 'Work Order Issued to Sample Contractor G',
         titleHindi: 'कार्य आदेश जारी',
         eventType: 'Work Order',
         neutralDescription: 'Work order executed for ₹13.90 Crore awarded cost.',

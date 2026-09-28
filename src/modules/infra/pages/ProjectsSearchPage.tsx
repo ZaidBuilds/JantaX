@@ -35,7 +35,7 @@ export function ProjectsSearchPage() {
   const states = ['All', 'Delhi', 'Uttar Pradesh', 'Karnataka', 'Maharashtra'];
   const sectors = ['All', 'Roads & Highways', 'Urban Transit', 'Water & Sewage', 'Bridges & Culverts', 'Power & Energy'];
   const statuses: Array<'All' | NeutralStatus> = ['All', 'Delayed', 'Extended', 'Incomplete', 'Under Review', 'Completed', 'Verified'];
-  const contractors = ['All', 'Sample Contractor A', 'Sample Contractor B', 'Sample Contractor C', 'Chaudhary Road Builders', 'Sample Water Works D'];
+  const contractors = ['All', 'Sample Contractor A', 'Sample Contractor B', 'Sample Contractor C', 'Sample Contractor G', 'Sample Water Works D'];
   const authorities = ['All', 'PWD', 'BMRCL', 'BMC', 'UP Jal Nigam', 'NMCG', 'NHAI'];
 
   // Query results from project service

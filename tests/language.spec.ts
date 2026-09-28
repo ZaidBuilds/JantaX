@@ -17,6 +17,9 @@ const routes = [
   '/module/schools?pin=110001',
   '/sources',
   '/transparency/freshness',
+  // Not-found states of detail pages.
+  '/schools/nope',
+  '/contractors/nope',
 ];
 
 async function open(page: Page, path: string, lang: 'en' | 'hi') {

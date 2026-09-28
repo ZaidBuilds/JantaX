@@ -1,7 +1,8 @@
 import type { ContractorProfile } from '../types/contractorIntelligence';
 import { MOCK_CONTRACTORS } from '../data/mockContractors';
 
-const STORAGE_KEY = 'jantax_contractor_profiles_v1';
+// Bumped when the sample profiles change, so browsers drop their cached copy.
+const STORAGE_KEY = 'jantax_contractor_profiles_v2';
 
 export function getStoredContractors(): ContractorProfile[] {
   if (typeof window === 'undefined') return MOCK_CONTRACTORS;
