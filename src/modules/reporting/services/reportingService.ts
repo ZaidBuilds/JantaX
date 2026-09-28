@@ -4,6 +4,7 @@ import { MOCK_CITIZEN_REPORTS, MOCK_OFFICIAL_TRACKING } from '../data/mockReport
 
 import { sanitizeReportForPublicView, sanitizeInput } from '../../security/services/securityService';
 import { getCurrentUserRole } from '../../security/services/rbacService';
+import { locale } from '../../../i18n';
 
 const REPORTS_KEY = 'jantax_citizen_reports_v1';
 const TRACKING_KEY = 'jantax_official_tracking_v1';
@@ -248,7 +249,7 @@ REQUESTED OFFICIAL ACTION:
 
 Thank you.
 
-Dated: ${new Date(report.createdAt).toLocaleDateString()}
+Dated: ${new Date(report.createdAt).toLocaleDateString(locale())}
 Report Generated via JantaX Public Data Transparency Portal (ID: ${report.id})`;
 
   return {

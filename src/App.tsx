@@ -9,6 +9,7 @@ import { Header } from './shell/Header';
 import { Footer } from './shell/Footer';
 import { StatusBanner } from './shell/StatusBanner';
 import { ScrollToTop } from './shell/ScrollToTop';
+import { ScrollableRegions } from './shell/ScrollableRegions';
 import { ToastProvider } from './ui/Toast';
 import { ModuleFrame } from './pages/ModuleFrame';
 import { canonicalModuleId, moduleHref } from './ui/modules';
@@ -22,6 +23,7 @@ function page<T extends Record<string, unknown>, K extends keyof T>(loader: () =
 const Home = page(() => import('./pages/Home'), 'Home');
 const ExplorePage = page(() => import('./pages/ExplorePage'), 'ExplorePage');
 const SearchPage = page(() => import('./pages/SearchPage'), 'SearchPage');
+const GovernancePage = page(() => import('./pages/GovernancePage'), 'GovernancePage');
 const PinDashboard = page(() => import('./pages/PinDashboard'), 'PinDashboard');
 const SchoolDeepLink = page(() => import('./pages/schools/SchoolDeepLink'), 'SchoolDeepLink');
 const ComparePage = page(() => import('./pages/ComparePage'), 'ComparePage');
@@ -114,6 +116,7 @@ function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/explore" element={<ExplorePage />} />
       <Route path="/search" element={<SearchPage />} />
+      <Route path="/governance" element={<GovernancePage />} />
       <Route path="/pin" element={<PinDashboard choose />} />
       <Route path="/pin/new" element={<PinDashboard choose />} />
       <Route path="/pin/:pinCode" element={<PinDashboard />} />
@@ -200,6 +203,7 @@ function AppRoutes() {
       <Route path="/reports/:id" element={<ReportDetailPage />} />
       <Route path="/reports/:id/action" element={<ReportDetailPage />} />
       <Route path="/report-issue" element={<CitizenReportingPage />} />
+      <Route path="/report" element={<Navigate to="/report-issue" replace />} />
       <Route path="/evidence/submitted" element={<Navigate to="/reports" replace />} />
 
       {/* Transparency */}
@@ -234,6 +238,7 @@ export function App() {
             <DataStateProvider>
               <ToastProvider>
                 <ScrollToTop />
+                <ScrollableRegions />
                 <div className="app">
                   <Header />
                   <StatusBanner />

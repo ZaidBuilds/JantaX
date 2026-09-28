@@ -12,6 +12,7 @@ import {
   User
 } from 'lucide-react';
 import { addCitizenReportToProject, upvoteCitizenReport } from '../services/projectService';
+import { locale } from '../../../i18n';
 
 interface ProjectGroundTruthTabProps {
   project: InfraProject;
@@ -92,7 +93,7 @@ export const ProjectGroundTruthTab: React.FC<ProjectGroundTruthTabProps> = ({
           border: '1px solid rgba(255,255,255,0.15)',
           textAlign: 'right'
         }}>
-          <div style={{ fontSize: '0.74rem', color: 'var(--ink-4)', fontWeight: 600 }}>Official Claim vs Reality</div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)', fontWeight: 600 }}>Official Claim vs Reality</div>
           <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--on-solid)', marginTop: '0.1rem' }}>
             Claim: {project.progressPhysical}% · Reality: {project.groundTruth.physicalScore}%
           </div>
@@ -146,7 +147,7 @@ export const ProjectGroundTruthTab: React.FC<ProjectGroundTruthTabProps> = ({
                     left: '0.5rem',
                     background: 'rgba(15, 23, 42, 0.8)',
                     color: 'var(--on-solid)',
-                    fontSize: '0.72rem',
+                    fontSize: 'var(--text-xs)',
                     fontWeight: 600,
                     padding: '0.2rem 0.5rem',
                     borderRadius: 4,
@@ -159,7 +160,7 @@ export const ProjectGroundTruthTab: React.FC<ProjectGroundTruthTabProps> = ({
                 </div>
                 <div style={{ padding: '0.75rem', fontSize: '0.82rem', color: 'var(--ink-2)' }}>
                   <div style={{ fontWeight: 700, color: 'var(--ink)', marginBottom: '0.2rem' }}>{photo.caption}</div>
-                  <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)' }}>Captured: {photo.timestamp}</div>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Captured: {photo.timestamp}</div>
                 </div>
               </div>
             ))}
@@ -207,8 +208,8 @@ export const ProjectGroundTruthTab: React.FC<ProjectGroundTruthTabProps> = ({
                     </div>
                     <div>
                       <span style={{ fontSize: '0.86rem', fontWeight: 700, color: 'var(--ink)' }}>{report.userName}</span>
-                      <span style={{ fontSize: '0.74rem', color: 'var(--ink-3)', marginLeft: '0.5rem' }}>
-                        {new Date(report.timestamp).toLocaleDateString()}
+                      <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', marginLeft: '0.5rem' }}>
+                        {new Date(report.timestamp).toLocaleDateString(locale())}
                       </span>
                     </div>
                   </div>
@@ -217,7 +218,7 @@ export const ProjectGroundTruthTab: React.FC<ProjectGroundTruthTabProps> = ({
                     fontSize: '0.78rem',
                     fontWeight: 800,
                     color: report.ratingValue >= 70 ? 'var(--good)' : 'var(--warn)',
-                    background: report.ratingValue >= 70 ? 'var(--good-soft)' : '#fffbebf',
+                    background: report.ratingValue >= 70 ? 'var(--good-soft)' : 'var(--warn-soft)',
                     padding: '0.2rem 0.6rem',
                     borderRadius: 6
                   }}>
@@ -291,7 +292,7 @@ export const ProjectGroundTruthTab: React.FC<ProjectGroundTruthTabProps> = ({
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Ankit Sharma"
+                  placeholder="Leave blank to stay anonymous"
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
                   style={{ width: '100%', padding: '0.55rem 0.75rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.85rem' }}

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import type { Project } from '../../../core/types/Project';
 import { useLanguage } from '../../../core/context/LanguageContext';
 import { CircularProgressRing } from './CircularProgressRing';
+import { locale, pick } from '../../../i18n';
 
 interface ProjectDetailProps {
   project: Project;
@@ -83,13 +84,13 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
     switch (statusVal) {
       case 'Approved':
       case 'Completed':
-        return <span style={{ color: 'var(--status-completed)', fontWeight: 'bold' }}>✓ स्वीकृत (Approved)</span>;
+        return <span style={{ color: 'var(--status-completed)', fontWeight: 'bold' }}>✓ Approved</span>;
       case 'Pending':
-        return <span style={{ color: 'var(--status-critical)', fontWeight: 'bold' }}>लंबित (Pending)</span>;
+        return <span style={{ color: 'var(--status-critical)', fontWeight: 'bold' }}>Pending</span>;
       case 'In Progress':
-        return <span style={{ color: 'var(--status-delayed)', fontWeight: 'bold' }}>प्रगति पर (In Progress)</span>;
+        return <span style={{ color: 'var(--status-delayed)', fontWeight: 'bold' }}>In Progress</span>;
       default:
-        return <span style={{ color: 'var(--text-muted)' }}>लागू नहीं (N/A)</span>;
+        return <span style={{ color: 'var(--text-muted)' }}>N/A</span>;
     }
   };
 
@@ -106,16 +107,15 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
 
   // WhatsApp Share Formatter
   const handleWhatsAppShare = () => {
-    const realityText = citizenConsensus !== null ? `${citizenConsensus}%` : "सुरक्षित / Unverified";
-    const shareText = `*सड़क/कार्य रिपोर्ट (PROJECT UPDATE)* \n` +
-                      `*पिन कोड (PIN Code):* ${pinCode}\n` +
-                      `*कार्य (Project):* ${nameEnglish}\n` +
-                      `*हिन्दी:* ${nameHindi}\n` +
-                      `*सरकारी दावा (Official Claim):* ${progressPhysical}% Complete (₹${budgetAnticipated} Cr)\n` +
-                      `*जमीनी हकीकत (Reality):* ${realityText}\n` +
-                      `*ठेकेदार (Contractor):* ${leadContractor}\n` +
-                      `*ज़िम्मेदार अधिकारी (Officer):* ${responsibleOfficer} (${responsibleOfficerDesignation})\n` +
-                      `*सत्यापन लिंक (Source):* ${window.location.origin}/project/${id}`;
+    const realityText = citizenConsensus !== null ? `${citizenConsensus}%` : "Unverified";
+    const shareText = `*PROJECT UPDATE* \n` +
+                      `*PIN Code:* ${pinCode}\n` +
+                      `*Project:* ${pick(nameEnglish, nameHindi)}\n` +
+                      `*Official Claim:* ${progressPhysical}% Complete (₹${budgetAnticipated} Cr)\n` +
+                      `*Reality:* ${realityText}\n` +
+                      `*Contractor:* ${leadContractor}\n` +
+                      `*Officer:* ${responsibleOfficer} (${responsibleOfficerDesignation})\n` +
+                      `*Source:* ${window.location.origin}/project/${id}`;
 
     // Copy to clipboard
     navigator.clipboard.writeText(shareText);
@@ -137,7 +137,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
     if (!comment.trim()) return;
 
     onAddReport(id, {
-      userName: "गुमनाम नागरिक (Anonymous Citizen)",
+      userName: "Anonymous Citizen",
       ratingValue,
       comment,
       imageUrl: mockPhotoName ? `mock_assets/${mockPhotoName}` : undefined
@@ -171,46 +171,40 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
             transition: 'all 0.2s'
           }}
         >
-          ← मुख्य सूची पर जाएं / Back to Dashboard
+          ← Back to Dashboard
         </button>
 
         <span className={`status-badge ${getStatusClass(status)}`} style={{ fontSize: '0.85rem', padding: '0.5rem 1rem' }}>
           <span className={`pulse-dot ${getStatusClass(status)}`} style={{ marginRight: '0.35rem' }}></span>
-          {status} ({statusHindi} / {statusRegional})
+          {pick(status, statusHindi)}
         </span>
       </div>
 
       {/* Multilingual Title, PIN Code, Contractor & responsible officer */}
       <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
-          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--brand-ink)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             {sector} Sector • {implementingAgency}
           </span>
           <span style={{ 
             fontSize: '0.95rem', 
             fontWeight: 800, 
-            color: 'var(--color-primary)',
+            color: 'var(--brand-ink)',
             background: 'rgba(37, 99, 235, 0.08)',
             padding: '4px 12px',
             borderRadius: '4px'
           }}>
-            पिन कोड / PIN {pinCode}
+            PIN {pinCode}
           </span>
         </div>
         
         <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: '1.3' }}>
-          {nameEnglish}
+          {pick(nameEnglish, nameHindi)}
         </h1>
-        <h2 style={{ fontSize: '1.25rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
-          हिन्दी: {nameHindi}
-        </h2>
-        <h3 style={{ fontSize: '1.05rem', color: 'var(--text-muted)', fontWeight: 500 }}>
-          मराठी: {nameRegional}
-        </h3>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid var(--border-color)' }}>
-          <div><strong>स्थान / Location:</strong> {district}, {state}</div>
-          <div><strong>मंत्रालय / Ministry:</strong> {ministry}</div>
+          <div><strong>Location:</strong> {district}, {state}</div>
+          <div><strong>Ministry:</strong> {ministry}</div>
         </div>
 
         {/* Naming Contractor & Officer for direct accountability */}
@@ -226,11 +220,11 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
           marginTop: '0.5rem'
         }}>
           <div>
-            <span style={{ color: 'var(--text-secondary)', display: 'block', marginBottom: '0.25rem' }}>मुख्य ठेकेदार (Lead Contractor)</span>
+            <span style={{ color: 'var(--text-secondary)', display: 'block', marginBottom: '0.25rem' }}>Lead Contractor</span>
             <strong style={{ color: 'var(--text-primary)', fontSize: '1rem' }}>{leadContractor}</strong>
           </div>
           <div>
-            <span style={{ color: 'var(--text-secondary)', display: 'block', marginBottom: '0.25rem' }}>ज़िम्मेदार अधिकारी (Officer In-Charge)</span>
+            <span style={{ color: 'var(--text-secondary)', display: 'block', marginBottom: '0.25rem' }}>Officer In-Charge</span>
             <strong style={{ color: 'var(--text-primary)', fontSize: '1rem' }}>{responsibleOfficer}</strong>
             <span style={{ color: 'var(--text-secondary)' }}> ({responsibleOfficerDesignation})</span>
           </div>
@@ -238,23 +232,8 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
 
         {/* WhatsApp Share Button */}
         <div style={{ display: 'flex', justifyContent: 'end', marginTop: '0.5rem' }}>
-          <button
-            onClick={handleWhatsAppShare}
-            style={{
-              padding: '0.5rem 1.25rem',
-              background: '#25D366',
-              border: 'none',
-              borderRadius: '6px',
-              color: 'var(--on-solid)',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.35rem',
-              fontSize: '0.85rem'
-            }}
-          >
-            WhatsApp पर शेयर करें (Share Report)
+          <button type="button" className="btn btn-whatsapp" onClick={handleWhatsAppShare}>
+            WhatsApp Share Report
           </button>
         </div>
       </div>
@@ -307,7 +286,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
               </div>
               <div>
                 <span style={{ color: 'var(--text-secondary)' }}>Actual Expenditure</span>
-                <p style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-primary)', marginTop: '0.2rem' }}>₹{expenditureToDate} Cr</p>
+                <p style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--brand-ink)', marginTop: '0.2rem' }}>₹{expenditureToDate} Cr</p>
               </div>
             </div>
           </div>
@@ -321,7 +300,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem' }}>
                   <span style={{ fontWeight: 500 }}>Land Acquisition Status</span>
-                  <span style={{ color: 'var(--color-primary)', fontWeight: 700 }}>{clearances.landAcquisition}% Complete</span>
+                  <span style={{ color: 'var(--brand-ink)', fontWeight: 700 }}>{clearances.landAcquisition}% Complete</span>
                 </div>
                 <div style={{ height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
                   <div style={{ height: '100%', width: `${clearances.landAcquisition}%`, background: 'var(--color-primary)', borderRadius: '4px' }}></div>
@@ -357,10 +336,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
             <div className="glass-card" style={{ padding: '1.5rem', borderLeft: '4px solid var(--status-delayed)' }}>
               <h3 style={{ fontSize: '1.15rem', color: 'var(--status-delayed)', marginBottom: '0.75rem' }}>Delay Assessment Report</h3>
               <p style={{ fontSize: '0.95rem', color: 'var(--text-primary)', lineHeight: '1.6', marginBottom: '0.5rem' }}>
-                {delaySummary}
-              </p>
-              <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontStyle: 'italic', marginBottom: '1.25rem' }}>
-                हिन्दी: {delaySummaryHindi}
+                {pick(delaySummary, delaySummaryHindi)}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Key Bottlenecks Logged:</span>
@@ -430,8 +406,8 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
               {/* Official Claim */}
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.25rem' }}>
-                  <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>सरकारी दावा (Official Claim)</span>
-                  <span style={{ fontWeight: 800, color: 'var(--color-primary)' }}>{progressPhysical}% Complete</span>
+                  <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Official Claim</span>
+                  <span style={{ fontWeight: 800, color: 'var(--brand-ink)' }}>{progressPhysical}% Complete</span>
                 </div>
                 <div style={{ height: '8px', background: 'rgba(15,23,42,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
                   <div style={{ height: '100%', width: `${progressPhysical}%`, background: 'var(--color-primary)', borderRadius: '4px' }}></div>
@@ -441,12 +417,12 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
               {/* Citizen consensus */}
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.25rem' }}>
-                  <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>जमीनी हकीकत (Ground Reality)</span>
+                  <span style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>Ground Reality</span>
                   <span style={{ 
                     fontWeight: 800, 
                     color: citizenConsensus === null ? 'var(--text-muted)' : isDiscrepancy ? 'var(--status-critical)' : 'var(--status-completed)' 
                   }}>
-                    {citizenConsensus !== null ? `${citizenConsensus}% Consensus` : "नदारद (Unverified)"}
+                    {citizenConsensus !== null ? `${citizenConsensus}% Consensus` : "Unverified"}
                   </span>
                 </div>
                 <div style={{ height: '8px', background: 'rgba(15,23,42,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
@@ -470,7 +446,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
                   color: 'var(--status-critical)',
                   lineHeight: '1.4'
                 }}>
-                  <strong>दावे में विसंगति! (Discrepancy Warning):</strong> Ground reality consensus varies by {Math.abs(progressPhysical - citizenConsensus)}% compared to the official dashboard records.
+                  <strong>Discrepancy Warning:</strong> Ground reality consensus varies by {Math.abs(progressPhysical - citizenConsensus)}% compared to the official dashboard records.
                 </div>
               )}
             </div>
@@ -478,7 +454,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
 
           {/* Submission Form: Anonymous Photo Drop Zone */}
           <div className="glass-card" style={{ padding: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.1rem', color: 'var(--text-primary)', marginBottom: '0.25rem' }}>गुमनाम फोटो ड्रॉप (Anonymous Photo Drop)</h3>
+            <h3 style={{ fontSize: '1.1rem', color: 'var(--text-primary)', marginBottom: '0.25rem' }}>Anonymous Photo Drop</h3>
             <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
               Official data lies; photo evidence of locked buildings, idle cranes, or broken roads does not. Upload anonymously.
             </p>
@@ -516,29 +492,29 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
                   onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; e.currentTarget.style.background = 'rgba(15,23,42,0.01)'; }}
                 >
                   <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.5rem' }}></span>
-                  <strong>क्लिक करें या फोटो ड्रॉप करें (Click to Drop Photo)</strong>
-                  <span style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                  <strong>Click to Drop Photo</strong>
+                  <span style={{ display: 'block', fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
                     {mockPhotoName ? `Selected: ${mockPhotoName}` : "Locked PHC, broken tracks, rusting rods..."}
                   </span>
                 </div>
 
                 <div>
                   <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.25rem' }}>
-                    गुमनाम गवाह (Reporter Identity)
+                    Reporter Identity
                   </label>
                   <input 
                     type="text" 
                     className="form-input" 
                     disabled 
-                    value="गुमनाम नागरिक (Anonymous Citizen) - 100% Secure" 
+                    value="Anonymous Citizen - 100% Secure" 
                     style={{ background: 'rgba(15,23,42,0.04)', color: 'var(--text-muted)', borderStyle: 'dotted' }}
                   />
                 </div>
 
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>
-                    <label style={{ fontWeight: 500 }}>जमीनी प्रगति का अनुमान (Estimate Progress)</label>
-                    <span style={{ color: 'var(--color-primary)', fontWeight: 700 }}>{ratingValue}%</span>
+                    <label style={{ fontWeight: 500 }}>Estimate Progress</label>
+                    <span style={{ color: 'var(--brand-ink)', fontWeight: 700 }}>{ratingValue}%</span>
                   </div>
                   <input 
                     type="range" 
@@ -553,7 +529,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
 
                 <div>
                   <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.25rem', fontWeight: 500 }}>
-                    सच्ची टिप्पणी / Ground Observation
+                    Ground Observation
                   </label>
                   <textarea 
                     placeholder="Add description of work done, idle machinery, delays..." 
@@ -607,12 +583,12 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem' }}>
                       <span style={{ fontWeight: 700, color: 'var(--text-muted)' }}>{report.userName}</span>
                       <span style={{ color: 'var(--text-muted)' }}>
-                        {new Date(report.timestamp).toLocaleDateString()}
+                        {new Date(report.timestamp).toLocaleDateString(locale())}
                       </span>
                     </div>
 
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                      Estimated Progress: <strong style={{ color: 'var(--color-primary)' }}>{report.ratingValue}%</strong>
+                      Estimated Progress: <strong style={{ color: 'var(--brand-ink)' }}>{report.ratingValue}%</strong>
                     </div>
 
                     <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.4', fontStyle: 'italic' }}>
@@ -627,7 +603,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
                         background: 'rgba(239, 68, 68, 0.08)',
                         border: '1px solid rgba(239,68,68,0.15)',
                         borderRadius: '6px',
-                        fontSize: '0.7rem',
+                        fontSize: 'var(--text-xs)',
                         color: 'var(--status-critical)',
                         display: 'flex',
                         alignItems: 'center',
@@ -646,7 +622,7 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({
                           borderRadius: '4px',
                           padding: '2px 8px',
                           color: 'var(--text-secondary)',
-                          fontSize: '0.7rem',
+                          fontSize: 'var(--text-xs)',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',

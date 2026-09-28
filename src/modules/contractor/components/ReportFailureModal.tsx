@@ -150,7 +150,7 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
                   <Landmark className="w-3 h-3 text-ink" />
                   <span>Filter by State:</span>
                 </label>
-                <select
+                <select aria-label="Filter by State"
                   value={filterState}
                   onChange={(e) => {
                     setFilterState(e.target.value);
@@ -172,7 +172,7 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
                   <Building2 className="w-3 h-3 text-bad" />
                   <span>Filter by City:</span>
                 </label>
-                <select
+                <select aria-label="Filter by City"
                   value={filterCity}
                   onChange={(e) => setFilterCity(e.target.value)}
                   className="w-full bg-surface border rounded-[10px] border-line px-2 py-1 text-xs font-bold text-ink cursor-pointer"
@@ -192,7 +192,7 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
               <label className="text-xs font-bold text-ink block mb-1">
                 Select Road / Municipal Work Order ({filteredWorkOrders.length} Available):
               </label>
-              <select
+              <select aria-label="Road or work order"
                 value={selectedWoId}
                 onChange={(e) => setSelectedWoId(e.target.value)}
                 className="w-full bg-surface-2 border rounded-[10px] border-line px-3 py-2 text-xs font-bold text-ink focus:outline-none cursor-pointer"
@@ -218,7 +218,7 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
                 <label className="text-xs font-bold text-ink block mb-1">
                   Defect Classification:
                 </label>
-                <select
+                <select aria-label="Defect Classification"
                   value={defectType}
                   onChange={(e: any) => setDefectType(e.target.value)}
                   className="w-full bg-surface-2 border rounded-[10px] border-line px-3 py-2 text-xs font-bold text-ink focus:outline-none cursor-pointer"
@@ -235,7 +235,7 @@ export const ReportFailureModal: React.FC<ReportFailureModalProps> = ({
                 <label className="text-xs font-bold text-ink block mb-1">
                   Hazard Severity:
                 </label>
-                <select
+                <select aria-label="Hazard Severity"
                   value={severity}
                   onChange={(e: any) => setSeverity(e.target.value)}
                   className="w-full bg-surface-2 border rounded-[10px] border-line px-3 py-2 text-xs font-bold text-ink focus:outline-none cursor-pointer"

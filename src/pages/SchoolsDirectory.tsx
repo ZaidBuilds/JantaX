@@ -6,6 +6,7 @@ import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver'
 import { Badge, EmptyState, Stat, toneForScore, toneForStatus, useToast } from '../ui';
 import { ModuleFrame } from './ModuleFrame';
 import { OfficialRecords } from '../ui/OfficialRecords';
+import { pick } from '../i18n';
 
 const SAMPLE_PINS = ['110001', '250001', '560001', '400001', '226001', '800001'];
 const LEVELS = ['All', 'Primary', 'Upper Primary', 'Secondary', 'Higher Secondary'];
@@ -148,7 +149,7 @@ export function SchoolsDirectory() {
         </div>
         <div className="field">
           <label className="label" htmlFor="schools-sort">Sort by</label>
-          <select id="schools-sort" className="select" value={sort} onChange={(e) => setParam('sort', e.target.value === 'score-desc' ? '' : e.target.value)}>
+          <select aria-label="Sort by" id="schools-sort" className="select" value={sort} onChange={(e) => setParam('sort', e.target.value === 'score-desc' ? '' : e.target.value)}>
             <option value="score-desc">Ground truth, highest first</option>
             <option value="score-asc">Ground truth, lowest first</option>
             <option value="ptr">Most pupils per teacher</option>
@@ -224,11 +225,10 @@ export function SchoolsDirectory() {
                 <div className="school-card-main">
                   <div style={{ minWidth: 0 }}>
                     <h3 className="card-title">
-                      <Link to={`/schools/${s.id}`} className="school-link">{s.titleEnglish}</Link>
+                      <Link to={`/schools/${s.id}`} className="school-link" translate="no">{pick(s.titleEnglish, s.titleHindi)}</Link>
                     </h3>
-                    <p className="tiny muted" lang="hi">{s.titleHindi}</p>
                     <p className="small" style={{ color: 'var(--ink-2)', marginTop: 'var(--s-2)' }}>
-                      {s.schoolLevel} · {s.managementType} · UDISE <span className="mono">{s.udiseCode}</span> · PIN {s.location.pinCode}, {s.location.district}
+                      {s.schoolLevel} · {s.managementType} · UDISE <span className="mono">{s.udiseCode}</span> · PIN {s.location.pinCode}, <span translate="no">{s.location.district}</span>
                     </p>
                     <div className="cluster" style={{ marginTop: 'var(--s-3)' }}>
                       <Facility ok={s.hasToilet} label="Toilets" />

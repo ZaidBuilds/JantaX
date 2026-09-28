@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Popup, useMap, CircleMarker } from 'react-leaf
 import { Search, Crosshair, List, Map as MapIcon, X, ArrowRight, Layers, SearchX } from 'lucide-react';
 import { usePin } from '../core/context/PinContext';
 import { useCatalog } from '../core/hooks/useCatalog';
-import { getCoordinateForPin } from '../core/utils/pinCoordinates';
+import { circleBounds, INDIA_VIEW, pinArea, placeRecord, type PinArea, type Placement } from '../core/geo/placement';
 import { usePinRecord } from '../core/services/pinDirectory';
 import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver';
 import { getAllWorks } from '../modules/mplads/services/mpladsService';
@@ -12,6 +12,8 @@ import { getAllBooths } from '../modules/booth/services/boothService';
 import { getAllCourts } from '../modules/courts/services/courtsService';
 import { MOCK_CITIZEN_REPORTS } from '../modules/reporting/data/mockReports';
 import { Badge, EmptyState, toneForStatus, decodeEntities } from '../ui';
+import { AreaCircle, FitView, MapLegend, TILE_ATTRIBUTION, TILE_URL, areaText } from '../ui/MapParts';
+import { pick, t } from '../i18n';
 
 type Layer = 'school' | 'infra' | 'mplads' | 'booth' | 'court' | 'issue';
 
@@ -20,11 +22,14 @@ export interface MapGeoEntity {
   layer: Layer;
   title: string;
   titleHi?: string;
-  subtitle: string;
+  /** Interface text about the record (translated). */
+  subtitle?: string;
+  /** The record's own place or landmark, shown as published. */
+  place?: string;
   status: string;
   pinCode: string;
-  lat: number;
-  lng: number;
+  /** An exact point only when the record carries its own coordinates; otherwise somewhere in the PIN. */
+  placement: Placement;
   href: string;
   metricLabel?: string;
   metricValue?: string;
@@ -48,24 +53,15 @@ const HUBS = [
   { pin: '560001', name: 'Bengaluru' },
 ];
 
-function Recenter({ lat, lng, zoom, nonce }: { lat: number; lng: number; zoom: number; nonce: number }) {
+/** Moves the view to the selected record: its point, or the PIN area when it has no exact location. */
+function FocusOn({ entity, area }: { entity: MapGeoEntity | null; area: PinArea | null }) {
   const map = useMap();
   useEffect(() => {
-    map.setView([lat, lng], zoom, { animate: true });
-  }, [map, lat, lng, zoom, nonce]);
+    if (!entity) return;
+    if (entity.placement.kind === 'exact') map.setView([entity.placement.lat, entity.placement.lng], Math.max(map.getZoom(), 15), { animate: true });
+    else if (area) map.fitBounds(circleBounds(area, area.radiusKm), { padding: [24, 24], animate: true });
+  }, [map, entity, area]);
   return null;
-}
-
-function FocusOn({ entity }: { entity: MapGeoEntity | null }) {
-  const map = useMap();
-  useEffect(() => {
-    if (entity) map.panTo([entity.lat, entity.lng], { animate: true });
-  }, [map, entity]);
-  return null;
-}
-
-function jitter(i: number, spread = 0.0038) {
-  return [((i % 5) - 2) * spread, (((i + 2) % 5) - 2) * spread] as const;
 }
 
 export function MapExplorer() {
@@ -84,37 +80,32 @@ export function MapExplorer() {
     setSelectedPin(pin);
   }, [pin, setSelectedPin]);
 
-  // Centre on the PIN's post offices (India Post directory); the prefix table and Delhi are fallbacks only.
+  // The PIN as an area around its post offices (India Post directory); its postal district if the
+  // directory has no location for it. Nothing is placed at an invented point.
   const dir = usePinRecord(pin);
-  const base =
-    dir.record && dir.record.lat !== null && dir.record.lng !== null
-      ? { lat: dir.record.lat, lng: dir.record.lng }
-      : getCoordinateForPin(pin) || { lat: 28.6139, lng: 77.209 };
+  const area = dir.status === 'loading' ? null : pinArea(pin, dir.record);
   const loc = resolvePincode(pin);
   const { records, isLoading } = useCatalog(pin);
 
   const entities = useMemo<MapGeoEntity[]>(() => {
     const list: MapGeoEntity[] = [];
-    records.forEach((r, i) => {
-      const [dLat, dLng] = jitter(i);
+    records.forEach((r) => {
       const layer: Layer = r.moduleId === 'school' ? 'school' : 'infra';
       list.push({
         id: r.id,
         layer,
         title: r.titleEnglish,
         titleHi: r.titleHindi,
-        subtitle: `${r.location.district}, ${r.location.state}`,
+        place: `${r.location.district}, ${r.location.state}`,
         status: r.status,
         pinCode: r.location.pinCode,
-        lat: base.lat + dLat,
-        lng: base.lng + dLng,
+        placement: { kind: 'area' },
         href: layer === 'school' ? `/schools/${r.id}` : `/module/infra?pin=${r.location.pinCode}`,
         metricLabel: 'Ground truth',
         metricValue: `${r.groundTruthScore}/100`,
       });
     });
-    getAllWorks({ pinCode: pin }).forEach((w, i) => {
-      const [dLat, dLng] = jitter(i + 7, 0.0042);
+    getAllWorks({ pinCode: pin }).forEach((w) => {
       list.push({
         id: w.id,
         layer: 'mplads',
@@ -123,15 +114,13 @@ export function MapExplorer() {
         subtitle: `Recommended by ${w.representativeName}`,
         status: w.status,
         pinCode: w.pinCode,
-        lat: base.lat + dLat,
-        lng: base.lng + dLng,
+        placement: placeRecord({ lat: w.latitude, lng: w.longitude }, area),
         href: `/mplads/projects/${w.id}`,
         metricLabel: 'Sanctioned',
         metricValue: `₹${w.sanctionCostLakhs} lakh`,
       });
     });
-    getAllBooths({ pinCode: pin }).forEach((b, i) => {
-      const [dLat, dLng] = jitter(i + 3, 0.0046);
+    getAllBooths({ pinCode: pin }).forEach((b) => {
       list.push({
         id: b.id,
         layer: 'booth',
@@ -140,47 +129,45 @@ export function MapExplorer() {
         subtitle: `BLO ${b.blo.name}`,
         status: b.facilities.wheelchairRamp ? 'Ramp available' : 'No ramp',
         pinCode: b.pinCode,
-        lat: base.lat + dLat,
-        lng: base.lng + dLng,
+        placement: placeRecord({ lat: b.latitude, lng: b.longitude }, area),
         href: `/booth/${b.id}`,
         metricLabel: 'Electors',
         metricValue: b.totalElectors.toLocaleString('en-IN'),
       });
     });
-    getAllCourts({ pinCode: pin }).forEach((c, i) => {
+    getAllCourts({ pinCode: pin }).forEach((c) => {
       list.push({
         id: c.id,
         layer: 'court',
         title: c.complexName,
         titleHi: c.complexNameHi,
-        subtitle: `${c.courtType} · ${c.district}`,
+        subtitle: c.courtType,
+        place: c.district,
         status: `${c.vacancyPercentage}% judge posts vacant`,
         pinCode: c.pinCode,
-        lat: base.lat - 0.005 - i * 0.002,
-        lng: base.lng + 0.005,
+        placement: placeRecord({ lat: c.latitude, lng: c.longitude }, area),
         href: `/courts/${c.id}`,
         metricLabel: 'Pending cases',
         metricValue: c.totalPendingCases.toLocaleString('en-IN'),
       });
     });
-    MOCK_CITIZEN_REPORTS.filter((r) => r.location.pinCode === pin).forEach((r, i) => {
-      const [dLat, dLng] = jitter(i + 11, 0.003);
+    MOCK_CITIZEN_REPORTS.filter((r) => r.location.pinCode === pin).forEach((r) => {
       list.push({
         id: r.id,
         layer: 'issue',
         title: decodeEntities(r.title),
-        subtitle: `${r.category} · ${r.location.landmark}`,
+        subtitle: r.category,
+        place: r.location.landmark,
         status: r.moderationState,
         pinCode: r.location.pinCode,
-        lat: r.location.lat ?? base.lat + dLat,
-        lng: r.location.lng ?? base.lng + dLng,
+        placement: placeRecord(r.location, area),
         href: `/reports/${r.id}`,
         metricLabel: 'Upvotes',
         metricValue: String(r.upvotes),
       });
     });
     return list;
-  }, [records, pin, base.lat, base.lng]);
+  }, [records, pin, area]);
 
   const counts = useMemo(() => {
     const c = {} as Record<Layer, number>;
@@ -189,6 +176,8 @@ export function MapExplorer() {
   }, [entities]);
 
   const visible = entities.filter((e) => layers[e.layer]);
+  const exact = visible.filter((e): e is MapGeoEntity & { placement: { kind: 'exact'; lat: number; lng: number } } => e.placement.kind === 'exact');
+  const inArea = visible.length - exact.length;
 
   const submit = (e?: FormEvent, value = draft) => {
     e?.preventDefault();
@@ -201,7 +190,10 @@ export function MapExplorer() {
         <div className="map-panel-head">
           <h1 className="card-title" style={{ fontSize: 'var(--text-xl)' }}>Map</h1>
           <p className="tiny muted">
-            PIN {pin} · {loc.district}, {loc.state}
+            PIN {pin} ·{' '}
+            <span translate="no">
+              {loc.district}, {loc.state}
+            </span>
           </p>
           <form onSubmit={submit} className="cluster" style={{ marginTop: 'var(--s-3)', flexWrap: 'nowrap' }}>
             <div className="input-group" style={{ flex: 1 }}>
@@ -235,6 +227,7 @@ export function MapExplorer() {
               </button>
             ))}
           </div>
+          <MapLegend area={area} className="map-panel-legend" />
         </div>
 
         <div className="map-results" aria-live="polite">
@@ -260,8 +253,15 @@ export function MapExplorer() {
                 >
                   <span className="layer-swatch" style={{ background: LAYERS[e.layer].color, marginTop: 6 }} aria-hidden="true" />
                   <span style={{ flex: 1, minWidth: 0 }}>
-                    <span className="strong clamp-2" style={{ display: 'block' }}>{e.title}</span>
-                    <span className="tiny muted truncate" style={{ display: 'block' }}>{LAYERS[e.layer].label} · {e.subtitle}</span>
+                    <span className="strong clamp-2" style={{ display: 'block' }} translate="no">{pick(e.title, e.titleHi)}</span>
+                    <span className="tiny muted truncate" style={{ display: 'block' }}>
+                      {LAYERS[e.layer].label}
+                      {e.subtitle && <> · {e.subtitle}</>}
+                      {e.place && <> · <span translate="no">{e.place}</span></>}
+                    </span>
+                    <span className="loc-tag" style={{ marginTop: 4 }} data-placement={e.placement.kind}>
+                      {e.placement.kind === 'exact' ? t('Exact location') : t('In PIN area')}
+                    </span>
                   </span>
                   {e.metricValue && <span className="tiny num muted" style={{ whiteSpace: 'nowrap' }}>{e.metricValue}</span>}
                 </button>
@@ -277,36 +277,65 @@ export function MapExplorer() {
       </aside>
 
       <section className="map-canvas" aria-label={`Map of PIN ${pin}`}>
-        <MapContainer center={[base.lat, base.lng]} zoom={14} style={{ height: '100%', width: '100%' }} scrollWheelZoom>
-          <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          <Recenter lat={base.lat} lng={base.lng} zoom={14} nonce={recenter} />
-          <FocusOn entity={selected} />
-          {visible.map((e) => (
+        <MapContainer
+          center={area ? [area.lat, area.lng] : INDIA_VIEW.center}
+          zoom={area ? 13 : INDIA_VIEW.zoom}
+          style={{ height: '100%', width: '100%' }}
+          scrollWheelZoom
+        >
+          <TileLayer attribution={TILE_ATTRIBUTION} url={TILE_URL} />
+          <FitView areas={area ? [area] : []} points={exact.map((e) => e.placement)} nonce={recenter} />
+          <FocusOn entity={selected} area={area} />
+          {area && (
+            <AreaCircle area={area} emphasis={selected?.placement.kind === 'area'}>
+              <strong>PIN {pin}</strong>
+              <br />
+              <span style={{ fontSize: 12 }}>{areaText(area)}</span>
+              {inArea > 0 && (
+                <>
+                  <br />
+                  <span style={{ fontSize: 12 }}>{t(inArea === 1 ? '{n} record here has no published exact location; it is in the list.' : '{n} records here have no published exact location; they are in the list.', { n: inArea })}</span>
+                </>
+              )}
+            </AreaCircle>
+          )}
+          {exact.map((e) => (
             <CircleMarker
               key={`${e.layer}-${e.id}`}
-              center={[e.lat, e.lng]}
+              center={[e.placement.lat, e.placement.lng]}
               radius={selected?.id === e.id ? 11 : 8}
+              className="map-point"
               pathOptions={{ color: '#ffffff', weight: 2, fillColor: LAYERS[e.layer].color, fillOpacity: 0.92 }}
               eventHandlers={{ click: () => setSelected(e) }}
             >
               <Popup>
-                <strong>{e.title}</strong>
+                <strong translate="no">{pick(e.title, e.titleHi)}</strong>
                 <br />
-                <span style={{ fontSize: 12 }}>{e.subtitle}</span>
+                <span style={{ fontSize: 12 }}>
+                  {e.subtitle}
+                  {e.subtitle && e.place && ' · '}
+                  {e.place && <span translate="no">{e.place}</span>}
+                </span>
               </Popup>
             </CircleMarker>
           ))}
         </MapContainer>
 
+        {dir.status === 'missing' && !area && (
+          <div className="callout callout-info map-notice" role="status">
+            <span>{t('PIN {pin} has no location in the India Post directory, so the map shows all of India.', { pin })}</span>
+          </div>
+        )}
+
         <button type="button" className="btn btn-secondary btn-icon map-recenter" onClick={() => {
             setSelected(null);
             setRecenter((n) => n + 1);
-          }} aria-label="Recentre on PIN" title="Recentre">
+          }} aria-label="Show the whole PIN area" title="Show the whole PIN area">
           <Crosshair size={17} aria-hidden="true" />
         </button>
 
         {selected && (
-          <div className="card map-selection" role="dialog" aria-label={selected.title}>
+          <div className="card map-selection" role="dialog" aria-label={pick(selected.title, selected.titleHi)}>
             <div className="card-body stack-sm">
               <div className="spread" style={{ alignItems: 'flex-start' }}>
                 <span className="tiny strong" style={{ color: LAYERS[selected.layer].color }}>{LAYERS[selected.layer].label}</span>
@@ -314,14 +343,23 @@ export function MapExplorer() {
                   <X size={15} aria-hidden="true" />
                 </button>
               </div>
-              <div className="card-title" style={{ fontSize: 'var(--text-md)' }}>{selected.title}</div>
-              {selected.titleHi && <div className="tiny muted" lang="hi">{selected.titleHi}</div>}
-              <div className="small muted">{selected.subtitle}</div>
+              <div className="card-title" style={{ fontSize: 'var(--text-md)' }}>{pick(selected.title, selected.titleHi)}</div>
+              <div className="small muted">
+                {selected.subtitle}
+                {selected.subtitle && selected.place && ' · '}
+                {selected.place && <span translate="no">{selected.place}</span>}
+              </div>
+              <p className="tiny muted">
+                {selected.placement.kind === 'exact'
+                  ? t('Shown at the location published with this record.')
+                  : t('This record has no published exact location, so it is shown as the PIN area.')}
+              </p>
               <div className="spread">
                 <Badge tone={toneForStatus(selected.status)}>{selected.status}</Badge>
                 {selected.metricValue && (
                   <span className="small">
-                    <span className="muted">{selected.metricLabel}: </span>
+                    <span className="muted">{selected.metricLabel}</span>
+                    <span className="muted">: </span>
                     <strong className="num">{selected.metricValue}</strong>
                   </span>
                 )}

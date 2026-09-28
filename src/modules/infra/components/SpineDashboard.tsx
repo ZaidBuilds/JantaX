@@ -1,7 +1,13 @@
+import { Link } from 'react-router-dom';
 import React, { useState, useMemo } from 'react';
 import { getSpineDataForPincode } from '../data/nationwideSpine';
 import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
 import { resolvePincode } from '../../../core/utils/pinResolver';
+import { pick } from '../../../i18n';
+import { findState } from '../../../core/geo/indiaStates';
+import { localNamesFor } from '../../../core/governance/chain';
+
+const STATUS_LABEL = { planned: 'Planned', 'in-progress': 'In progress', completed: 'Completed', stalled: 'Stalled' } as const;
 
 export function SpineDashboard() {
   const { share } = useWhatsAppShare();
@@ -13,6 +19,7 @@ export function SpineDashboard() {
 
   // Resolve Location details
   const resolvedLoc = useMemo(() => resolvePincode(currentPin), [currentPin]);
+  const localNames = localNamesFor(findState(resolvedLoc.state)?.code);
 
   // Load dynamic dataset based on the current active PIN code
   const { representatives, funds, projects, contractors } = useMemo(() => {
@@ -54,7 +61,7 @@ export function SpineDashboard() {
     const matchingContractors = contractors.filter(c => c.name === contractorName && c.projectId !== currentProjectId);
     return matchingContractors.map(c => {
       const proj = projects.find(p => p.id === c.projectId);
-      return proj ? { projId: proj.id, name: proj.workName } : null;
+      return proj ? { projId: proj.id, name: proj.workName, nameHi: proj.workNameHi } : null;
     }).filter(Boolean);
   };
 
@@ -65,10 +72,10 @@ export function SpineDashboard() {
       titleEnglish: proj.workName,
       claimLabel: `₹${proj.sanctionedCostLakhs} Lakhs Allocated`,
       claimLabelHindi: `₹${proj.sanctionedCostLakhs} लाख स्वीकृत`,
-      realityLabel: proj.statusHi,
+      realityLabel: proj.realityTextEn ?? STATUS_LABEL[proj.status as keyof typeof STATUS_LABEL],
       realityLabelHindi: proj.realityTextHi || proj.statusHi,
       responsiblePerson: repName,
-      responsibleOrg: fund.schemeNameHi,
+      responsibleOrg: pick(fund.schemeName, fund.schemeNameHi),
       sourceUrl: 'https://egramswaraj.gov.in',
       moduleNameHindi: `Project 777 (जवाबदेही पिन: ${currentPin})`,
     });
@@ -80,7 +87,7 @@ export function SpineDashboard() {
       setCurrentPin(pinInput);
       setSelectedRepId(null);
     } else {
-      alert('कृपया एक सही ६-अंकीय भारतीय पिन कोड दर्ज करें। (Please enter a valid 6-digit Indian PIN code.)');
+      alert('Please enter a valid 6-digit Indian PIN code.');
     }
   };
 
@@ -90,16 +97,17 @@ export function SpineDashboard() {
       {/* Nationwide PIN Search Form */}
       <div className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
         <h3 style={{ fontSize: '1.1rem', marginBottom: '0.75rem' }}>
-          अखिल भारतीय ५-स्तरीय जवाबदेही खोज (Nationwide 5-Level Spine Search)
+          Follow the money by PIN code
         </h3>
-        <p style={{ fontSize: '0.8rem', opacity: 0.7, marginBottom: '1rem' }}>
-          भारत के किसी भी कोने का ६-अंकीय पिन कोड दर्ज करें। यह प्रणाली उस स्थान के सांसद (MP), विधायक (MLA), जिला परिषद, ब्लॉक पंचायत और ग्राम पंचायत के कोष, कार्यों और ठेकेदारों की श्रृंखला को प्रदर्शित करेगी।
+        <p style={{ fontSize: '0.8rem', marginBottom: '1rem', color: 'var(--ink-3)' }}>
+          Enter any 6-digit PIN code in India to see funds, works and contractors at each level: MP, MLA, zila parishad, block and gram panchayat. Sample data.{' '}
+          <Link to={`/governance?pin=${currentPin}`}>See every level of government for this PIN</Link>
         </p>
         <form onSubmit={handlePinSearch} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
           <input
             type="text"
             maxLength={6}
-            placeholder="पिन कोड दर्ज करें (उदा. 560001, 400001, 250001)..."
+            placeholder="Enter a PIN code, e.g. 560001"
             value={pinInput}
             onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ''))}
             style={{
@@ -125,7 +133,7 @@ export function SpineDashboard() {
               fontSize: '0.85rem',
             }}
           >
-            खोजें (Search)
+            Search
           </button>
         </form>
         {resolvedLoc.isValid && (
@@ -145,7 +153,7 @@ export function SpineDashboard() {
       {/* Level Selection Tabs */}
       <div className="glass-card" style={{ padding: '1rem', marginBottom: '1.5rem' }}>
         <h3 style={{ fontSize: '0.85rem', marginBottom: '0.75rem', opacity: 0.8 }}>
-          ५-स्तरीय जवाबदेही श्रृंखला (Select Level of Governance)
+          Select Level of Governance
         </h3>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
           {(['all', 'union', 'state', 'district', 'block', 'village'] as const).map(level => (
@@ -160,7 +168,7 @@ export function SpineDashboard() {
                 borderRadius: '8px',
                 border: '1px solid',
                 borderColor: selectedLevel === level ? 'var(--color-primary)' : 'var(--border-color)',
-                background: selectedLevel === level ? 'var(--color-primary)' : 'rgba(255,255,255,0.03)',
+                background: selectedLevel === level ? 'var(--color-primary)' : 'var(--surface)',
                 color: selectedLevel === level ? 'white' : 'inherit',
                 fontSize: '0.75rem',
                 fontWeight: 600,
@@ -168,12 +176,12 @@ export function SpineDashboard() {
                 textTransform: 'uppercase',
               }}
             >
-              {level === 'all' && 'सभी स्तर (All)'}
-              {level === 'union' && 'सांसद (MP)'}
-              {level === 'state' && 'विधायक (MLA)'}
-              {level === 'district' && 'जिला परिषद (Zilla Parishad)'}
-              {level === 'block' && 'ब्लॉक समिति (Block Samiti)'}
-              {level === 'village' && 'ग्राम पंचायत (Gram Panchayat)'}
+              {level === 'all' && 'All'}
+              {level === 'union' && 'MP'}
+              {level === 'state' && 'MLA'}
+              {level === 'district' && pick(localNames.district?.name.en ?? 'District panchayat', localNames.district?.name.hi)}
+              {level === 'block' && pick(localNames.block?.name.en ?? 'Block panchayat', localNames.block?.name.hi)}
+              {level === 'village' && pick(localNames.village?.name.en ?? 'Gram panchayat', localNames.village?.name.hi)}
             </button>
           ))}
         </div>
@@ -203,20 +211,20 @@ export function SpineDashboard() {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>{rep.nameHi}</span>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>{pick(rep.name, rep.nameHi)}</span>
                   <span style={{
-                    fontSize: '0.6rem',
+                    fontSize: 'var(--text-xs)',
                     padding: '2px 6px',
                     borderRadius: '10px',
-                    background: rep.party === 'BJP' ? '#FF993333' : '#0066CC33',
-                    color: rep.party === 'BJP' ? '#FF9933' : '#0066CC',
+                    background: 'var(--surface-3)',
+                    color: 'var(--ink-2)',
                     fontWeight: 700,
                   }}>
                     {rep.party}
                   </span>
                 </div>
-                <div style={{ fontSize: '0.7rem', opacity: 0.6, marginTop: '0.25rem' }}>
-                  {rep.constituencyName} · level: {rep.level}
+                <div style={{ fontSize: 'var(--text-xs)', marginTop: '0.25rem', color: 'var(--ink-3)' }}>
+                  {pick(rep.constituencyName, rep.constituencyNameHi)}
                 </div>
               </div>
             ))}
@@ -229,17 +237,17 @@ export function SpineDashboard() {
             
             {/* Representative Card */}
             <div className="glass-card" style={{ padding: '1.5rem', borderLeft: '4px solid var(--color-primary)' }}>
-              <div style={{ fontSize: '0.75rem', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '1px' }}>
+              <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '1px', color: 'var(--ink-3)' }}>
                 REPRESENTATIVE PROFILE · {activeRep.level.toUpperCase()} LEVEL
               </div>
-              <h2 style={{ fontSize: '1.4rem', margin: '0.25rem 0' }}>{activeRep.nameHi} ({activeRep.name})</h2>
+              <h2 style={{ fontSize: '1.4rem', margin: '0.25rem 0' }}>{pick(activeRep.name, activeRep.nameHi)}</h2>
               <p style={{ fontSize: '0.85rem', opacity: 0.8 }}>
-                Jurisdiction: <strong>{activeRep.constituencyNameHi}</strong>
+                Jurisdiction: <strong>{pick(activeRep.constituencyName, activeRep.constituencyNameHi)}</strong>
               </p>
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.75rem' }}>
                 {activeRep.pinCodes.map(pin => (
                   <span key={pin} style={{
-                    fontSize: '0.65rem',
+                    fontSize: 'var(--text-xs)',
                     padding: '2px 8px',
                     borderRadius: '4px',
                     background: 'rgba(255,255,255,0.06)',
@@ -258,22 +266,22 @@ export function SpineDashboard() {
                 <div key={fund.id} className="glass-card" style={{ padding: '1.25rem', borderLeft: '4px solid var(--good)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1rem' }}>
                     <div>
-                      <div style={{ fontSize: '0.65rem', opacity: 0.6, fontWeight: 700, color: 'var(--good)', textTransform: 'uppercase' }}>
+                      <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--ink-3)', textTransform: 'uppercase' }}>
                         Sanctioned Fund
                       </div>
-                      <h3 style={{ fontSize: '1.05rem', margin: '0.1rem 0' }}>{fund.schemeNameHi}</h3>
-                      <div style={{ fontSize: '0.75rem', opacity: 0.6 }}>{fund.schemeName} · FY: {fund.financialYear}</div>
+                      <h3 style={{ fontSize: '1.05rem', margin: '0.1rem 0' }}>{pick(fund.schemeName, fund.schemeNameHi)}</h3>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--ink-3)' }}>{fund.schemeName} · FY: {fund.financialYear}</div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--good)' }}>
                         ₹{fund.amountSanctionedCr} Cr
                       </div>
-                      <div style={{ fontSize: '0.6rem', opacity: 0.5 }}>Sanctioned Limit</div>
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Sanctioned Limit</div>
                     </div>
                   </div>
 
                   {/* Projects List under this Fund */}
-                  <h4 style={{ fontSize: '0.8rem', opacity: 0.7, marginBottom: '0.75rem', textTransform: 'uppercase' }}>
+                  <h4 style={{ fontSize: '0.8rem', marginBottom: '0.75rem', textTransform: 'uppercase', color: 'var(--ink-3)' }}>
                     Projects Sanctioned ({fundProjects.length})
                   </h4>
 
@@ -291,18 +299,18 @@ export function SpineDashboard() {
                         }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <div>
-                              <h5 style={{ fontSize: '0.9rem', margin: 0 }}>{proj.workNameHi}</h5>
-                              <div style={{ fontSize: '0.75rem', opacity: 0.6, marginTop: '0.1rem' }}>{proj.workName}</div>
+                              <h5 style={{ fontSize: '0.9rem', margin: 0 }}>{pick(proj.workName, proj.workNameHi)}</h5>
+                              <div style={{ fontSize: '0.75rem', marginTop: '0.1rem', color: 'var(--ink-3)' }}>{proj.workName}</div>
                             </div>
                             <span style={{
-                              fontSize: '0.7rem',
+                              fontSize: 'var(--text-xs)',
                               padding: '2px 8px',
                               borderRadius: '20px',
                               background: proj.status === 'completed' ? 'var(--status-completed-bg)' : proj.status === 'stalled' ? 'var(--status-critical-bg)' : 'var(--status-construction-bg)',
                               color: proj.status === 'completed' ? 'var(--status-completed)' : proj.status === 'stalled' ? 'var(--status-critical)' : 'var(--status-construction)',
                               fontWeight: 700,
                             }}>
-                              {proj.statusHi}
+                              {pick(STATUS_LABEL[proj.status], proj.statusHi)}
                             </span>
                           </div>
 
@@ -310,7 +318,7 @@ export function SpineDashboard() {
                             
                             {/* Claim vs Reality Split */}
                             <div style={{ background: 'rgba(59, 130, 246, 0.04)', padding: '0.5rem', borderRadius: '6px', borderLeft: '3px solid var(--brand-ink)' }}>
-                              <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'var(--brand-ink)', textTransform: 'uppercase' }}>
+                              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--brand-ink)', textTransform: 'uppercase' }}>
                                 Govt Claim
                               </div>
                               <div style={{ fontSize: '0.75rem', marginTop: '0.25rem' }}>
@@ -319,11 +327,11 @@ export function SpineDashboard() {
                             </div>
 
                             <div style={{ background: 'rgba(239, 68, 68, 0.04)', padding: '0.5rem', borderRadius: '6px', borderLeft: '3px solid var(--bad)' }}>
-                              <div style={{ fontSize: '0.6rem', fontWeight: 700, color: 'var(--bad)', textTransform: 'uppercase' }}>
-                                Reality (जमीनी हकीकत)
+                              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--bad)', textTransform: 'uppercase' }}>
+                                Reality
                               </div>
-                              <div style={{ fontSize: '0.75rem', marginTop: '0.25rem', color: '#fca5a5' }}>
-                                {proj.realityTextHi || 'No reports logged.'}
+                              <div style={{ fontSize: '0.75rem', marginTop: '0.25rem', color: 'var(--bad)' }}>
+                                {pick(proj.realityTextEn ?? 'No reports logged yet.', proj.realityTextHi)}
                               </div>
                             </div>
 
@@ -335,13 +343,13 @@ export function SpineDashboard() {
                               marginTop: '0.75rem',
                               paddingTop: '0.75rem',
                               borderTop: '1px dashed rgba(255,255,255,0.06)',
-                              fontSize: '0.72rem',
+                              fontSize: 'var(--text-xs)',
                             }}>
                               <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
                                 <div>
-                                  Contractor: <strong>{contractor.nameHi}</strong>
+                                  Contractor: <strong>{pick(contractor.name, contractor.nameHi)}</strong>
                                   <br />
-                                  <span style={{ opacity: 0.5 }}>{contractor.registrationNumber} · Past Projects: {contractor.pastProjectsCount}</span>
+                                  <span style={{ color: 'var(--ink-3)' }}>{contractor.registrationNumber} · Past Projects: {contractor.pastProjectsCount}</span>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
                                   Payment Status: <strong style={{ color: contractor.paymentStatus === 'paid' ? 'var(--good)' : 'var(--warn)' }}>{contractor.paymentStatus.toUpperCase()}</strong>
@@ -358,11 +366,11 @@ export function SpineDashboard() {
                                   borderLeft: '3px solid var(--warn)',
                                 }}>
                                   <span style={{ fontWeight: 600, color: 'var(--warn)' }}>Cross-Panchayat Contractor Alert:</span>
-                                  <div style={{ opacity: 0.8, fontSize: '0.68rem', marginTop: '0.15rem' }}>
+                                  <div style={{ opacity: 0.8, fontSize: 'var(--text-xs)', marginTop: '0.15rem' }}>
                                     This contractor is also awarded projects elsewhere:
                                     <ul style={{ paddingLeft: '1rem', marginTop: '0.1rem' }}>
                                       {crossRefs.map((ref: any, idx: number) => (
-                                        <li key={idx}>{ref.name}</li>
+                                        <li key={idx}>{pick(ref.name, ref.nameHi)}</li>
                                       ))}
                                     </ul>
                                   </div>
@@ -373,19 +381,7 @@ export function SpineDashboard() {
 
                           {/* Action Bar */}
                           <div style={{ marginTop: '0.75rem', display: 'flex', justifyContent: 'flex-end' }}>
-                            <button
-                              onClick={() => handleShareWhatsApp(activeRep.nameHi, fund, proj, contractor)}
-                              style={{
-                                padding: '0.4rem 0.8rem',
-                                background: '#25d366',
-                                border: 'none',
-                                borderRadius: '6px',
-                                color: 'white',
-                                fontWeight: 700,
-                                fontSize: '0.7rem',
-                                cursor: 'pointer',
-                              }}
-                            >
+                            <button type="button" className="btn btn-sm btn-whatsapp" onClick={() => handleShareWhatsApp(pick(activeRep.name, activeRep.nameHi), fund, proj, contractor)}>
                               Share Chain on WhatsApp
                             </button>
                           </div>

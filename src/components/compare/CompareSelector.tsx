@@ -70,8 +70,8 @@ export function CompareSelector({
                 alignItems: 'center',
                 gap: '0.5rem',
                 padding: '0.5rem 0.75rem',
-                background: `${color}10`,
-                border: `1px solid ${color}25`,
+                background: `color-mix(in srgb, ${color} 6%, transparent)`,
+                border: `1px solid color-mix(in srgb, ${color} 15%, transparent)`,
                 borderRadius: 10,
                 minWidth: 0,
               }}
@@ -81,7 +81,7 @@ export function CompareSelector({
                   width: 28,
                   height: 28,
                   borderRadius: 8,
-                  background: `${color}20`,
+                  background: `color-mix(in srgb, ${color} 13%, transparent)`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -107,8 +107,8 @@ export function CompareSelector({
                 {entity.location && (
                   <div
                     style={{
-                      fontSize: '0.65rem',
-                      opacity: 0.6,
+                      fontSize: 'var(--text-xs)',
+                      color: 'var(--ink-3)',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
@@ -119,10 +119,12 @@ export function CompareSelector({
                 )}
               </div>
               <button
+                type="button"
                 onClick={() => handleRemove(entity.id)}
+                aria-label={`Remove ${entity.name}`}
                 style={{
-                  width: 20,
-                  height: 20,
+                  width: 24,
+                  height: 24,
                   borderRadius: '50%',
                   background: 'transparent',
                   border: 'none',
@@ -130,12 +132,12 @@ export function CompareSelector({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  opacity: 0.5,
+                  color: 'var(--ink-3)',
                   padding: 0,
                   flexShrink: 0,
                 }}
-                onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
-                onMouseLeave={e => (e.currentTarget.style.opacity = '0.5')}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--ink)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'var(--ink-3)')}
               >
                 <X size={14} />
               </button>
@@ -145,7 +147,7 @@ export function CompareSelector({
 
         {canAddMore && (
           <div style={{ position: 'relative', minWidth: 200 }}>
-            <div style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }}>
+            <div style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink-3)' }}>
               <Search size={15} />
             </div>
             <input
@@ -194,8 +196,8 @@ export function CompareSelector({
         )}
       </div>
 
-      <div style={{ fontSize: '0.72rem', opacity: 0.5 }}>
-        {value.length} / {maxItems} entities selected
+      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
+        {value.length} of {maxItems} selected
         {compatibleTypes && (
           <span> · Comparing: {compatibleTypes.map(t => getEntityTypeLabel(t)).join(', ')}</span>
         )}
@@ -280,7 +282,7 @@ function QuickSearchResults({ query, onSelect, compatibleTypes, excludeIds = [] 
                 width: 32,
                 height: 32,
                 borderRadius: 8,
-                background: `${color}12`,
+                background: `color-mix(in srgb, ${color} 7%, transparent)`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -292,15 +294,15 @@ function QuickSearchResults({ query, onSelect, compatibleTypes, excludeIds = [] 
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>{result.name}</div>
               {result.subtitle && (
-                <div style={{ fontSize: '0.72rem', opacity: 0.6 }}>{result.subtitle}</div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>{result.subtitle}</div>
               )}
             </div>
             <span
               style={{
-                fontSize: '0.65rem',
+                fontSize: 'var(--text-xs)',
                 padding: '2px 6px',
                 borderRadius: 4,
-                background: `${color}12`,
+                background: `color-mix(in srgb, ${color} 7%, transparent)`,
                 color,
                 fontWeight: 600,
                 flexShrink: 0,

@@ -12,7 +12,6 @@ function ModuleCard({ m, pin }: { m: ModuleInfo; pin: string }) {
         <ArrowRight size={16} className="module-card-arrow" aria-hidden="true" />
       </div>
       <h3 className="module-card-title">{m.shortName}</h3>
-      <p className="module-card-hi" lang="hi">{m.hindi}</p>
       <p className="module-card-text">{m.summary}</p>
       <p className="module-card-source">{m.dataSource}</p>
     </Link>

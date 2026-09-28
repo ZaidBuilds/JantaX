@@ -6,6 +6,7 @@ import { GrapStatusCard } from '../components/GrapStatusCard';
 import { PollutionReportGenerator } from '../components/PollutionReportGenerator';
 import { TransparencyDisclaimer } from '../../transparency/components/TransparencyDisclaimer';
 import { ArrowLeft, MapPin, Activity, ShieldAlert, Flame, ExternalLink, AlertTriangle } from 'lucide-react';
+import { pick } from '../../../i18n';
 
 export function StationDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -34,7 +35,7 @@ export function StationDetailPage() {
       <div style={{ marginBottom: '1rem' }}>
         <Link
           to="/pollution"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
+          style={{ display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
         >
           <ArrowLeft size={16} /> Back to Air Quality Directory
         </Link>
@@ -54,11 +55,8 @@ export function StationDetailPage() {
             </div>
 
             <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--ink)', fontFamily: 'var(--font-heading)', margin: '0 0 0.3rem', lineHeight: 1.3 }}>
-              {station.stationName}
+              {pick(station.stationName, station.stationNameHi)}
             </h1>
-            <div style={{ fontSize: '0.95rem', color: 'var(--ink-3)', marginBottom: '0.4rem' }}>
-              {station.stationNameHi}
-            </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', color: 'var(--ink-2)' }}>
               <MapPin size={15} style={{ color: 'var(--accent-ink)' }} />
@@ -67,7 +65,7 @@ export function StationDetailPage() {
           </div>
 
           <div style={{ textAlign: 'right', minWidth: 160 }}>
-            <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', textTransform: 'uppercase', fontWeight: 700 }}>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', textTransform: 'uppercase', fontWeight: 700 }}>
               Live Status
             </div>
             <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--good)', marginTop: '0.2rem' }}>

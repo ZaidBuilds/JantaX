@@ -18,7 +18,7 @@ export function WardComparePage() {
       <div style={{ marginBottom: '1rem' }}>
         <Link
           to="/nagar"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
+          style={{ display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
         >
           <ArrowLeft size={16} /> Back to Municipal Directory
         </Link>
@@ -38,7 +38,7 @@ export function WardComparePage() {
             <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--ink-2)', display: 'block', marginBottom: '0.4rem' }}>
               Select Municipal Ward 1
             </label>
-            <select
+            <select aria-label="Select Municipal Ward 1"
               value={ward1Id}
               onChange={(e) => setWard1Id(e.target.value)}
               style={{ width: '100%', padding: '0.6rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.88rem' }}
@@ -55,7 +55,7 @@ export function WardComparePage() {
             <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--ink-2)', display: 'block', marginBottom: '0.4rem' }}>
               Select Municipal Ward 2
             </label>
-            <select
+            <select aria-label="Select Municipal Ward 2"
               value={ward2Id}
               onChange={(e) => setWard2Id(e.target.value)}
               style={{ width: '100%', padding: '0.6rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.88rem' }}

@@ -47,25 +47,27 @@ export const ProjectOverviewTab: React.FC<ProjectOverviewTabProps> = ({ project 
         <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 14, border: '1px solid var(--border)' }}>
           <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>Original Sanctioned Cost</div>
           <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.2rem' }}>₹{origCr} Cr</div>
-          <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', marginTop: '0.2rem' }}>Sanctioned by {project.sanctioningBody}</div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', marginTop: '0.2rem' }}>
+            Sanctioned by <span translate="no">{project.sanctioningBody}</span>
+          </div>
         </div>
 
         <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 14, border: '1px solid var(--border)' }}>
           <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>Revised / Anticipated Cost</div>
           <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--accent-ink)', marginTop: '0.2rem' }}>₹{antCr} Cr</div>
-          <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', marginTop: '0.2rem' }}>Target Completion: {project.anticipatedCompletionDate}</div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', marginTop: '0.2rem' }}>Target Completion: {project.anticipatedCompletionDate}</div>
         </div>
 
         <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 14, border: '1px solid var(--border)' }}>
           <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>Expenditure Disbursed To Date</div>
           <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--good)', marginTop: '0.2rem' }}>₹{expCr} Cr</div>
-          <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', marginTop: '0.2rem' }}>{project.progressFinancial}% Financial Disbursed</div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', marginTop: '0.2rem' }}>{project.progressFinancial}% Financial Disbursed</div>
         </div>
 
         <div style={{ background: 'var(--surface)', padding: '1.25rem', borderRadius: 14, border: '1px solid var(--border)' }}>
           <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>Physical Milestone Progress</div>
           <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--brand-ink)', marginTop: '0.2rem' }}>{project.progressPhysical}%</div>
-          <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', marginTop: '0.2rem' }}>Verified Ground Audit</div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', marginTop: '0.2rem' }}>Verified Ground Audit</div>
         </div>
       </div>
 
@@ -78,28 +80,29 @@ export const ProjectOverviewTab: React.FC<ProjectOverviewTabProps> = ({ project 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem' }}>
           <div>
             <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Administrative Ministry</div>
-            <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--ink)', marginTop: '0.2rem' }}>{project.ministry}</div>
+            <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--ink)', marginTop: '0.2rem' }} translate="no">{project.ministry}</div>
           </div>
 
           <div>
             <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Implementing Agency</div>
-            <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--ink)', marginTop: '0.2rem' }}>{project.implementingAgency}</div>
+            <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--ink)', marginTop: '0.2rem' }} translate="no">{project.implementingAgency}</div>
           </div>
 
           <div>
             <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Responsible Public Officer</div>
-            <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--ink)', marginTop: '0.2rem' }}>{project.responsibleOfficer}</div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--ink-3)' }}>{project.responsibleOfficerDesignation}</div>
+            <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--ink)', marginTop: '0.2rem' }} translate="no">{project.responsibleOfficer}</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--ink-3)' }} translate="no">{project.responsibleOfficerDesignation}</div>
             <a
               href={`https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(project.responsibleOfficer + ' ' + project.implementingAgency)}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{
-                fontSize: '0.74rem',
+                fontSize: 'var(--text-xs)',
                 color: '#0a66c2',
                 fontWeight: 700,
                 textDecoration: 'none',
                 display: 'inline-flex',
+                minHeight: 32,
                 alignItems: 'center',
                 gap: '0.25rem',
                 marginTop: '0.35rem'
@@ -112,17 +115,20 @@ export const ProjectOverviewTab: React.FC<ProjectOverviewTabProps> = ({ project 
           <div>
             <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Lead Contractor / JV</div>
             <div style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--ink)', marginTop: '0.2rem' }}>{project.leadContractor}</div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--ink-3)' }}>Reg ID: {project.contractorDetails.registrationNumber}</div>
+            <div style={{ fontSize: '0.8rem', color: 'var(--ink-3)' }}>
+              Reg ID: <span translate="no">{project.contractorDetails.registrationNumber}</span>
+            </div>
             <a
               href={`https://www.linkedin.com/search/results/companies/?keywords=${encodeURIComponent(project.leadContractor)}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{
-                fontSize: '0.74rem',
+                fontSize: 'var(--text-xs)',
                 color: '#0a66c2',
                 fontWeight: 700,
                 textDecoration: 'none',
                 display: 'inline-flex',
+                minHeight: 32,
                 alignItems: 'center',
                 gap: '0.25rem',
                 marginTop: '0.35rem'
@@ -177,9 +183,10 @@ export const ProjectOverviewTab: React.FC<ProjectOverviewTabProps> = ({ project 
       }}>
         <div>
           <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Authoritative Source Attribution</div>
-          <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.2rem' }}>{project.originalSource.name}</div>
+          <div style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.2rem' }} translate="no">{project.originalSource.name}</div>
           <div style={{ fontSize: '0.78rem', color: 'var(--ink-3)', marginTop: '0.1rem' }}>
-            Last Synced: {project.originalSource.lastUpdated} · Ref: {project.originalSource.publicationRef || 'N/A'}
+            Last Synced: <span translate="no">{project.originalSource.lastUpdated}</span> · Ref:{' '}
+            <span translate="no">{project.originalSource.publicationRef || 'N/A'}</span>
           </div>
         </div>
 

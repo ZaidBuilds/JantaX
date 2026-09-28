@@ -5,6 +5,7 @@ import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
 import { getUpdatedGrievances } from '../../../core/utils/autoUpdater';
 import { SourceLine, Stat } from '../../../ui';
 import { SectionTitle, pct } from '../../shared/ModuleKit';
+import { pick } from '../../../i18n';
 
 type Row = {
   id: string;
@@ -44,12 +45,12 @@ export function CpgramsDashboard() {
     <div className="stack" style={{ gap: 'var(--s-6)' }}>
       <div className="spread" style={{ flexWrap: 'wrap' }}>
         <div className="segmented" role="tablist" aria-label="Rank by">
-          <button type="button" role="tab" aria-selected={tab === 'ministry'} aria-pressed={tab === 'ministry'} onClick={() => setTab('ministry')}>Union ministries</button>
-          <button type="button" role="tab" aria-selected={tab === 'state'} aria-pressed={tab === 'state'} onClick={() => setTab('state')}>State governments</button>
+          <button type="button" role="tab" aria-selected={tab === 'ministry'} onClick={() => setTab('ministry')}>Union ministries</button>
+          <button type="button" role="tab" aria-selected={tab === 'state'} onClick={() => setTab('state')}>State governments</button>
         </div>
         <div className="cluster">
           <label htmlFor="griev-sort" className="small muted">Sort by</label>
-          <select id="griev-sort" className="select select-sm" style={{ width: 'auto' }} value={sort} onChange={(e) => setSort(e.target.value as SortKey)}>
+          <select aria-label="Sort by" id="griev-sort" className="select select-sm" style={{ width: 'auto' }} value={sort} onChange={(e) => setSort(e.target.value as SortKey)}>
             <option value="avgDisposalDays">Slowest to resolve</option>
             <option value="backlogOver30Days">Largest 30-day backlog</option>
             <option value="resolvedPct">Lowest resolution rate</option>
@@ -83,10 +84,8 @@ export function CpgramsDashboard() {
                   <tr key={r.id}>
                     <td className="num muted">{i + 1}</td>
                     <td>
-                      <div className="strong">{r.name}</div>
-                      <div className="tiny muted">
-                        <span lang="hi">{r.nameHi}</span> · Most complaints: {r.worst}
-                      </div>
+                      <div className="strong">{pick(r.name, r.nameHi)}</div>
+                      <div className="tiny muted">Most complaints: {r.worst}</div>
                     </td>
                     <td className="num" style={{ textAlign: 'right' }}>{r.totalGrievances.toLocaleString('en-IN')}</td>
                     <td className={`num ${resolved < 75 ? 'text-bad' : ''}`} style={{ textAlign: 'right' }}>{resolved}%</td>

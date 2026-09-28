@@ -8,8 +8,8 @@ export const MOCK_CONTRACTORS: ContractorProfile[] = [
     category: 'Class 1 Heavy Infrastructure',
     incorporationYear: 1946,
     headquarters: 'Mumbai, Maharashtra',
-    directors: ['Shri S.N. Subrahmanyan (CMD)', 'Shri R. Shankar Raman'],
-    gstin: '27AAACL0123P1Z2',
+    directors: ['Director (sample 1)', 'Director (sample 2)'],
+    gstin: '27SAMPLE001A1Z0',
     cin: 'L99999MH1946PLC004768',
     performanceIndicators: {
       overallScore: 91,
@@ -82,8 +82,8 @@ export const MOCK_CONTRACTORS: ContractorProfile[] = [
     category: 'Urban Transit & Metro',
     incorporationYear: 1990,
     headquarters: 'Hyderabad & Mumbai',
-    directors: ['Shri A.A.V. Ranga Raju', 'Shri K. Subramanian'],
-    gstin: '36AAACN1029F1Z1',
+    directors: ['Director (sample 3)', 'Director (sample 4)'],
+    gstin: '36SAMPLE002B1Z0',
     cin: 'L74210TG1990PLC011146',
     performanceIndicators: {
       overallScore: 84,
@@ -134,14 +134,14 @@ export const MOCK_CONTRACTORS: ContractorProfile[] = [
     }
   },
   {
-    id: 'cont-chaudhary-builders',
-    companyName: 'M/s Chaudhary Road Builders & Sons',
+    id: 'cont-sample-g',
+    companyName: 'M/s Sample Contractor G',
     registrationNumber: 'UP-PWD-REG-2019-441',
     category: 'Rural Roads & PMGSY',
     incorporationYear: 2008,
     headquarters: 'Meerut, Uttar Pradesh',
-    directors: ['Shri Satish Chaudhary', 'Shri Pravin Chaudhary'],
-    gstin: '09AABFC8890Q1Z8',
+    directors: ['Director (sample 5)', 'Director (sample 6)'],
+    gstin: '09SAMPLE003G1Z0',
     performanceIndicators: {
       overallScore: 88,
       completionRatePct: 94,
@@ -186,8 +186,8 @@ export const MOCK_CONTRACTORS: ContractorProfile[] = [
     category: 'Water & Sewage Specialist',
     incorporationYear: 1996,
     headquarters: 'Chennai, Tamil Nadu',
-    directors: ['Shri Rajiv Mittal (MD)', 'Shri S. Varadarajan'],
-    gstin: '33AAACV2098M1Z4',
+    directors: ['Director (sample 7)', 'Director (sample 8)'],
+    gstin: '33SAMPLE004D1Z0',
     cin: 'L45205TN1996PLC035968',
     performanceIndicators: {
       overallScore: 86,

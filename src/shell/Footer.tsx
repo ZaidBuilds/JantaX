@@ -28,6 +28,7 @@ const COLUMNS = [
     title: 'Take part',
     links: [
       { label: 'Report an issue', to: '/report-issue' },
+      { label: 'Who runs your area', to: '/governance' },
       { label: 'Citizen reports', to: '/reports' },
       { label: 'Compare areas', to: '/compare' },
       { label: 'About JantaX', to: '/about' },

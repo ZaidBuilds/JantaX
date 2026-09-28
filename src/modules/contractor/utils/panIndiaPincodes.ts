@@ -603,21 +603,20 @@ export function generatePanIndiaPincodeRecord(pincode: string): PincodeRecord {
   ];
   const chosenContractor = contractorNames[pinNum % contractorNames.length];
 
+  // Sample officials are named by role only, never with personal names that could match real people.
   const eeNames = [
-    { name: 'Er. R. K. Sharma', desig: 'Executive Engineer (Civil/Roads)' },
-    { name: 'Er. S. N. Mukherjee', desig: 'Executive Engineer (Infrastructure)' },
-    { name: 'Er. M. K. Patil', desig: 'Executive Engineer (PWD Division)' },
-    { name: 'Er. V. Subramaniam', desig: 'Executive Engineer (Ward Infrastructure)' },
-    { name: 'Er. Arvind Singh Yadav', desig: 'Executive Engineer (Urban Works)' },
-    { name: 'Er. K. Suresh Reddy', desig: 'Executive Engineer (Road Construction)' },
+    { name: 'Executive engineer (sample 1)', desig: 'Executive Engineer (Civil/Roads)' },
+    { name: 'Executive engineer (sample 2)', desig: 'Executive Engineer (Infrastructure)' },
+    { name: 'Executive engineer (sample 3)', desig: 'Executive Engineer (PWD Division)' },
+    { name: 'Executive engineer (sample 4)', desig: 'Executive Engineer (Ward Infrastructure)' },
   ];
   const chosenEe = eeNames[pinNum % eeNames.length];
 
   const mlaNames = [
-    { name: 'Shri A. K. Verma', role: 'MLA' as const, party: 'Constituency Chairperson' },
-    { name: 'Smt. Preeti Deshmukh', role: 'MLA' as const, party: 'Urban Development Committee' },
-    { name: 'Shri R. Annamalai', role: 'MLA' as const, party: 'Ward Action Committee' },
-    { name: 'Shri Manoj Jha', role: 'MLA' as const, party: 'Public Accounts Panel' },
+    { name: 'MLA (sample 1)', role: 'MLA' as const, party: 'Constituency Chairperson' },
+    { name: 'MLA (sample 2)', role: 'MLA' as const, party: 'Urban Development Committee' },
+    { name: 'MLA (sample 3)', role: 'MLA' as const, party: 'Ward Action Committee' },
+    { name: 'MLA (sample 4)', role: 'MLA' as const, party: 'Public Accounts Panel' },
   ];
   const chosenMla = mlaNames[pinNum % mlaNames.length];
 
@@ -631,7 +630,7 @@ export function generatePanIndiaPincodeRecord(pincode: string): PincodeRecord {
     dominantContractor: {
       contractorId: `cont-pan-${cleanPin.slice(0, 3)}`,
       name: chosenContractor,
-      directors: ['Sunil K. Aggarwal', 'Rajiv Mehta', 'Pooja Singhania'],
+      directors: ['Director (sample 1)', 'Director (sample 2)'],
       sharePercent: monopolyShare,
     },
     executiveEngineer: {

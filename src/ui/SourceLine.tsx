@@ -1,5 +1,6 @@
 import { ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { locale } from '../i18n';
 
 interface SourceLineProps {
   source: string;
@@ -12,7 +13,7 @@ function formatDate(value?: string) {
   if (!value) return null;
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return value;
-  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  return d.toLocaleDateString(locale(), { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 /** Every number on JantaX should be traceable. This is the one-line provenance footer. */

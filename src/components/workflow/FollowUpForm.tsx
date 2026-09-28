@@ -43,7 +43,7 @@ export function FollowUpForm({ grievanceId, issueId, onSave }: FollowUpFormProps
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-            <select
+            <select aria-label="Status"
               value={status}
               onChange={(e) => setStatus(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

@@ -1,6 +1,7 @@
 import React from 'react';
 import { getVoterFormGuides } from '../services/boothService';
 import { FileText, ExternalLink, CheckCircle2, ChevronRight } from 'lucide-react';
+import { pick } from '../../../i18n';
 
 export function VoterFormsAccordion() {
   const guides = getVoterFormGuides();
@@ -8,9 +9,9 @@ export function VoterFormsAccordion() {
   return (
     <div className="jantax-card" style={{ padding: '1.75rem', marginBottom: '1.5rem' }}>
       <div style={{ marginBottom: '1.25rem' }}>
-        <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: '0 0 0.3rem' }}>
+        <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', margin: '0 0 0.3rem' }}>
           Official Election Commission of India (ECI) Voter Service Forms
-        </h3>
+        </h2>
         <p style={{ fontSize: '0.85rem', color: 'var(--ink-3)', margin: 0 }}>
           Direct step-by-step guidance on how to register as a new voter, object to incorrect names, or update address & name errors on the official ECI portal.
         </p>
@@ -33,12 +34,12 @@ export function VoterFormsAccordion() {
                   <span style={{ background: 'var(--brand)', color: 'var(--on-solid)', fontSize: '0.75rem', fontWeight: 800, padding: '0.2rem 0.6rem', borderRadius: 6 }}>
                     {g.formType}
                   </span>
-                  <h4 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
-                    {g.title}
-                  </h4>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
+                    {pick(g.title, g.titleHi)}
+                  </h3>
                 </div>
                 <div style={{ fontSize: '0.82rem', color: 'var(--ink-2)', fontWeight: 600 }}>
-                  {g.purpose}
+                  {pick(g.purpose, g.purposeHi)}
                 </div>
               </div>
 

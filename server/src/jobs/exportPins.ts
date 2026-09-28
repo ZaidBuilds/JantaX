@@ -2,13 +2,17 @@ import fs from 'fs/promises';
 import path from 'path';
 import { prisma } from '../prisma';
 import { SOURCES } from './sources';
+import { spreadKm } from './lib/geo';
 
 /**
  * Writes the synced PIN directory as static JSON the frontend can fetch without an API:
  * one file per 3-digit PIN prefix (the postal sorting district), plus index.json with provenance
  * and each prefix's bounding box (for nearest-PIN lookups from a location).
  *
- *   { "110001": { "d": "New Delhi", "s": "Delhi", "c": [28.62, 77.21], "o": [["Connaught Place SO", "PO", 0], ...] } }
+ *   { "110001": { "d": "New Delhi", "s": "Delhi", "c": [28.62, 77.21], "r": 2.4, "o": [["Connaught Place SO", "PO", 0], ...] } }
+ *
+ * `c` is the median of the PIN's post offices and `r` how far they spread around it in km (see spreadKm),
+ * so maps can draw the PIN as an area rather than a precise point.
  *
  * `via` records how the data reached us when it did not come straight from the publisher.
  */
@@ -23,14 +27,20 @@ export async function exportPinChunks(outDir: string, via?: string) {
     orderBy: { code: 'asc' },
   });
   const offices = await prisma.postOffice.findMany({
-    select: { pincodeCode: true, officeName: true, officeType: true, delivery: true },
+    select: { pincodeCode: true, officeName: true, officeType: true, delivery: true, lat: true, lng: true },
     orderBy: [{ pincodeCode: 'asc' }, { officeType: 'desc' }, { officeName: 'asc' }],
   });
   const officesByPin = new Map<string, [string, string, number][]>();
+  const pointsByPin = new Map<string, { lat: number; lng: number }[]>();
   for (const o of offices) {
     const list = officesByPin.get(o.pincodeCode) ?? [];
     list.push([o.officeName, o.officeType, o.delivery ? 1 : 0]);
     officesByPin.set(o.pincodeCode, list);
+    if (o.lat !== null && o.lng !== null) {
+      const pts = pointsByPin.get(o.pincodeCode) ?? [];
+      pts.push({ lat: o.lat, lng: o.lng });
+      pointsByPin.set(o.pincodeCode, pts);
+    }
   }
 
   const chunks = new Map<string, Record<string, unknown>>();
@@ -45,10 +55,12 @@ export async function exportPinChunks(outDir: string, via?: string) {
       bounds.set(prefix, b ? [Math.min(b[0], lat), Math.min(b[1], lng), Math.max(b[2], lat), Math.max(b[3], lng)] : [lat, lng, lat, lng]);
     }
     const chunk = chunks.get(prefix) ?? {};
+    const r = p.lat !== null && p.lng !== null ? spreadKm({ lat: p.lat, lng: p.lng }, pointsByPin.get(p.code) ?? []) : null;
     chunk[p.code] = {
       d: p.district,
       s: p.state,
       ...(p.lat !== null && p.lng !== null ? { c: [r4(p.lat), r4(p.lng)] } : {}),
+      ...(r !== null ? { r } : {}),
       o: officesByPin.get(p.code) ?? [],
     };
     chunks.set(prefix, chunk);

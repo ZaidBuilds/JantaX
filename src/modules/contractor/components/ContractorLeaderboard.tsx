@@ -73,7 +73,7 @@ export const ContractorLeaderboard: React.FC<ContractorLeaderboardProps> = ({
         );
       case 'HIGH_RISK':
         return (
-          <span className="bg-[var(--surface-inverse)] text-bad border rounded-[10px] border-bad px-2.5 py-0.5 text-xs font-bold inline-flex items-center gap-1">
+          <span className="bg-bad-soft text-bad border rounded-[10px] border-bad px-2.5 py-0.5 text-xs font-bold inline-flex items-center gap-1">
             <ShieldAlert className="w-3 h-3 text-bad" />
             HIGH RISK • {score}/100
           </span>
@@ -117,7 +117,7 @@ export const ContractorLeaderboard: React.FC<ContractorLeaderboardProps> = ({
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink mt-1">
-              Contractor Scorecards & Hall of Shame
+              Contractor scorecards
             </h2>
             <p className="text-xs text-ink-3 mt-1 max-w-2xl">
               Cross-referenced from State e-Procurement + GeM + Municipal Work Orders. Scored against Indian Road Congress (IRC) Defect Liability enforcement and first-monsoon collapse records.
@@ -127,12 +127,12 @@ export const ContractorLeaderboard: React.FC<ContractorLeaderboardProps> = ({
           {/* Sort Switcher */}
           <div className="flex items-center gap-2 self-start md:self-end">
             <span className="text-xs font-bold opacity-60">Sort:</span>
-            <select
+            <select aria-label="Sort contractors"
               value={sortBy}
               onChange={(e: any) => setSortBy(e.target.value)}
               className="bg-surface-2 border rounded-[10px] border-line text-xs font-bold text-ink px-3 py-1.5 focus:outline-none cursor-pointer tracking-tight"
             >
-              <option value="integrity_asc">Worst Integrity First (Hall of Shame)</option>
+              <option value="integrity_asc">Lowest integrity score first</option>
               <option value="monsoon_desc">Highest Monsoon Failure Rate</option>
               <option value="dlp_desc">Most Active DLP Breaches</option>
               <option value="budget_desc">Highest Public Funds (₹ Cr)</option>
@@ -159,7 +159,7 @@ export const ContractorLeaderboard: React.FC<ContractorLeaderboardProps> = ({
           {/* Risk Tier Filter */}
           <div className="relative">
             <Filter className="w-4 h-4 text-ink-3 absolute left-3 top-2.5" />
-            <select
+            <select aria-label="Risk Tiers"
               value={selectedRisk}
               onChange={(e) => setSelectedRisk(e.target.value)}
               className="w-full bg-surface-2 border rounded-[10px] border-line pl-9 pr-3 py-2 text-xs font-bold text-ink focus:outline-none focus:bg-surface cursor-pointer"

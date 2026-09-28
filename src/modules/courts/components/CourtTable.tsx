@@ -51,7 +51,7 @@ export function CourtTable({ courts }: Props) {
                   <div style={{ fontSize: '0.75rem', color: 'var(--ink-3)', marginTop: '0.15rem' }}>
                     {c.courtType}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.72rem', color: 'var(--accent-ink)', marginTop: '0.2rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: 'var(--text-xs)', color: 'var(--accent-ink)', marginTop: '0.2rem' }}>
                     <MapPin size={11} />
                     <span>PIN {c.pinCode} • {c.district}, {c.state}</span>
                   </div>
@@ -61,7 +61,7 @@ export function CourtTable({ courts }: Props) {
                   <div style={{ fontWeight: 800, color: 'var(--ink)', fontSize: '0.95rem' }}>
                     {c.totalPendingCases.toLocaleString('en-IN')}
                   </div>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
                     Avg {c.avgDisposalDays} days/case
                   </div>
                 </td>
@@ -75,7 +75,7 @@ export function CourtTable({ courts }: Props) {
                   <div style={{ fontWeight: 800, color: c.pendingOver5Years > 10000 ? 'var(--bad)' : 'var(--warn)' }}>
                     {c.pendingOver5Years.toLocaleString('en-IN')}
                   </div>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
                     {((c.pendingOver5Years / c.totalPendingCases) * 100).toFixed(1)}% of cases
                   </div>
                 </td>
@@ -93,7 +93,7 @@ export function CourtTable({ courts }: Props) {
                   <div style={{ fontWeight: 700, color: c.clearanceRatePercent >= 90 ? 'var(--good)' : 'var(--ink-2)' }}>
                     {c.clearanceRatePercent}%
                   </div>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
                     {c.casesDisposedLastMonth} last mo.
                   </div>
                 </td>

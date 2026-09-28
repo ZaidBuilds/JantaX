@@ -6,6 +6,7 @@ import { CpioFaaContactCard } from '../components/CpioFaaContactCard';
 import { RtiDraftGenerator } from '../components/RtiDraftGenerator';
 import { TransparencyDisclaimer } from '../../transparency/components/TransparencyDisclaimer';
 import { ArrowLeft, Clock, ShieldCheck, FileText, ExternalLink, MapPin, Building2, AlertTriangle } from 'lucide-react';
+import { pick } from '../../../i18n';
 
 export function AuthorityDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -31,7 +32,7 @@ export function AuthorityDetailPage() {
       <div style={{ marginBottom: '1rem' }}>
         <Link
           to="/rti"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
+          style={{ display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
         >
           <ArrowLeft size={16} /> Back to RTI Directory
         </Link>
@@ -51,11 +52,8 @@ export function AuthorityDetailPage() {
             </div>
 
             <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--ink)', fontFamily: 'var(--font-heading)', margin: '0 0 0.3rem', lineHeight: 1.3 }}>
-              {authority.authorityName}
+              {pick(authority.authorityName, authority.authorityNameHi)}
             </h1>
-            <div style={{ fontSize: '0.95rem', color: 'var(--ink-3)', marginBottom: '0.4rem' }}>
-              {authority.authorityNameHi}
-            </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', color: 'var(--ink-2)' }}>
               <Building2 size={15} style={{ color: 'var(--accent-ink)' }} />
@@ -64,7 +62,7 @@ export function AuthorityDetailPage() {
           </div>
 
           <div style={{ textAlign: 'right', minWidth: 160 }}>
-            <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', textTransform: 'uppercase', fontWeight: 700 }}>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', textTransform: 'uppercase', fontWeight: 700 }}>
               Average Response Speed
             </div>
             <div style={{ fontSize: '2rem', fontWeight: 800, color: authority.avgResponseDays <= 30 ? 'var(--good)' : 'var(--bad)' }}>
@@ -79,35 +77,35 @@ export function AuthorityDetailPage() {
         {/* 4 Key Metrics */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', background: 'var(--surface-2)', padding: '1.25rem', borderRadius: 14, border: '1px solid var(--border)', marginBottom: '1.5rem' }}>
           <div>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Annual RTIs Received</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Annual RTIs Received</span>
             <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.2rem' }}>
               {authority.totalRequestsReceivedAnnual.toLocaleString('en-IN')}
             </div>
-            <span style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>Citizen Inquiries</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Citizen Inquiries</span>
           </div>
 
           <div>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>30-Day Disposals</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>30-Day Disposals</span>
             <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--good)', marginTop: '0.2rem' }}>
               {authority.disposedWithin30DaysPercent}%
             </div>
-            <span style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>On-Time Compliance</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>On-Time Compliance</span>
           </div>
 
           <div>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Rejection Rate</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Rejection Rate</span>
             <div style={{ fontSize: '1.2rem', fontWeight: 800, color: authority.rejectionRatePercent > 5 ? 'var(--bad)' : 'var(--good)', marginTop: '0.2rem' }}>
               {authority.rejectionRatePercent}%
             </div>
-            <span style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>Section 8 Invoked</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Section 8 Invoked</span>
           </div>
 
           <div>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>First Appeals Filed</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>First Appeals Filed</span>
             <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--brand-ink)', marginTop: '0.2rem' }}>
               {authority.firstAppealsFiled.toLocaleString('en-IN')}
             </div>
-            <span style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>{authority.firstAppealsUpheldPercent}% Upheld by FAA</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>{authority.firstAppealsUpheldPercent}% Upheld by FAA</span>
           </div>
         </div>
 
@@ -169,7 +167,7 @@ export function AuthorityDetailPage() {
               </div>
               <div style={{ textAlign: 'right' }}>
                 <span style={{ fontWeight: 800, color: 'var(--bad)', fontSize: '0.85rem' }}>{ex.percentage}%</span>
-                <div style={{ fontSize: '0.7rem', color: 'var(--ink-3)' }}>{ex.count} rejections</div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>{ex.count} rejections</div>
               </div>
             </div>
           ))}

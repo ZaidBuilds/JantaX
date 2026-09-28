@@ -195,7 +195,7 @@ export const MODULE_REGISTRY: ModuleMeta[] = [
   {
     id: 'grievance',
     nameHindi: 'शिकायत स्कोर',
-    nameEnglish: 'CPGRAMS Shame Index',
+    nameEnglish: 'Public grievance tracker',
     icon: TrendingDown,
     color: '#0ea5e9',
     description: 'Worst performing ministries & states ranked by backlog & delays',

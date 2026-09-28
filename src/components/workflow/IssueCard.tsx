@@ -1,4 +1,5 @@
 import React from 'react';
+import { locale } from '../../i18n';
 
 interface IssueCardProps {
   issue: {
@@ -46,7 +47,7 @@ export function IssueCard({ issue }: IssueCardProps) {
           </div>
         )}
         <div className="mt-2 text-xs text-gray-500">
-          Detected: {new Date(issue.detectedAt).toLocaleDateString()}
+          Detected: {new Date(issue.detectedAt).toLocaleDateString(locale())}
         </div>
       </div>
       <div className="px-4 py-3 border-t border-gray-200 flex justify-end space-x-2">

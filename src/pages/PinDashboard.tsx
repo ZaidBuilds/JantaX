@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { MapContainer, TileLayer, CircleMarker } from 'react-leaflet';
+import { MapContainer, TileLayer } from 'react-leaflet';
 import {
   Star,
   Share2,
@@ -16,11 +16,12 @@ import {
   AlertTriangle,
   ChevronRight,
   FileSearch,
- FlaskConical } from 'lucide-react';
+ FlaskConical, Landmark } from 'lucide-react';
 import { api, type ApiRecord, type PincodeInfo } from '../core/services/api';
 import { usePin } from '../core/context/PinContext';
 import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver';
-import { getCoordinateForPin } from '../core/utils/pinCoordinates';
+import { pinArea } from '../core/geo/placement';
+import { AreaCircle, FitView, TILE_ATTRIBUTION, TILE_URL, areaText } from '../ui/MapParts';
 import { usePinRecord } from '../core/services/pinDirectory';
 import { PostOfficesCard } from '../ui/PostOffices';
 import { AreaSummary } from '../ui/OfficialRecords';
@@ -42,6 +43,7 @@ import {
   useShare,
   useToast,
 } from '../ui';
+import { locale, pick } from '../i18n';
 
 const COUNT_TILES = [
   { key: 'schools', label: 'Government schools', icon: GraduationCap, module: 'school' },
@@ -110,8 +112,8 @@ export function PinDashboard({ choose = false }: { choose?: boolean }) {
     const nearby = MOCK_CITIZEN_REPORTS.filter((r) => r.location.pinCode.slice(0, 3) === pin.slice(0, 3) && r.location.pinCode !== pin);
     return [...local, ...nearby].slice(0, 4).map(reportForDisplay);
   }, [pin]);
-  const dirCoord = directory.record && directory.record.lat !== null && directory.record.lng !== null ? { lat: directory.record.lat, lng: directory.record.lng } : null;
-  const coord = dirCoord ?? getCoordinateForPin(pin);
+  // The PIN as the area around its post offices, not a point: a PIN covers streets or villages, not an address.
+  const area = directory.status === 'loading' ? null : pinArea(pin, directory.record);
   const following = isFollowing(pin);
 
   if (choose || !valid) {
@@ -142,7 +144,7 @@ export function PinDashboard({ choose = false }: { choose?: boolean }) {
           <div className="eyebrow">Area dashboard</div>
           <h1 className="pin-hero-title">
             <span className="num">{pin}</span>
-            <span className="pin-hero-place">{place}</span>
+            <span className="pin-hero-place" translate="no">{place}</span>
           </h1>
           <div className="cluster" style={{ marginTop: 'var(--s-3)' }}>
             {loc.region && <Badge>{loc.region} India</Badge>}
@@ -223,14 +225,14 @@ export function PinDashboard({ choose = false }: { choose?: boolean }) {
                   <div className="card-body stack-sm">
                     <div className="spread" style={{ alignItems: 'flex-start' }}>
                       <div style={{ minWidth: 0 }}>
-                        <h3 className="card-title">{lens.title}</h3>
-                        <p className="card-sub">{tidy(lens.noun)}</p>
+                        <h3 className="card-title">{pick(lens.title, lens.titleHi)}</h3>
+                        <p className="card-sub" translate="no">{tidy(pick(lens.noun, lens.nounHi))}</p>
                       </div>
                       <Badge tone={severityTone(lens.severity)}>{severityLabel(lens.severity)}</Badge>
                     </div>
                     <ClaimReality
-                      claim={<p className="small" style={{ color: 'var(--ink)' }}>{lens.officialClaim}</p>}
-                      reality={<p className="small" style={{ color: 'var(--ink)' }}>{lens.auditReality}</p>}
+                      claim={<p className="small" style={{ color: 'var(--ink)' }}>{pick(lens.officialClaim, lens.officialClaimHi)}</p>}
+                      reality={<p className="small" style={{ color: 'var(--ink)' }}>{pick(lens.auditReality, lens.auditRealityHi)}</p>}
                     />
                   </div>
                   <div className="card-foot">
@@ -272,8 +274,7 @@ export function PinDashboard({ choose = false }: { choose?: boolean }) {
                     <Link key={r.id} to={recordHref(r)} className="list-row">
                       <ModuleIcon id={r.moduleId} size="sm" />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <div className="strong truncate">{r.titleEnglish}</div>
-                        <div className="tiny muted truncate" lang="hi">{r.titleHindi}</div>
+                        <div className="strong truncate" translate="no">{pick(r.titleEnglish, r.titleHindi)}</div>
                       </div>
                       <Badge tone={toneForStatus(r.status)} className="hide-mobile">{r.status}</Badge>
                       <span className={`score text-${toneForScore(r.groundTruthScore)}`} style={{ minWidth: 48, justifyContent: 'flex-end' }}>
@@ -313,7 +314,7 @@ export function PinDashboard({ choose = false }: { choose?: boolean }) {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div className="strong clamp-2">{r.title}</div>
                         <div className="tiny muted">
-                          {r.category} · PIN {r.location.pinCode} · {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                          {r.category} · PIN {r.location.pinCode} · {new Date(r.createdAt).toLocaleDateString(locale(), { day: 'numeric', month: 'short' })}
                         </div>
                       </div>
                       <Badge tone={toneForStatus(r.moderationState)} className="hide-mobile">{r.moderationState}</Badge>
@@ -326,32 +327,42 @@ export function PinDashboard({ choose = false }: { choose?: boolean }) {
         </div>
 
         <aside className="stack sticky-aside" style={{ gap: 'var(--s-5)' }}>
-          {coord && (
+          {area && (
             <div className="card" style={{ overflow: 'hidden' }}>
               <div style={{ height: 200 }}>
                 <MapContainer
                   key={pin}
-                  center={[coord.lat, coord.lng]}
+                  center={[area.lat, area.lng]}
                   zoom={11}
                   zoomControl={false}
                   dragging={false}
                   scrollWheelZoom={false}
                   doubleClickZoom={false}
-                  attributionControl={false}
+                  keyboard={false}
                   style={{ height: '100%', width: '100%' }}
                 >
-                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                  <CircleMarker center={[coord.lat, coord.lng]} radius={10} pathOptions={{ color: '#e2600c', weight: 3, fillOpacity: 0.25 }} />
+                  <TileLayer attribution={TILE_ATTRIBUTION} url={TILE_URL} />
+                  <FitView areas={[area]} maxZoom={14} />
+                  <AreaCircle area={area} />
                 </MapContainer>
               </div>
-              <div className="card-foot" style={{ borderRadius: 0 }}>
-                <span>{dirCoord ? 'Centre of its post offices' : 'Approximate area centre'}</span>
-                <Link to={`/maps?pin=${pin}`} className="link">Open full map</Link>
+              <div className="card-foot" style={{ borderRadius: 0, alignItems: 'flex-start', gap: 'var(--s-3)' }}>
+                <span className="tiny">{areaText(area)}</span>
+                <Link to={`/maps?pin=${pin}`} className="link" style={{ whiteSpace: 'nowrap' }}>Open full map</Link>
               </div>
             </div>
           )}
 
           <PostOfficesCard pin={pin} />
+
+          <Link to={`/governance?pin=${pin}`} className="card card-pad list-row" style={{ alignItems: 'flex-start', gap: 'var(--s-3)' }}>
+            <Landmark size={20} aria-hidden="true" style={{ color: 'var(--brand-ink)', flexShrink: 0, marginTop: 2 }} />
+            <span style={{ flex: 1 }}>
+              <span className="strong" style={{ display: 'block', color: 'var(--ink)' }}>Who runs this area</span>
+              <span className="small muted">Every level from the Centre to the ward or village, and who to approach for a problem.</span>
+            </span>
+            <ChevronRight size={16} className="muted" aria-hidden="true" />
+          </Link>
 
           <div className="card card-pad">
             <div className="strong" style={{ marginBottom: 'var(--s-3)' }}>Switch area</div>

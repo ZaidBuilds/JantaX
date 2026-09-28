@@ -36,43 +36,43 @@ export function WardCleanlinessCard({ score, services, slaCompliance }: Props) {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', fontSize: 'var(--text-xs)', fontWeight: 700, textTransform: 'uppercase' }}>
             <Trash2 size={13} style={{ color: 'var(--good)' }} /> Door-to-Door
           </div>
           <div style={{ fontSize: '1.2rem', fontWeight: 800, color: services.doorToDoorGarbage ? 'var(--good)' : 'var(--bad)', marginTop: '0.25rem' }}>
             {services.doorToDoorGarbage ? 'Active 100%' : 'Irregular'}
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>{services.sweepingFrequency}</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>{services.sweepingFrequency}</span>
         </div>
 
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', fontSize: 'var(--text-xs)', fontWeight: 700, textTransform: 'uppercase' }}>
             <Lightbulb size={13} style={{ color: 'var(--warn)' }} /> Streetlights
           </div>
           <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.25rem' }}>
             {services.streetlightCoveragePercent}%
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Working LED Luminaires</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Working LED Luminaires</span>
         </div>
 
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', fontSize: 'var(--text-xs)', fontWeight: 700, textTransform: 'uppercase' }}>
             <Waves size={13} style={{ color: 'var(--brand-ink)' }} /> Waterlogging
           </div>
           <div style={{ fontSize: '1.2rem', fontWeight: 800, color: services.waterloggingHotspots === 0 ? 'var(--good)' : 'var(--bad)', marginTop: '0.25rem' }}>
             {services.waterloggingHotspots} Spots
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Monsoon Vulnerability</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Monsoon Vulnerability</span>
         </div>
 
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', fontSize: '0.72rem', fontWeight: 700, textTransform: 'uppercase' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', fontSize: 'var(--text-xs)', fontWeight: 700, textTransform: 'uppercase' }}>
             <CheckCircle2 size={13} style={{ color: 'var(--brand-ink)' }} /> 311 SLA Rate
           </div>
           <div style={{ fontSize: '1.2rem', fontWeight: 800, color: slaCompliance >= 85 ? 'var(--good)' : 'var(--warn)', marginTop: '0.25rem' }}>
             {slaCompliance}%
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Within Citizen Charter</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Within Citizen Charter</span>
         </div>
       </div>
 

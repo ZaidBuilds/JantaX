@@ -1,6 +1,7 @@
 import React from 'react';
 import type { CouncillorDetails, SanitaryInspectorDetails } from '../types/nagar';
 import { UserCheck, Phone, MapPin, Clock, ShieldCheck, Award } from 'lucide-react';
+import { pick } from '../../../i18n';
 
 interface Props {
   councillor: CouncillorDetails;
@@ -17,15 +18,15 @@ export function WardOfficerCard({ councillor, sanitaryInspector, wardNumber, war
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem' }}>
           <Award size={16} style={{ color: 'var(--accent-ink)' }} />
           <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--accent-ink)', textTransform: 'uppercase' }}>
-            Elected Ward Councillor (पार्षद)
+            Elected ward councillor
           </span>
         </div>
 
         <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ink)', margin: '0 0 0.2rem' }}>
-          {councillor.name}
+          {pick(councillor.name, councillor.nameHi)}
         </h4>
         <div style={{ fontSize: '0.8rem', color: 'var(--ink-3)', marginBottom: '0.75rem' }}>
-          {councillor.nameHi} • Party: <strong>{councillor.party}</strong>
+          Party: <strong>{councillor.party}</strong>
         </div>
 
         <div style={{ display: 'grid', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--ink-2)' }}>
@@ -47,15 +48,15 @@ export function WardOfficerCard({ councillor, sanitaryInspector, wardNumber, war
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.4rem' }}>
           <UserCheck size={16} style={{ color: 'var(--good)' }} />
           <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--good)', textTransform: 'uppercase' }}>
-            Designated Sanitary Inspector (सफाई निरीक्षक)
+            Sanitary inspector for this ward
           </span>
         </div>
 
         <h4 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ink)', margin: '0 0 0.2rem' }}>
-          {sanitaryInspector.name}
+          {pick(sanitaryInspector.name, sanitaryInspector.nameHi)}
         </h4>
         <div style={{ fontSize: '0.8rem', color: 'var(--ink-3)', marginBottom: '0.75rem' }}>
-          {sanitaryInspector.nameHi} • Ward #{wardNumber} Field Officer
+          Field officer, ward {wardNumber}
         </div>
 
         <div style={{ display: 'grid', gap: '0.4rem', fontSize: '0.8rem', color: 'var(--ink-2)' }}>

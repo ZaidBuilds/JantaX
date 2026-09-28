@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { api } from '../../core/services/api';
+import { pick } from '../../i18n';
 
 export function QuickCheckIn({ pincode, schoolId, schoolName, onClose }: { pincode: string; schoolId: string; schoolName: string; onClose: ()=>void }) {
   const [step, setStep] = useState(0);
@@ -17,9 +18,9 @@ export function QuickCheckIn({ pincode, schoolId, schoolName, onClose }: { pinco
     { k:'classroom', hi:'कक्षा तैयार?', en:'Classroom ready?' },
   ];
   const opts = [
-    { v:'yes', label:'✓ हां' },
-    { v:'no', label:'✕ नहीं' },
-    { v:'not_sure', label:'पता नहीं' },
+    { v:'yes', label:'Yes' },
+    { v:'no', label:'No' },
+    { v:'not_sure', label:'Not sure' },
   ];
 
   const submit = async () => {
@@ -43,7 +44,7 @@ export function QuickCheckIn({ pincode, schoolId, schoolName, onClose }: { pinco
   if (done) return (
     <div style={{ background:'var(--surface)', border:'1px solid var(--border)', borderRadius:12, padding:'1.2rem', textAlign:'center' }}>
       <div style={{ width:48, height:48, borderRadius:999, background:'var(--good-soft)', color:'var(--good)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 0.6rem', fontSize:20 }}>✓</div>
-      <h4 style={{ margin:'0 0 0.3rem', color:'var(--ink)' }}>Submitted · निजी संदर्भ: {done}</h4>
+      <h4 style={{ margin:'0 0 0.3rem', color:'var(--ink)' }}>Submitted · private reference: {done}</h4>
       <p style={{ fontSize:'0.82rem', color:'var(--ink-2)' }}>Anon, pending verification. Distinct contributors + agreement will raise confidence (low→building→strong).</p>
       <button onClick={onClose} style={{ marginTop:'0.8rem', padding:'0.5rem 1rem', background:'var(--brand)', color:'var(--on-solid)', border:'none', borderRadius:8, fontWeight:700, cursor:'pointer' }}>Close</button>
     </div>
@@ -57,8 +58,7 @@ export function QuickCheckIn({ pincode, schoolId, schoolName, onClose }: { pinco
       </div>
       <div style={{ display:'flex', gap:'4px', marginBottom:'0.8rem' }}>{qs.map((_,i)=><span key={i} style={{ flex:1, height:4, borderRadius:999, background: step>=i ? 'var(--brand)':'var(--border)' }}></span>)}<span style={{ fontSize:'0.68rem', color:'var(--ink-3)' }}>{step+1}/{qs.length}</span></div>
       <div>
-        <div style={{ fontWeight:800, color:'var(--ink)', fontSize:'0.92rem' }}>{qs[step].hi}</div>
-        <div style={{ fontSize:'0.72rem', color:'var(--ink-3)' }}>{qs[step].en}</div>
+        <div style={{ fontWeight:800, color:'var(--ink)', fontSize:'0.92rem' }}>{pick(qs[step].en, qs[step].hi)}</div>
         <div style={{ display:'flex', gap:'0.5rem', marginTop:'0.6rem' }}>{opts.map(o=>(
           <button key={o.v} onClick={()=>setAnswers(a=>({...a,[qs[step].k]:o.v}))} style={{ flex:1, padding:'0.5rem', borderRadius:8, border: answers[qs[step].k]===o.v ? '1px solid var(--brand-ink)':'1px solid var(--border)', background: answers[qs[step].k]===o.v ? 'var(--brand-soft)':'var(--surface)', fontWeight:700, cursor:'pointer', fontSize:'0.78rem' }}>{o.label}</button>
         ))}</div>

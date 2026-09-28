@@ -122,21 +122,21 @@ export const Dashboard: React.FC<DashboardProps> = ({
         <div className="glass-card" style={{ padding: '1rem', borderLeft: '4px solid var(--color-primary)' }}>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>MONITORED BUDGET</span>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginTop: '0.25rem', color: 'var(--text-primary)' }}>₹{metrics.totalBudget} Cr</h2>
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Across central sector projects</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Across central sector projects</span>
         </div>
 
         {/* Total Escalation Card */}
         <div className="glass-card" style={{ padding: '1rem', borderLeft: '4px solid var(--status-critical)' }}>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>CUMULATIVE ESCALATION</span>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginTop: '0.25rem', color: 'var(--status-critical)' }}>₹{metrics.totalOverrun} Cr</h2>
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Total project cost overruns</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Total project cost overruns</span>
         </div>
 
         {/* Construction Count */}
         <div className="glass-card" style={{ padding: '1rem', textAlign: 'center' }}>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>UNDER CONSTRUCTION</span>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, marginTop: '0.25rem', color: 'var(--status-construction)' }}>{metrics.construction}</h2>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.35rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.35rem', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
             <span className="pulse-dot construction"></span> Active execution phase
           </div>
         </div>
@@ -145,7 +145,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         <div className="glass-card" style={{ padding: '1rem', textAlign: 'center' }}>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>PROJECTS DELAYED</span>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, marginTop: '0.25rem', color: 'var(--status-delayed)' }}>{metrics.delayed}</h2>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.35rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.35rem', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
             <span className="pulse-dot delayed"></span> Regulatory/terrain bottlenecks
           </div>
         </div>
@@ -154,7 +154,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         <div className="glass-card" style={{ padding: '1rem', textAlign: 'center' }}>
           <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>COMPLETED ASSETS</span>
           <h2 style={{ fontSize: '1.75rem', fontWeight: 700, marginTop: '0.25rem', color: 'var(--status-completed)' }}>{metrics.completed}</h2>
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.35rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.35rem', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
             <span className="pulse-dot completed"></span> Commissioned & operating
           </div>
         </div>
@@ -182,7 +182,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           
           {/* Filter Toolbar */}
           <div className="glass-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <h3 style={{ fontSize: '1.1rem', color: 'var(--text-primary)' }}>Filter Operations</h3>
+            <h3 style={{ fontSize: '1.1rem', color: 'var(--text-primary)' }}>Filter projects</h3>
             <div style={{ 
               display: 'grid', 
               gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
@@ -191,14 +191,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
               {/* Text Search */}
               <input 
                 type="text" 
-                placeholder="पिन कोड या नाम / PIN or Name..." 
+                placeholder="PIN or Name..." 
                 className="form-input" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
 
               {/* Sector Selector */}
-              <select 
+              <select aria-label="Sectors" 
                 className="form-input"
                 value={selectedSector}
                 onChange={(e) => setSelectedSector(e.target.value)}
@@ -214,7 +214,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               </select>
 
               {/* Status Selector */}
-              <select 
+              <select aria-label="Statuses" 
                 className="form-input"
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
@@ -231,22 +231,19 @@ export const Dashboard: React.FC<DashboardProps> = ({
             {/* Active filters display */}
             {selectedState && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                <span>Filtering by Region:</span>
+                <span>Showing state:</span>
                 <span style={{ 
                   padding: '2px 8px', 
                   background: 'rgba(0, 242, 254, 0.1)', 
                   border: '1px solid var(--color-primary)', 
-                  color: 'var(--color-primary)', 
+                  color: 'var(--brand-ink)', 
                   borderRadius: '4px',
                   fontWeight: 600
                 }}>
                   {selectedState}
                 </span>
-                <button 
-                  onClick={() => onSelectState('')}
-                  style={{ border: 'none', background: 'transparent', color: 'var(--status-critical)', cursor: 'pointer', fontWeight: 600 }}
-                >
-                  ✕ Clear
+                <button type="button" className="btn btn-ghost btn-sm" onClick={() => onSelectState('')}>
+                  Show all states
                 </button>
               </div>
             )}
@@ -256,7 +253,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
               <h3 style={{ fontSize: '1.25rem', color: 'var(--text-primary)' }}>
-                Projects Ledger ({filteredProjects.length})
+                Projects ({filteredProjects.length})
               </h3>
               <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
                 <SourceBadge sourceType="A" sourceName="MoSPI PAIMANA" />
@@ -297,8 +294,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
           <div className="glass-card" style={{ padding: '1.5rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
               <div>
-                <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>Budget Allocations Growth</h3>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Click years to filter timeline initiates</p>
+                <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>Budget by year</h3>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Pick a year to see only the projects that started then.</p>
               </div>
               {selectedYear && (
                 <button
@@ -352,13 +349,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   >
                     {/* Budget Label above bar */}
                     <span style={{
-                      fontSize: '0.6rem',
+                      fontSize: 'var(--text-xs)',
                       fontWeight: 700,
-                      color: isActive ? 'var(--color-primary)' : 'var(--text-secondary)',
+                      color: isActive ? 'var(--brand-ink)' : 'var(--text-secondary)',
                       position: 'absolute',
                       bottom: `${data.heightPercent + 4}%`,
                       whiteSpace: 'nowrap',
-                      background: 'rgba(255,255,255,0.7)',
+                      background: 'color-mix(in srgb, var(--surface) 80%, transparent)',
                       padding: '1px 3px',
                       borderRadius: '3px'
                     }}>
@@ -404,7 +401,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     textAlign: 'center',
                     fontSize: '0.75rem',
                     fontWeight: selectedYear === data.year ? 700 : 500,
-                    color: selectedYear === data.year ? 'var(--color-primary)' : 'var(--text-secondary)',
+                    color: selectedYear === data.year ? 'var(--brand-ink)' : 'var(--text-secondary)',
                     cursor: 'pointer',
                     padding: '2px 0'
                   }}
@@ -417,13 +414,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
           {/* Sector Chart */}
           <div className="glass-card" style={{ padding: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)', marginBottom: '1rem' }}>Sector Distribution</h3>
+            <h3 style={{ fontSize: '1.15rem', color: 'var(--text-primary)', marginBottom: '1rem' }}>Projects by sector</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
               {sectorMetrics.map((sec) => (
                 <div key={sec.name}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '0.25rem' }}>
                     <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{sec.name}</span>
-                    <span style={{ color: 'var(--text-secondary)' }}>{sec.count} projects ({Math.round(sec.percent)}%)</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>{sec.count} {sec.count === 1 ? 'project' : 'projects'} ({Math.round(sec.percent)}%)</span>
                   </div>
                   <div style={{ height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '4px', overflow: 'hidden' }}>
                     <div style={{ 

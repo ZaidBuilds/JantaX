@@ -18,7 +18,7 @@ export function RtiComparePage() {
       <div style={{ marginBottom: '1rem' }}>
         <Link
           to="/rti"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
+          style={{ display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
         >
           <ArrowLeft size={16} /> Back to RTI Directory
         </Link>
@@ -38,7 +38,7 @@ export function RtiComparePage() {
             <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--ink-2)', display: 'block', marginBottom: '0.4rem' }}>
               Select Public Authority 1
             </label>
-            <select
+            <select aria-label="Select Public Authority 1"
               value={auth1Id}
               onChange={(e) => setAuth1Id(e.target.value)}
               style={{ width: '100%', padding: '0.6rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.88rem' }}
@@ -55,7 +55,7 @@ export function RtiComparePage() {
             <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--ink-2)', display: 'block', marginBottom: '0.4rem' }}>
               Select Public Authority 2
             </label>
-            <select
+            <select aria-label="Select Public Authority 2"
               value={auth2Id}
               onChange={(e) => setAuth2Id(e.target.value)}
               style={{ width: '100%', padding: '0.6rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.88rem' }}

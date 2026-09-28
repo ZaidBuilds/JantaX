@@ -22,11 +22,11 @@ export function PollutionDashboard() {
     const suffix = parseInt(currentPin.substring(4, 6)) || 1;
     return {
       aqiValue: loc.region === 'North' ? 342 : loc.region === 'South' ? 88 : 160,
-      aqiStatus: loc.region === 'North' ? 'Very Poor (बहुत खराब)' : loc.region === 'South' ? 'Satisfactory (संतोषजनक)' : 'Moderate (मध्यम)',
+      aqiStatus: loc.region === 'North' ? 'Very Poor' : loc.region === 'South' ? 'Satisfactory' : 'Moderate',
       activeSPCBNotices: [
         {
           industryName: `M/S Balaji Chemical Industries Pvt Ltd #${suffix}`,
-          noticeType: 'Closure Order / बंदी आदेश (SPCB Section 33A)',
+          noticeType: 'Closure Order / SPCB Section 33A',
           issueDate: '2025-06-12',
           violationReason: 'कचरा पानी को बिना शोधित किए सीधे जल स्रोतों में बहाया जा रहा था।',
         }
@@ -47,16 +47,16 @@ export function PollutionDashboard() {
       responsiblePerson: 'Regional Environment Officer',
       responsibleOrg: 'State Pollution Control Board',
       sourceUrl: 'https://cpcb.nic.in',
-      moduleNameHindi: 'M13 - प्रदूषण नक्शा (Pollution Notice Overlay)',
+      moduleNameHindi: 'M13 - प्रदूषण नक्शा',
     });
   };
 
   return (
     <div className="module-dashboard">
-      <div className="glass-card dash-header-card" style={{ borderLeftColor: '#65a30d' }}>
-        <h2>प्रदूषण नक्शा (Pollution Notice Overlay)</h2>
+      <div className="glass-card dash-header-card" style={{ borderLeftColor: 'var(--aqi-satisfactory)' }}>
+        <h2>Pollution notices</h2>
         <p>
-          केंद्रीय प्रदूषण नियंत्रण बोर्ड (CPCB) वायु सूचकांक एवं राज्य बोर्डों द्वारा जारी औद्योगिक बंदी और कारण बताओ नोटिसों का स्थानीय संकलन।
+          CPCB air quality readings, with closure orders and show-cause notices issued by the state pollution control board near you.
         </p>
       </div>
 
@@ -69,10 +69,10 @@ export function PollutionDashboard() {
             maxLength={6}
             value={pinInput}
             onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ''))}
-            placeholder="पिन कोड दर्ज करें..."
+            placeholder="Enter a PIN code"
           />
           <button onClick={() => { setCurrentPin(pinInput); setSearchParams({ pin: pinInput }); }} className="dash-search-btn">
-            खोजें
+            Search
           </button>
         </div>
         {loc.isValid && (
@@ -83,7 +83,7 @@ export function PollutionDashboard() {
       </div>
 
       <div className="glass-card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
-        <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Air Quality Index / वायु गुणवत्ता सूचकांक</h3>
+        <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>Air Quality Index</h3>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface-2)', padding: '0.75rem 1.25rem', borderRadius: '8px', borderLeft: '4px solid var(--status-critical)' }}>
           <span style={{ fontSize: '0.9rem', fontWeight: 700 }}>AQI Value: {pollutionRecords.aqiValue}</span>
           <span style={{ fontSize: '0.85rem', color: 'var(--status-critical)', fontWeight: 700 }}>{pollutionRecords.aqiStatus}</span>
@@ -91,14 +91,14 @@ export function PollutionDashboard() {
       </div>
 
       <div style={{ display: 'grid', gap: '1rem' }}>
-        <h3 style={{ fontSize: '1.1rem', margin: '0.5rem 0' }}>Active PCB Notices / सक्रिय प्रदूषण नियंत्रण नोटिस</h3>
+        <h3 style={{ fontSize: '1.1rem', margin: '0.5rem 0' }}>Active PCB Notices</h3>
         {pollutionRecords.activeSPCBNotices.map((n, idx) => (
           <div key={idx} className="glass-card" style={{ padding: '1.25rem', borderLeft: '4px solid var(--status-critical)' }}>
             <h4 style={{ fontSize: '1.05rem', marginBottom: '0.25rem' }}>{n.industryName}</h4>
             <div style={{ fontSize: '0.75rem', color: 'var(--status-critical)', fontWeight: 700, marginBottom: '0.75rem' }}>{n.noticeType}</div>
             
             <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-              <strong>उल्लंघन कारण (Violation):</strong> {n.violationReason}
+              <strong>Violation:</strong> {n.violationReason}
             </p>
             <div className="card-footer-meta">
               <span>Issue Date: {n.issueDate}</span>

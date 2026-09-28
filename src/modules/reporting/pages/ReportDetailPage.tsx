@@ -40,6 +40,7 @@ export function ReportDetailPage({ activeTab: initialTab }: ReportDetailPageProp
         <div className="card">
           <EmptyState
             icon={AlertCircle}
+            heading="h1"
             title="We could not find that report"
             text={`No report with the reference "${id}" exists, or it was removed after review.`}
             action={<Link to="/reports" className="btn btn-primary">Back to all reports</Link>}

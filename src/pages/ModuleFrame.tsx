@@ -118,7 +118,6 @@ export function ModuleFrame({ moduleId, children }: ModuleFrameProps) {
         <ModuleIcon id={moduleId} size="lg" />
         <div className="module-hero-main">
           <h1 className="page-title">{m.shortName}</h1>
-          <p className="module-hindi" lang="hi">{m.hindi}</p>
           <p className="page-lede">{m.summary}</p>
           <DataStatus moduleId={moduleId} />
           <div className="source-row" style={{ marginTop: 'var(--s-2)' }}>

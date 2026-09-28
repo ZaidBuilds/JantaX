@@ -45,7 +45,7 @@ Traditional civic grievance apps (such as *IChangeMyCity*, municipal 1912 hotlin
 
 1. **Contractor Entity (`Contractor`)**
    - `id`: string
-   - `name`: string (e.g., "Vanguard Infra Projects Pvt Ltd", "Sri Balaji Roadworks & Const.")
+   - `name`: string (e.g., "Sample Contractor H", "Sample Contractor J Roadworks")
    - `registrationNumber`: string (e.g., "PWD-CL-1-KA-8849")
    - `directors`: string[]
    - `integrityScore`: number (0–100 calculated metric)

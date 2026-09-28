@@ -21,12 +21,12 @@ export function ScoreCard({ score, label, subLabel, size = 120 }: ScoreCardProps
           <circle cx="50" cy="50" r="40" fill="transparent" stroke={scoreColor} strokeWidth="8" strokeDasharray={`${(safeScore / 100) * 180} 360`} strokeLinecap="round" transform="rotate(135 50 50)" />
         </svg>
         <div style={{ position: 'absolute', top: '55%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
-          <div style={{ fontSize: `${size * 0.22}px`, fontWeight: 800, color: 'var(--color-primary)', lineHeight: 1 }}>{safeScore}</div>
-          <div style={{ fontSize: `${size * 0.08}px`, opacity: 0.5 }}>/100</div>
+          <div style={{ fontSize: `${size * 0.22}px`, fontWeight: 800, color: 'var(--brand-ink)', lineHeight: 1 }}>{safeScore}</div>
+          <div style={{ fontSize: `${size * 0.08}px`, color: 'var(--ink-3)' }}>/100</div>
         </div>
       </div>
       {label && <div style={{ color: scoreColor, fontWeight: 700, fontSize: '0.85rem', marginTop: '0.5rem' }}>{label}</div>}
-      {subLabel && <span style={{ fontSize: '0.65rem', opacity: 0.5, marginTop: '0.15rem' }}>{subLabel}</span>}
+      {subLabel && <span style={{ fontSize: 'var(--text-xs)', marginTop: '0.15rem', color: 'var(--ink-3)' }}>{subLabel}</span>}
     </div>
   );
 }

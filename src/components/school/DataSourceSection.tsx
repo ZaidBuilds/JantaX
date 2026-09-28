@@ -1,6 +1,7 @@
 import React from 'react';
 import { Shield, Users, BarChart3, CheckCircle2, AlertTriangle, Info } from 'lucide-react';
 import { SourceBadge } from '../UI/SourceBadge';
+import { locale, pick } from '../../i18n';
 
 export type DataSourceType = 'official' | 'community' | 'independent' | 'verified';
 
@@ -90,11 +91,11 @@ export function DataSourceSection({
           <span style={{ fontWeight: 800, fontSize: '0.82rem', color: config.color }}>
             {config.label}
           </span>
-          <span style={{ fontSize: '0.72rem', opacity: 0.6 }}>- {config.description}</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>- {config.description}</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           {recordCount !== undefined && (
-            <span style={{ fontSize: '0.68rem', fontWeight: 600, color: config.color }}>
+            <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: config.color }}>
               {recordCount.toLocaleString('en-IN')} records
             </span>
           )}
@@ -105,7 +106,7 @@ export function DataSourceSection({
             <SourceBadge sourceType={source.type} sourceName={source.name} />
           )}
           {lastUpdated && (
-            <span style={{ fontSize: '0.68rem', opacity: 0.5 }}>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
               Updated {formatDate(lastUpdated)}
             </span>
           )}
@@ -113,11 +114,10 @@ export function DataSourceSection({
       </div>
       <div style={{ padding: '1rem' }}>
         <div style={{ marginBottom: '0.5rem' }}>
-          <span style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{title}</span>
-          {titleHi && <span style={{ fontSize: '0.82rem', opacity: 0.6, marginLeft: '0.4rem' }}>{titleHi}</span>}
+          <span style={{ fontWeight: 800, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{pick(title, titleHi)}</span>
         </div>
         {methodologyNote && (
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.35rem', marginTop: '0.5rem', fontSize: '0.72rem', color: 'var(--ink-3)' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.35rem', marginTop: '0.5rem', fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
             <Info size={12} style={{ flexShrink: 0, marginTop: 2 }} />
             {methodologyNote}
           </div>
@@ -143,7 +143,7 @@ export function ConfidenceBadge({ confidence, showLabel = true }: ConfidenceBadg
   return (
     <span
       style={{
-        fontSize: '0.62rem',
+        fontSize: 'var(--text-xs)',
         fontWeight: 700,
         padding: '2px 6px',
         borderRadius: 999,
@@ -161,7 +161,7 @@ export function ConfidenceBadge({ confidence, showLabel = true }: ConfidenceBadg
 function formatDate(dateStr: string): string {
   try {
     const d = new Date(dateStr);
-    return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    return d.toLocaleDateString(locale(), { day: 'numeric', month: 'short', year: 'numeric' });
   } catch {
     return dateStr;
   }
@@ -195,8 +195,7 @@ export function DataComparisonRow({
   return (
     <tr style={{ borderBottom: '1px solid var(--border)' }}>
       <td style={{ padding: '0.75rem 0.5rem', fontWeight: 600, fontSize: '0.82rem' }}>
-        <div>{label}</div>
-        {labelHi && <div style={{ fontSize: '0.72rem', opacity: 0.5 }}>{labelHi}</div>}
+        <div>{pick(label, labelHi)}</div>
       </td>
       {[
         { val: officialValue, type: 'official' as DataSourceType },
@@ -219,7 +218,7 @@ export function DataComparisonRow({
             }}
           >
             <div>{val ?? '-'}</div>
-            {unit && hasVal && <div style={{ fontSize: '0.68rem', opacity: 0.5 }}>{unit}</div>}
+            {unit && hasVal && <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>{unit}</div>}
           </td>
         );
       })}
@@ -232,7 +231,7 @@ export function DataComparisonTableHeader({ types }: { types: DataSourceType[] }
     <thead>
       <tr style={{ borderBottom: '2px solid var(--border)' }}>
         <th style={{ textAlign: 'left', padding: '0.6rem 0.5rem', minWidth: 160 }}>
-          <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--ink-3)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Metric</span>
+          <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--ink-3)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Metric</span>
         </th>
         {types.map(t => {
           const config = SOURCE_CONFIG[t];
@@ -249,7 +248,7 @@ export function DataComparisonTableHeader({ types }: { types: DataSourceType[] }
             >
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
                 <Icon size={13} style={{ color: config.color }} />
-                <span style={{ fontSize: '0.7rem', fontWeight: 700, color: config.color }}>{config.label}</span>
+                <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: config.color }}>{config.label}</span>
               </div>
             </th>
           );

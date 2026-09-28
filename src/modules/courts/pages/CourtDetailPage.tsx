@@ -6,6 +6,7 @@ import { CourtStageBottleneckCard } from '../components/CourtStageBottleneckCard
 import { CnrGuideCard } from '../components/CnrGuideCard';
 import { TransparencyDisclaimer } from '../../transparency/components/TransparencyDisclaimer';
 import { ArrowLeft, MapPin, Scale, Clock, Users, ExternalLink, ShieldCheck, Phone, Mail, AlertTriangle } from 'lucide-react';
+import { pick } from '../../../i18n';
 
 export function CourtDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -31,7 +32,7 @@ export function CourtDetailPage() {
       <div style={{ marginBottom: '1rem' }}>
         <Link
           to="/courts"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
+          style={{ display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
         >
           <ArrowLeft size={16} /> Back to Courts Directory
         </Link>
@@ -51,11 +52,8 @@ export function CourtDetailPage() {
             </div>
 
             <h1 style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--ink)', fontFamily: 'var(--font-heading)', margin: '0 0 0.3rem', lineHeight: 1.3 }}>
-              {court.complexName}
+              {pick(court.complexName, court.complexNameHi)}
             </h1>
-            <div style={{ fontSize: '0.95rem', color: 'var(--ink-3)', marginBottom: '0.4rem' }}>
-              {court.complexNameHi}
-            </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', color: 'var(--ink-2)' }}>
               <MapPin size={15} style={{ color: 'var(--accent-ink)' }} />
@@ -64,7 +62,7 @@ export function CourtDetailPage() {
           </div>
 
           <div style={{ textAlign: 'right', minWidth: 160 }}>
-            <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', textTransform: 'uppercase', fontWeight: 700 }}>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', textTransform: 'uppercase', fontWeight: 700 }}>
               Total Case Pendency
             </div>
             <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--ink)' }}>
@@ -79,35 +77,35 @@ export function CourtDetailPage() {
         {/* 4 Key Pendency Metrics */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem', background: 'var(--surface-2)', padding: '1.25rem', borderRadius: 14, border: '1px solid var(--border)', marginBottom: '1.5rem' }}>
           <div>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Civil Pendency</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Civil Pendency</span>
             <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.2rem' }}>
               {court.civilPending.toLocaleString('en-IN')}
             </div>
-            <span style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>Property, Contract, Family</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Property, Contract, Family</span>
           </div>
 
           <div>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Criminal Pendency</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Criminal Pendency</span>
             <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--brand-ink)', marginTop: '0.2rem' }}>
               {court.criminalPending.toLocaleString('en-IN')}
             </div>
-            <span style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>Bail, Trial, Appeals</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Bail, Trial, Appeals</span>
           </div>
 
           <div>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Pending &gt; 10 Years</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Pending &gt; 10 Years</span>
             <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--bad)', marginTop: '0.2rem' }}>
               {court.pendingOver10Years.toLocaleString('en-IN')}
             </div>
-            <span style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>Chronic Backlog</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Chronic Backlog</span>
           </div>
 
           <div>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Case Clearance Rate</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>Case Clearance Rate</span>
             <div style={{ fontSize: '1.2rem', fontWeight: 800, color: court.clearanceRatePercent >= 90 ? 'var(--good)' : 'var(--warn)', marginTop: '0.2rem' }}>
               {court.clearanceRatePercent}%
             </div>
-            <span style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>Disposals vs Inflow</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Disposals vs Inflow</span>
           </div>
         </div>
 

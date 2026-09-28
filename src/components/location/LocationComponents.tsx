@@ -2,6 +2,7 @@ import React from 'react';
 import { MapPin, Clock, AlertTriangle, Minus, CheckCircle } from 'lucide-react';
 import { SourceBadge } from '../UI/SourceBadge';
 import { DataFreshnessBadge } from '../data-states';
+import { locale } from '../../i18n';
 
 export interface MetricData {
   label: string;
@@ -77,14 +78,14 @@ export function MetricCard({
             style={{
               fontSize: '2rem',
               fontWeight: 800,
-              color: isAvailable ? 'var(--color-primary)' : 'var(--ink-4)',
+              color: isAvailable ? 'var(--brand-ink)' : 'var(--ink-4)',
               lineHeight: 1.1,
               marginBottom: '0.35rem',
             }}
           >
             {displayValue}
             {metric.unit && isAvailable && (
-              <span style={{ fontSize: '0.9rem', fontWeight: 600, opacity: 0.6, marginLeft: 2 }}>
+              <span style={{ fontSize: '0.9rem', fontWeight: 600, marginLeft: 2, color: 'var(--ink-3)' }}>
                 {metric.unit}
               </span>
             )}
@@ -104,7 +105,7 @@ export function MetricCard({
           {metric.alert && isAvailable && (
             <div
               style={{
-                fontSize: '0.65rem',
+                fontSize: 'var(--text-xs)',
                 fontWeight: 700,
                 color: 'var(--bad)',
                 marginBottom: '0.35rem',
@@ -120,7 +121,7 @@ export function MetricCard({
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '0.25rem',
-                fontSize: '0.65rem',
+                fontSize: 'var(--text-xs)',
                 fontWeight: 600,
                 color: 'var(--ink-4)',
                 padding: '2px 8px',
@@ -136,7 +137,7 @@ export function MetricCard({
           {isStale && isAvailable && (
             <div
               style={{
-                fontSize: '0.65rem',
+                fontSize: 'var(--text-xs)',
                 fontWeight: 600,
                 color: 'var(--accent-ink)',
                 marginBottom: '0.35rem',
@@ -166,9 +167,9 @@ export function MetricCard({
           onClick={onViewDetails}
           style={{
             marginTop: '0.75rem',
-            fontSize: '0.72rem',
+            fontSize: 'var(--text-xs)',
             fontWeight: 700,
-            color: 'var(--color-primary)',
+            color: 'var(--brand-ink)',
             background: 'none',
             border: 'none',
             cursor: 'pointer',
@@ -243,7 +244,7 @@ export function LocationHeader({
           </>
         ) : (
           <>
-            <h2 style={{ fontSize: '2rem', color: 'var(--color-primary)', margin: 0, fontWeight: 800 }}>
+            <h2 style={{ fontSize: '2rem', color: 'var(--brand-ink)', margin: 0, fontWeight: 800 }}>
               PIN Code {pincode}
             </h2>
             <button
@@ -383,7 +384,7 @@ export function AboutLocationCard({
   const formatDate = (d: Date | string | null | undefined) => {
     if (!d) return '-';
     const date = typeof d === 'string' ? new Date(d) : d;
-    return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    return date.toLocaleDateString(locale(), { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
   const infoRows = [
@@ -397,7 +398,7 @@ export function AboutLocationCard({
 
   return (
     <div className="glass-card" style={{ padding: '1.25rem' }}>
-      <h3 style={{ fontSize: '0.95rem', marginBottom: '1rem', color: 'var(--color-primary)' }}>
+      <h3 style={{ fontSize: '0.95rem', marginBottom: '1rem', color: 'var(--brand-ink)' }}>
         About this area
       </h3>
       {isLoading ? (
@@ -413,7 +414,7 @@ export function AboutLocationCard({
         <div style={{ display: 'grid', gap: '0.75rem', fontSize: '0.85rem' }}>
           {infoRows.map(row => (
             <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ opacity: 0.6 }}>{row.label}:</span>
+              <span style={{ color: 'var(--ink-3)' }}>{row.label}:</span>
               <strong style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                 {row.value}
                 {row.badge && (
@@ -424,7 +425,7 @@ export function AboutLocationCard({
                       border: '1px solid var(--color-primary-500)',
                       padding: '0 5px',
                       borderRadius: 999,
-                      fontSize: '0.6rem',
+                      fontSize: 'var(--text-xs)',
                       fontWeight: 800,
                     }}
                   >

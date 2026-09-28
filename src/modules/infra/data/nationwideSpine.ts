@@ -3,24 +3,10 @@ import { resolvePincode, getDeterministicIndex } from '../../../core/utils/pinRe
 import { representatives as meerutReps, funds as meerutFunds, projects as meerutProjs, contractors as meerutConts } from './meerutData';
 import { getUpdatedProjects } from '../../../core/utils/autoUpdater';
 
-// Regional name pools to maintain geographic credibility
-const FIRST_NAMES: Record<string, string[]> = {
-  North: ['राजेश', 'संजय', 'अमित', 'दिनेश', 'रमेश', 'सुनील', 'विजय', 'सतीश', 'राकेश', 'मनोज'],
-  South: ['वेंकटेश', 'सुब्रह्मण्यम', 'रंगराजन', 'मूर्ती', 'कृष्णप्पा', 'राघवन', 'बालन', 'शेखर', 'नायडू', 'रेड्डी'],
-  East: ['सुब्रत', 'तपन', 'अनिल', 'अजय', 'मनोज', 'प्रसन्न', 'तपस', 'देबाशीष', 'रंजीत', 'बिकास'],
-  West: ['अनिल', 'प्रमोद', 'संजय', 'विजय', 'राधाकृष्ण', 'यशवंत', 'दिलीप', 'बाळासाहेब', 'उद्धव', 'ज्ञानेश्वर'],
-  Central: ['रामगोपाल', 'शिवराज', 'कमलनाथ', 'दिग्विजय', 'अखिलेश', 'मायावती', 'मुलायम', 'भूपेश', 'रमन', 'अर्जुन'],
-};
-
-const LAST_NAMES: Record<string, string[]> = {
-  North: ['शर्मा', 'सिंह', 'तोमर', 'यादव', 'गुप्ता', 'तिवारी', 'वर्मा', 'खटीक', 'मिश्रा', 'चौधरी'],
-  South: ['रविचंद्रन', 'मल्लाप्पा', 'अय्यर', 'गौड़ा', 'रेड्डी', 'नायर', 'राजू', 'चंद्रशेखर', 'पिल्लई', 'सुब्रमण्यम'],
-  East: ['बनर्जी', 'घोष', 'सेन', 'झा', 'मजूमदार', 'सिन्हा', 'महतो', 'पात्रा', 'दास', 'उरांव'],
-  West: ['पाटील', 'देशमुख', 'फडणवीस', 'पाटिल', 'जोशी', 'शिंदे', 'सावंत', 'पटेल', 'शाह', 'मेहता'],
-  Central: ['चौहान', 'शुक्ला', 'बघेल', 'दुबे', 'पाण्डेय', 'सक्सेना', 'दीक्षित', 'द्विवेदी', 'मिश्रा', 'यादव'],
-};
-
-const VILLAGE_PREFIXES = ['रामपुर', 'कल्याणपुर', 'गोपालपुर', 'हरिपुर', 'शिवपुर', 'मोहनपुर', 'कृष्णपुर', 'अंबेडकर नगर', 'गांधी नगर', 'सुभाष नगर'];
+const VILLAGE_PREFIXES: [string, string][] = [
+  ['Rampur', 'रामपुर'], ['Kalyanpur', 'कल्याणपुर'], ['Gopalpur', 'गोपालपुर'], ['Haripur', 'हरिपुर'], ['Shivpur', 'शिवपुर'],
+  ['Mohanpur', 'मोहनपुर'], ['Krishnapur', 'कृष्णपुर'], ['Ambedkar Nagar', 'अंबेडकर नगर'], ['Gandhi Nagar', 'गांधी नगर'], ['Subhash Nagar', 'सुभाष नगर'],
+];
 const SCHEMES = [
   { name: '15th Finance Commission Tied Grant', nameHi: '15वां वित्त आयोग बंधा हुआ अनुदान' },
   { name: 'Swachh Bharat Mission (Grameen) Sanitation Fund', nameHi: 'स्वच्छ भारत मिशन (ग्रामीण) स्वच्छता कोष' },
@@ -36,7 +22,8 @@ const PROJECT_TEMPLATES = [
   { en: 'Retrofitting of Toilets in Local Government Primary School', hi: 'स्थानीय सरकारी प्राथमिक विद्यालय में शौचालयों का नवीनीकरण', cost: 6 },
 ];
 
-const CONTRACTORS_POOL = ['शर्मा कंस्ट्रक्शंस', 'रॉयल बिल्डर्स', 'बालाजी इंफ्रास्ट्रक्चर', 'तोमर एंटरप्राइजेज', 'यूनिक बिल्डकॉन', 'चौधरी ब्रदर्स', 'पटेल रोडवर्कर्स'];
+// Placeholder labels, not firm names: real firms are only shown from sourced tender records.
+const CONTRACTORS_POOL: [string, string][] = ['A', 'B', 'C', 'D', 'E', 'F', 'G'].map((k) => [`Contractor (sample ${k})`, `ठेकेदार (नमूना ${k})`]);
 
 export interface SpineData {
   representatives: Representative[];
@@ -59,20 +46,18 @@ export function getSpineDataForPincode(pinCode: string): SpineData {
   const loc = resolvePincode(pinCode);
   const region = loc.region;
 
-  // Derive regional pools
-  const firstNames = FIRST_NAMES[region] || FIRST_NAMES.North;
-  const lastNames = LAST_NAMES[region] || LAST_NAMES.North;
-
   // Helper to generate a deterministic name
+  // Sample officials are named by role, never with invented personal names that could match real people.
+  const ROLE_LABELS: Record<string, [string, string]> = {
+    mp: ['Member of Parliament (sample)', 'सांसद (नमूना)'],
+    mla: ['MLA (sample)', 'विधायक (नमूना)'],
+    zp: ['Zila panchayat chair (sample)', 'ज़िला पंचायत अध्यक्ष (नमूना)'],
+    bp: ['Block pramukh (sample)', 'ब्लॉक प्रमुख (नमूना)'],
+    gp: ['Gram pradhan (sample)', 'ग्राम प्रधान (नमूना)'],
+  };
   const makeName = (seed: string) => {
-    const fnIdx = getDeterministicIndex(seed + 'first', firstNames.length);
-    const lnIdx = getDeterministicIndex(seed + 'last', lastNames.length);
-    const fn = firstNames[fnIdx];
-    const ln = lastNames[lnIdx];
-    return {
-      nameHi: `श्री ${fn} ${ln}`,
-      nameEn: `Shri ${fn} ${ln}`, // Simplified english fallback
-    };
+    const [nameEn, nameHi] = ROLE_LABELS[seed.split('-').pop() ?? ''] ?? ['Official (sample)', 'अधिकारी (नमूना)'];
+    return { nameHi, nameEn };
   };
 
   // 1. Generate Representatives
@@ -83,7 +68,7 @@ export function getSpineDataForPincode(pinCode: string): SpineData {
     name: mpName.nameEn,
     nameHi: mpName.nameHi,
     level: 'union',
-    party: getDeterministicIndex(mpSeed + 'party', 2) === 0 ? 'BJP' : 'INC',
+    party: 'Sample party',
     constituencyName: `${loc.district} Lok Sabha`,
     constituencyNameHi: `${loc.district} लोकसभा निर्वाचन क्षेत्र`,
     pinCodes: [pinCode],
@@ -96,7 +81,7 @@ export function getSpineDataForPincode(pinCode: string): SpineData {
     name: mlaName.nameEn,
     nameHi: mlaName.nameHi,
     level: 'state',
-    party: getDeterministicIndex(mlaSeed + 'party', 3) === 0 ? 'BJP' : getDeterministicIndex(mlaSeed + 'party', 3) === 1 ? 'INC' : 'Regional',
+    party: 'Sample party',
     constituencyName: `${loc.district} Assembly`,
     constituencyNameHi: `${loc.district} विधानसभा निर्वाचन क्षेत्र`,
     pinCodes: [pinCode],
@@ -109,7 +94,7 @@ export function getSpineDataForPincode(pinCode: string): SpineData {
     name: zpName.nameEn,
     nameHi: zpName.nameHi,
     level: 'district',
-    party: 'BJP',
+    party: 'Sample party',
     constituencyName: `${loc.district} Zilla Parishad`,
     constituencyNameHi: `${loc.district} जिला पंचायत`,
     pinCodes: [pinCode],
@@ -131,7 +116,7 @@ export function getSpineDataForPincode(pinCode: string): SpineData {
   const gpSeed = pinCode + '-gp';
   const gpName = makeName(gpSeed);
   const gpVillageIdx = getDeterministicIndex(gpSeed + 'village', VILLAGE_PREFIXES.length);
-  const gpVillage = VILLAGE_PREFIXES[gpVillageIdx];
+  const [gpVillage, gpVillageHi] = VILLAGE_PREFIXES[gpVillageIdx];
   const gp: Representative = {
     id: `rep-gp-${pinCode}`,
     name: gpName.nameEn,
@@ -139,7 +124,7 @@ export function getSpineDataForPincode(pinCode: string): SpineData {
     level: 'village',
     party: 'IND',
     constituencyName: `${gpVillage} Gram Panchayat`,
-    constituencyNameHi: `${gpVillage} ग्राम पंचायत`,
+    constituencyNameHi: `${gpVillageHi} ग्राम पंचायत`,
     pinCodes: [pinCode],
   };
 
@@ -178,7 +163,7 @@ export function getSpineDataForPincode(pinCode: string): SpineData {
 
     // Deterministic contractor assignment (to create cross-referencing alerts!)
     const contIdx = getDeterministicIndex(pSeed + 'contractor', CONTRACTORS_POOL.length);
-    const contName = CONTRACTORS_POOL[contIdx];
+    const [contName, contNameHi] = CONTRACTORS_POOL[contIdx];
     const contId = `cont-${fund.id}`;
 
     projectsList.push({
@@ -197,7 +182,7 @@ export function getSpineDataForPincode(pinCode: string): SpineData {
       id: contId,
       projectId: projId,
       name: contName,
-      nameHi: contName,
+      nameHi: contNameHi,
       registrationNumber: `GSTIN: 09${pinCode}A1Z${fIdx}`,
       paymentStatus: getDeterministicIndex(pSeed + 'pay', 2) === 0 ? 'paid' : 'pending',
       pastProjectsCount: getDeterministicIndex(pSeed + 'past', 20) + 2,

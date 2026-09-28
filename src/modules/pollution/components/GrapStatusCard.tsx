@@ -12,9 +12,9 @@ export function GrapStatusCard({ activeStage, allStages }: Props) {
     <div className="jantax-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>
             Graded Response Action Plan (GRAP) · Statutory Enforcement
-          </h3>
+          </h2>
           <span style={{ fontSize: '0.78rem', color: 'var(--ink-3)', fontWeight: 600 }}>
             Mandated by Commission for Air Quality Management (CAQM) under Section 12
           </span>
@@ -46,13 +46,13 @@ export function GrapStatusCard({ activeStage, allStages }: Props) {
                 textAlign: 'center',
               }}
             >
-              <span style={{ fontSize: '0.7rem', fontWeight: 800, color: isThisActive ? 'var(--bad)' : 'var(--ink-3)', textTransform: 'uppercase' }}>
+              <span style={{ fontSize: 'var(--text-xs)', fontWeight: 800, color: isThisActive ? 'var(--bad)' : 'var(--ink-3)', textTransform: 'uppercase' }}>
                 Stage {stage.stageNumber}
               </span>
               <div style={{ fontSize: '0.82rem', fontWeight: 800, color: isThisActive ? 'var(--bad)' : 'var(--ink-2)', marginTop: '0.15rem' }}>
                 {stage.stageName.split('-')[1] || stage.stageName}
               </div>
-              <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>{stage.aqiThreshold}</span>
+              <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>{stage.aqiThreshold}</span>
             </div>
           );
         })}

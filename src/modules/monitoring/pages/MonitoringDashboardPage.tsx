@@ -7,10 +7,19 @@ import { QuarantineQueue } from '../components/QuarantineQueue';
 import { SnapshotRollback } from '../components/SnapshotRollback';
 import { LivePipelineHealth } from '../components/LivePipelineHealth';
 import { ShieldAlert, Activity, Clock, CheckCircle2, RotateCcw, AlertTriangle, Layers, Filter } from 'lucide-react';
+import { Stat } from '../../../ui';
 
 interface MonitoringDashboardPageProps {
   initialTab?: 'all' | 'quarantine' | 'snapshots';
 }
+
+const CATEGORY_FILTERS = [
+  { id: 'all', label: 'All' },
+  { id: 'new_school_records', label: 'School records' },
+  { id: 'new_tenders', label: 'Tenders' },
+  { id: 'new_rera_orders', label: 'RERA orders' },
+  { id: 'new_documents', label: 'Documents' },
+];
 
 export function MonitoringDashboardPage({ initialTab }: MonitoringDashboardPageProps) {
   const location = useLocation();
@@ -46,26 +55,11 @@ export function MonitoringDashboardPage({ initialTab }: MonitoringDashboardPageP
   return (
     <div>
       <LivePipelineHealth />
-      {/* Top Banner */}
-      <div className="card card-pad module-toolbar">
-{/* Status Counter Chips */}
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <div style={{ background: 'var(--surface)', padding: '0.65rem 1.15rem', borderRadius: 12, backdropFilter: 'blur(8px)' }}>
-            <div style={{ fontSize: '0.72rem', color: 'var(--ink-4)', fontWeight: 700 }}>Total System Alerts</div>
-            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--on-solid)' }}>{alerts.length}</div>
-          </div>
-
-          <div style={{ background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '0.65rem 1.15rem', borderRadius: 12 }}>
-            <div style={{ fontSize: '0.72rem', color: '#fca5a5', fontWeight: 700 }}>Quarantined Updates</div>
-            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--bad)' }}>{quarantinedAlerts.length} Require Review</div>
-          </div>
-
-          <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.3)', padding: '0.65rem 1.15rem', borderRadius: 12 }}>
-            <div style={{ fontSize: '0.72rem', color: '#6ee7b7', fontWeight: 700 }}>Active Version Snapshots</div>
-            <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--good)' }}>{snapshots.length} Baselines</div>
-          </div>
-        </div>
-</div>
+      <div className="stat-row" style={{ marginBottom: 'var(--s-6)' }}>
+        <Stat label="Example alerts" value={alerts.length} />
+        <Stat label="Waiting for review" value={quarantinedAlerts.length} meta="Held back until a person approves them" />
+        <Stat label="Saved snapshots" value={snapshots.length} meta="Versions you can roll back to" />
+      </div>
 
       {/* Tabs Navigation Bar */}
       <div style={{ display: 'flex', gap: '0.5rem', borderBottom: '2px solid var(--border)', marginBottom: '1.5rem', overflowX: 'auto' }}>
@@ -80,7 +74,7 @@ export function MonitoringDashboardPage({ initialTab }: MonitoringDashboardPageP
             textDecoration: 'none'
           }}
         >
-          All System Alerts ({alerts.length})
+          All alerts ({alerts.length})
         </Link>
 
         <Link
@@ -97,7 +91,7 @@ export function MonitoringDashboardPage({ initialTab }: MonitoringDashboardPageP
             gap: '0.35rem'
           }}
         >
-          <ShieldAlert size={16} /> Human Review Quarantine Queue ({quarantinedAlerts.length})
+          <ShieldAlert size={16} /> Waiting for review ({quarantinedAlerts.length})
         </Link>
 
         <Link
@@ -114,7 +108,7 @@ export function MonitoringDashboardPage({ initialTab }: MonitoringDashboardPageP
             gap: '0.35rem'
           }}
         >
-          <RotateCcw size={16} /> Dataset Snapshots & Rollback
+          <RotateCcw size={16} /> Snapshots and rollback
         </Link>
       </div>
 
@@ -122,24 +116,10 @@ export function MonitoringDashboardPage({ initialTab }: MonitoringDashboardPageP
       {activeTab === 'all' && (
         <div style={{ display: 'grid', gap: '1.25rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-3)' }}>Filter Category:</span>
-            {['all', 'new_school_records', 'new_tenders', 'new_rera_orders', 'new_documents'].map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setSelectedCategory(cat)}
-                style={{
-                  padding: '0.35rem 0.85rem',
-                  borderRadius: '9999px',
-                  border: selectedCategory === cat ? '1px solid var(--border-strong)' : '1px solid var(--border-strong)',
-                  background: selectedCategory === cat ? 'var(--surface-inverse)' : 'var(--surface)',
-                  color: selectedCategory === cat ? 'var(--on-solid)' : 'var(--ink-2)',
-                  fontWeight: 700,
-                  fontSize: '0.78rem',
-                  cursor: 'pointer'
-                }}
-              >
-                {cat}
+            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-3)' }}>Show:</span>
+            {CATEGORY_FILTERS.map(({ id, label }) => (
+              <button key={id} type="button" className="chip" aria-pressed={selectedCategory === id} onClick={() => setSelectedCategory(id)}>
+                {label}
               </button>
             ))}
           </div>

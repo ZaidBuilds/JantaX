@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
 import { Stat } from '../../../ui';
 import { EvidenceCard, Kv, ModulePinBar, SectionTitle, pct, pinSeed, useModulePin } from '../../shared/ModuleKit';
+import { pick } from '../../../i18n';
 
 interface Facility {
   id: string;
@@ -106,7 +107,7 @@ export function HospitalDashboard() {
               ]}
             />
           }
-          finding={f.finding}
+          finding={pick(f.finding, f.findingHi)}
           responsible="Chief Medical Officer (CMO), State Health Department"
           source={{ name: 'NHM Facility Registry / HMIS', url: 'https://hmis.mohfw.gov.in', updated: '2026-08-15' }}
           recordRef={f.id}

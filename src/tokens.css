@@ -23,7 +23,7 @@
   --ink: #0c1424;
   --ink-2: #384357;
   --ink-3: #5a6679;
-  --ink-4: #8a94a6;
+  --ink-4: #626c7f; /* 4.5:1 on every light surface; placeholders and small print */
   --on-solid: #ffffff;
 
   /* Brand: navy spine + saffron accent */
@@ -56,7 +56,7 @@
   --warn-solid: #a95f06;
   --bad-solid: #b3261e;
   --info-solid: #1f55c0;
-  --accent-solid: #c9540a;
+  --accent-solid: #b84c08;
   --surface-inverse: #121a2b;
 
   /* Categorical data colours (charts, map layers, module marks) */
@@ -65,7 +65,7 @@
   --viz-3: #12774a;
   --viz-4: #7440b5;
   --viz-5: #bf2f52;
-  --viz-6: #0d7a84;
+  --viz-6: #0b7079;
   --viz-7: #8a6a00;
   --viz-8: #52607a;
 
@@ -138,7 +138,7 @@
   --ink: #e8ecf3;
   --ink-2: #b9c2d1;
   --ink-3: #8f9aae;
-  --ink-4: #667188;
+  --ink-4: #8591a7;
   --on-solid: #ffffff;
 
   --brand: #3563d8;
@@ -168,7 +168,7 @@
   --warn-solid: #b06a0c;
   --bad-solid: #c2392f;
   --info-solid: #2c62d0;
-  --accent-solid: #d4600f;
+  --accent-solid: #b8540f;
   --surface-inverse: #1c2638;
 
   --viz-1: #7fa2ff;
@@ -184,6 +184,64 @@
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.35), 0 1px 3px rgb(0 0 0 / 0.25);
   --shadow-md: 0 10px 28px -12px rgb(0 0 0 / 0.6), 0 2px 6px rgb(0 0 0 / 0.3);
   --shadow-lg: 0 24px 48px -16px rgb(0 0 0 / 0.7);
+}
+
+/* AQI categories outside the status palette (CPCB bands). Text-safe on light and dark surfaces. */
+:root { --aqi-satisfactory: #4d7c0f; --aqi-severe-plus: #7f1d1d; }
+:root[data-theme='dark'] { --aqi-satisfactory: #a3d65c; --aqi-severe-plus: #ff9a9a; }
+
+/* Illustration palette for the "Your area" scene (src/ui/AreaScene.tsx): day in light mode, night in dark. */
+:root {
+  --scene-sky-top: #dce8f7;
+  --scene-sky-bottom: #fbf2e6;
+  --scene-sun: #f7c66b;
+  --scene-far: #cdd8e7;
+  --scene-far-2: #b4c3d8;
+  --scene-snow: #ffffff;
+  --scene-sea: #a7c9e6;
+  --scene-leaf: #5c9c75;
+  --scene-leaf-2: #7db791;
+  --scene-trunk: #8a6a4f;
+  --scene-kerb: #dde3eb;
+  --scene-road: #b9c2cf;
+  --scene-lane: #f6f8fb;
+  --scene-wall: #f7f0e3;
+  --scene-post-red: #c62f2a;
+  --scene-door: #45567a;
+  --scene-window: #cfe0f3;
+  --scene-pole: #8793a6;
+  --scene-lamp: #fbe3a4;
+  --scene-glow-opacity: 0;
+  --scene-auto-green: #2f8a5a;
+  --scene-auto-yellow: #f2c53d;
+  --scene-auto-dark: #26324a;
+  --scene-tyre: #1f2533;
+}
+:root[data-theme='dark'] {
+  --scene-sky-top: #0c1630;
+  --scene-sky-bottom: #1c2446;
+  --scene-sun: #e4e9f2;
+  --scene-far: #1b2944;
+  --scene-far-2: #26375c;
+  --scene-snow: #c9d3e3;
+  --scene-sea: #1b3452;
+  --scene-leaf: #2d664a;
+  --scene-leaf-2: #3a7a59;
+  --scene-trunk: #5b4634;
+  --scene-kerb: #2a3550;
+  --scene-road: #1a2234;
+  --scene-lane: #3a4763;
+  --scene-wall: #2b3754;
+  --scene-post-red: #cf4a40;
+  --scene-door: #111a2c;
+  --scene-window: #f5c96a;
+  --scene-pole: #5b6780;
+  --scene-lamp: #ffd98a;
+  --scene-glow-opacity: 0.55;
+  --scene-auto-green: #2c7a50;
+  --scene-auto-yellow: #d8ad36;
+  --scene-auto-dark: #0b111d;
+  --scene-tyre: #070b13;
 }
 
 /* Legacy aliases: older modules read these names. */

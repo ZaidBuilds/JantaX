@@ -51,7 +51,7 @@ export function PollutionTable({ stations }: Props) {
                   <div style={{ fontSize: '0.75rem', color: 'var(--ink-3)', marginTop: '0.15rem' }}>
                     {s.operator}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.72rem', color: 'var(--accent-ink)', marginTop: '0.2rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: 'var(--text-xs)', color: 'var(--accent-ink)', marginTop: '0.2rem' }}>
                     <MapPin size={11} />
                     <span>PIN {s.pinCode} • {s.city}, {s.state}</span>
                   </div>
@@ -62,7 +62,7 @@ export function PollutionTable({ stations }: Props) {
                     <span
                       style={{
                         background: color,
-                        color: 'var(--on-solid)',
+                        color: 'var(--surface)',
                         fontSize: '1rem',
                         fontWeight: 900,
                         padding: '0.25rem 0.65rem',
@@ -77,7 +77,7 @@ export function PollutionTable({ stations }: Props) {
                       <div style={{ fontWeight: 800, color: color, fontSize: '0.82rem' }}>
                         {s.category}
                       </div>
-                      <div style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>
+                      <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
                         CPCB NAQI Standard
                       </div>
                     </div>

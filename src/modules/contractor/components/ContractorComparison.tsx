@@ -51,7 +51,7 @@ export const ContractorComparison: React.FC<ContractorComparisonProps> = ({
           {/* Add Contractor to Compare Dropdown */}
           <div className="flex items-center space-x-2">
             <span className="text-xs font-bold text-ink">Add:</span>
-            <select
+            <select aria-label="Add a contractor to compare"
               onChange={(e) => {
                 if (e.target.value) {
                   onAddToCompare(e.target.value);

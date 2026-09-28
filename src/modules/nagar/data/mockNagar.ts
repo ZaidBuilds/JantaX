@@ -18,7 +18,7 @@ export const MOCK_WARDS: MunicipalWard[] = [
     councillor: {
       name: 'Ward councillor (sample 1)',
       nameHi: 'वार्ड पार्षद (नमूना 1)',
-      party: 'BJP',
+      party: 'Sample party',
       phone: '011-2334-8890',
       officeAddress: 'Ward Office, Near Shivaji Stadium Bus Terminal, New Delhi - 110001',
     },
@@ -63,7 +63,7 @@ export const MOCK_WARDS: MunicipalWard[] = [
     councillor: {
       name: 'Ward councillor (sample 2)',
       nameHi: 'वार्ड पार्षद (नमूना 2)',
-      party: 'AAP',
+      party: 'Sample party',
       phone: '011-2396-1234',
       officeAddress: 'Zonal Office, 16 Rajpur Road, Civil Lines, Delhi - 110054',
     },
@@ -108,7 +108,7 @@ export const MOCK_WARDS: MunicipalWard[] = [
     councillor: {
       name: 'Ward councillor (sample 3)',
       nameHi: 'वार्ड पार्षद (नमूना 3)',
-      party: 'BJP',
+      party: 'Sample party',
       phone: '0121-264-8800',
       officeAddress: 'Nagar Nigam Ward Camp Office, Kutchery Road, Meerut',
     },
@@ -153,7 +153,7 @@ export const MOCK_WARDS: MunicipalWard[] = [
     councillor: {
       name: 'Ward councillor (sample 4)',
       nameHi: 'वार्ड पार्षद (नमूना 4)',
-      party: 'BJP',
+      party: 'Sample party',
       phone: '0712-256-7890',
       officeAddress: 'Zonal Office, Near Shankar Nagar Square, Nagpur',
     },

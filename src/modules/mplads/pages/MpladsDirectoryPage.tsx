@@ -5,6 +5,8 @@ import type { SectorType, WorkStatus, HouseType } from '../types/mplads';
 import { MpladsProjectTable } from '../components/MpladsProjectTable';
 import { TransparencyDisclaimer } from '../../transparency/components/TransparencyDisclaimer';
 import { Search, MapPin, IndianRupee, Users, Building2, Layers, Filter, CheckCircle2, ChevronRight, Scale } from 'lucide-react';
+import { Avatar } from '../../../ui/Avatar';
+import { Badge } from '../../../ui';
 
 export function MpladsDirectoryPage() {
   const [activeTab, setActiveTab] = useState<'representatives' | 'works'>('representatives');
@@ -161,19 +163,13 @@ export function MpladsDirectoryPage() {
               return (
                 <div key={rep.id} className="jantax-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column' }}>
                   <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1rem' }}>
-                    <img
-                      src={rep.photoUrl}
-                      alt={rep.name}
-                      style={{ width: 64, height: 64, borderRadius: 16, objectFit: 'cover', border: '2px solid var(--border)' }}
-                    />
+                    <Avatar name={rep.name} size={64} />
                     <div style={{ flex: 1 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                        <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--brand-ink)', background: 'var(--brand-soft)', padding: '0.15rem 0.5rem', borderRadius: 6 }}>
+                        <span style={{ fontSize: 'var(--text-xs)', fontWeight: 800, color: 'var(--brand-ink)', background: 'var(--brand-soft)', padding: '0.15rem 0.5rem', borderRadius: 6 }}>
                           {rep.house}
                         </span>
-                        <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--on-solid)', background: rep.partyColor, padding: '0.15rem 0.5rem', borderRadius: 6 }}>
-                          {rep.party}
-                        </span>
+                        <Badge>{rep.party}</Badge>
                       </div>
                       <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ink)', margin: '0.3rem 0 0.15rem' }}>
                         {rep.name}
@@ -201,15 +197,15 @@ export function MpladsDirectoryPage() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', textAlign: 'center', marginBottom: '1.25rem', fontSize: '0.75rem' }}>
                     <div style={{ background: 'var(--surface-3)', padding: '0.5rem', borderRadius: 8 }}>
                       <div style={{ fontWeight: 800, color: 'var(--ink)', fontSize: '0.95rem' }}>{rep.totalWorksSanctioned}</div>
-                      <span style={{ color: 'var(--ink-3)', fontSize: '0.68rem' }}>Sanctioned</span>
+                      <span style={{ color: 'var(--ink-3)', fontSize: 'var(--text-xs)' }}>Sanctioned</span>
                     </div>
                     <div style={{ background: 'var(--surface-3)', padding: '0.5rem', borderRadius: 8 }}>
                       <div style={{ fontWeight: 800, color: 'var(--good)', fontSize: '0.95rem' }}>{rep.totalWorksCompleted}</div>
-                      <span style={{ color: 'var(--ink-3)', fontSize: '0.68rem' }}>Completed</span>
+                      <span style={{ color: 'var(--ink-3)', fontSize: 'var(--text-xs)' }}>Completed</span>
                     </div>
                     <div style={{ background: 'var(--surface-3)', padding: '0.5rem', borderRadius: 8 }}>
                       <div style={{ fontWeight: 800, color: 'var(--warn)', fontSize: '0.95rem' }}>₹{rep.fundSummary.unspentBalanceCr} Cr</div>
-                      <span style={{ color: 'var(--ink-3)', fontSize: '0.68rem' }}>Unspent</span>
+                      <span style={{ color: 'var(--ink-3)', fontSize: 'var(--text-xs)' }}>Unspent</span>
                     </div>
                   </div>
 
@@ -245,7 +241,7 @@ export function MpladsDirectoryPage() {
         <div>
           {/* Sector & Status Filter Bar */}
           <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
-            <select
+            <select aria-label="Sectors"
               value={selectedSector}
               onChange={(e) => setSelectedSector(e.target.value as SectorType | 'All')}
               style={{ padding: '0.45rem 0.85rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.82rem', background: 'var(--surface)', color: 'var(--ink)' }}
@@ -259,7 +255,7 @@ export function MpladsDirectoryPage() {
               <option value="Community Infrastructure">Community Infrastructure</option>
             </select>
 
-            <select
+            <select aria-label="Execution Status"
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value as WorkStatus | 'All')}
               style={{ padding: '0.45rem 0.85rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.82rem', background: 'var(--surface)', color: 'var(--ink)' }}

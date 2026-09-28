@@ -4,6 +4,7 @@ import { getActiveGrapStage, getGrapRules } from '../services/pollutionService';
 import { GrapStatusCard } from '../components/GrapStatusCard';
 import { TransparencyDisclaimer } from '../../transparency/components/TransparencyDisclaimer';
 import { ArrowLeft, ShieldAlert, FileText, ExternalLink } from 'lucide-react';
+import { pick } from '../../../i18n';
 
 export function GrapGuidePage() {
   const activeGrap = getActiveGrapStage();
@@ -15,7 +16,7 @@ export function GrapGuidePage() {
       <div style={{ marginBottom: '1rem' }}>
         <Link
           to="/pollution"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
+          style={{ display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
         >
           <ArrowLeft size={16} /> Back to Air Quality Directory
         </Link>
@@ -33,9 +34,9 @@ export function GrapGuidePage() {
 
         {/* All Stages Detailed Breakdown */}
         <div style={{ marginTop: '2rem' }}>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', marginBottom: '1rem' }}>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--ink)', marginBottom: '1rem' }}>
             Full 4-Stage GRAP Restriction Hierarchy
-          </h3>
+          </h2>
 
           <div style={{ display: 'grid', gap: '1.25rem' }}>
             {allGrap.map((stage) => (
@@ -50,7 +51,7 @@ export function GrapGuidePage() {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
                   <span style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ink)' }}>
-                    {stage.stageName} ({stage.stageNameHi})
+                    {pick(stage.stageName, stage.stageNameHi)}
                   </span>
                   <span style={{ background: 'var(--brand)', color: 'var(--on-solid)', fontSize: '0.75rem', fontWeight: 700, padding: '0.2rem 0.6rem', borderRadius: 4 }}>
                     {stage.aqiThreshold}

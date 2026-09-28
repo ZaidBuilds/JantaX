@@ -36,3 +36,32 @@ export function nearest<T extends Point>(from: Point, items: T[], limit = 1): (T
     .sort((a, b) => a.km - b.km)
     .slice(0, limit);
 }
+
+/** Linear-interpolated quantile of an ascending list (the same definition as Postgres percentile_cont). */
+function quantile(sorted: number[], q: number): number {
+  const pos = (sorted.length - 1) * q;
+  const lo = Math.floor(pos);
+  const hi = Math.ceil(pos);
+  return sorted[lo] + (sorted[hi] - sorted[lo]) * (pos - lo);
+}
+
+/** The smallest and largest radius a PIN's area is drawn with. */
+export const SPREAD_KM = { min: 1, max: 25 };
+
+/**
+ * How far a PIN's post offices spread around its centre, in km: the distance that covers 80% of them,
+ * after dropping offices more than three times the median distance (and over 5 km) away, which are
+ * mis-geocoded rather than remote. Null with fewer than two located offices. Clamped to SPREAD_KM,
+ * so maps draw an area that is neither a dot nor half a state.
+ */
+export function spreadKm(centre: Point, points: Point[]): number | null {
+  const ds = points
+    .filter((p) => isInIndia(p.lat, p.lng))
+    .map((p) => distanceKm(centre, p))
+    .sort((a, b) => a - b);
+  if (ds.length < 2) return null;
+  const median = quantile(ds, 0.5);
+  const kept = ds.filter((d) => d <= Math.max(3 * median, 5));
+  const p80 = quantile(kept, 0.8);
+  return Math.round(Math.min(Math.max(p80, SPREAD_KM.min), SPREAD_KM.max) * 10) / 10;
+}

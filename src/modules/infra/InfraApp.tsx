@@ -6,6 +6,7 @@ import { SpineDashboard } from './components/SpineDashboard';
 import { useSearchParams } from 'react-router-dom';
 import { SourceBadge } from '../../components/UI/SourceBadge';
 import { resolvePincode } from '../../core/utils/pinResolver';
+import { locale } from '../../i18n';
 
 export function InfraApp() {
   const { projects, addCitizenReport, upvoteReport, resetDB, importProjects } = useLocalDB();
@@ -44,7 +45,7 @@ export function InfraApp() {
 
     setTimeout(() => {
       resetDB();
-      setSyncTime(new Date().toLocaleTimeString() + " (Live Sync)");
+      setSyncTime(new Date().toLocaleTimeString(locale()) + " (Live Sync)");
       setSyncMessage("Done! Synced 15 active projects. Dashboard updated.");
       setIsSyncing(false);
     }, 1500);
@@ -90,7 +91,7 @@ export function InfraApp() {
         "state": "Uttar Pradesh",
         "district": "Gautam Buddha Nagar",
         "leadContractor": "DMRC Contract JV",
-        "responsibleOfficer": "Shri Vikas Kumar",
+        "responsibleOfficer": "Executive engineer (sample)",
         "responsibleOfficerDesignation": "Managing Director, DMRC",
         "status": "Construction",
         "statusHindi": "निर्माण कार्य चालू है",
@@ -132,11 +133,11 @@ export function InfraApp() {
   return (
     <div className="stack" style={{ gap: 'var(--s-6)' }}>
       <div className="segmented" role="tablist" aria-label="Public works views">
-        <button type="button" role="tab" aria-selected={activeSpineView === 'national'} aria-pressed={activeSpineView === 'national'} onClick={() => setActiveSpineView('national')}>
+        <button type="button" role="tab" aria-selected={activeSpineView === 'national'} onClick={() => setActiveSpineView('national')}>
           Projects and progress
         </button>
-        <button type="button" role="tab" aria-selected={activeSpineView === 'spine'} aria-pressed={activeSpineView === 'spine'} onClick={() => setActiveSpineView('spine')}>
-          Who is accountable, MP to gram panchayat
+        <button type="button" role="tab" aria-selected={activeSpineView === 'spine'} onClick={() => setActiveSpineView('spine')}>
+          Money trail, MP to gram panchayat
         </button>
       </div>
 

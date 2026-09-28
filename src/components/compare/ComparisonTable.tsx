@@ -2,6 +2,7 @@ import React from 'react';
 import { ExternalLink, AlertTriangle, CheckCircle, Clock, Info } from 'lucide-react';
 import { ComparisonData, ComparisonEntity, ComparisonMetric, getEntityTypeLabel } from './types';
 import { SourceBadge } from '../UI/SourceBadge';
+import { locale, pick } from '../../i18n';
 
 interface ComparisonTableProps {
   data: ComparisonData;
@@ -26,7 +27,7 @@ export function ComparisonTable({ data, onEntityClick, showSourceDisclosure = tr
         <thead>
           <tr style={{ borderBottom: '2px solid var(--border)' }}>
             <th style={{ textAlign: 'left', padding: '0.75rem 1rem', minWidth: 180, position: 'sticky', left: 0, background: 'var(--surface)', zIndex: 1 }}>
-              <span style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Metric</span>
+              <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Metric</span>
             </th>
             {entities.map(entity => {
               const color = ENTITY_COLORS[entity.type] || 'var(--ink-3)';
@@ -37,11 +38,11 @@ export function ComparisonTable({ data, onEntityClick, showSourceDisclosure = tr
                     textAlign: 'center',
                     padding: '0.75rem 0.5rem',
                     minWidth: 160,
-                    background: `${color}08`,
+                    background: `color-mix(in srgb, ${color} 3%, transparent)`,
                   }}
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem' }}>
-                    <span style={{ fontSize: '0.65rem', padding: '2px 6px', borderRadius: 4, background: `${color}15`, color, fontWeight: 700 }}>
+                    <span style={{ fontSize: 'var(--text-xs)', padding: '2px 6px', borderRadius: 4, background: `color-mix(in srgb, ${color} 8%, transparent)`, color, fontWeight: 700 }}>
                       {getEntityTypeLabel(entity.type)}
                     </span>
                     <span
@@ -51,15 +52,15 @@ export function ComparisonTable({ data, onEntityClick, showSourceDisclosure = tr
                       {entity.name}
                     </span>
                     {entity.location && (
-                      <span style={{ fontSize: '0.65rem', opacity: 0.6 }}>
+                      <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
                         {entity.location.district}, {entity.location.state}
                       </span>
                     )}
                     {onEntityClick && (
                       <button
                         style={{
-                          fontSize: '0.65rem',
-                          color: 'var(--color-primary)',
+                          fontSize: 'var(--text-xs)',
+                          color: 'var(--brand-ink)',
                           background: 'none',
                           border: 'none',
                           cursor: 'pointer',
@@ -83,13 +84,10 @@ export function ComparisonTable({ data, onEntityClick, showSourceDisclosure = tr
           {rows.map((row, rowIdx) => (
             <tr
               key={row.id}
-              style={{ borderBottom: '1px solid var(--border)', background: rowIdx % 2 === 0 ? 'transparent' : '#fafbfc' }}
+              style={{ borderBottom: '1px solid var(--border)', background: rowIdx % 2 === 0 ? 'transparent' : 'var(--surface-2)' }}
             >
-              <td style={{ padding: '0.85rem 1rem', position: 'sticky', left: 0, background: rowIdx % 2 === 0 ? 'var(--surface)' : '#fafbfc', zIndex: 1 }}>
-                <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>{row.category}</div>
-                {row.categoryHi && (
-                  <div style={{ fontSize: '0.7rem', opacity: 0.5 }}>{row.categoryHi}</div>
-                )}
+              <td style={{ padding: '0.85rem 1rem', position: 'sticky', left: 0, background: rowIdx % 2 === 0 ? 'var(--surface)' : 'var(--surface-2)', zIndex: 1 }}>
+                <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 2 }}>{pick(row.category, row.categoryHi)}</div>
               </td>
               {row.metrics.map((metric, colIdx) => (
                 <td
@@ -97,7 +95,7 @@ export function ComparisonTable({ data, onEntityClick, showSourceDisclosure = tr
                   style={{
                     padding: '0.85rem 0.5rem',
                     textAlign: 'center',
-                    background: colIdx === 0 ? 'transparent' : `${ENTITY_COLORS[entities[colIdx]?.type] || '#6b7280'}08`,
+                    background: colIdx === 0 ? 'transparent' : `color-mix(in srgb, ${ENTITY_COLORS[entities[colIdx]?.type] || 'var(--ink-3)'} 3%, transparent)`,
                   }}
                 >
                   <ComparisonCell metric={metric} />
@@ -134,7 +132,7 @@ function ComparisonCell({ metric }: ComparisonCellProps) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.25rem' }}>
         <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--ink-4)' }}>-</span>
-        <span style={{ fontSize: '0.6rem', color: 'var(--ink-4)' }}>Unavailable</span>
+        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Unavailable</span>
       </div>
     );
   }
@@ -146,18 +144,18 @@ function ComparisonCell({ metric }: ComparisonCellProps) {
           {metric.value}
         </span>
         {metric.unit && (
-          <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>{metric.unit}</span>
+          <span style={{ fontSize: '0.75rem', color: 'var(--ink-3)' }}>{metric.unit}</span>
         )}
       </div>
 
       {metric.rank && (
-        <span style={{ fontSize: '0.65rem', fontWeight: 700, padding: '1px 6px', borderRadius: 999, background: metric.rank <= 3 ? '#10b98115' : 'var(--surface-3)', color: metric.rank <= 3 ? 'var(--good)' : 'var(--ink-3)' }}>
+        <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, padding: '1px 6px', borderRadius: 999, background: metric.rank <= 3 ? 'var(--good-soft)' : 'var(--surface-3)', color: metric.rank <= 3 ? 'var(--good)' : 'var(--ink-3)' }}>
           #{metric.rank}
         </span>
       )}
 
       {metric.badge && (
-        <span style={{ fontSize: '0.6rem', fontWeight: 600, padding: '1px 6px', borderRadius: 4, background: `${metric.color || '#6b7280'}15`, color: metric.color || 'var(--ink-3)' }}>
+        <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, padding: '1px 6px', borderRadius: 4, background: `color-mix(in srgb, ${metric.color || 'var(--ink-3)'} 8%, transparent)`, color: metric.color || 'var(--ink-3)' }}>
           {metric.badge}
         </span>
       )}
@@ -167,13 +165,13 @@ function ComparisonCell({ metric }: ComparisonCellProps) {
       )}
 
       {metric.freshness && (
-        <span style={{ fontSize: '0.6rem', opacity: 0.5 }}>
+        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
           {formatFreshness(metric.freshness)}
         </span>
       )}
 
       {metric.methodology && (
-        <span title={metric.methodology} style={{ cursor: 'help', opacity: 0.4 }}>
+        <span title={metric.methodology} style={{ cursor: 'help', color: 'var(--ink-3)' }}>
           <Info size={12} />
         </span>
       )}
@@ -190,7 +188,7 @@ function formatFreshness(date: Date | string | null | undefined): string {
   if (hours < 24) return `${Math.floor(hours)}h ago`;
   const days = Math.floor(hours / 24);
   if (days < 30) return `${days}d ago`;
-  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+  return d.toLocaleDateString(locale(), { day: 'numeric', month: 'short' });
 }
 
 interface SourceDisclosureProps {
@@ -233,11 +231,11 @@ function SourceDisclosure({ rows, entities }: SourceDisclosureProps) {
         {[...sources.values()].map(source => (
           <div key={source.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem' }}>
             <SourceBadge sourceType={source.type as 'A' | 'B' | 'C'} sourceName={source.name} />
-            <span style={{ opacity: 0.5 }}>({source.count} metrics)</span>
+            <span style={{ color: 'var(--ink-3)' }}>({source.count} metrics)</span>
           </div>
         ))}
       </div>
-      <p style={{ fontSize: '0.7rem', opacity: 0.5, marginTop: '0.75rem', lineHeight: 1.5 }}>
+      <p style={{ fontSize: 'var(--text-xs)', marginTop: '0.75rem', lineHeight: 1.5, color: 'var(--ink-3)' }}>
         All metrics are sourced from official government data portals. Methodology available on request.
         Scores are calculated using standardized formulas and may differ from official government reports.
       </p>

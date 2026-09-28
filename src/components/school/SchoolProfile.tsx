@@ -33,6 +33,10 @@ import {
 } from 'lucide-react';
 import { normalizeSchool } from '../../modules/school/normalize';
 import { Breadcrumbs, EmptyState } from '../../ui';
+import { locale, pick } from '../../i18n';
+
+/** A school's name in the chosen language (records from UDISE+ may only have English). */
+const nameOf = (s: SchoolRecord) => pick(s.titleEnglish || s.titleHindi, s.titleHindi);
 
 const TAB_MAP: Record<string, string> = {
   overview: 'overview',
@@ -276,7 +280,7 @@ export function SchoolProfile({ schoolId: propId }: Props) {
 
   const handleShare = async () => {
     if (!school) return;
-    const text = `${school.titleHindi} · PIN ${school.location.pinCode} | Ground Truth: ${school.groundTruthScore}/100 | ${window.location.href}`;
+    const text = `${nameOf(school)} · PIN ${school.location.pinCode} | Ground Truth: ${school.groundTruthScore}/100 | ${window.location.href}`;
     try { await navigator.clipboard.writeText(text); } catch {}
     setShowShareToast(true);
     setTimeout(() => setShowShareToast(false), 2000);
@@ -294,6 +298,7 @@ export function SchoolProfile({ schoolId: propId }: Props) {
       <div className="card" style={{ marginTop: 'var(--s-4)' }}>
         <EmptyState
           icon={GraduationCap}
+          heading="h1"
           title="We could not find that school"
           text={`No school with the reference "${schoolId}" is in our records. Search by name, PIN code or UDISE code instead.`}
           action={<Link to="/schools/search" className="btn btn-primary">Search schools</Link>}
@@ -312,7 +317,7 @@ export function SchoolProfile({ schoolId: propId }: Props) {
 
       <div style={{ maxWidth: 1280, margin: '0 auto', padding: '1rem 1.25rem 0' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem' }}>
-          <Breadcrumbs items={[{ label: 'Schools', to: '/schools' }, { label: school.titleEnglish || school.titleHindi }]} />
+          <Breadcrumbs items={[{ label: 'Schools', to: '/schools' }, { label: nameOf(school) }]} />
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             <button onClick={() => setFollowing(v => !v)} style={{ padding: '0.45rem 0.9rem', borderRadius: 8, border: '1px solid var(--border)', background: following ? 'var(--good-soft)' : 'var(--surface)', fontWeight: 700, fontSize: '0.78rem', cursor: 'pointer', display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
               <Heart size={14} fill={following ? '#ef4444' : 'none'} style={{ color: following ? 'var(--bad)' : 'inherit' }} />
@@ -330,7 +335,7 @@ export function SchoolProfile({ schoolId: propId }: Props) {
 
       {showCheckIn && (
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 1.25rem' }}>
-          <QuickCheckIn pincode={school.location.pinCode} schoolId={school.id} schoolName={school.titleHindi} onClose={() => setShowCheckIn(false)} />
+          <QuickCheckIn pincode={school.location.pinCode} schoolId={school.id} schoolName={nameOf(school)} onClose={() => setShowCheckIn(false)} />
         </div>
       )}
 
@@ -392,13 +397,13 @@ function SchoolHeaderCard({ school, composite, conf }: { school: SchoolRecord; c
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <h1 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }}>{school.titleEnglish || school.titleHindi}</h1>
-          {school.groundTruthScore >= 70 && <span style={{ fontSize: '0.62rem', background: 'var(--good-soft)', color: 'var(--good)', padding: '2px 7px', borderRadius: 999, fontWeight: 800, border: '1px solid var(--good-line)' }}>● Verified</span>}
+          <h1 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--ink)', margin: 0 }} translate="no">{nameOf(school)}</h1>
+          {school.groundTruthScore >= 70 && <span style={{ fontSize: 'var(--text-xs)', background: 'var(--good-soft)', color: 'var(--good)', padding: '2px 7px', borderRadius: 999, fontWeight: 800, border: '1px solid var(--good-line)' }}>● Verified</span>}
         </div>
-        <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)', marginTop: '0.25rem', display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
+        <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', marginTop: '0.25rem', display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
           <MapPin size={12} /> {school.location.district}, {school.location.state} – {school.location.pinCode}
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.4rem 0.9rem', marginTop: '0.6rem', fontSize: '0.72rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.4rem 0.9rem', marginTop: '0.6rem', fontSize: 'var(--text-xs)' }}>
           <span style={{ color: 'var(--ink-3)' }}><strong style={{ color: 'var(--ink)' }}>UDISE:</strong> {school.udiseCode}</span>
           <span style={{ color: 'var(--ink-3)' }}><strong style={{ color: 'var(--ink)' }}>Level:</strong> {school.schoolLevel}</span>
           <span style={{ color: 'var(--ink-3)' }}><strong style={{ color: 'var(--ink)' }}>Management:</strong> {school.managementType}</span>
@@ -475,7 +480,7 @@ function OverviewTab({ school, dimensions }: { school: SchoolRecord; dimensions:
             { label: 'PTR', value: '28:1' },
           ].map(item => (
             <div key={item.label} style={{ background: 'var(--surface-2)', borderRadius: 8, padding: '0.6rem 0.75rem' }}>
-              <div style={{ fontSize: '0.65rem', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
               <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.15rem' }}>{item.value}</div>
             </div>
           ))}
@@ -500,7 +505,7 @@ function OverviewTab({ school, dimensions }: { school: SchoolRecord; dimensions:
             { label: 'Ground Score', value: `${school.groundTruthScore}/100` },
           ].map(item => (
             <div key={item.label} style={{ background: 'var(--brand-soft)', borderRadius: 'var(--radius-control)', padding: '0.6rem 0.75rem' }}>
-              <div style={{ fontSize: '0.65rem', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
               <div style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.15rem' }}>{item.value}</div>
             </div>
           ))}
@@ -538,9 +543,9 @@ function InfrastructureTab({ school }: { school: SchoolRecord }) {
                 <td style={{ padding: '0.6rem 0.5rem' }}>{r.udise}</td>
                 <td style={{ padding: '0.6rem 0.5rem', fontWeight: 700, color: r.match === false ? 'var(--bad)' : r.match === null ? 'var(--warn)' : 'var(--good)' }}>{r.community}</td>
                 <td style={{ padding: '0.6rem 0.5rem' }}>
-                  {r.match === true && <span className="badge badge-success" style={{ fontSize: '0.72rem' }}><Check size={10} /> Match</span>}
-                  {r.match === false && <span className="badge badge-danger" style={{ fontSize: '0.72rem' }}><AlertTriangle size={10} /> Mismatch</span>}
-                  {r.match === null && <span className="badge badge-warning" style={{ fontSize: '0.72rem' }}><HelpCircle size={10} /> Partial</span>}
+                  {r.match === true && <span className="badge badge-success" style={{ fontSize: 'var(--text-xs)' }}><Check size={10} /> Match</span>}
+                  {r.match === false && <span className="badge badge-danger" style={{ fontSize: 'var(--text-xs)' }}><AlertTriangle size={10} /> Mismatch</span>}
+                  {r.match === null && <span className="badge badge-warning" style={{ fontSize: 'var(--text-xs)' }}><HelpCircle size={10} /> Partial</span>}
                 </td>
               </tr>
             ))}
@@ -563,7 +568,7 @@ function StaffingTab({ school }: { school: SchoolRecord }) {
             { label: 'Female Teachers', value: '60%' },
           ].map(item => (
             <div key={item.label} style={{ background: 'var(--surface-2)', borderRadius: 'var(--radius-control)', padding: '0.6rem 0.75rem' }}>
-              <div style={{ fontSize: '0.65rem', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.15rem' }}>{item.value}</div>
             </div>
           ))}
@@ -583,7 +588,7 @@ function AttendanceTab({ school }: { school: SchoolRecord }) {
           { label: 'Average Days Present', value: '185/200' },
         ].map(item => (
           <div key={item.label} style={{ background: 'var(--surface-2)', borderRadius: 'var(--radius-control)', padding: '0.6rem 0.75rem' }}>
-            <div style={{ fontSize: '0.65rem', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
             <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.15rem' }}>{item.value}</div>
           </div>
         ))}
@@ -596,7 +601,7 @@ function MealsTab({ school }: { school: SchoolRecord }) {
   return (
     <div style={{ display: 'grid', gap: '1rem' }}>
       <DataSourceSection type="official" title="Mid-Day Meal · Official" lastUpdated="2024-03-15" source={{ name: 'MDM Portal', type: 'A' }}>
-        <p style={{ fontSize: '0.82rem', opacity: 0.7 }}>Meal served on {school.metrics.mdmServed === 'yes' ? 'reported school days' : 'select days'}.</p>
+        <p style={{ fontSize: '0.82rem', color: 'var(--ink-3)' }}>Meal served on {school.metrics.mdmServed === 'yes' ? 'reported school days' : 'select days'}.</p>
       </DataSourceSection>
       <DataSourceSection type="community" title="Mid-Day Meal · Community Reports" lastUpdated={school.lastCheckInDate} source={{ name: `${school.totalCheckIns} Check-ins`, type: 'C' }} recordCount={school.totalCheckIns}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
@@ -620,7 +625,7 @@ function LearningTab({ school }: { school: SchoolRecord }) {
           { label: 'EVS (Gr 3)', value: '62%' },
         ].map(item => (
           <div key={item.label} style={{ background: 'var(--surface-2)', borderRadius: 'var(--radius-control)', padding: '0.6rem 0.75rem' }}>
-            <div style={{ fontSize: '0.65rem', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
             <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.15rem' }}>{item.value}</div>
           </div>
         ))}
@@ -646,11 +651,11 @@ function GroundTruthTab({ school }: { school: SchoolRecord }) {
           {[
             { label: 'Ground Score', value: `${school.groundTruthScore}/100` },
             { label: 'Check-in Count', value: school.totalCheckIns },
-            { label: 'Last Check-in', value: school.lastCheckInDate ? new Date(school.lastCheckInDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '-' },
+            { label: 'Last Check-in', value: school.lastCheckInDate ? new Date(school.lastCheckInDate).toLocaleDateString(locale(), { day: 'numeric', month: 'short' }) : '-' },
             { label: 'Confidence', value: school.confidenceLevel },
           ].map(item => (
             <div key={item.label} style={{ background: 'var(--warn-soft)', borderRadius: 8, padding: '0.6rem 0.75rem' }}>
-              <div style={{ fontSize: '0.65rem', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>{item.label}</div>
               <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.15rem' }}>{item.value}</div>
             </div>
           ))}
@@ -668,7 +673,7 @@ function EvidenceTab({ school }: { school: SchoolRecord }) {
         <div style={{ background: 'var(--surface-2)', borderRadius: 8, padding: '0.75rem', textAlign: 'center' }}>
           <Camera size={24} style={{ opacity: 0.4, marginBottom: '0.4rem' }} />
           <div style={{ fontSize: '0.85rem', fontWeight: 700 }}>{school.reality?.evidenceCount || 0}</div>
-          <div style={{ fontSize: '0.68rem', opacity: 0.6 }}>Photos submitted</div>
+          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>Photos submitted</div>
         </div>
       </div>
     </DataSourceSection>
@@ -689,7 +694,7 @@ function TimelineTab({ school }: { school: SchoolRecord }) {
           <div key={i} style={{ display: 'flex', gap: '0.75rem', alignItems: 'flex-start' }}>
             <div style={{ width: 8, height: 8, borderRadius: '50%', background: e.type === 'official' ? 'var(--brand)' : 'var(--viz-4)', marginTop: 6, flexShrink: 0 }} />
             <div>
-              <div style={{ fontSize: '0.65rem', color: 'var(--ink-3)' }}>{new Date(e.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>{new Date(e.date).toLocaleDateString(locale(), { day: 'numeric', month: 'short', year: 'numeric' })}</div>
               <div style={{ fontSize: '0.82rem', fontWeight: 600 }}>{e.event}</div>
             </div>
           </div>
@@ -704,7 +709,7 @@ function ReportsTab({ school }: { school: SchoolRecord }) {
     <DataSourceSection type="community" title="Citizen Reports & Issues" lastUpdated={school.lastCheckInDate} source={{ name: 'JantaX Reports', type: 'C' }} recordCount={school.reality?.evidenceCount || 0}>
       <div style={{ textAlign: 'center', padding: '1.5rem' }}>
         <MessageSquare size={32} style={{ opacity: 0.3, marginBottom: '0.5rem' }} />
-        <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>
+        <p style={{ fontSize: '0.85rem', color: 'var(--ink-3)' }}>
           {school.reality?.evidenceCount > 0
             ? `${school.reality.evidenceCount} citizen reports filed for this school.`
             : 'No reports filed for this school yet.'}
@@ -718,7 +723,7 @@ function CompareTab({ school }: { school: SchoolRecord }) {
   return (
     <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center' }}>
       <BarChart3 size={32} style={{ opacity: 0.3, marginBottom: '0.5rem' }} />
-      <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>
+      <p style={{ fontSize: '0.85rem', color: 'var(--ink-3)' }}>
         <Link to={`/compare?type=schools&ids=${school.id}`} style={{ color: 'var(--brand-ink)' }}>Compare this school</Link> with others in the same PIN code.
       </p>
     </div>

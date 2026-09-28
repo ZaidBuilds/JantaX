@@ -105,7 +105,7 @@ export const ProjectFinancialsTab: React.FC<ProjectFinancialsTabProps> = ({ proj
                     href={tnd.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ fontSize: '0.76rem', color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+                    style={{ fontSize: '0.76rem', color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.25rem' }}
                   >
                     View Tender Notice ({tnd.sourceTitle}) <ExternalLink size={12} />
                   </a>
@@ -155,7 +155,7 @@ export const ProjectFinancialsTab: React.FC<ProjectFinancialsTabProps> = ({ proj
                   href={wo.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ fontSize: '0.76rem', color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+                  style={{ fontSize: '0.76rem', color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.25rem' }}
                 >
                   Work Order Gazette Entry ({wo.sourceTitle}) <ExternalLink size={12} />
                 </a>
@@ -202,10 +202,10 @@ export const ProjectFinancialsTab: React.FC<ProjectFinancialsTabProps> = ({ proj
                       ₹{(pay.amountLakhs / 100).toFixed(2)} Cr
                     </div>
                     <span style={{
-                      fontSize: '0.72rem',
+                      fontSize: 'var(--text-xs)',
                       fontWeight: 700,
                       color: pay.paymentStatus === 'Disbursed' ? 'var(--good)' : 'var(--warn)',
-                      background: pay.paymentStatus === 'Disbursed' ? 'var(--good-soft)' : '#fffbebf',
+                      background: pay.paymentStatus === 'Disbursed' ? 'var(--good-soft)' : 'var(--warn-soft)',
                       padding: '0.15rem 0.5rem',
                       borderRadius: 4,
                       display: 'inline-block',
@@ -221,7 +221,7 @@ export const ProjectFinancialsTab: React.FC<ProjectFinancialsTabProps> = ({ proj
                     href={pay.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{ fontSize: '0.76rem', color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+                    style={{ fontSize: '0.76rem', color: 'var(--brand-ink)', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.25rem' }}
                   >
                     PFMS Verification Link ({pay.sourceTitle}) <ExternalLink size={12} />
                   </a>

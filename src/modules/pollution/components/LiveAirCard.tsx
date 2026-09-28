@@ -4,6 +4,7 @@ import { api, type AirNear } from '../../../core/services/api';
 import { usePin } from '../../../core/context/PinContext';
 import { Badge, SourceLine } from '../../../ui';
 import type { Tone as BadgeTone } from '../../../ui/Badge';
+import { locale } from '../../../i18n';
 
 const TONE: Record<string, BadgeTone> = {
   Good: 'good',
@@ -15,7 +16,7 @@ const TONE: Record<string, BadgeTone> = {
 };
 
 function when(iso: string) {
-  return new Date(iso).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'Asia/Kolkata' });
+  return new Date(iso).toLocaleString(locale(), { day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', timeZone: 'Asia/Kolkata' });
 }
 
 /** The CPCB stations nearest the selected PIN, straight from the live feed. Shows nothing invented. */

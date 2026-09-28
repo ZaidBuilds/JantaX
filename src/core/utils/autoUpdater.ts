@@ -51,7 +51,7 @@ export function getUpdatedProjects<T extends { id: string; sanctionedCostLakhs?:
 }
 
 /**
- * Simulates live daily citizen grievance resolution updates in CPGRAMS Shame Index.
+ * Simulates live daily citizen grievance resolution updates in the public grievance tracker.
  * Dynamically shifts backlog counts and averages slightly every day.
  */
 export function getUpdatedGrievances<T extends { id: string; totalGrievances: number; resolvedCount: number; pendingCount: number; backlogOver30Days: number }>(

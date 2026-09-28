@@ -5,6 +5,7 @@ import { BloContactCard } from '../components/BloContactCard';
 import { BoothFacilitiesCard } from '../components/BoothFacilitiesCard';
 import { TransparencyDisclaimer } from '../../transparency/components/TransparencyDisclaimer';
 import { ArrowLeft, MapPin, Users, Vote, ExternalLink, ShieldCheck, FileText, Send } from 'lucide-react';
+import { pick } from '../../../i18n';
 
 export function BoothDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -31,7 +32,7 @@ export function BoothDetailPage() {
       <div style={{ marginBottom: '1rem' }}>
         <Link
           to="/booth"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
+          style={{ display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
         >
           <ArrowLeft size={16} /> Back to Booth Directory
         </Link>
@@ -51,11 +52,8 @@ export function BoothDetailPage() {
             </div>
 
             <h1 style={{ fontSize: '1.7rem', fontWeight: 800, color: 'var(--ink)', fontFamily: 'var(--font-heading)', margin: '0 0 0.3rem', lineHeight: 1.3 }}>
-              {booth.buildingName}
+              {pick(booth.buildingName, booth.buildingNameHi)}
             </h1>
-            <div style={{ fontSize: '0.95rem', color: 'var(--ink-3)', marginBottom: '0.4rem' }}>
-              {booth.buildingNameHi}
-            </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.85rem', color: 'var(--ink-2)' }}>
               <MapPin size={15} style={{ color: 'var(--accent-ink)' }} />
@@ -64,7 +62,7 @@ export function BoothDetailPage() {
           </div>
 
           <div style={{ textAlign: 'right', minWidth: 140 }}>
-            <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)', textTransform: 'uppercase', fontWeight: 700 }}>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', textTransform: 'uppercase', fontWeight: 700 }}>
               Registered Electors
             </div>
             <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--ink)' }}>
@@ -79,17 +77,17 @@ export function BoothDetailPage() {
         {/* 3 Quick Electoral Stats */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)', marginBottom: '1.5rem', fontSize: '0.82rem' }}>
           <div>
-            <span style={{ color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.68rem' }}>Parliamentary Constituency</span>
+            <span style={{ color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase', fontSize: 'var(--text-xs)' }}>Parliamentary Constituency</span>
             <div style={{ fontWeight: 700, color: 'var(--ink)', marginTop: '0.15rem' }}>{booth.parliamentaryConstituency}</div>
           </div>
 
           <div>
-            <span style={{ color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.68rem' }}>Roll Revision Date</span>
+            <span style={{ color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase', fontSize: 'var(--text-xs)' }}>Roll Revision Date</span>
             <div style={{ fontWeight: 700, color: 'var(--ink)', marginTop: '0.15rem' }}>{booth.electoralRollRevisionDate}</div>
           </div>
 
           <div>
-            <span style={{ color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.68rem' }}>Gazette Order No.</span>
+            <span style={{ color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase', fontSize: 'var(--text-xs)' }}>Gazette Order No.</span>
             <div style={{ fontWeight: 700, color: 'var(--ink)', marginTop: '0.15rem' }}>{booth.gazetteOrderNumber}</div>
           </div>
         </div>

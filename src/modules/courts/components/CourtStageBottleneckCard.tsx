@@ -1,6 +1,7 @@
 import React from 'react';
 import type { StageBottleneck } from '../types/courts';
 import { Clock, AlertCircle } from 'lucide-react';
+import { pick } from '../../../i18n';
 
 interface Props {
   stages: StageBottleneck[];
@@ -36,10 +37,7 @@ export function CourtStageBottleneckCard({ stages }: Props) {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <div>
                   <div style={{ fontWeight: 700, color: 'var(--ink)', fontSize: '0.88rem' }}>
-                    {stage.stage}
-                  </div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--ink-3)' }}>
-                    {stage.stageHi}
+                    {pick(stage.stage, stage.stageHi)}
                   </div>
                 </div>
 
@@ -47,7 +45,7 @@ export function CourtStageBottleneckCard({ stages }: Props) {
                   <span style={{ fontWeight: 800, color: isCritical ? 'var(--bad)' : 'var(--brand-ink)', fontSize: '0.9rem' }}>
                     {stage.percentage}% of Backlog
                   </span>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)' }}>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
                     {stage.caseCount.toLocaleString('en-IN')} cases
                   </div>
                 </div>
@@ -63,7 +61,7 @@ export function CourtStageBottleneckCard({ stages }: Props) {
                     }}
                   />
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', fontSize: '0.7rem', color: 'var(--ink-2)', whiteSpace: 'nowrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem', fontSize: 'var(--text-xs)', color: 'var(--ink-2)', whiteSpace: 'nowrap' }}>
                   <Clock size={12} />
                   <span>Avg ~{stage.avgMonths} months at this stage</span>
                 </div>

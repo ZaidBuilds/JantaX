@@ -3,8 +3,8 @@ import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
 import { Stat } from '../../../ui';
 import { EvidenceCard, Kv, ModulePinBar, SectionTitle, pct, pinSeed, useModulePin } from '../../shared/ModuleKit';
 
-const DEALERS_NORTH = ['Sanjay Sharma', 'Rekha Devi', 'Mohd. Arif', 'Suresh Pal'];
-const DEALERS_OTHER = ['M. Ravichandran', 'Lakshmi Narayan', 'Anita Patil', 'Joseph Mathew'];
+const DEALERS_NORTH = ['Dealer (sample 1)', 'Dealer (sample 2)', 'Dealer (sample 3)', 'Dealer (sample 4)'];
+const DEALERS_OTHER = DEALERS_NORTH;
 
 export function RationDashboard() {
   const { share } = useWhatsAppShare();

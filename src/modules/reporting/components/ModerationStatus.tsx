@@ -23,7 +23,7 @@ export const ModerationStatus: React.FC<ModerationStatusProps> = ({
     icon = <CheckCircle2 size={16} />;
   } else if (moderationState === 'Flagged for Review') {
     badgeColor = 'var(--warn)';
-    badgeBg = '#fffbebf';
+    badgeBg = 'var(--warn-soft)';
     icon = <AlertTriangle size={16} />;
   } else if (moderationState === 'Rejected') {
     badgeColor = 'var(--bad)';

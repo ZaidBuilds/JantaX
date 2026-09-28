@@ -42,16 +42,16 @@ export function RtiDashboard() {
       responsiblePerson: 'Public Information Officer (PIO)',
       responsibleOrg: 'State Information Commission',
       sourceUrl: 'https://rtionline.gov.in',
-      moduleNameHindi: 'M8 - RTI ट्रैकर (RTI Delay Tracker)',
+      moduleNameHindi: 'M8 - RTI ट्रैकर',
     });
   };
 
   return (
     <div className="module-dashboard">
       <div className="glass-card dash-header-card" style={{ borderLeftColor: 'var(--viz-6)' }}>
-        <h2>सूचना का अधिकार (RTI) विलंब ट्रैकर (RTI Delay Tracker)</h2>
+        <h2>RTI delay tracker</h2>
         <p>
-          RTI अधिनियम के तहत ३० दिनों में उत्तर देने की कानूनी सीमा बनाम सरकारी कार्यालयों द्वारा सूचना प्रदान करने में लगाए गए वास्तविक समय का ऑडिट।
+          The RTI Act gives public offices 30 days to reply. This compares that limit with how long offices near you actually take.
         </p>
       </div>
 
@@ -64,10 +64,10 @@ export function RtiDashboard() {
             maxLength={6}
             value={pinInput}
             onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ''))}
-            placeholder="पिन कोड दर्ज करें..."
+            placeholder="Enter a PIN code"
           />
           <button onClick={() => { setCurrentPin(pinInput); setSearchParams({ pin: pinInput }); }} className="dash-search-btn">
-            खोजें
+            Search
           </button>
         </div>
         {loc.isValid && (
@@ -78,21 +78,21 @@ export function RtiDashboard() {
       </div>
 
       <div className="glass-card" style={{ padding: '1.25rem' }}>
-        <h3 style={{ fontSize: '1.15rem', marginBottom: '0.5rem' }}>RTI response timeline / आरटीआई प्रतिक्रिया समय</h3>
+        <h3 style={{ fontSize: '1.15rem', marginBottom: '0.5rem' }}>RTI response timeline</h3>
         <div className="dash-panel-grid">
           <div className="dash-panel claim">
-            <span className="dash-panel-label">SLA PROMISED (कानूनी सीमा)</span>
+            <span className="dash-panel-label">SLA PROMISED</span>
             <p className="dash-panel-value">{rtiStats.promisedResponseDays} Days</p>
           </div>
           <div className="dash-panel reality">
-            <span className="dash-panel-label">ACTUAL AVERAGE (वास्तविक औसत)</span>
+            <span className="dash-panel-label">ACTUAL AVERAGE</span>
             <p className="dash-panel-value">{rtiStats.actualAverageDays} Days</p>
           </div>
         </div>
 
         <div style={{ display: 'grid', gap: '0.5rem', fontSize: '0.8rem', marginBottom: '1rem' }}>
-          <div><strong>कुल अस्वीकृत आरटीआई (Rejection Rate):</strong> <span style={{ color: 'var(--status-critical)', fontWeight: 700 }}>{rtiStats.rejectedPercentage}% Applications rejected</span></div>
-          <div><strong>कुल दायर फाइलें (Total Filed):</strong> {rtiStats.totalRtiFiled} filings in last quarter</div>
+          <div><strong>Rejection Rate:</strong> <span style={{ color: 'var(--status-critical)', fontWeight: 700 }}>{rtiStats.rejectedPercentage}% Applications rejected</span></div>
+          <div><strong>Total Filed:</strong> {rtiStats.totalRtiFiled} filings in last quarter</div>
         </div>
 
         <div className="card-footer-meta">

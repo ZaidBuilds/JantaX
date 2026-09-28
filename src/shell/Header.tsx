@@ -18,6 +18,7 @@ import {
   Columns3,
   FileText,
   Info,
+  Landmark,
 } from 'lucide-react';
 import { usePin } from '../core/context/PinContext';
 import { useLanguage, SUPPORTED_LANGUAGES, type LanguageCode } from '../core/context/LanguageContext';
@@ -29,6 +30,7 @@ import { useDismiss } from '../ui/useDismiss';
 const NAV = [
   { label: 'Explore', to: '/explore', icon: LayoutGrid },
   { label: 'Map', to: '/maps', icon: MapIcon },
+  { label: 'Who runs it', to: '/governance', icon: Landmark },
   { label: 'Compare', to: '/compare', icon: Columns3 },
   { label: 'Reports', to: '/reports', icon: FileText },
   { label: 'About', to: '/about', icon: Info },
@@ -76,7 +78,7 @@ function HeaderSearch({ onDone }: { onDone?: () => void }) {
   };
 
   return (
-    <form role="search" onSubmit={submit} className="header-search">
+    <form role="search" aria-label="Site search" onSubmit={submit} className="header-search">
       <Search size={16} aria-hidden="true" />
       <input
         ref={ref}
@@ -178,7 +180,7 @@ function LanguageMenu() {
         aria-label={`Language: ${languageInfo.label}`}
       >
         <Languages size={16} aria-hidden="true" />
-        <span>{languageInfo.labelLocal}</span>
+        <span translate="no">{languageInfo.labelLocal}</span>
       </button>
       {open && (
         <div className="popover" role="menu" style={{ right: 0, top: 44, minWidth: 200 }}>
@@ -194,8 +196,9 @@ function LanguageMenu() {
                 setOpen(false);
               }}
             >
-              <span style={{ flex: 1 }}>{l.labelLocal}</span>
-              <span className="tiny muted">{l.label}</span>
+              {/* Language names stay in their own script so each reader can find theirs. */}
+              <span style={{ flex: 1 }} translate="no" lang={l.code}>{l.labelLocal}</span>
+              <span className="tiny muted" translate="no">{l.label}</span>
               {language === l.code && <Check size={14} aria-hidden="true" />}
             </button>
           ))}
@@ -263,9 +266,9 @@ function MobileDrawer({ onClose }: { onClose: () => void }) {
           </Link>
           <div className="field">
             <label className="label" htmlFor="drawer-lang">Language</label>
-            <select id="drawer-lang" className="select" value={language} onChange={(e) => setLanguage(e.target.value as LanguageCode)}>
+            <select aria-label="Language" id="drawer-lang" className="select" value={language} onChange={(e) => setLanguage(e.target.value as LanguageCode)}>
               {SUPPORTED_LANGUAGES.map((l) => (
-                <option key={l.code} value={l.code}>
+                <option key={l.code} value={l.code} translate="no">
                   {l.labelLocal} ({l.label})
                 </option>
               ))}

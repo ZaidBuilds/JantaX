@@ -36,43 +36,43 @@ export function RtiClockCard({ avgDays, disposedWithin30DaysPercent, pendingBeyo
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             Avg Response Time
           </span>
           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: isCompliant ? 'var(--good)' : 'var(--bad)', marginTop: '0.25rem' }}>
             {avgDays} Days
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Statutory limit: 30 days</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Statutory limit: 30 days</span>
         </div>
 
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             On-Time Disposals
           </span>
           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--brand-ink)', marginTop: '0.25rem' }}>
             {disposedWithin30DaysPercent}%
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Within 30-day window</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Within 30-day window</span>
         </div>
 
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             Delayed Requests
           </span>
           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: pendingBeyond30DaysPercent > 10 ? 'var(--bad)' : 'var(--warn)', marginTop: '0.25rem' }}>
             {pendingBeyond30DaysPercent}%
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Deemed Refusal Risk</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Deemed Refusal Risk</span>
         </div>
 
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             Rejection Rate
           </span>
           <div style={{ fontSize: '1.4rem', fontWeight: 800, color: rejectionRate > 5 ? 'var(--bad)' : 'var(--good)', marginTop: '0.25rem' }}>
             {rejectionRate}%
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Section 8 Exemptions</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Section 8 Exemptions</span>
         </div>
       </div>
 

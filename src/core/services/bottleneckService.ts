@@ -21,6 +21,8 @@ export interface BottleneckLens {
   title: string;
   titleHi: string;
   noun: string; // The named entity (contractor, PHC, ward, court, school, etc.)
+  /** The same, in Hindi, from the records' own Hindi names where they have them. */
+  nounHi: string;
   officialClaim: string;
   officialClaimHi: string;
   auditReality: string;
@@ -60,6 +62,7 @@ export function getBottleneckLensesForPin(pinCode: string): PinBottleneckSummary
       title: 'Municipal & Water Delivery Inflation',
       titleHi: 'नगर पालिका एवं जल आपूर्ति दावा बनाम हकीकत',
       noun: `Ward #${nagar.ward.wardNumber} (${nagar.ward.wardName}) — Councillor: ${nagar.councillor.name}`,
+      nounHi: `वार्ड #${nagar.ward.wardNumber} (${nagar.ward.wardNameHi || nagar.ward.wardName}) — पार्षद: ${nagar.councillor.nameHi || nagar.councillor.name}`,
       officialClaim: `100% Door-to-Door Solid Waste Collection & 96% Streetlight Coverage on Municipal Dashboard.`,
       officialClaimHi: `नगर निगम डैशबोर्ड पर 100% डोर-टू-डोर कूड़ा उठान और 96% स्ट्रीट लाइट चालू होने का दावा।`,
       auditReality: `CAG & Citizen Audit: 3 chronic waterlogging hotspots unaddressed; median 311 grievance sitting time is ${nagar.avgResolutionHours} hours.`,
@@ -78,6 +81,7 @@ export function getBottleneckLensesForPin(pinCode: string): PinBottleneckSummary
       title: 'Judicial & Administrative File Sitting Clock',
       titleHi: 'अदालती एवं प्रशासनिक फाइल विलंब घड़ी',
       noun: `${courts.court.complexName} — Nodal Authority: ${rti.primaryAuthority.authorityName}`,
+      nounHi: `${courts.court.complexNameHi || courts.court.complexName} — नोडल प्राधिकरण: ${rti.primaryAuthority.authorityNameHi || rti.primaryAuthority.authorityName}`,
       officialClaim: `Citizen Charter Standard: RTI resolution in 30 days, CPGRAMS in 21 days.`,
       officialClaimHi: `सिटिजन चार्टर मानक: RTI का 30 दिन एवं CPGRAMS का 21 दिन में अनिवार्य निस्तारण।`,
       auditReality: `NJDG & RTI Audit: ${courts.court.pendingOver5Years.toLocaleString('en-IN')} cases pending >5 years; Judge vacancy at ${courts.court.vacancyPercentage}%; RTI first appeals filed: ${rti.primaryAuthority.firstAppealsFiled} cases (${rti.primaryAuthority.pendingBeyond30DaysPercent}% delayed beyond 30 days).`,
@@ -96,6 +100,7 @@ export function getBottleneckLensesForPin(pinCode: string): PinBottleneckSummary
       title: 'Procurement Cartel & Repeat Contractor Ledger',
       titleHi: 'ठेकेदार एकाधिकार एवं सांसद निधि हिसाब',
       noun: `MP ${mplads.representative.name} (${mplads.representative.constituencyName}) — Works Ledger`,
+      nounHi: `सांसद ${mplads.representative.nameHi || mplads.representative.name} (${mplads.representative.constituencyNameHi || mplads.representative.constituencyName}) — कार्यों का हिसाब`,
       officialClaim: `₹${mplads.representative.fundSummary.entitledAmountCr} Cr Total Sanctioned Allocation for Constituency Development.`,
       officialClaimHi: `संसदीय क्षेत्र विकास के लिए कुल ₹${mplads.representative.fundSummary.entitledAmountCr} करोड़ का आवंटन दावा।`,
       auditReality: `MoSPI & Tender Audit: ₹${mplads.representative.fundSummary.unspentBalanceCr} Cr remains unspent; Top civil contractors captured 68% of road/drain work orders.`,
@@ -114,6 +119,7 @@ export function getBottleneckLensesForPin(pinCode: string): PinBottleneckSummary
       title: 'Silent Deletion & Electoral Roll Dropouts',
       titleHi: 'मतदाता सूची एवं राशन e-KYC विलोपन दर',
       noun: `Polling Station: ${booth.booths[0]?.buildingName || 'Primary Booth'} (Room ${booth.booths[0]?.roomNumber || '1'}) — BLO: ${booth.primaryBlo?.name || 'Assigned BLO'}`,
+      nounHi: `मतदान केंद्र: ${booth.booths[0]?.buildingNameHi || booth.booths[0]?.buildingName || 'मुख्य बूथ'} (कमरा ${booth.booths[0]?.roomNumber || '1'}) — BLO: ${booth.primaryBlo?.nameHi || booth.primaryBlo?.name || 'निर्धारित BLO'}`,
       officialClaim: `100% Electoral Roll purification & Aadhaar-linked statutory verification completed.`,
       officialClaimHi: `मतदाता सूची शुद्धिकरण एवं 100% आधार प्रमाणीकरण का दावा।`,
       auditReality: `ECI Roll Verification: ${(booth.booths[0]?.totalElectors || booth.totalElectorsInPin).toLocaleString('en-IN')} registered voters; PwD Wheelchair Ramp: ${booth.booths[0]?.facilities.wheelchairRamp ? 'Installed' : 'Missing Ground Facility'}.`,
@@ -132,6 +138,7 @@ export function getBottleneckLensesForPin(pinCode: string): PinBottleneckSummary
       title: 'Air Quality Clearance vs Ambient Smog Reality',
       titleHi: 'पर्यावरण मानक दावा बनाम वायु प्रदूषण हकीकत',
       noun: `${pollution.station.stationName} (CAAQMS Station)`,
+      nounHi: `${pollution.station.stationNameHi || pollution.station.stationName} (CAAQMS स्टेशन)`,
       officialClaim: `Statutory NAAQ Standard: PM2.5 < 60 µg/m³, Active GRAP Stage: ${pollution.activeGrapStage}.`,
       officialClaimHi: `राष्ट्रीय मानक: PM2.5 < 60 µg/m³, लागू GRAP चरण: ${pollution.activeGrapStage}।`,
       auditReality: `CPCB Live Measurement: AQI ${pollution.currentAqi} (${pollution.category}) with PM2.5 at ${pollution.pm25Value} µg/m³ (${Math.round((pollution.pm25Value / 60) * 100)}% of safe limit).`,

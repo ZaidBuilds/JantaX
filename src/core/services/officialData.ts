@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { apiUrl } from './api';
+import { locale } from '../../i18n';
 
 /**
  * Official government datasets served by the JantaX data service (/api/data, /api/area).
@@ -154,7 +155,7 @@ export function formatValue(value: OfficialRow[string], col: Column): string {
   if (col.type === 'date' && typeof value === 'string') {
     const d = new Date(value.length === 7 ? `${value}-01T00:00:00Z` : `${value}T00:00:00Z`);
     if (Number.isNaN(d.getTime())) return value;
-    return d.toLocaleDateString('en-IN', { day: value.length === 7 ? undefined : 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+    return d.toLocaleDateString(locale(), { day: value.length === 7 ? undefined : 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
   }
   if (typeof value === 'number') {
     if (col.type === 'percent' || col.unit === '%') return `${inr.format(value)}%`;
@@ -169,5 +170,5 @@ export function formatWhen(iso: string | null): string | null {
   if (!iso) return null;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+  return d.toLocaleDateString(locale(), { day: 'numeric', month: 'short', year: 'numeric' });
 }

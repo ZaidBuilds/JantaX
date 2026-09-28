@@ -18,7 +18,7 @@ export function CourtsComparePage() {
       <div style={{ marginBottom: '1rem' }}>
         <Link
           to="/courts"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
+          style={{ display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.35rem', color: 'var(--ink-3)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}
         >
           <ArrowLeft size={16} /> Back to Courts Directory
         </Link>
@@ -38,7 +38,7 @@ export function CourtsComparePage() {
             <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--ink-2)', display: 'block', marginBottom: '0.4rem' }}>
               Select Court Complex 1
             </label>
-            <select
+            <select aria-label="Select Court Complex 1"
               value={court1Id}
               onChange={(e) => setCourt1Id(e.target.value)}
               style={{ width: '100%', padding: '0.6rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.88rem' }}
@@ -55,7 +55,7 @@ export function CourtsComparePage() {
             <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--ink-2)', display: 'block', marginBottom: '0.4rem' }}>
               Select Court Complex 2
             </label>
-            <select
+            <select aria-label="Select Court Complex 2"
               value={court2Id}
               onChange={(e) => setCourt2Id(e.target.value)}
               style={{ width: '100%', padding: '0.6rem', borderRadius: 8, border: '1px solid var(--border-strong)', fontSize: '0.88rem' }}

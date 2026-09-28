@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Search,
@@ -23,12 +23,20 @@ import {
   Hospital,
   Wheat,
   MessageSquareWarning,
+  ArrowRight,
   Database,
   type LucideIcon,
 } from 'lucide-react';
 import { api, type SearchResponse, type SearchResult, type AutocompleteSuggestion } from '../core/services/api';
 import { isValidIndianPincode } from '../core/utils/pinResolver';
-import { Badge, Breadcrumbs, EmptyState, toneForStatus, useDismiss } from '../ui';
+import { Badge, Breadcrumbs, EmptyState, ModuleIcon, toneForStatus, useDismiss } from '../ui';
+import { searchTopics } from '../core/services/topicSearch';
+import { pick, t } from '../i18n';
+import type { SearchMapItem } from '../ui/SearchResultsMap';
+
+// Leaflet loads only when a search has results with a place to show.
+const SearchResultsMap = lazy(() => import('../ui/SearchResultsMap'));
+const MAP_PREF_KEY = 'jantax.searchMap';
 
 const TYPES: Record<string, { label: string; icon: LucideIcon; tone: string }> = {
   location: { label: 'Areas', icon: MapPin, tone: 'var(--accent)' },
@@ -108,24 +116,31 @@ function TypeIcon({ type }: { type: string }) {
 }
 
 function ResultRow({ r }: { r: SearchResult }) {
-  const meta = r.metadata as { status?: string; score?: number; hindi?: string };
+  const meta = r.metadata as { status?: string; score?: number; hindi?: string; descriptionHi?: string };
   const t = TYPES[r.type] || TYPES.source;
   return (
     <Link to={hrefFor(r)} className="list-row search-result">
       <TypeIcon type={r.type} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div className="search-result-title">{r.title}</div>
-        {meta?.hindi && <div className="tiny muted truncate" lang="hi">{meta.hindi}</div>}
-        <div className="small" style={{ color: 'var(--ink-2)', marginTop: 2 }}>{r.description}</div>
+        <div className="search-result-title" translate="no">{pick(r.title, meta.hindi)}</div>
+        {/* A Hindi description, where the record has one, keeps its own values (places, sectors) as published. */}
+        <div className="small" style={{ color: 'var(--ink-2)', marginTop: 2 }} translate={meta.descriptionHi ? 'no' : undefined}>
+          {pick(r.description, meta.descriptionHi)}
+        </div>
         <div className="source-row" style={{ marginTop: 6 }}>
           <span>{t.label}</span>
           {r.location && (
             <span>
-              PIN {r.location.pincode} · {r.location.district}
-              {r.location.state && r.location.state !== r.location.district ? `, ${r.location.state}` : ''}
+              PIN {r.location.pincode} ·{' '}
+              <span translate="no">
+                {r.location.district}
+                {r.location.state && r.location.state !== r.location.district ? `, ${r.location.state}` : ''}
+              </span>
             </span>
           )}
-          <span>Source: {r.source.name}</span>
+          <span>
+            Source: <span translate="no">{r.source.name}</span>
+          </span>
         </div>
       </div>
       <div className="report-row-meta">
@@ -155,10 +170,28 @@ export function SearchPage() {
   const [suggestions, setSuggestions] = useState<AutocompleteSuggestion[]>([]);
   const [suggestOpen, setSuggestOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [showMap, setShowMap] = useState(() => {
+    try {
+      return localStorage.getItem(MAP_PREF_KEY) !== 'off';
+    } catch {
+      return true;
+    }
+  });
+  const toggleMap = () => {
+    setShowMap((on) => {
+      try {
+        localStorage.setItem(MAP_PREF_KEY, on ? 'off' : 'on');
+      } catch {
+        /* not remembered, but the toggle still applies */
+      }
+      return !on;
+    });
+  };
   const boxRef = useRef<HTMLDivElement>(null);
   const closeSuggest = useCallback(() => setSuggestOpen(false), []);
   useDismiss(boxRef, suggestOpen, closeSuggest);
 
+  const topics = useMemo(() => searchTopics(q), [q]);
   useEffect(() => setDraft(q), [q]);
 
   useEffect(() => {
@@ -227,6 +260,24 @@ export function SearchPage() {
   }, [data]);
 
   const total = data?.pagination.total ?? 0;
+  const mapItems = useMemo<SearchMapItem[]>(
+    () =>
+      (data?.results ?? []).flatMap((r) =>
+        r.location?.pincode
+          ? [{
+              key: `${r.type}-${r.id}`,
+              title: r.title,
+              titleHi: (r.metadata as { hindi?: string }).hindi,
+              typeLabel: (TYPES[r.type] || TYPES.source).label,
+              href: hrefFor(r),
+              pin: r.location.pincode,
+              lat: r.location.lat,
+              lng: r.location.lng,
+            }]
+          : [],
+      ),
+    [data],
+  );
   const totalPages = data?.pagination.totalPages ?? 1;
   const activeFilters = [type && (TYPES[type]?.label || type), pin && `PIN ${pin}`, state].filter(Boolean) as string[];
 
@@ -265,7 +316,7 @@ export function SearchPage() {
       </form>
       <div className="field">
         <label className="label" htmlFor="filter-state">State</label>
-        <select id="filter-state" className="select" value={state} onChange={(e) => setParam({ state: e.target.value })}>
+        <select aria-label="State" id="filter-state" className="select" value={state} onChange={(e) => setParam({ state: e.target.value })}>
           <option value="">All states</option>
           {['Delhi', 'Uttar Pradesh', 'Maharashtra', 'Karnataka', 'Tamil Nadu', 'West Bengal', 'Bihar', 'Telangana', 'Gujarat', 'Rajasthan', 'Kerala'].map((s) => (
             <option key={s} value={s}>{s}</option>
@@ -286,7 +337,7 @@ export function SearchPage() {
       <h1 className="page-title" style={{ marginBottom: 'var(--s-5)' }}>Search public records</h1>
 
       <div ref={boxRef} style={{ position: 'relative', maxWidth: 760 }}>
-        <form role="search" onSubmit={submit} className="search-field">
+        <form role="search" aria-label="Search records" onSubmit={submit} className="search-field">
           <Search size={20} aria-hidden="true" />
           <input
             type="search"
@@ -299,8 +350,10 @@ export function SearchPage() {
             onFocus={() => setSuggestOpen(true)}
             placeholder="School, project, contractor, court, ward or PIN"
             aria-label="Search public records"
+            role="combobox"
             aria-autocomplete="list"
-            aria-controls="search-suggest"
+            aria-controls={suggestOpen && suggestions.length > 0 ? 'search-suggest' : undefined}
+            aria-expanded={suggestOpen && suggestions.length > 0}
             autoFocus={!q}
           />
           {draft && (
@@ -388,7 +441,7 @@ export function SearchPage() {
               <p className="small" style={{ color: 'var(--ink-2)' }}>
                 {loading ? 'Searching…' : (
                   <>
-                    <strong className="num">{total}</strong> {total === 1 ? 'result' : 'results'} for <strong>“{q}”</strong>
+                    <span className="strong">{t(total === 1 ? '{n} result for “{q}”' : '{n} results for “{q}”', { n: total, q })}</span>
                   </>
                 )}
               </p>
@@ -402,6 +455,43 @@ export function SearchPage() {
               </div>
             </div>
             {filtersOpen && <div className="card card-pad show-filters-panel" style={{ marginBottom: 'var(--s-4)' }}>{Filters}</div>}
+
+            {topics.length > 0 && (
+              <section className="card" style={{ marginBottom: 'var(--s-4)' }} aria-labelledby="topics-h">
+                <div className="card-head">
+                  <h2 id="topics-h" className="card-title" style={{ fontSize: 'var(--text-md)' }}>Pages and modules</h2>
+                </div>
+                <div className="list">
+                  {topics.map((t) => (
+                    <Link key={t.id} to={t.to} className="list-row">
+                      {t.module ? <ModuleIcon id={t.module} size="sm" /> : <span className="topic-icon" aria-hidden="true"><ArrowRight size={14} /></span>}
+                      <span style={{ flex: 1, minWidth: 0 }}>
+                        <span className="strong" style={{ display: 'block', color: 'var(--ink)' }}>{t.title}</span>
+                        <span className="small muted">{t.text}</span>
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {mapItems.length > 0 && (
+              <div style={{ marginBottom: 'var(--s-4)' }}>
+                <div className="spread" style={{ marginBottom: 'var(--s-2)' }}>
+                  <h2 className="small strong" style={{ margin: 0 }}>On the map</h2>
+                  <button type="button" className="btn btn-ghost btn-sm" aria-expanded={showMap} aria-controls="search-map" onClick={toggleMap}>
+                    <MapPin size={14} aria-hidden="true" /> {showMap ? t('Hide map') : t('Show map')}
+                  </button>
+                </div>
+                {showMap && (
+                  <div id="search-map">
+                    <Suspense fallback={<div className="card skeleton search-map-canvas" />}>
+                      <SearchResultsMap items={mapItems} />
+                    </Suspense>
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="card">
               {loading && !data ? (
@@ -425,8 +515,8 @@ export function SearchPage() {
               ) : (
                 <EmptyState
                   icon={SearchX}
-                  title={`Nothing found for “${q}”`}
-                  text="Check the spelling, search a district or PIN code instead, or remove filters."
+                  title={topics.length ? `No individual records match “${q}” yet` : `Nothing found for “${q}”`}
+                  text={topics.length ? 'Records appear here as official datasets are connected. The pages above cover this topic.' : 'Check the spelling, search a district or PIN code instead, or remove filters.'}
                   action={
                     <div className="cluster" style={{ justifyContent: 'center' }}>
                       {activeFilters.length > 0 && (

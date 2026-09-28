@@ -26,7 +26,7 @@ function doc(
   id: string,
   title: string,
   description: string,
-  loc: { pincode?: string; state?: string; district?: string },
+  loc: { pincode?: string; state?: string; district?: string; lat?: number; lng?: number },
   meta: Record<string, unknown>,
   source: string,
   extra = ''
@@ -37,7 +37,9 @@ function doc(
       type,
       title,
       description,
-      location: loc.pincode ? { pincode: loc.pincode, state: loc.state || '', district: loc.district || '' } : undefined,
+      location: loc.pincode
+        ? { pincode: loc.pincode, state: loc.state || '', district: loc.district || '', ...(loc.lat !== undefined && loc.lng !== undefined ? { lat: loc.lat, lng: loc.lng } : {}) }
+        : undefined,
       metadata: meta,
       score: 0,
       source: { name: source, freshness: 'Sample dataset', reliability: 'medium' },
@@ -46,6 +48,19 @@ function doc(
     haystack: [title, description, loc.pincode, loc.state, loc.district, extra].filter(Boolean).join(' ').toLowerCase(),
   };
 }
+
+/** Public works sectors in Hindi; the ministry that follows is a proper name, kept as published. */
+const SECTOR_HI: Record<string, string> = {
+  'Roads & Highways': 'सड़क और राजमार्ग',
+  'Urban Transit': 'शहरी परिवहन',
+  'Water & Sewage': 'पानी और सीवर',
+  'Bridges & Culverts': 'पुल और पुलिया',
+  'Power & Energy': 'बिजली और ऊर्जा',
+  'Social Infra': 'सामाजिक ढाँचा',
+};
+
+/** AQI categories as CPCB names them in Hindi. */
+const AQI_HI: Record<string, string> = { Good: 'अच्छा', Satisfactory: 'संतोषजनक', Moderate: 'मध्यम', Poor: 'ख़राब', 'Very Poor': 'बहुत ख़राब', Severe: 'गंभीर' };
 
 let cache: Doc[] | null = null;
 
@@ -61,37 +76,37 @@ function buildIndex(schools: ApiRecord[]): Doc[] {
 
   for (const p of PIN_COORDINATES) {
     const pin = `${p.prefix}001`;
-    docs.push(doc('location', pin, `${p.district}, ${p.state}`, `Area dashboard for PIN ${pin}`, { pincode: pin, state: p.state, district: p.district }, { href: `/pin/${pin}` }, 'India Post PIN directory'));
+    docs.push(doc('location', pin, `${p.district}, ${p.state}`, `Area dashboard for PIN ${pin}`, { pincode: pin, state: p.state, district: p.district }, { href: `/pin/${pin}`, descriptionHi: `पिन ${pin} का क्षेत्र डैशबोर्ड` }, 'India Post PIN directory'));
   }
   for (const s of schools) {
     docs.push(doc('school', s.id, s.titleEnglish, `${s.schoolLevel || 'School'} · ${s.managementType || 'Government'} · UDISE ${s.udiseCode || 'n/a'}`, { pincode: s.location.pinCode, state: s.location.state, district: s.location.district }, { href: `/schools/${s.id}`, status: s.status, score: s.groundTruthScore, hindi: s.titleHindi }, 'UDISE+', s.titleHindi));
   }
   for (const p of safe(getStoredProjects)) {
-    docs.push(doc('infra', p.id, p.nameEnglish, `${p.sector} · ${p.ministry}`, { pincode: p.pinCode, state: p.state, district: p.district }, { href: `/projects/${p.id}`, status: p.status, hindi: p.nameHindi }, 'MoSPI / PMGSY', p.nameHindi));
+    docs.push(doc('infra', p.id, p.nameEnglish, `${p.sector} · ${p.ministry}`, { pincode: p.pinCode, state: p.state, district: p.district }, { href: `/projects/${p.id}`, status: p.status, hindi: p.nameHindi, descriptionHi: `${SECTOR_HI[p.sector] ?? p.sector} · ${p.ministry}` }, 'MoSPI / PMGSY', p.nameHindi));
   }
   for (const c of safe(getStoredContractors)) {
-    docs.push(doc('contractor', c.id, c.companyName, `${c.category} contractor · ${c.headquarters} · ${c.projects.length} public projects`, {}, { href: `/contractors/${c.id}`, status: c.debarmentRecords.length ? 'Debarment on record' : 'No debarment' }, c.officialSource.name, [c.registrationNumber, ...c.directors].join(' ')));
+    docs.push(doc('contractor', c.id, c.companyName, `${c.category} contractor · ${c.headquarters} · ${c.projects.length} public projects`, {}, { href: `/contractors/${c.id}`, status: c.debarmentRecords.length ? 'Debarment on record' : 'No debarment', descriptionHi: `ठेकेदार (${c.category}) · ${c.headquarters} · ${c.projects.length} सार्वजनिक परियोजनाएँ` }, c.officialSource.name, [c.registrationNumber, ...c.directors].join(' ')));
   }
   for (const r of safe(getStoredReraProjects)) {
-    docs.push(doc('rera', r.id, r.projectName, `By ${r.builderName}`, { pincode: r.pinCode, state: r.state, district: r.district }, { href: `/rera/projects/${r.id}`, status: r.status }, 'State RERA', r.builderName));
+    docs.push(doc('rera', r.id, r.projectName, `By ${r.builderName}`, { pincode: r.pinCode, state: r.state, district: r.district }, { href: `/rera/projects/${r.id}`, status: r.status, descriptionHi: `बिल्डर: ${r.builderName}` }, 'State RERA', r.builderName));
   }
   for (const w of safe(() => getAllWorks())) {
-    docs.push(doc('mplads', w.id, w.workTitle, `${w.sector} · Recommended by ${w.representativeName} · ${w.locationName}`, { pincode: w.pinCode, state: w.state, district: w.district }, { href: `/mplads/projects/${w.id}`, status: w.status, score: w.groundTruthScore, hindi: w.workTitleHi }, 'MoSPI MPLADS', `${w.workTitleHi} ${w.executingAgency}`));
+    docs.push(doc('mplads', w.id, w.workTitle, `${w.sector} · Recommended by ${w.representativeName} · ${w.locationName}`, { pincode: w.pinCode, state: w.state, district: w.district, lat: w.latitude, lng: w.longitude }, { href: `/mplads/projects/${w.id}`, status: w.status, score: w.groundTruthScore, hindi: w.workTitleHi, descriptionHi: `${w.sector} · अनुशंसा: ${w.representativeName} · ${w.locationName}` }, 'MoSPI MPLADS', `${w.workTitleHi} ${w.executingAgency}`));
   }
   for (const c of safe(() => getAllCourts())) {
-    docs.push(doc('court', c.id, c.complexName, 'District court complex', { pincode: c.pinCode, state: c.state, district: c.district }, { href: `/courts/${c.id}` }, 'NJDG / eCourts'));
+    docs.push(doc('court', c.id, c.complexName, 'District court complex', { pincode: c.pinCode, state: c.state, district: c.district, lat: c.latitude, lng: c.longitude }, { href: `/courts/${c.id}`, hindi: c.complexNameHi, descriptionHi: 'ज़िला न्यायालय परिसर' }, 'NJDG / eCourts'));
   }
   for (const b of safe(() => getAllBooths())) {
-    docs.push(doc('booth', b.id, b.buildingName, 'Polling station', { pincode: b.pinCode, state: b.state, district: b.district }, { href: `/booth/${b.id}` }, 'ECI electoral roll'));
+    docs.push(doc('booth', b.id, b.buildingName, 'Polling station', { pincode: b.pinCode, state: b.state, district: b.district, lat: b.latitude, lng: b.longitude }, { href: `/booth/${b.id}`, hindi: b.buildingNameHi, descriptionHi: 'मतदान केंद्र' }, 'ECI electoral roll'));
   }
   for (const w of safe(() => getAllWards())) {
-    docs.push(doc('ward', w.id, `Ward ${w.wardNumber}: ${w.wardName}`, 'Municipal ward', { pincode: w.pinCode, state: w.state, district: w.district }, { href: `/nagar/wards/${w.id}` }, 'Urban local body'));
+    docs.push(doc('ward', w.id, `Ward ${w.wardNumber}: ${w.wardName}`, 'Municipal ward', { pincode: w.pinCode, state: w.state, district: w.district }, { href: `/nagar/wards/${w.id}`, descriptionHi: 'नगर निकाय वार्ड' }, 'Urban local body'));
   }
   for (const s of safe(() => getAllStations())) {
-    docs.push(doc('station', s.id, s.stationName, `Air quality station · AQI ${s.currentAqi} (${s.category})`, { pincode: s.pinCode, state: s.state, district: s.district }, { href: `/pollution/stations/${s.id}`, status: s.category }, 'CPCB', s.city));
+    docs.push(doc('station', s.id, s.stationName, `Air quality station · AQI ${s.currentAqi} (${s.category})`, { pincode: s.pinCode, state: s.state, district: s.district, lat: s.latitude, lng: s.longitude }, { href: `/pollution/stations/${s.id}`, status: s.category, hindi: s.stationNameHi, descriptionHi: `वायु गुणवत्ता स्टेशन · AQI ${s.currentAqi} (${AQI_HI[s.category] ?? s.category})` }, 'CPCB', s.city));
   }
   for (const a of safe(() => getAllAuthorities())) {
-    docs.push(doc('authority', a.id, a.authorityName, `Public authority under the RTI Act · ${a.city}`, { pincode: a.pinCode, state: a.state, district: a.city }, { href: `/rti/authorities/${a.id}` }, 'RTI Online'));
+    docs.push(doc('authority', a.id, a.authorityName, `Public authority under the RTI Act · ${a.city}`, { pincode: a.pinCode, state: a.state, district: a.city }, { href: `/rti/authorities/${a.id}`, descriptionHi: `RTI अधिनियम के तहत लोक प्राधिकरण · ${a.city}` }, 'RTI Online'));
   }
   return docs;
 }

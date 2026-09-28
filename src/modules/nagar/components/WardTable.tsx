@@ -46,7 +46,7 @@ export function WardTable({ wards }: Props) {
               >
                 <td style={{ padding: '1rem', maxWidth: 280 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.2rem' }}>
-                    <span style={{ background: 'var(--brand)', color: 'var(--on-solid)', fontSize: '0.72rem', fontWeight: 800, padding: '0.15rem 0.5rem', borderRadius: 4 }}>
+                    <span style={{ background: 'var(--brand)', color: 'var(--on-solid)', fontSize: 'var(--text-xs)', fontWeight: 800, padding: '0.15rem 0.5rem', borderRadius: 4 }}>
                       WARD #{w.wardNumber}
                     </span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--ink-3)', fontWeight: 600 }}>{w.zone}</span>
@@ -54,7 +54,7 @@ export function WardTable({ wards }: Props) {
                   <div style={{ fontWeight: 700, color: 'var(--ink)', lineHeight: 1.3 }}>
                     {w.wardName}
                   </div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--accent-ink)', marginTop: '0.15rem' }}>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--accent-ink)', marginTop: '0.15rem' }}>
                     {w.corporationName} • PIN {w.pinCode}
                   </div>
                 </td>
@@ -66,7 +66,7 @@ export function WardTable({ wards }: Props) {
                   >
                     {w.cleanlinessScore} / 100
                   </span>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--ink-3)', marginTop: '0.2rem' }}>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', marginTop: '0.2rem' }}>
                     {w.services.doorToDoorGarbage ? '✓ Daily Collection' : 'Irregular'}
                   </div>
                 </td>
@@ -75,10 +75,10 @@ export function WardTable({ wards }: Props) {
                   <div style={{ fontWeight: 700, color: 'var(--ink)', fontSize: '0.82rem' }}>
                     {w.councillor.name}
                   </div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--ink-3)' }}>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
                     {w.councillor.party}
                   </div>
-                  <a href={`tel:${w.councillor.phone}`} style={{ fontSize: '0.72rem', color: 'var(--brand-ink)', textDecoration: 'none', fontWeight: 600 }}>
+                  <a href={`tel:${w.councillor.phone}`} style={{ fontSize: 'var(--text-xs)', color: 'var(--brand-ink)', textDecoration: 'none', fontWeight: 600 }}>
                     {w.councillor.phone}
                   </a>
                 </td>
@@ -87,7 +87,7 @@ export function WardTable({ wards }: Props) {
                   <div style={{ fontWeight: 700, color: 'var(--ink)', fontSize: '0.82rem' }}>
                     {w.sanitaryInspector.name}
                   </div>
-                  <a href={`tel:${w.sanitaryInspector.phone}`} style={{ fontSize: '0.72rem', color: 'var(--good)', textDecoration: 'none', fontWeight: 600 }}>
+                  <a href={`tel:${w.sanitaryInspector.phone}`} style={{ fontSize: 'var(--text-xs)', color: 'var(--good)', textDecoration: 'none', fontWeight: 600 }}>
                     {w.sanitaryInspector.phone}
                   </a>
                 </td>
@@ -96,7 +96,7 @@ export function WardTable({ wards }: Props) {
                   <div style={{ fontWeight: 800, color: w.avgResolutionHours <= 30 ? 'var(--good)' : 'var(--warn)' }}>
                     ~{w.avgResolutionHours} Hours
                   </div>
-                  <div style={{ fontSize: '0.68rem', color: 'var(--ink-3)' }}>
+                  <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>
                     {w.slaCompliancePercent}% within SLA
                   </div>
                 </td>

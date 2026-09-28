@@ -81,7 +81,7 @@ export const AiTenderAudit: React.FC<AiTenderAuditProps> = ({
             <label className="text-xs font-bold text-ink block mb-1.5">
               Select Audited Work Order / Tender:
             </label>
-            <select
+            <select aria-label="Select Audited Work Order / Tender"
               value={selectedWorkOrderId}
               onChange={(e) => setSelectedWorkOrderId(e.target.value)}
               className="w-full bg-surface-2 border rounded-[10px] border-line px-3 py-2 text-xs font-bold text-ink focus:outline-none cursor-pointer"

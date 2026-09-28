@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertTriangle, Clock, Database, WifiOff, Info } from 'lucide-react';
+import { locale } from '../../i18n';
 
 interface DataFreshnessBadgeProps {
   lastUpdated: string | Date;
@@ -82,7 +83,7 @@ export function DataFreshnessBadge({
       <Clock size={12} style={{ color: freshnessColor }} />
       <span
         style={{
-          fontSize: '0.7rem',
+          fontSize: 'var(--text-xs)',
           fontWeight: 600,
           color: freshnessColor,
           padding: '2px 6px',
@@ -131,7 +132,7 @@ export function StaleDataBadge({
         <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-ink)' }}>
           Data may be outdated
         </p>
-        <p style={{ fontSize: '0.68rem', color: 'var(--text-secondary)' }}>
+        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
           Last update: {Math.floor(daysSinceUpdate)}d ago (expected: {expectedInterval})
           {source && ` · Source: ${source}`}
         </p>
@@ -178,8 +179,8 @@ export function SourceUnavailable({
           {sourceName} unavailable
         </p>
         {failedAtDate && (
-          <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-            Failed at {failedAtDate.toLocaleTimeString()}
+          <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
+            Failed at {failedAtDate.toLocaleTimeString(locale())}
           </p>
         )}
       </div>
@@ -187,7 +188,7 @@ export function SourceUnavailable({
         <button
           onClick={onRetry}
           style={{
-            fontSize: '0.72rem',
+            fontSize: 'var(--text-xs)',
             fontWeight: 600,
             color: 'var(--bad)',
             background: 'transparent',
@@ -232,12 +233,12 @@ export function PartialDataNotice({
         <p style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--warn)', marginBottom: 4 }}>
           Partial data available
         </p>
-        <p style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
           Some fields are missing: {missingFields.join(', ')}
           {source && ` · Source: ${source}`}
         </p>
         {loadedFields.length > 0 && (
-          <p style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginTop: 4 }}>
+          <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginTop: 4 }}>
             Available: {loadedFields.join(', ')}
           </p>
         )}
@@ -245,7 +246,7 @@ export function PartialDataNotice({
           <button
             onClick={onRetry}
             style={{
-              fontSize: '0.7rem',
+              fontSize: 'var(--text-xs)',
               fontWeight: 600,
               color: 'var(--warn)',
               background: 'transparent',
@@ -290,8 +291,8 @@ export function VerificationPending({
         Verification pending
       </p>
       {submittedAt && (
-        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-          · Submitted {typeof submittedAt === 'string' ? submittedAt : submittedAt.toLocaleDateString()}
+        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
+          · Submitted {typeof submittedAt === 'string' ? submittedAt : submittedAt.toLocaleDateString(locale())}
         </span>
       )}
     </div>

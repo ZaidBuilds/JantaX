@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { getLang } from '../../i18n';
 
 /**
  * WhatsApp share hook: generates the formatted JantaX share card.
@@ -20,27 +21,36 @@ interface ShareData {
 }
 
 export function useWhatsAppShare() {
+  // The card is written in the reader's language: one language per message, as on the page.
   const generateCard = useCallback((data: ShareData): string => {
+    const link = `https://jantax.in/pin/${data.pinCode}`;
+    if (getLang() === 'hi') {
+      return [
+        `*${data.moduleNameHindi} · JantaX रिपोर्ट*`,
+        ``,
+        `📍 *पिन कोड:* ${data.pinCode}`,
+        `📋 *${data.titleHindi}*`,
+        ``,
+        `📈 *सरकारी दावा:* ${data.claimLabelHindi}`,
+        `👁️ *ज़मीनी हकीकत:* ${data.realityLabelHindi}`,
+        `👤 *ज़िम्मेदार:* ${data.responsiblePerson}, ${data.responsibleOrg}`,
+        ``,
+        `🔗 *स्रोत:* ${data.sourceUrl}`,
+        `🔎 *JantaX:* ${link}`,
+      ].join('\n');
+    }
     return [
-      `*${data.moduleNameHindi} · JantaX रिपोर्ट*`,
+      `*JantaX report*`,
       ``,
-      `📍 *पिन कोड:* ${data.pinCode}`,
-      `📋 *${data.titleHindi}*`,
-      `   ${data.titleEnglish}`,
+      `📍 *PIN code:* ${data.pinCode}`,
+      `📋 *${data.titleEnglish}*`,
       ``,
-      `📈 *सरकारी दावा:* ${data.claimLabelHindi}`,
-      `   Official Claim: ${data.claimLabel}`,
+      `📈 *Official claim:* ${data.claimLabel}`,
+      `👁️ *Ground reality:* ${data.realityLabel}`,
+      `👤 *Responsible:* ${data.responsiblePerson}, ${data.responsibleOrg}`,
       ``,
-      `👁️ *जमीनी हकीकत:* ${data.realityLabelHindi}`,
-      `   Ground Reality: ${data.realityLabel}`,
-      ``,
-      `👤 *ज़िम्मेदार:* ${data.responsiblePerson}`,
-      `   ${data.responsibleOrg}`,
-      ``,
-      `🔗 *सत्यापन:* ${data.sourceUrl}`,
-      `🔎 *JantaX:* https://jantax.in/pin/${data.pinCode}`,
-      ``,
-      `JantaX | PIN code dalo, hisaab lo`,
+      `🔗 *Source:* ${data.sourceUrl}`,
+      `🔎 *JantaX:* ${link}`,
     ].join('\n');
   }, []);
 

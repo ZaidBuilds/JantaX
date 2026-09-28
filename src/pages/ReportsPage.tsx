@@ -6,6 +6,7 @@ import { getStoredReports } from '../modules/reporting/services/reportingService
 import type { CitizenReport } from '../modules/reporting/types/citizenReport';
 import { isValidIndianPincode, resolvePincode } from '../core/utils/pinResolver';
 import { Badge, EmptyState, PageHeader, reportForDisplay, toneForStatus } from '../ui';
+import { locale } from '../i18n';
 
 const CATEGORIES = ['All', 'Road', 'School', 'Healthcare', 'Water', 'Sanitation', 'Electricity', 'Public works', 'Other'] as const;
 const STATUSES = [
@@ -205,7 +206,7 @@ export function ReportsPage() {
                 <div className="strong clamp-2">{r.title}</div>
                 <div className="tiny muted" style={{ marginTop: 2 }}>
                   {r.category} · PIN {r.pin}
-                  {r.place ? ` · ${r.place}` : ''} · {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  {r.place ? ` · ${r.place}` : ''} · {new Date(r.createdAt).toLocaleDateString(locale(), { day: 'numeric', month: 'short', year: 'numeric' })}
                 </div>
               </div>
               <div className="report-row-meta">

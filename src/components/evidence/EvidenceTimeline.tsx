@@ -1,4 +1,5 @@
 import React from 'react';
+import { locale } from '../../i18n';
 
 interface EvidenceTimelineProps {
   evidences: Array<any>; // Sorted by observedAt or createdAt
@@ -24,7 +25,7 @@ export function EvidenceTimeline({ evidences }: EvidenceTimelineProps) {
           <div className="ml-4">
             <div className="flex items-center space-x-2 mb-1">
               <span className="text-xs text-gray-500">
-                {new Date(evidence.observedAt).toLocaleDateString()}
+                {new Date(evidence.observedAt).toLocaleDateString(locale())}
               </span>
               {/* We'll add evidence type badge later */}
             </div>

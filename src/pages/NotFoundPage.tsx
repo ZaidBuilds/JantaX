@@ -9,6 +9,7 @@ export function NotFoundPage() {
       <div className="card">
         <EmptyState
           icon={Compass}
+          heading="h1"
           title="We could not find that page"
           text={<>Nothing lives at <span className="mono">{pathname}</span>. It may have moved, or the link may be mistyped.</>}
           action={

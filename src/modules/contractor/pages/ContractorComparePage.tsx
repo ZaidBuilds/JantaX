@@ -16,7 +16,7 @@ export function ContractorComparePage() {
     <div>
       {/* Back Button */}
       <div style={{ marginBottom: '1.25rem' }}>
-        <Link to="/contractors" style={{ color: 'var(--brand-ink)', fontWeight: 700, fontSize: '0.86rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+        <Link to="/contractors" style={{ color: 'var(--brand-ink)', fontWeight: 700, fontSize: '0.86rem', textDecoration: 'none', display: 'inline-flex', minHeight: 32, alignItems: 'center', gap: '0.35rem' }}>
           <ArrowLeft size={16} /> Back to Contractors Directory
         </Link>
       </div>
@@ -45,7 +45,7 @@ export function ContractorComparePage() {
           <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.4rem' }}>
             Select Contractor 1
           </label>
-          <select
+          <select aria-label="Select Contractor 1"
             value={selectedId1}
             onChange={(e) => setSelectedId1(e.target.value)}
             style={{ width: '100%', padding: '0.6rem 0.85rem', borderRadius: 10, border: '1px solid var(--border-strong)', fontWeight: 700, fontSize: '0.9rem' }}
@@ -60,7 +60,7 @@ export function ContractorComparePage() {
           <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 700, color: 'var(--ink-2)', marginBottom: '0.4rem' }}>
             Select Contractor 2
           </label>
-          <select
+          <select aria-label="Select Contractor 2"
             value={selectedId2}
             onChange={(e) => setSelectedId2(e.target.value)}
             style={{ width: '100%', padding: '0.6rem 0.85rem', borderRadius: 10, border: '1px solid var(--border-strong)', fontWeight: 700, fontSize: '0.9rem' }}
@@ -92,7 +92,7 @@ export function ContractorComparePage() {
               <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 10, border: '1px solid var(--border)' }}>
                 <div style={{ fontSize: '0.76rem', color: 'var(--ink-3)', fontWeight: 600 }}>Total Contracts Value</div>
                 <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--good)' }}>₹{c1.performanceIndicators.totalAwardedValueCr.toLocaleString()} Cr</div>
-                <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)' }}>{c1.performanceIndicators.totalContractsCount} Projects</div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>{c1.performanceIndicators.totalContractsCount} Projects</div>
               </div>
 
               <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 10, border: '1px solid var(--border)' }}>
@@ -124,7 +124,7 @@ export function ContractorComparePage() {
               <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 10, border: '1px solid var(--border)' }}>
                 <div style={{ fontSize: '0.76rem', color: 'var(--ink-3)', fontWeight: 600 }}>Total Contracts Value</div>
                 <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--good)' }}>₹{c2.performanceIndicators.totalAwardedValueCr.toLocaleString()} Cr</div>
-                <div style={{ fontSize: '0.74rem', color: 'var(--ink-3)' }}>{c2.performanceIndicators.totalContractsCount} Projects</div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>{c2.performanceIndicators.totalContractsCount} Projects</div>
               </div>
 
               <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 10, border: '1px solid var(--border)' }}>

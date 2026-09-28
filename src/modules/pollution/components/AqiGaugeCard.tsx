@@ -18,7 +18,7 @@ export function getAqiColor(category: AqiCategory): string {
     case 'Good':
       return 'var(--good)'; // Green
     case 'Satisfactory':
-      return '#65a30d'; // Light Green
+      return 'var(--aqi-satisfactory)';
     case 'Moderate':
       return 'var(--warn)'; // Yellow-Orange
     case 'Poor':
@@ -28,9 +28,9 @@ export function getAqiColor(category: AqiCategory): string {
     case 'Severe':
       return 'var(--bad)'; // Deep Maroon
     case 'Severe Plus':
-      return '#450a0a'; // Dark Maroon/Purple
+      return 'var(--aqi-severe-plus)';
     default:
-      return '#64748b';
+      return 'var(--ink-3)';
   }
 }
 
@@ -52,9 +52,9 @@ export function AqiGaugeCard({ aqi, category, prominentPollutant, pm25, pm10, no
         <div>
           <span
             style={{
-              background: `${color}18`,
+              background: `color-mix(in srgb, ${color} 9%, transparent)`,
               color: color,
-              border: `1px solid ${color}40`,
+              border: `1px solid color-mix(in srgb, ${color} 25%, transparent)`,
               fontSize: '0.85rem',
               fontWeight: 800,
               padding: '0.3rem 0.8rem',
@@ -69,46 +69,46 @@ export function AqiGaugeCard({ aqi, category, prominentPollutant, pm25, pm10, no
       {/* Main Stats Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: `2px solid ${color}` }}>
-          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             Current AQI
           </span>
           <div style={{ fontSize: '1.8rem', fontWeight: 900, color: color, marginTop: '0.2rem' }}>
             {aqi}
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-3)', fontWeight: 600 }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 600 }}>
             Main: {prominentPollutant}
           </span>
         </div>
 
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             PM2.5 (Fine Particulate)
           </span>
           <div style={{ fontSize: '1.3rem', fontWeight: 800, color: pm25 > 60 ? 'var(--bad)' : 'var(--good)', marginTop: '0.2rem' }}>
             {pm25} µg/m³
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Standard: 60 µg/m³</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Standard: 60 µg/m³</span>
         </div>
 
         <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-          <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
             PM10 (Coarse Dust)
           </span>
           <div style={{ fontSize: '1.3rem', fontWeight: 800, color: pm10 > 100 ? 'var(--accent-ink)' : 'var(--good)', marginTop: '0.2rem' }}>
             {pm10} µg/m³
           </div>
-          <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Standard: 100 µg/m³</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Standard: 100 µg/m³</span>
         </div>
 
         {no2 !== undefined && (
           <div style={{ background: 'var(--surface-2)', padding: '1rem', borderRadius: 12, border: '1px solid var(--border)' }}>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', fontWeight: 700, textTransform: 'uppercase' }}>
               NO2 (Vehicular Gas)
             </span>
             <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--ink)', marginTop: '0.2rem' }}>
               {no2} µg/m³
             </div>
-            <span style={{ fontSize: '0.68rem', color: 'var(--ink-4)' }}>Standard: 80 µg/m³</span>
+            <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>Standard: 80 µg/m³</span>
           </div>
         )}
       </div>
@@ -119,7 +119,7 @@ export function AqiGaugeCard({ aqi, category, prominentPollutant, pm25, pm10, no
           <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--ink-2)', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
             <Clock size={12} /> 24-Hour Diurnal AQI Trend
           </span>
-          <span style={{ fontSize: '0.7rem', color: 'var(--ink-3)' }}>6-Hour Sampling Bins</span>
+          <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)' }}>6-Hour Sampling Bins</span>
         </div>
 
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end', height: 60, paddingTop: 10 }}>
@@ -127,9 +127,9 @@ export function AqiGaugeCard({ aqi, category, prominentPollutant, pm25, pm10, no
             const heightPercent = Math.min(100, (t.aqi / 450) * 100);
             return (
               <div key={t.hour} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' }}>
-                <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--ink)' }}>{t.aqi}</span>
+                <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--ink)' }}>{t.aqi}</span>
                 <div style={{ width: '100%', height: `${heightPercent}%`, background: t.aqi > 300 ? 'var(--bad-solid)' : t.aqi > 200 ? 'var(--accent-solid)' : 'var(--good-solid)', borderRadius: 4 }} />
-                <span style={{ fontSize: '0.62rem', color: 'var(--ink-4)' }}>{t.hour}</span>
+                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-4)' }}>{t.hour}</span>
               </div>
             );
           })}

@@ -142,7 +142,7 @@ export const EvidenceUploader: React.FC<EvidenceUploaderProps> = ({ files, onCha
                 <div style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {file.fileName}
                 </div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--ink-3)', display: 'flex', alignItems: 'center', gap: '0.2rem', marginTop: '0.15rem' }}>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-3)', display: 'flex', alignItems: 'center', gap: '0.2rem', marginTop: '0.15rem' }}>
                   <Clock size={10} style={{ color: 'var(--warn)' }} /> Pending Moderation
                 </div>
               </div>

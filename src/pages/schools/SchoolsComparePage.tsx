@@ -8,6 +8,7 @@ import { ComparisonTable } from '../../components/compare/ComparisonTable';
 import type { ComparisonData, ComparisonEntity } from '../../components/compare/types';
 import { SchoolHealthScore, getStatusFromScore } from '../../components/school/SchoolHealthScore';
 import { SCORING_VERSION } from '../../core/utils/scoring';
+import { pick } from '../../i18n';
 
 export function SchoolsComparePage() {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ export function SchoolsComparePage() {
         metrics: entities.map(e => ({
           id: `${e.id}-name`,
           label: 'Name',
-          value: schoolRecords[e.id]?.titleEnglish || schoolRecords[e.id]?.titleHindi || '-',
+          value: pick(schoolRecords[e.id]?.titleEnglish || schoolRecords[e.id]?.titleHindi || '-', schoolRecords[e.id]?.titleHindi),
           status: 'available' as const,
         })),
       },
@@ -172,8 +173,8 @@ export function SchoolsComparePage() {
   return (
     <div className="container" style={{ padding: '2rem 1.25rem' }}>
       <div style={{ marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '1.5rem', color: 'var(--color-primary)', margin: 0 }}>Compare Schools</h2>
-        <p style={{ fontSize: '0.85rem', opacity: 0.7, margin: '0.25rem 0 0' }}>
+        <h2 style={{ fontSize: '1.5rem', color: 'var(--brand-ink)', margin: 0 }}>Compare Schools</h2>
+        <p style={{ fontSize: '0.85rem', color: 'var(--ink-3)', margin: '0.25rem 0 0' }}>
           Select 2-4 schools to compare official data, community reports, and ground truth scores.
         </p>
       </div>
@@ -195,13 +196,13 @@ export function SchoolsComparePage() {
         <div style={{ textAlign: 'center', padding: '3rem 1rem', background: 'var(--surface-2)', borderRadius: 12, border: '1px dashed var(--border-strong)' }}>
           <GraduationCap size={40} style={{ opacity: 0.2, marginBottom: '0.75rem' }} />
           <h3 style={{ fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '0.4rem' }}>Select schools to compare</h3>
-          <p style={{ fontSize: '0.82rem', opacity: 0.6 }}>Add at least 2 schools using the search box above.</p>
+          <p style={{ fontSize: '0.82rem', color: 'var(--ink-3)' }}>Add at least 2 schools using the search box above.</p>
         </div>
       )}
 
       {loading && (
         <div style={{ textAlign: 'center', padding: '2rem' }}>
-          <p style={{ fontSize: '0.85rem', opacity: 0.6 }}>Loading school data…</p>
+          <p style={{ fontSize: '0.85rem', color: 'var(--ink-3)' }}>Loading school data…</p>
         </div>
       )}
 
