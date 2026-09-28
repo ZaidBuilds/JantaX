@@ -27,7 +27,8 @@ export function SchoolsDirectory() {
     setLoading(true);
     api.getSchools(pinFromUrl || '').then((res: any) => {
       if (!cancelled) {
-        setSchools(res.records?.school || []);
+        const arr = Array.isArray(res) ? res : (res?.records?.school || []);
+        setSchools(arr);
         setLoading(false);
       }
     }).catch(() => {

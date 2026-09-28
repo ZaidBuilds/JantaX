@@ -199,15 +199,22 @@ export const api = {
   getRecord: async (module: string, id: string) => {
     try { return await apiFetch<{ module: string; record: unknown }>(`/api/records/${module}/${id}`); }
     catch {
-      // Fallback: try to synthesize from mockRecords if id is mock-* or auth-*
-      if (id.startsWith('mock-') || id.startsWith('auth-')) {
-        const codeMatch = id.match(/(?:mock|auth)-\w+-(\d{6})/);
-        const code = codeMatch ? codeMatch[1] : '110001';
-        const recs = mockRecords(code);
-        const all: ApiRecord[] = [...(recs.records.school||[]), ...(recs.records.infra||[])];
-        const found = all.find(r=>r.id===id);
-        if (found) return { module, record: found as unknown };
-      }
+      // Pan-India fallback: extract 6-digit PIN from id if present
+      const codeMatch = id.match(/(\d{6})/);
+      const code = codeMatch ? codeMatch[1] : '110001';
+      const recs = mockRecords(code, module);
+      const list = (recs.records as any)[module] || [];
+      const found = list.find((r: any) => r.id === id) || list[0];
+      if (found) return { module, record: found as unknown };
+
+      const all: any[] = [
+        ...(recs.records.school || []),
+        ...(recs.records.infra || []),
+        ...((recs.records as any).rera || []),
+        ...((recs.records as any).hospital || []),
+      ];
+      const matchAll = all.find((r: any) => r.id === id) || all[0];
+      if (matchAll) return { module, record: matchAll as unknown };
 
       throw new Error('Record not found (offline fallback)');
     }
@@ -238,7 +245,14 @@ export const api = {
   },
 
   getReraProject: async (id: string) => {
-    return apiFetch<any>(`/api/rera/${id}`);
+    try {
+      return await apiFetch<any>(`/api/rera/${id}`);
+    } catch {
+      const pinMatch = id.match(/(\d{6})/);
+      const pin = pinMatch ? pinMatch[1] : '110001';
+      const r = (mockRecords(pin, 'rera').records as any).rera || [];
+      return r.find((x: any) => x.id === id) || r[0] || null;
+    }
   },
 
   getHospitals: async (code: string) => {

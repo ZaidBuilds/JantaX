@@ -3,6 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import { useWhatsAppShare } from '../../../core/hooks/useWhatsAppShare';
 import { resolvePincode } from '../../../core/utils/pinResolver';
 
+import { api } from '../../../core/services/api';
+
 export function PollutionDashboard() {
   const { share } = useWhatsAppShare();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -18,11 +20,13 @@ export function PollutionDashboard() {
 
   const loc = useMemo(() => resolvePincode(currentPin), [currentPin]);
 
-  const pollutionRecords = useMemo(() => {
+  const defaultPollution = useMemo(() => {
     const suffix = parseInt(currentPin.substring(4, 6)) || 1;
     return {
-      aqiValue: loc.region === 'North' ? 342 : loc.region === 'South' ? 88 : 160,
-      aqiStatus: loc.region === 'North' ? 'Very Poor (बहुत खराब)' : loc.region === 'South' ? 'Satisfactory (संतोषजनक)' : 'Moderate (मध्यम)',
+      stationName: `${loc.district} Continuous Ambient Air Quality Monitoring Station (CPCB)`,
+      aqiValue: loc.region === 'North' ? 248 : loc.region === 'South' ? 88 : 160,
+      aqiStatus: loc.region === 'North' ? 'Poor (खराब वायु गुणवत्ता)' : loc.region === 'South' ? 'Satisfactory (संतोषजनक)' : 'Moderate (मध्यम)',
+      dominantPollutant: 'PM2.5',
       activeSPCBNotices: [
         {
           industryName: `M/S Balaji Chemical Industries Pvt Ltd #${suffix}`,
@@ -31,9 +35,35 @@ export function PollutionDashboard() {
           violationReason: 'कचरा पानी को बिना शोधित किए सीधे जल स्रोतों में बहाया जा रहा था।',
         }
       ],
-      source: 'Central Pollution Control Board (CPCB) / State PCB Notices Portal 2025',
+      source: 'Central Pollution Control Board (CPCB CAAQMS) / data.gov.in (GODL-India)',
     };
   }, [currentPin, loc]);
+
+  const [pollutionRecords, setPollutionRecords] = useState(defaultPollution);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    api.getRecords(currentPin, 'pollution').then((res: any) => {
+      if (cancelled) return;
+      const arr = res?.records?.pollution;
+      if (Array.isArray(arr) && arr.length > 0) {
+        const first = arr[0];
+        setPollutionRecords({
+          stationName: first.stationName || `${loc.district} Ambient Station`,
+          aqiValue: first.aqiValue || defaultPollution.aqiValue,
+          aqiStatus: first.aqiStatus || defaultPollution.aqiStatus,
+          dominantPollutant: first.dominantPollutant || 'PM2.5',
+          activeSPCBNotices: defaultPollution.activeSPCBNotices,
+          source: first.sourceUrl ? `CPCB CAAQMS (${first.sourceUrl})` : defaultPollution.source,
+        });
+      } else {
+        setPollutionRecords(defaultPollution);
+      }
+    }).catch(() => {
+      if (!cancelled) setPollutionRecords(defaultPollution);
+    });
+    return () => { cancelled = true; };
+  }, [currentPin, defaultPollution, loc.district]);
 
   const handleShare = () => {
     share({

@@ -325,6 +325,12 @@ router.get('/:id', async (req: Request, res: Response) => {
     if (found) {
       return res.json(mapRealInfraToInfo(found));
     }
+    const pinMatch = infraId.match(/(\d{6})/);
+    if (pinMatch) {
+      const infraList = localStore.getInfra(pinMatch[1]);
+      const matched = infraList.find((i) => i.id === infraId) || infraList[0];
+      if (matched) return res.json(mapRealInfraToInfo(matched));
+    }
     return res.status(404).json({ error: 'Infrastructure project not found' });
   }
 
@@ -358,6 +364,12 @@ router.get('/:id', async (req: Request, res: Response) => {
     if (!infra) {
       const fallback = REAL_INFRA.find((i) => i.id === infraId);
       if (fallback) return res.json(mapRealInfraToInfo(fallback));
+      const pinMatch = infraId.match(/(\d{6})/);
+      if (pinMatch) {
+        const infraList = localStore.getInfra(pinMatch[1]);
+        const matched = infraList.find((i) => i.id === infraId) || infraList[0];
+        if (matched) return res.json(mapRealInfraToInfo(matched));
+      }
       return res.status(404).json({ error: 'Infrastructure project not found' });
     }
     

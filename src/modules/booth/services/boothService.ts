@@ -43,7 +43,34 @@ export function getAllBooths(filter?: BoothFilter): PollingBooth[] {
 }
 
 export function getBoothById(id: string): PollingBooth | undefined {
-  return MOCK_POLLING_BOOTHS.find((b) => b.id.toLowerCase() === id.toLowerCase());
+  const found = MOCK_POLLING_BOOTHS.find((b) => b.id.toLowerCase() === id.toLowerCase());
+  if (found) return found;
+
+  const pinMatch = id.match(/(\d{6})/);
+  if (pinMatch) {
+    const pin = pinMatch[1];
+    const loc = resolvePincode(pin);
+    const base = MOCK_POLLING_BOOTHS[0];
+    return {
+      ...base,
+      id,
+      stationNumber: 1,
+      buildingName: `Government Primary School (${loc.district})`,
+      buildingNameHi: `राजकीय प्राथमिक विद्यालय (${loc.district})`,
+      assemblyConstituency: `${loc.district} Sadar Assembly`,
+      parliamentaryConstituency: `${loc.district} Parliamentary`,
+      district: loc.district,
+      state: loc.state,
+      pinCode: pin,
+      blo: {
+        ...base.blo,
+        name: `Booth Level Officer (${loc.district})`,
+        nameHi: `बीएलओ (${loc.district})`,
+      },
+    };
+  }
+
+  return undefined;
 }
 
 export function getBoothsByPin(pinCode: string): PollingBooth[] {

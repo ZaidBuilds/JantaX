@@ -100,20 +100,26 @@ export const AUTHENTIC_PINCODES: Record<string, AuthenticPincodeInfo> = {
   },
 };
 
+import { resolvePincode } from '../utils/pinResolver';
+import { getCoordinateForPin } from '../utils/pinCoordinates';
+
 export function getAuthenticPincode(code: string, locAccurate?: any): AuthenticPincodeInfo {
   if (AUTHENTIC_PINCODES[code]) return AUTHENTIC_PINCODES[code];
-  const state = locAccurate?.state || 'Uttar Pradesh';
-  const district = locAccurate?.district || 'Meerut';
-  const postOffice = locAccurate?.postOffice || `${district} Head Post Office`;
-  const block = locAccurate?.block || `${district} Sub-Division`;
+  const resolved = locAccurate?.state ? locAccurate : resolvePincode(code);
+  const coords = getCoordinateForPin(code);
+  const state = resolved?.state || 'Uttar Pradesh';
+  const district = resolved?.district || 'District';
+  const postOffice = resolved?.postOffice || `${district} Head Post Office`;
+  const block = resolved?.block || `${district} Sub-Division`;
   return {
     code,
     state,
+    stateCode: resolved?.stateCode,
     district,
-    region: locAccurate?.region || 'North',
+    region: resolved?.region || 'North',
     areaType: `${district} Administrative Circle`,
-    lat: 28.9845,
-    lng: 77.7064,
+    lat: coords.lat,
+    lng: coords.lng,
     postOffice,
     block,
     counts: { schools: 2, infraProjects: 2, reraProjects: 1, hospitals: 1, pdsShops: 1, grievances: 2, citizenReports: 1 },

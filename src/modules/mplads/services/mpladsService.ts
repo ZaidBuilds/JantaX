@@ -7,7 +7,26 @@ export function getAllRepresentatives(): Representative[] {
 }
 
 export function getRepresentativeById(id: string): Representative | undefined {
-  return MOCK_REPRESENTATIVES.find((r) => r.id.toLowerCase() === id.toLowerCase());
+  const found = MOCK_REPRESENTATIVES.find((r) => r.id.toLowerCase() === id.toLowerCase());
+  if (found) return found;
+
+  const pinMatch = id.match(/(\d{6})/);
+  if (pinMatch) {
+    const pin = pinMatch[1];
+    const loc = resolvePincode(pin);
+    const base = MOCK_REPRESENTATIVES[0];
+    return {
+      ...base,
+      id,
+      name: `Member of Parliament (${loc.district})`,
+      nameHi: `सांसद (${loc.district})`,
+      constituencyName: `${loc.district} Lok Sabha`,
+      constituencyNameHi: `${loc.district} लोक सभा`,
+      state: loc.state,
+    };
+  }
+
+  return undefined;
 }
 
 export function getAllWorks(filter?: MpladsFilter): MpladsWork[] {
@@ -57,7 +76,27 @@ export function getAllWorks(filter?: MpladsFilter): MpladsWork[] {
 }
 
 export function getWorkById(id: string): MpladsWork | undefined {
-  return MOCK_MPLADS_WORKS.find((w) => w.id.toLowerCase() === id.toLowerCase());
+  const found = MOCK_MPLADS_WORKS.find((w) => w.id.toLowerCase() === id.toLowerCase());
+  if (found) return found;
+
+  const pinMatch = id.match(/(\d{6})/);
+  if (pinMatch) {
+    const pin = pinMatch[1];
+    const loc = resolvePincode(pin);
+    const base = MOCK_MPLADS_WORKS[0];
+    return {
+      ...base,
+      id,
+      workTitle: `Community Drinking Water RO Plant (${loc.district})`,
+      workTitleHi: `सामुदायिक पेयजल आरओ प्लांट स्थापना (${loc.district})`,
+      representativeId: `rep-mp-${pin}`,
+      representativeName: `Member of Parliament (${loc.district})`,
+      locationName: `${loc.district} Sadar`,
+      pinCode: pin,
+    };
+  }
+
+  return undefined;
 }
 
 export function getWorksByRepresentativeId(repId: string): MpladsWork[] {

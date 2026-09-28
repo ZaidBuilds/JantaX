@@ -101,10 +101,9 @@ const MpladsComparePage = lazy(() => import('./modules/mplads/pages/MpladsCompar
 const WardComparePage = lazy(() => import('./modules/nagar/pages/WardComparePage').then((m) => ({ default: m.WardComparePage })));
 const PollutionComparePage = lazy(() => import('./modules/pollution/pages/PollutionComparePage').then((m) => ({ default: m.PollutionComparePage })));
 
-// Healthcare, Ration, Land, Grievance, Budget & Locality Compare
+// Healthcare, Ration, Grievance, Budget & Locality Compare
 const HospitalsDirectoryPage = lazy(() => import('./modules/hospital/pages/HospitalsDirectoryPage').then((m) => ({ default: m.HospitalsDirectoryPage })));
 const RationDirectoryPage = lazy(() => import('./modules/ration/pages/RationDirectoryPage').then((m) => ({ default: m.RationDirectoryPage })));
-const LandDirectoryPage = lazy(() => import('./modules/land/pages/LandDirectoryPage').then((m) => ({ default: m.LandDirectoryPage })));
 const GrievanceObservatoryPage = lazy(() => import('./modules/grievance/pages/GrievanceObservatoryPage').then((m) => ({ default: m.GrievanceObservatoryPage })));
 const BudgetLedgerPage = lazy(() => import('./modules/budget/pages/BudgetLedgerPage').then((m) => ({ default: m.BudgetLedgerPage })));
 const LocalityComparePage = lazy(() => import('./pages/LocalityComparePage').then((m) => ({ default: m.LocalityComparePage })));
@@ -177,7 +176,7 @@ function AppContent() {
               <Route path="/pin/:pinCode/hospitals" element={<HospitalsDirectoryPage />} />
               <Route path="/pin/:pinCode/ration" element={<RationDirectoryPage />} />
               <Route path="/pin/:pinCode/pds" element={<RationDirectoryPage />} />
-              <Route path="/pin/:pinCode/land" element={<LandDirectoryPage />} />
+              <Route path="/pin/:pinCode/land" element={<Navigate to="/pin" replace />} />
               <Route path="/pin/:pinCode/works" element={<ProjectsDirectoryPage />} />
               <Route path="/pin/:pinCode/schemes" element={<SchemesPage />} />
               <Route path="/pin/:pinCode/budget" element={<BudgetLedgerPage />} />
@@ -192,9 +191,9 @@ function AppContent() {
               <Route path="/ration" element={<RationDirectoryPage />} />
               <Route path="/pds" element={<RationDirectoryPage />} />
 
-              {/* Land Records & Bhulekh */}
-              <Route path="/land" element={<LandDirectoryPage />} />
-              <Route path="/bhulekh" element={<LandDirectoryPage />} />
+              {/* Land Redirects */}
+              <Route path="/land" element={<Navigate to="/" replace />} />
+              <Route path="/bhulekh" element={<Navigate to="/" replace />} />
 
               {/* Grievance & CPGRAMS */}
               <Route path="/grievance" element={<GrievanceObservatoryPage />} />

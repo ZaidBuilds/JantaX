@@ -54,7 +54,26 @@ export function getAllCourts(filter?: CourtFilter): CourtComplex[] {
 }
 
 export function getCourtById(id: string): CourtComplex | undefined {
-  return MOCK_COURTS.find((c) => c.id.toLowerCase() === id.toLowerCase());
+  const found = MOCK_COURTS.find((c) => c.id.toLowerCase() === id.toLowerCase());
+  if (found) return found;
+
+  const pinMatch = id.match(/(\d{6})/);
+  if (pinMatch) {
+    const pin = pinMatch[1];
+    const loc = resolvePincode(pin);
+    const base = MOCK_COURTS[0];
+    return {
+      ...base,
+      id,
+      complexName: `District & Sessions Court Complex, ${loc.district}`,
+      complexNameHi: `जिला एवं सत्र न्यायालय परिसर, ${loc.district}`,
+      district: loc.district,
+      state: loc.state,
+      pinCode: pin,
+    };
+  }
+
+  return undefined;
 }
 
 export function getCourtsByPin(pinCode: string): CourtComplex[] {

@@ -55,7 +55,29 @@ export function getAllWards(filter?: NagarFilter): MunicipalWard[] {
 }
 
 export function getWardById(id: string): MunicipalWard | undefined {
-  return MOCK_WARDS.find((w) => w.id.toLowerCase() === id.toLowerCase());
+  const found = MOCK_WARDS.find((w) => w.id.toLowerCase() === id.toLowerCase());
+  if (found) return found;
+
+  const pinMatch = id.match(/(\d{6})/);
+  if (pinMatch) {
+    const pin = pinMatch[1];
+    const loc = resolvePincode(pin);
+    const base = MOCK_WARDS[0];
+    return {
+      ...base,
+      id,
+      wardNumber: Number(id.match(/\d+$/)?.[0] || 1),
+      wardName: `${loc.district} Central Ward`,
+      wardNameHi: `${loc.district} केंद्रीय वार्ड`,
+      corporationName: `${loc.district} Municipal Corporation`,
+      zone: `${loc.district} Urban Zone`,
+      district: loc.district,
+      state: loc.state,
+      pinCode: pin,
+    };
+  }
+
+  return undefined;
 }
 
 export function getWardsByPin(pinCode: string): MunicipalWard[] {

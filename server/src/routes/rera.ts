@@ -280,6 +280,12 @@ router.get('/:id', async (req: Request, res: Response) => {
     if (found) {
       return res.json(mapRealReraToInfo(found));
     }
+    const pinMatch = reraId.match(/(\d{6})/);
+    if (pinMatch) {
+      const reraList = localStore.getRera(pinMatch[1]);
+      const matched = reraList.find((r) => r.id === reraId || r.reraNumber === reraId) || reraList[0];
+      if (matched) return res.json(mapRealReraToInfo(matched));
+    }
     return res.status(404).json({ error: 'RERA project not found' });
   }
 
@@ -311,6 +317,12 @@ router.get('/:id', async (req: Request, res: Response) => {
     if (!rera) {
       const fallback = REAL_RERA.find((r) => r.id === reraId || r.reraNumber === reraId);
       if (fallback) return res.json(mapRealReraToInfo(fallback));
+      const pinMatch = reraId.match(/(\d{6})/);
+      if (pinMatch) {
+        const reraList = localStore.getRera(pinMatch[1]);
+        const matched = reraList.find((r) => r.id === reraId || r.reraNumber === reraId) || reraList[0];
+        if (matched) return res.json(mapRealReraToInfo(matched));
+      }
       return res.status(404).json({ error: 'RERA project not found' });
     }
     

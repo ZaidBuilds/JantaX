@@ -315,6 +315,12 @@ router.get('/:id', async (req: Request, res: Response) => {
     if (found) {
       return res.json(mapRealSchoolToInfo(found));
     }
+    const pinMatch = schoolId.match(/(\d{6})/);
+    if (pinMatch) {
+      const schools = localStore.getSchools(pinMatch[1]);
+      const matched = schools.find((s) => s.id === schoolId) || schools[0];
+      if (matched) return res.json(mapRealSchoolToInfo(matched));
+    }
     return res.status(404).json({ error: 'School not found' });
   }
 
@@ -350,6 +356,12 @@ router.get('/:id', async (req: Request, res: Response) => {
     if (!school) {
       const fallback = REAL_SCHOOLS.find((s) => s.id === schoolId || s.udiseCode === schoolId);
       if (fallback) return res.json(mapRealSchoolToInfo(fallback));
+      const pinMatch = schoolId.match(/(\d{6})/);
+      if (pinMatch) {
+        const schools = localStore.getSchools(pinMatch[1]);
+        const matched = schools.find((s) => s.id === schoolId) || schools[0];
+        if (matched) return res.json(mapRealSchoolToInfo(matched));
+      }
       return res.status(404).json({ error: 'School not found' });
     }
     

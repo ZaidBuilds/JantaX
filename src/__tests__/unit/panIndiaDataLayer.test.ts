@@ -5,7 +5,7 @@ import { runAllConnectors } from '../../../server/src/connectors/connectorRunner
 import { fetchPmgsyPackagesForPin } from '../../../server/src/connectors/pmgsyRoadConnector';
 import { fetchUdiseSchoolsForPin } from '../../../server/src/connectors/udiseSchoolConnector';
 import { fetchReraProjectsForPin } from '../../../server/src/connectors/reraProjectConnector';
-import { getAuthenticRecordsForPin } from '../../core/data/authenticData';
+import { getAuthenticRecordsForPin, getAuthenticPincode } from '../../core/data/authenticData';
 
 describe('Pan-India 9-Postal-Zone Administrative Resolution', () => {
   const zoneTestPins = [
@@ -36,6 +36,60 @@ describe('Pan-India 9-Postal-Zone Administrative Resolution', () => {
       expect(record?.parliamentaryConstituency).toBeDefined();
       expect(record?.assemblyConstituency).toBeDefined();
     });
+  });
+
+  it('accurately resolves non-pilot Pan-India PINs to authentic state and district', () => {
+    // Pune, Maharashtra (41)
+    const pune = localStore.getPincode('411001');
+    expect(pune).not.toBeNull();
+    expect(pune?.code).toBe('411001');
+    expect(pune?.state).toBe('Maharashtra');
+    expect(pune?.district).toBe('Pune');
+    expect(pune?.region).toBe('West');
+
+    // Coimbatore, Tamil Nadu (64)
+    const cbe = localStore.getPincode('641001');
+    expect(cbe).not.toBeNull();
+    expect(cbe?.code).toBe('641001');
+    expect(cbe?.state).toBe('Tamil Nadu');
+    expect(cbe?.district).toBe('Coimbatore');
+    expect(cbe?.region).toBe('South');
+
+    // Ranchi, Jharkhand (83)
+    const ranchi = localStore.getPincode('834001');
+    expect(ranchi).not.toBeNull();
+    expect(ranchi?.code).toBe('834001');
+    expect(ranchi?.state).toBe('Jharkhand');
+    expect(ranchi?.district).toBe('Ranchi');
+    expect(ranchi?.region).toBe('East');
+  });
+
+  it('localizes school and infrastructure records to the queried Pan-India district', async () => {
+    const records = await dal.getRecordsForPin('411001');
+    expect(records.school).toBeDefined();
+    expect(records.school?.length).toBeGreaterThan(0);
+    expect(records.school?.[0]?.titleEnglish).toContain('Pune');
+    expect(records.school?.[0]?.location.district).toBe('Pune');
+    expect(records.school?.[0]?.location.state).toBe('Maharashtra');
+
+    expect(records.infra).toBeDefined();
+    expect(records.infra?.length).toBeGreaterThan(0);
+    expect(records.infra?.[0]?.titleEnglish).toContain('Pune');
+    expect(records.infra?.[0]?.location.district).toBe('Pune');
+  });
+
+  it('resolves authentic Pan-India data on client getAuthenticPincode', () => {
+    const puneClient = getAuthenticPincode('411001');
+    expect(puneClient.code).toBe('411001');
+    expect(puneClient.state).toBe('Maharashtra');
+    expect(puneClient.district).toBe('Pune');
+    expect(puneClient.lat).toBeCloseTo(18.52, 1);
+    expect(puneClient.lng).toBeCloseTo(73.85, 1);
+
+    const chennaiClient = getAuthenticPincode('600001');
+    expect(chennaiClient.code).toBe('600001');
+    expect(chennaiClient.state).toBe('Tamil Nadu');
+    expect(chennaiClient.district).toBe('Chennai');
   });
 
   it('guarantees deterministic non-crashing resolution for remote / unknown PINs', async () => {

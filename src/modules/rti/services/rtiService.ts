@@ -50,7 +50,36 @@ export function getAllAuthorities(filter?: RtiFilter): PublicAuthority[] {
 }
 
 export function getAuthorityById(id: string): PublicAuthority | undefined {
-  return MOCK_PUBLIC_AUTHORITIES.find((a) => a.id.toLowerCase() === id.toLowerCase());
+  const found = MOCK_PUBLIC_AUTHORITIES.find((a) => a.id.toLowerCase() === id.toLowerCase());
+  if (found) return found;
+
+  const pinMatch = id.match(/(\d{6})/);
+  if (pinMatch) {
+    const pin = pinMatch[1];
+    const loc = resolvePincode(pin);
+    const base = MOCK_PUBLIC_AUTHORITIES[0];
+    return {
+      ...base,
+      id,
+      authorityName: `Office of the District Magistrate & Collector, ${loc.district}`,
+      authorityNameHi: `कार्यालय जिलाधिकारी एवं कलेक्टर, ${loc.district}`,
+      parentMinistry: `Department of Revenue & General Administration, Govt of ${loc.state}`,
+      city: loc.district,
+      state: loc.state,
+      pinCode: pin,
+      cpio: {
+        ...base.cpio,
+        name: `Public Information Officer (${loc.district})`,
+        officeAddress: `Collectorate Compound, ${loc.district}, ${loc.state} - ${pin}`,
+      },
+      faa: {
+        ...base.faa,
+        name: `First Appellate Authority (${loc.district})`,
+      },
+    };
+  }
+
+  return undefined;
 }
 
 export function getAuthoritiesByPin(pinCode: string): PublicAuthority[] {

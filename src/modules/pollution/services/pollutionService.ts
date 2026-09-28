@@ -54,7 +54,35 @@ export function getAllStations(filter?: PollutionFilter): AirQualityStation[] {
 }
 
 export function getStationById(id: string): AirQualityStation | undefined {
-  return MOCK_STATIONS.find((s) => s.id.toLowerCase() === id.toLowerCase());
+  const found = MOCK_STATIONS.find((s) => s.id.toLowerCase() === id.toLowerCase());
+  if (found) return found;
+
+  const pinMatch = id.match(/(\d{6})/);
+  if (pinMatch) {
+    const pin = pinMatch[1];
+    const loc = resolvePincode(pin);
+    const aqi = loc.region === 'North' ? 245 : loc.region === 'South' ? 82 : 148;
+    const cat = aqi > 200 ? 'Poor' : aqi > 100 ? 'Moderate' : 'Satisfactory';
+    const base = MOCK_STATIONS[0];
+    return {
+      ...base,
+      id,
+      stationName: `${loc.district} Continuous Ambient Air Quality Monitoring Station (CAAQMS)`,
+      stationNameHi: `${loc.district} सतत परिवेशी वायु गुणवत्ता निगरानी केंद्र`,
+      operator: `${loc.state} Pollution Control Board / CPCB`,
+      city: loc.district,
+      district: loc.district,
+      state: loc.state,
+      pinCode: pin,
+      currentAqi: aqi,
+      category: cat as any,
+      healthAdvisory: aqi > 200
+        ? 'Breathing discomfort to people with lung, asthma and heart diseases.'
+        : 'Minor breathing discomfort to sensitive people.',
+    };
+  }
+
+  return undefined;
 }
 
 export function getStationsByPin(pinCode: string): AirQualityStation[] {

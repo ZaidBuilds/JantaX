@@ -1,12 +1,12 @@
 import type { SourceConnector } from './connector';
 import { runSyncJob } from './syncEngine';
 
-const SCHEDULE_CRON: Record<string,string> = {
-  daily: '0 2 * * *',      // 02:00 IST daily
-  weekly: '0 2 * * 1',     // Monday 02:00
-  monthly: '0 2 1 * *',    // 1st 02:00
-  quarterly: '0 2 1 */3 *',// quarterly
-  annual: '0 2 1 1 *',     // Jan 1 02:00
+const SCHEDULE_CRON: Record<string, string> = {
+  daily: '0 2 * * *', // 02:00 IST daily
+  weekly: '0 2 * * 1', // Monday 02:00
+  monthly: '0 2 1 * *', // 1st 02:00
+  quarterly: '0 2 1 */3 *', // quarterly
+  annual: '0 2 1 1 *', // Jan 1 02:00
   event: '', // event-driven, no cron
 };
 
@@ -22,28 +22,54 @@ export class SyncScheduler {
       return;
     }
     console.log(`[scheduler] registered ${connector.sourceId} → ${connector.schedule} (${cron})`);
-    // In production use node-cron: import cron from 'node-cron'; cron.schedule(cron, ()=> this.run(connector.sourceId), { timezone: 'Asia/Kolkata' })
-    // For PoC without extra dep, use setInterval for daily demo (every 24h) or immediate run in dev
+
+    // In development or test, don't flood background timers, but keep them accessible
     if (process.env.NODE_ENV === 'development') {
-      // Run once after 15s in dev for demo observability
-      const t = setTimeout(()=> this.run(connector.sourceId), 15000);
+      const t = setTimeout(() => {
+        this.run(connector.sourceId).catch((err) =>
+          console.warn(`[scheduler] background sync warning for ${connector.sourceId}:`, err?.message)
+        );
+      }, 15000);
       this.timers.set(connector.sourceId, t);
     }
   }
 
+  get(sourceId: string): SourceConnector | undefined {
+    if (this.connectors.has(sourceId)) return this.connectors.get(sourceId);
+    const aliasMap: Record<string, string> = {
+      'cpcb-aqi': 'src_cpcb_aqi',
+      'darpg-cpgrams': 'src_darpg_202408',
+      'pmgsy-roads': 'src_mord_pmgsy',
+      'udise-plus': 'src_udise_plus',
+      'state-rera': 'src_rera_national',
+      'india-post': 'src_indiapost_live',
+    };
+    const mapped = aliasMap[sourceId];
+    return mapped ? this.connectors.get(mapped) : undefined;
+  }
+
   async run(sourceId: string) {
-    const c = this.connectors.get(sourceId);
+    const c = this.get(sourceId);
     if (!c) throw new Error(`Unknown source ${sourceId}`);
-    console.log(`[scheduler] run ${sourceId} start`);
-    const obs = await runSyncJob(c);
-    console.log(`[scheduler] run ${sourceId} done`, obs);
-    return obs;
+    console.log(`[scheduler] run ${c.sourceId} start`);
+    try {
+      const obs = await runSyncJob(c);
+      console.log(`[scheduler] run ${c.sourceId} done`, obs);
+      return obs;
+    } catch (err: any) {
+      console.error(`[scheduler] run ${c.sourceId} error:`, err?.message || err);
+      throw err;
+    }
   }
 
   async runAll() {
     const results = [];
     for (const id of this.connectors.keys()) {
-      results.push(await this.run(id));
+      try {
+        results.push(await this.run(id));
+      } catch (err) {
+        console.warn(`[scheduler] runAll warning for ${id}:`, (err as any)?.message);
+      }
     }
     return results;
   }

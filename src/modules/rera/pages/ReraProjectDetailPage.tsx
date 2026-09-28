@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { getReraProjectById } from '../services/reraService';
+import { api } from '../../../core/services/api';
 import type { ReraProject } from '../types/reraIntelligence';
 import { 
   ArrowLeft, 
@@ -34,7 +35,16 @@ export function ReraProjectDetailPage({ initialTab }: ReraProjectDetailPageProps
 
   useEffect(() => {
     if (id) {
-      setProject(getReraProjectById(id));
+      const p = getReraProjectById(id);
+      if (p) {
+        setProject(p);
+      } else {
+        api.getReraProject(id).then((res: any) => {
+          if (res) {
+            setProject(getReraProjectById(id));
+          }
+        }).catch(() => {});
+      }
     }
   }, [id]);
 
