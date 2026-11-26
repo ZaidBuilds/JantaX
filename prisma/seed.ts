@@ -9,12 +9,10 @@ const prisma = new PrismaClient();
  *    Every sample row has `isSample: true` (Rule 40 — no fabricated data
  *    presented as real). Names are deliberately fictional; no real company,
  *    officer or project is attached to invented figures.
- * Sample data is skipped when NODE_ENV=production unless SEED_SAMPLE_DATA=true,
- * and always skipped when SEED_SAMPLE_DATA=false.
+ * Sample data is skipped unless SEED_SAMPLE_DATA=true is set explicitly.
  */
-const SEED_SAMPLE =
-  process.env.SEED_SAMPLE_DATA === 'true' ||
-  (process.env.SEED_SAMPLE_DATA !== 'false' && process.env.NODE_ENV !== 'production');
+// Real-data-only policy: sample rows are OFF everywhere unless explicitly "true".
+const SEED_SAMPLE = process.env.SEED_SAMPLE_DATA === 'true';
 
 async function main() {
   console.log('🌱 JantaX seed start');

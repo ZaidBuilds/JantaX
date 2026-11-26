@@ -9,46 +9,11 @@ export function createCpcbLiveConnector(): SourceConnector {
     schedule: 'daily',
 
     async fetch(): Promise<FetchResult> {
-      const samplePayload = [
-        {
-          station: 'Anand Vihar, New Delhi - DPCC',
-          city: 'Delhi',
-          state: 'Delhi',
-          pollutant_id: 'PM2.5',
-          avg_value: '284',
-          min_value: '142',
-          max_value: '412',
-          last_update: new Date().toISOString(),
-          latitude: '28.6469',
-          longitude: '77.3160',
-        },
-        {
-          station: 'Civil Lines, Meerut - UPPCB',
-          city: 'Meerut',
-          state: 'Uttar Pradesh',
-          pollutant_id: 'PM2.5',
-          avg_value: '192',
-          min_value: '95',
-          max_value: '260',
-          last_update: new Date().toISOString(),
-          latitude: '28.9845',
-          longitude: '77.7064',
-        },
-        {
-          station: 'BTM Layout, Bengaluru - KSPCB',
-          city: 'Bengaluru',
-          state: 'Karnataka',
-          pollutant_id: 'PM2.5',
-          avg_value: '88',
-          min_value: '42',
-          max_value: '115',
-          last_update: new Date().toISOString(),
-          latitude: '12.9166',
-          longitude: '77.6101',
-        },
-      ];
+      // Live fetch from CPCB OGD API with automatic timeout & resilient baseline
+      const { fetchAqiRaw } = await import('../../connectors/cpcbAqi');
+      const livePayload = await fetchAqiRaw(100);
 
-      const jsonStr = JSON.stringify(samplePayload);
+      const jsonStr = JSON.stringify(livePayload);
       const buffer = Buffer.from(jsonStr, 'utf-8');
       const hash = crypto.createHash('sha256').update(buffer).digest('hex');
 

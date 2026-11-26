@@ -11,6 +11,8 @@
     "server:build": "tsc -p server/tsconfig.json",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:connectors": "tsx server/src/scripts/testConnectors.ts",
+    "data:find": "tsx server/src/scripts/findDatasets.ts",
     "test:e2e": "playwright test",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",

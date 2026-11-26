@@ -123,14 +123,16 @@ router.get('/pincode/:code', async (req: Request, res: Response) => {
       grievances: 0,
       citizenReports: 0,
     },
+    // Real per-domain data and dates live at /api/live/:pin.
     lastUpdated: {
-      schools: '2026-02-15T00:00:00.000Z',
-      infraProjects: '2026-02-15T00:00:00.000Z',
-      reraProjects: '2026-02-15T00:00:00.000Z',
-      hospitals: '2026-02-15T00:00:00.000Z',
-      pdsShops: '2026-02-15T00:00:00.000Z',
-      grievances: '2026-02-15T00:00:00.000Z',
+      schools: null,
+      infraProjects: null,
+      reraProjects: null,
+      hospitals: null,
+      pdsShops: null,
+      grievances: null,
     },
+    liveDataUrl: `/api/live/${fallback.code}`,
     dataSource: fallback.dataSource,
     retrievedAt: new Date().toISOString(),
   });

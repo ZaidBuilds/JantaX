@@ -4,6 +4,7 @@
 
 import { prisma } from '../prisma';
 import { localStore } from './localStore';
+import { resolvePin } from '../live/pin';
 
 let isDbConnected: boolean | null = null;
 let lastDbCheckTime = 0;
@@ -34,45 +35,30 @@ export const dal = {
    * Resolves PIN code administrative metadata and verified counts.
    */
   async getPincode(code: string) {
-    const raw = localStore.getPincode(code);
-    const counts = localStore.getCountsForPin(code);
+    // Live, official lookup for any PIN. No default district: unknown → null.
+    const p = await resolvePin(code).catch(() => null);
+    if (!p) return null;
 
-    if (!raw) {
-      return {
-        code,
-        state: 'Uttar Pradesh',
-        stateCode: 'UP',
-        district: 'Meerut',
-        region: 'North',
-        areaType: 'Urban Block',
-        lat: 28.9845,
-        lng: 77.7064,
-        postOffice: 'Head Post Office',
-        block: 'Sadar Block',
-        tehsil: 'Sadar Tehsil',
-        counts,
-        dataSource: 'India Post & Local Government Directory (GODL-India)',
-      };
-    }
+    const counts = localStore.getCountsForPin(code);
+    const hasVillages = p.villages.length > 0;
 
     return {
-      code,
-      state: raw.state,
-
-      stateCode: raw.stateCode,
-      district: raw.district,
-      region: raw.region,
-      areaType: raw.areaType,
-      lat: raw.lat,
-      lng: raw.lng,
-      postOffice: raw.postOffice,
-      block: raw.block,
-      tehsil: raw.tehsil,
-      parliamentaryConstituency: raw.parliamentaryConstituency,
-      assemblyConstituency: raw.assemblyConstituency,
+      code: p.pin,
+      state: p.state,
+      stateCode: null,
+      district: p.district,
+      region: null,
+      areaType: hasVillages ? 'Rural / mixed (LGD villages mapped)' : 'Urban (no LGD villages mapped)',
+      lat: p.lat,
+      lng: p.lng,
+      postOffice: p.postOffices.find((o) => o.type === 'HO')?.name ?? p.postOffices[0]?.name ?? null,
+      block: p.subdistricts[0] ?? null,
+      tehsil: p.subdistricts[0] ?? null,
+      parliamentaryConstituency: null,
+      assemblyConstituency: null,
       counts,
-      dataSource: 'Department of Posts & MoPR LGD (GODL-India)',
-      lastVerified: '2026-02-15',
+      dataSource: p.sources.map((s) => s.name).join(' + '),
+      lastVerified: p.sources[0]?.updatedDate ?? null,
     };
   },
 
@@ -83,10 +69,7 @@ export const dal = {
     const req = requestedModule ? requestedModule.toLowerCase() : '';
     const wantAll = !req || req === 'all';
 
-    const p = (await this.getPincode(code)) || {
-      state: 'Uttar Pradesh',
-      district: 'Meerut',
-    };
+    const p = (await this.getPincode(code)) || { state: null, district: null, region: null };
 
     const records: Record<string, any[]> = {};
 

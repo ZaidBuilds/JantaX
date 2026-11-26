@@ -15,7 +15,7 @@ export interface CpgramsSummaryPayload {
   fetchedAt: string;
 }
 
-export async function fetchCpgramsMonthlySummary(): Promise<CpgramsSummaryPayload> {
+export async function fetchCpgramsMonthlySummary(targetMonth?: string): Promise<CpgramsSummaryPayload> {
   const topMinistries = REAL_GRIEVANCES;
   const totalGrievancesNational = topMinistries.reduce((acc, m) => acc + m.totalGrievances, 0);
   const totalResolvedNational = topMinistries.reduce((acc, m) => acc + m.resolvedCount, 0);
@@ -23,8 +23,10 @@ export async function fetchCpgramsMonthlySummary(): Promise<CpgramsSummaryPayloa
     topMinistries.reduce((acc, m) => acc + m.avgDisposalDays, 0) / (topMinistries.length || 1)
   );
 
+  const reportMonth = targetMonth || 'January 2026';
+
   return {
-    reportMonth: 'January 2026',
+    reportMonth,
     totalGrievancesNational,
     totalResolvedNational,
     avgDisposalDaysNational,

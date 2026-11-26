@@ -24,6 +24,7 @@ import modulesRoutes from './routes/modules';
 import authRoutes from './routes/auth';
 import representativesRoutes from './routes/representatives';
 import schemesRoutes from './routes/schemes';
+import liveRoutes from './routes/live';
 
 const app = express();
 app.set('trust proxy', Number(process.env.TRUST_PROXY) || 0);
@@ -114,6 +115,7 @@ app.use('/api/v1', v1Routes);
 app.use('/api/modules', modulesRoutes);
 app.use('/api/representatives', representativesRoutes);
 app.use('/api/schemes', schemesRoutes);
+app.use('/api/live', liveRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ error: 'Not found' });

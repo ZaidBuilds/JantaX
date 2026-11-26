@@ -116,275 +116,49 @@ async function fetchIndiaPostOfficial(pin: string): Promise<{ state: string; dis
 }
 
 import { checkDbHealth } from '../db/dal';
-import { localStore } from '../db/localStore';
+import { resolvePin } from '../live/pin';
 
 export async function ensurePincodeExists(code: string) {
   const cleanCode = code.replace(/\D/g, '');
   if (cleanCode.length !== 6) return null;
 
-  const isDbOnline = await checkDbHealth();
-  if (!isDbOnline) {
-    const raw = localStore.getPincode(cleanCode);
-    const prefix2 = cleanCode.substring(0, 2);
-    const circle = CIRCLE_MAP[prefix2] || { state: 'India', district: `District ${cleanCode.substring(0, 3)}` };
-    const state = raw?.state || circle.state;
-    const district = raw?.district || circle.district;
-    return {
-      id: `mem-${cleanCode}`,
-      code: cleanCode,
-      state,
-      district,
-      region: regionForState(state),
-      areaType: raw?.areaType || 'Urban/Semi-Urban Circle',
-      lat: raw?.lat || 20.5937,
-      lng: raw?.lng || 78.9629,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    } as any;
-  }
+  // Official live lookup only. No guessed districts, no invented coordinates,
+  // and no auto-generated schools/projects written to the database.
+  const p = await resolvePin(cleanCode).catch(() => null);
+  if (!p) return null;
+
+  const areaType = p.villages.length > 0 ? 'Rural / mixed' : 'Urban';
+  const memory = {
+    id: `live-${cleanCode}`,
+    code: cleanCode,
+    state: p.state,
+    district: p.district,
+    region: regionForState(p.state),
+    areaType,
+    lat: p.lat,
+    lng: p.lng,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  } as any;
+
+  if (!(await checkDbHealth())) return memory;
 
   try {
-    let pincode = await prisma.pincode.findUnique({ where: { code: cleanCode } });
-    if (pincode) return pincode;
-
-    // 1. Fetch official India Post registry for 100% authentic real-world data (no hallucination/guessing)
-    const official = await fetchIndiaPostOfficial(cleanCode);
-    const prefix2 = cleanCode.substring(0, 2);
-    const circleFallback = CIRCLE_MAP[prefix2] || { state: 'India', district: `District ${cleanCode.substring(0, 3)}` };
-
-    const state = official?.state || circleFallback.state;
-    const district = official?.district || circleFallback.district;
-    const areaType = official?.areaType || 'Urban/Semi-Urban';
-    const region = regionForState(state);
-
-    pincode = await prisma.pincode.create({
+    const existing = await prisma.pincode.findUnique({ where: { code: cleanCode } });
+    if (existing) return existing;
+    return await prisma.pincode.create({
       data: {
         code: cleanCode,
-        state,
-        district,
-        region,
+        state: p.state,
+        district: p.district,
+        region: regionForState(p.state),
         areaType,
-        lat: 20.5937 + (parseInt(cleanCode[0]) * 1.5),
-        lng: 78.9629 + (parseInt(cleanCode[1]) * 1.2),
+        lat: p.lat,
+        lng: p.lng,
       },
     });
-
-
-  const d = district;
-  const s = state;
-
-  // 1. Schools (UDISE+)
-  await prisma.school.createMany({
-    data: [
-      {
-        udiseCode: `${cleanCode}001`,
-        nameEnglish: `Kendriya Vidyalaya No. 1, ${d}`,
-        nameHindi: `केन्द्रीय विद्यालय क्रमांक 1, ${d}`,
-        level: 'Higher Secondary (1-12)',
-        managementType: 'Central Govt / KVS',
-        studentsEnrolled: 1140,
-        teachersWorking: 46,
-        teachersSanctioned: 48,
-        groundTruthScore: 92,
-        hasToilet: true,
-        hasElectricity: true,
-        hasDrinkingWater: true,
-        pincodeCode: cleanCode,
-      },
-      {
-        udiseCode: `${cleanCode}002`,
-        nameEnglish: `PM SHRI Government Boys Senior Secondary School, ${d}`,
-        nameHindi: `पीएम श्री राजकीय बालक उच्च माध्यमिक विद्यालय, ${d}`,
-        level: 'Senior Secondary (6-12)',
-        managementType: 'State Department of Education',
-        studentsEnrolled: 820,
-        teachersWorking: 31,
-        teachersSanctioned: 35,
-        groundTruthScore: 84,
-        hasToilet: true,
-        hasElectricity: true,
-        hasDrinkingWater: true,
-        pincodeCode: cleanCode,
-      },
-      {
-        udiseCode: `${cleanCode}003`,
-        nameEnglish: `Jawahar Navodaya Vidyalaya, ${d}`,
-        nameHindi: `जवाहर नवोदय विद्यालय, ${d}`,
-        level: 'Residential Secondary (6-12)',
-        managementType: 'Navodaya Vidyalaya Samiti',
-        studentsEnrolled: 540,
-        teachersWorking: 26,
-        teachersSanctioned: 28,
-        groundTruthScore: 88,
-        hasToilet: true,
-        hasElectricity: true,
-        hasDrinkingWater: true,
-        pincodeCode: cleanCode,
-      },
-    ],
-  });
-
-  // 2. Infra Projects (PMGSY / PWD)
-  await prisma.infraProject.createMany({
-    data: [
-      {
-        titleEnglish: `PMGSY All-Weather Road Connectivity Package - ${d}`,
-        titleHindi: `प्रधानमंत्री ग्राम सड़क योजना - ${d}`,
-        department: 'Ministry of Rural Development / State PWD',
-        budget: 125000000,
-        startDate: new Date('2023-04-01'),
-        expectedCompletion: new Date('2025-06-30'),
-        status: ProjectStatus.DELAYED,
-        claimCompletionPct: 100,
-        groundTruthScore: 68,
-        responsibleOfficer: `Superintending Engineer, ${d}`,
-        implementingAgency: 'State Public Works Department',
-        pincodeCode: cleanCode,
-      },
-      {
-        titleEnglish: `${d} Stormwater Drainage & Road Widening Scheme`,
-        titleHindi: `${d} नाला एवं जल निकासी सुधार परियोजना`,
-        department: 'Urban Development & Municipal Corporation',
-        budget: 64000000,
-        startDate: new Date('2024-01-15'),
-        expectedCompletion: new Date('2026-03-31'),
-        status: ProjectStatus.ONGOING,
-        claimCompletionPct: 70,
-        groundTruthScore: 74,
-        responsibleOfficer: `Executive Engineer, ${d}`,
-        implementingAgency: 'Municipal Corporation',
-        pincodeCode: cleanCode,
-      },
-    ],
-  });
-
-  // 3. RERA Projects
-  await prisma.reraProject.createMany({
-    data: [
-      {
-        name: `${d} Eco Heights Residency`,
-        reraNumber: `${s.substring(0, 2).toUpperCase()}RERA${cleanCode}01`,
-        promoter: `${d} Green Infra Developers LLP`,
-        configuration: '2BHK, 3BHK Residential Towers (420 Units)',
-        plannedPossession: new Date('2025-06-30'),
-        actualPossession: null,
-        status: ProjectStatus.DELAYED,
-        delayMonths: 14,
-        complaints: 12,
-        refundsPending: 2,
-        pincodeCode: cleanCode,
-      },
-      {
-        name: `Sunrise Smart City Enclave, ${d}`,
-        reraNumber: `${s.substring(0, 2).toUpperCase()}RERA${cleanCode}02`,
-        promoter: `Balaji Realcon Developers`,
-        configuration: '3BHK & 4BHK Premium Enclave (280 Units)',
-        plannedPossession: new Date('2026-12-31'),
-        actualPossession: null,
-        status: ProjectStatus.ONGOING,
-        delayMonths: 4,
-        complaints: 3,
-        refundsPending: 0,
-        pincodeCode: cleanCode,
-      },
-    ],
-  });
-
-  // 4. Hospitals (HMIS / NHM)
-  await prisma.hospital.createMany({
-    data: [
-      {
-        name: `District Civil Hospital, ${d}`,
-        type: 'DISTRICT_HOSPITAL',
-        isOpen: true,
-        doctorPresent: true,
-        bedsTotal: 200,
-        bedsOccupied: 168,
-        medicinesAvailable: true,
-        pincodeCode: cleanCode,
-      },
-      {
-        name: `Community Health Centre (CHC) ${d} Central`,
-        type: 'CHC',
-        isOpen: true,
-        doctorPresent: true,
-        bedsTotal: 30,
-        bedsOccupied: 22,
-        medicinesAvailable: true,
-        pincodeCode: cleanCode,
-      },
-    ],
-  });
-
-  // 5. PDS Ration Shops (NFSA)
-  await prisma.pdsShop.createMany({
-    data: [
-      {
-        shopName: `Fair Price Shop 108 - ${d} Central`,
-        dealerName: `Shri Ram Public Distribution Centre, ${d}`,
-        isOpen: true,
-        quotaDistributedPct: 94,
-        qualityOk: true,
-        beneficiaries: 1420,
-        pincodeCode: cleanCode,
-      },
-      {
-        shopName: `Fair Price Ration Outlet 42 - ${d} North`,
-        dealerName: `Kisan Seva Sahkari Fair Price Shop, ${d}`,
-        isOpen: true,
-        quotaDistributedPct: 91,
-        qualityOk: true,
-        beneficiaries: 980,
-        pincodeCode: cleanCode,
-      },
-    ],
-  });
-
-  // 6. CPGRAMS Grievances
-  await prisma.cpgramGrievance.createMany({
-    data: [
-      {
-        ministry: 'Ministry of Jal Shakti',
-        state: s,
-        category: `Drinking Water Supply & Pipe Repair - ${d}`,
-        status: 'In Progress',
-        filedDate: new Date('2026-07-15'),
-        resolvedDate: null,
-        delayDays: 48,
-        pincodeCode: cleanCode,
-      },
-      {
-        ministry: 'Ministry of Road Transport and Highways',
-        state: s,
-        category: `Road Potholes & Culvert Reconstruction - ${d}`,
-        status: 'Pending',
-        filedDate: new Date('2026-08-02'),
-        resolvedDate: null,
-        delayDays: 32,
-        pincodeCode: cleanCode,
-      },
-    ],
-  });
-
-    return pincode;
-  } catch (err: any) {
-    const raw = localStore.getPincode(cleanCode);
-    const prefix2 = cleanCode.substring(0, 2);
-    const circle = CIRCLE_MAP[prefix2] || { state: 'India', district: `District ${cleanCode.substring(0, 3)}` };
-    const state = raw?.state || circle.state;
-    const district = raw?.district || circle.district;
-    return {
-      id: `fallback-${cleanCode}`,
-      code: cleanCode,
-      state,
-      district,
-      region: regionForState(state),
-      areaType: raw?.areaType || 'Urban/Semi-Urban Circle',
-      lat: raw?.lat || 20.5937,
-      lng: raw?.lng || 78.9629,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    } as any;
+  } catch {
+    return memory;
   }
 }
 

@@ -8,54 +8,29 @@ export function createCpgramsFeedConnector(): SourceConnector {
     schedule: 'monthly',
 
     async fetch(): Promise<FetchResult> {
-      const feedData = [
-        {
-          rank: 1,
-          name: 'Department of Financial Services (Banking Division)',
-          nameHi: 'वित्तीय सेवाएं विभाग (बैंकिंग प्रभाग)',
-          totalGrievances: 18450,
-          resolvedCount: 16200,
-          pendingCount: 2250,
-          avgDisposalDays: 19,
-          backlogOver30Days: 240,
-          worstCategoryEn: 'Unauthorized digital debit & pension delay',
-          worstCategoryHi: 'अनधिकृत डिजिटल कटौती एवं पेंशन विलंब',
-          reportMonth: '2024-08',
-        },
-        {
-          rank: 2,
-          name: 'Ministry of Railways (Railway Board)',
-          nameHi: 'रेल मंत्रालय (रेलवे बोर्ड)',
-          totalGrievances: 14200,
-          resolvedCount: 12800,
-          pendingCount: 1400,
-          avgDisposalDays: 14,
-          backlogOver30Days: 110,
-          worstCategoryEn: 'Coach cleanliness & unreserved coach crowding',
-          worstCategoryHi: 'कोच स्वच्छता एवं सामान्य डिब्बों में अत्यधिक भीड़',
-          reportMonth: '2024-08',
-        },
-        {
-          rank: 3,
-          name: 'Ministry of Road Transport and Highways (NHAI)',
-          nameHi: 'सड़क परिवहन एवं राजमार्ग मंत्रालय (एनएचएआई)',
-          totalGrievances: 8900,
-          resolvedCount: 6100,
-          pendingCount: 2800,
-          avgDisposalDays: 42,
-          backlogOver30Days: 1150,
-          worstCategoryEn: 'Toll plaza FASTag double deduction & highway surface crater',
-          worstCategoryHi: 'टोल प्लाजा फास्टैग दोहरी कटौती एवं हाईवे सतह गड्ढे',
-          reportMonth: '2024-08',
-        },
-      ];
+      const { fetchCpgramsMonthlySummary } = await import('../../connectors/cpgramsMonthlyConnector');
+      const summary = await fetchCpgramsMonthlySummary();
+
+      const feedData = summary.topMinistries.map((m: any, idx) => ({
+        rank: idx + 1,
+        name: m.ministryName || m.name,
+        nameHi: m.ministryNameHi || m.nameHi,
+        totalGrievances: m.totalGrievances,
+        resolvedCount: m.resolvedCount,
+        pendingCount: m.pendingCount,
+        avgDisposalDays: m.avgDisposalDays,
+        backlogOver30Days: m.backlogOver30Days,
+        worstCategoryEn: m.worstCategoryEn,
+        worstCategoryHi: m.worstCategoryHi,
+        reportMonth: summary.reportMonth,
+      }));
 
       const jsonStr = JSON.stringify(feedData);
       const buffer = Buffer.from(jsonStr, 'utf-8');
       const hash = crypto.createHash('sha256').update(buffer).digest('hex');
 
       return {
-        url: 'https://darpg.gov.in/en/cpgrams-reports/monthly-summary.json',
+        url: 'https://darpg.gov.in/cpgrams/monthly-performance-bulletins',
         contentType: 'application/json',
         size: buffer.length,
         hash,

@@ -77,20 +77,38 @@ export function normaliseAqiRecords(raw: Array<Record<string, unknown>>): Normal
     .filter((x): x is NormalisedAqiReading => x !== null);
 }
 
-/** Live fetch of raw CPCB records from the OGD API. Throws on transport/key errors. */
-export async function fetchAqiRaw(limit = 500): Promise<Array<Record<string, unknown>>> {
+/** Live fetch of raw CPCB records from the OGD API with timeout & resilience. */
+export async function fetchAqiRaw(limit = 500, cityFilter?: string): Promise<Array<Record<string, unknown>>> {
   const key = process.env.DATA_GOV_IN_KEY || SAMPLE_KEY;
-  const endpoint = `https://api.data.gov.in/resource/${CPCB_RESOURCE_ID}?api-key=${key}&format=json&limit=${limit}`;
-  const res = await fetch(endpoint);
-  if (!res.ok) throw new Error(`CPCB AQI fetch failed: HTTP ${res.status}`);
-  const body = (await res.json()) as { records?: unknown; error?: string };
-  if (body.error) throw new Error(`CPCB AQI API error: ${body.error}`);
-  if (!Array.isArray(body.records)) throw new Error('CPCB AQI: unexpected payload (no records array)');
-  return body.records as Array<Record<string, unknown>>;
+  let endpoint = `https://api.data.gov.in/resource/${CPCB_RESOURCE_ID}?api-key=${key}&format=json&limit=${limit}`;
+  if (cityFilter) {
+    endpoint += `&filters[city]=${encodeURIComponent(cityFilter)}`;
+  }
+
+  try {
+    const res = await fetch(endpoint, {
+      signal: AbortSignal.timeout(4000), // 4s timeout against slow NIC gateways
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      },
+    });
+
+    if (res.ok) {
+      const body = (await res.json()) as { records?: unknown; error?: string };
+      if (Array.isArray(body.records) && body.records.length > 0) {
+        return body.records as Array<Record<string, unknown>>;
+      }
+    }
+  } catch {
+    // Network or NIC gateway timeout — return nothing rather than invented readings.
+  }
+
+  return [];
 }
 
 /** Fetch + normalise in one call. */
-export async function getAqiReadings(limit = 500): Promise<NormalisedAqiReading[]> {
-  const raw = await fetchAqiRaw(limit);
+export async function getAqiReadings(limit = 500, cityFilter?: string): Promise<NormalisedAqiReading[]> {
+  const raw = await fetchAqiRaw(limit, cityFilter);
   return normaliseAqiRecords(raw);
 }
